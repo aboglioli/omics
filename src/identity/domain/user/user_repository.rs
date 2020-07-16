@@ -1,9 +1,9 @@
 use crate::common::error::Error;
-use crate::identity::domain::user::{Email, User, UserID, Username};
+use crate::identity::domain::user::{User, UserID};
 
 pub trait UserRepository {
+    fn next_id(&self) -> Result<UserID, Error>;
     fn find_by_id(&self, id: UserID) -> Result<User, Error>;
-    fn find_by_username(&self, username: Username) -> Result<User, Error>;
-    fn find_by_email(&self, email: Email) -> Result<User, Error>;
+    fn find_by_username_or_email(&self, username_or_email: &str) -> Result<User, Error>;
     fn save(&self, user: &mut User) -> Result<(), Error>;
 }

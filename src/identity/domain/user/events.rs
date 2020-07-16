@@ -1,14 +1,19 @@
 use crate::common::event::Event;
-use crate::identity::domain::user::{Person, UserID};
+use crate::identity::domain::user::UserID;
 
 pub struct UserUpdated {
     pub id: UserID,
-    pub person: Person,
+    pub name: String,
+    pub lastname: String,
 }
 
 impl UserUpdated {
-    pub fn new(id: UserID, person: Person) -> UserUpdated {
-        UserUpdated { id, person }
+    pub fn new(id: UserID, name: &str, lastname: &str) -> UserUpdated {
+        UserUpdated {
+            id,
+            name: name.to_owned(),
+            lastname: lastname.to_owned(),
+        }
     }
 }
 
@@ -18,7 +23,32 @@ impl Event for UserUpdated {
     }
 
     fn payload(&self) -> Vec<u8> {
-        let res = self.id.clone() + self.person.name();
-        res.as_bytes().to_vec()
+        Vec::new()
+    }
+}
+
+pub struct UserRegistered {
+    pub id: UserID,
+    pub username: String,
+    pub email: String,
+}
+
+impl UserRegistered {
+    pub fn new(id: UserID, username: &str, email: &str) -> UserRegistered {
+        UserRegistered {
+            id,
+            username: username.to_owned(),
+            email: email.to_owned(),
+        }
+    }
+}
+
+impl Event for UserRegistered {
+    fn code(&self) -> &str {
+        "user-registered"
+    }
+
+    fn payload(&self) -> Vec<u8> {
+        Vec::new()
     }
 }
