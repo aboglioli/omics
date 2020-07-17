@@ -1,26 +1,31 @@
+use std::rc::Rc;
+
 use crate::common::error::Error;
 use crate::common::model::Entity;
 use crate::identity::domain::token::{Data, Token, TokenEncoder, TokenRepository, TokenService};
 use crate::identity::domain::user::{PasswordHasher, User, UserRepository};
 
-pub struct AuthenticationService<'a, UR, PH, TE, TR> {
-    user_repository: &'a UR,
-    password_hasher: &'a PH,
-    token_service: &'a TokenService<TE, TR>,
+pub struct AuthenticationService<TUserRepository, TPasswordHasher, TTokenEncoder, TTokenRepository>
+{
+    user_repository: Rc<TUserRepository>,
+    password_hasher: Rc<TPasswordHasher>,
+    token_service: Rc<TokenService<TTokenEncoder, TTokenRepository>>,
 }
 
-impl<'a, UR, PH, TE, TR> AuthenticationService<'a, UR, PH, TE, TR>
+impl<TUserRepository, TPasswordHasher, TTokenEncoder, TTokenRepository>
+    AuthenticationService<TUserRepository, TPasswordHasher, TTokenEncoder, TTokenRepository>
 where
-    UR: UserRepository,
-    PH: PasswordHasher,
-    TE: TokenEncoder,
-    TR: TokenRepository,
+    TUserRepository: UserRepository,
+    TPasswordHasher: PasswordHasher,
+    TTokenEncoder: TokenEncoder,
+    TTokenRepository: TokenRepository,
 {
-    pub fn new<'b>(
-        user_repository: &'b UR,
-        password_hasher: &'b PH,
-        token_service: &'b TokenService<TE, TR>,
-    ) -> AuthenticationService<'b, UR, PH, TE, TR> {
+    pub fn new(
+        user_repository: Rc<TUserRepository>,
+        password_hasher: Rc<TPasswordHasher>,
+        token_service: Rc<TokenService<TTokenEncoder, TTokenRepository>>,
+    ) -> AuthenticationService<TUserRepository, TPasswordHasher, TTokenEncoder, TTokenRepository>
+    {
         AuthenticationService {
             user_repository,
             password_hasher,

@@ -1,17 +1,20 @@
 use crate::common::error::Error;
 use crate::identity::domain::token::{Data, Token, TokenEncoder, TokenID, TokenRepository};
 
-pub struct TokenService<TE, TR> {
-    token_encoder: TE,
-    token_repository: TR,
+pub struct TokenService<TTokenEncoder, TTokenRepository> {
+    token_encoder: TTokenEncoder,
+    token_repository: TTokenRepository,
 }
 
-impl<TE, TR> TokenService<TE, TR>
+impl<TTokenEncoder, TTokenRepository> TokenService<TTokenEncoder, TTokenRepository>
 where
-    TE: TokenEncoder,
-    TR: TokenRepository,
+    TTokenEncoder: TokenEncoder,
+    TTokenRepository: TokenRepository,
 {
-    pub fn new(token_encoder: TE, token_repository: TR) -> TokenService<TE, TR> {
+    pub fn new(
+        token_encoder: TTokenEncoder,
+        token_repository: TTokenRepository,
+    ) -> TokenService<TTokenEncoder, TTokenRepository> {
         TokenService {
             token_encoder,
             token_repository,
@@ -38,5 +41,9 @@ where
         let token_id = self.token_encoder.decode(token)?;
         self.token_repository.delete(&token_id)?;
         Ok(())
+    }
+
+    pub fn token_repository(&self) -> &TTokenRepository {
+        &self.token_repository
     }
 }

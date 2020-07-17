@@ -1,20 +1,22 @@
+use std::rc::Rc;
+
 use crate::common::error::Error;
 use crate::identity::domain::user::{PasswordHasher, UserID, UserRepository};
 
-pub struct AuthorizationService<'a, UR, PH> {
-    user_repository: &'a UR,
-    password_hasher: &'a PH,
+pub struct AuthorizationService<TUserRepository, TPasswordHasher> {
+    user_repository: Rc<TUserRepository>,
+    password_hasher: Rc<TPasswordHasher>,
 }
 
-impl<'a, UR, PH> AuthorizationService<'_, UR, PH>
+impl<TUserRepository, TPasswordHasher> AuthorizationService<TUserRepository, TPasswordHasher>
 where
-    UR: UserRepository,
-    PH: PasswordHasher,
+    TUserRepository: UserRepository,
+    TPasswordHasher: PasswordHasher,
 {
-    pub fn new<'b>(
-        user_repository: &'b UR,
-        password_hasher: &'b PH,
-    ) -> AuthorizationService<'b, UR, PH> {
+    pub fn new(
+        user_repository: Rc<TUserRepository>,
+        password_hasher: Rc<TPasswordHasher>,
+    ) -> AuthorizationService<TUserRepository, TPasswordHasher> {
         AuthorizationService {
             user_repository,
             password_hasher,

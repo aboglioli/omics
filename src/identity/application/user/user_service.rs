@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::common::error::Error;
-use crate::common::event::{Event, EventPublisher};
+use crate::common::event::EventPublisher;
 use crate::common::model::Entity;
 use crate::identity::application::user::{
     ChangePasswordCommand, LoginCommand, RegisterCommand, UpdateCommand,
@@ -13,30 +13,68 @@ use crate::identity::domain::user::{
     UserRepository, UserUpdated,
 };
 
-pub struct UserService<'a, UR, EP, PH, TE, TR, RR> {
-    user_repository: &'a UR,
-    event_publisher: &'a EP,
-    authentication_service: &'a AuthenticationService<'a, UR, PH, TE, TR>,
-    authorization_service: &'a AuthorizationService<'a, UR, PH>,
-    role_repository: &'a RR,
+pub struct UserService<
+    TUserRepository,
+    TEventPublisher,
+    TPasswordHasher,
+    TTokenEncoder,
+    TTokenRepository,
+    TRoleRepository,
+> {
+    user_repository: Rc<TUserRepository>,
+    event_publisher: Rc<TEventPublisher>,
+    authentication_service: Rc<
+        AuthenticationService<TUserRepository, TPasswordHasher, TTokenEncoder, TTokenRepository>,
+    >,
+    authorization_service: Rc<AuthorizationService<TUserRepository, TPasswordHasher>>,
+    role_repository: Rc<TRoleRepository>,
 }
 
-impl<'a, UR, EP, PH, TE, TR, RR> UserService<'_, UR, EP, PH, TE, TR, RR>
+impl<
+        TUserRepository,
+        TEventPublisher,
+        TPasswordHasher,
+        TTokenEncoder,
+        TTokenRepository,
+        TRoleRepository,
+    >
+    UserService<
+        TUserRepository,
+        TEventPublisher,
+        TPasswordHasher,
+        TTokenEncoder,
+        TTokenRepository,
+        TRoleRepository,
+    >
 where
-    UR: UserRepository,
-    EP: EventPublisher,
-    PH: PasswordHasher,
-    TE: TokenEncoder,
-    TR: TokenRepository,
-    RR: RoleRepository,
+    TUserRepository: UserRepository,
+    TEventPublisher: EventPublisher,
+    TPasswordHasher: PasswordHasher,
+    TTokenEncoder: TokenEncoder,
+    TTokenRepository: TokenRepository,
+    TRoleRepository: RoleRepository,
 {
-    pub fn new<'b>(
-        user_repository: &'b UR,
-        event_publisher: &'b EP,
-        authentication_service: &'b AuthenticationService<'_, UR, PH, TE, TR>,
-        authorization_service: &'b AuthorizationService<'_, UR, PH>,
-        role_repository: &'b RR,
-    ) -> UserService<'b, UR, EP, PH, TE, TR, RR> {
+    pub fn new(
+        user_repository: Rc<TUserRepository>,
+        event_publisher: Rc<TEventPublisher>,
+        authentication_service: Rc<
+            AuthenticationService<
+                TUserRepository,
+                TPasswordHasher,
+                TTokenEncoder,
+                TTokenRepository,
+            >,
+        >,
+        authorization_service: Rc<AuthorizationService<TUserRepository, TPasswordHasher>>,
+        role_repository: Rc<TRoleRepository>,
+    ) -> UserService<
+        TUserRepository,
+        TEventPublisher,
+        TPasswordHasher,
+        TTokenEncoder,
+        TTokenRepository,
+        TRoleRepository,
+    > {
         UserService {
             user_repository,
             event_publisher,
