@@ -1,7 +1,7 @@
 use std::error;
 use std::fmt;
 
-use super::*;
+use super::error::*;
 
 #[test]
 fn basic() {

@@ -1,4 +1,4 @@
-use super::*;
+use super::model::*;
 
 struct FakeEntityWithIntegerID {
     id: ID<i32>,

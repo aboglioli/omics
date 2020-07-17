@@ -8,3 +8,6 @@ pub trait Event {
 pub trait EventPublisher {
     fn publish<E: Event + 'static>(&self, topic: &str, event: E) -> Result<(), Error>;
 }
+
+#[cfg(test)]
+mod event_test;

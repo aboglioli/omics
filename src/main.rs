@@ -22,5 +22,6 @@ fn main() -> Result<(), Error> {
             ..Default::default()
         }
     );
+
     Ok(())
 }
