@@ -1,10 +1,10 @@
-pub mod authentication_service;
-pub mod authorization_service;
-pub mod events;
-pub mod password_hasher;
-pub mod user;
-pub mod user_repository;
-pub mod value_objects;
+mod authentication_service;
+mod authorization_service;
+mod events;
+mod password_hasher;
+mod user;
+mod user_repository;
+mod value_objects;
 
 pub use authentication_service::*;
 pub use authorization_service::*;

@@ -1,5 +1,5 @@
-pub mod name;
-pub mod publication;
+mod name;
+mod publication;
 
 pub use name::*;
 pub use publication::*;

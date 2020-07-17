@@ -1,6 +1,6 @@
-pub mod role;
-pub mod role_repository;
-pub mod value_objects;
+mod role;
+mod role_repository;
+mod value_objects;
 
 pub use role::*;
 pub use role_repository::*;

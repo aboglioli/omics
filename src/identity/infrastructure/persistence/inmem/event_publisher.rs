@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 
 use crate::common::error::Error;
-use crate::common::event::event::{Event, EventPublisher};
+use crate::common::event::{Event, EventPublisher};
 
 pub struct InMemEventPublisher {
     events: RefCell<Vec<Box<dyn Event>>>,

@@ -10,33 +10,6 @@ use crate::identity::domain::{
 };
 use crate::identity::infrastructure::{mocks::*, persistence::inmem::*};
 
-// impl TestBed<'_> {
-//     fn new() -> TestBed<'static> {
-//         let user_repo = InMemUserRepository::new();
-//         let event_pub = InMemEventPublisher::new();
-//         let password_hasher = FakePasswordHasher::new();
-//         let token_encoder = FakeTokenEncoder::new();
-//         let token_repository = InMemTokenRepository::new();
-//         let token_serv = TokenService::new(token_encoder, token_repository);
-//         let authentication_serv =
-//             AuthenticationService::new(&user_repo, &password_hasher, &token_serv);
-//         let authorization_serv = AuthorizationService::new(&user_repo, &password_hasher);
-//         let role_repo = InMemRoleRepository::new();
-//
-//         TestBed {
-//             user_repo,
-//             event_pub,
-//             password_hasher,
-//             token_encoder,
-//             token_repository,
-//             token_serv,
-//             authentication_serv,
-//             authorization_serv,
-//             role_repo,
-//         }
-//     }
-// }
-
 struct Container {
     user_repo: Rc<InMemUserRepository>,
     event_pub: Rc<InMemEventPublisher>,
@@ -116,11 +89,6 @@ fn get_by_id() -> Result<(), Error> {
         &Role::new("user".to_owned(), "User")?,
     )?;
     c.user_repo.save(&mut user)?;
-
-    for _ in 0..1_000_000 {
-        let c = Container::new();
-        c.user_repo.save(&mut user)?;
-    }
 
     let found_user = c.user_serv.get_by_id(user_id)?;
     assert_eq!(found_user.id(), user.id());
