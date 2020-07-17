@@ -28,7 +28,8 @@ impl UserRepository for InMemUserRepository {
     fn find_by_id(&self, id: UserID) -> Result<User, Error> {
         let users = self.users.borrow();
         users
-            .get(&id).cloned()
+            .get(&id)
+            .cloned()
             .ok_or(Error::internal().set_code("not_found").clone())
     }
 

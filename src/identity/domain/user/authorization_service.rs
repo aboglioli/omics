@@ -25,10 +25,18 @@ where
 
     pub fn available(&self, username: &str, email: &str) -> Result<bool, Error> {
         let mut err = Error::application();
-        if self.user_repository.find_by_username_or_email(username).is_ok() {
+        if self
+            .user_repository
+            .find_by_username_or_email(username)
+            .is_ok()
+        {
             err.add_context("username", "not_available");
         }
-        if self.user_repository.find_by_username_or_email(email).is_ok() {
+        if self
+            .user_repository
+            .find_by_username_or_email(email)
+            .is_ok()
+        {
             err.add_context("email", "not_available");
         }
 

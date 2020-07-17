@@ -81,7 +81,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "omics-rs"
+name = "omics"
 version = "0.1.0"
 dependencies = [
  "chrono",
