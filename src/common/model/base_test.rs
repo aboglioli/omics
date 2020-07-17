@@ -44,8 +44,8 @@ fn equals() {
     let e3 = FakeEntityWithStringID {
         uuid: ID::new("U002".to_string()),
     };
-    assert!(e1.equals(&e2));
-    assert_eq!(e1.equals(&e3), false);
-    assert!(e1.equals_id("U001".to_string()));
-    assert!(!e1.equals_id("U002".to_string()));
+    assert!(e1.eq(&e2));
+    assert_eq!(e1.eq(&e3), false);
+    assert!(e1.eq_id("U001".to_string()));
+    assert!(!e1.eq_id("U002".to_string()));
 }

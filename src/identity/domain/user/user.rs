@@ -6,7 +6,7 @@ use crate::identity::domain::user::{Email, Password, Person, Username};
 // User
 pub type UserID = String;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct User {
     id: ID<UserID>,
     username: Username,

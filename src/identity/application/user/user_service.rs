@@ -1,5 +1,7 @@
+use std::rc::Rc;
+
 use crate::common::error::Error;
-use crate::common::event::EventPublisher;
+use crate::common::event::{Event, EventPublisher};
 use crate::common::model::Entity;
 use crate::identity::application::user::{
     ChangePasswordCommand, LoginCommand, RegisterCommand, UpdateCommand,

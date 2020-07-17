@@ -1,4 +1,3 @@
-use crate::common::cache::Cache;
 use crate::common::error::Error;
 use crate::identity::domain::token::{Data, Token, TokenEncoder, TokenID, TokenRepository};
 
@@ -21,13 +20,13 @@ where
 
     pub fn create(&self, data: Data) -> Result<Token, Error> {
         let token_id = TokenID::new();
-        self.token_repository.set(&token_id, data)?;
         let token = self.token_encoder.encode(&token_id)?;
+        self.token_repository.set(token_id, data)?;
 
         Ok(token)
     }
 
-    pub fn validate(&self, token: Token) -> Result<&Data, Error> {
+    pub fn validate(&self, token: Token) -> Result<Data, Error> {
         let token_id = self.token_encoder.decode(token)?;
         if let Some(data) = self.token_repository.get(&token_id) {
             return Ok(data);

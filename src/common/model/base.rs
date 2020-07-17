@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use std::cmp::PartialEq;
 
 // ID
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ID<T> {
     id: T,
     created_at: DateTime<Utc>,
@@ -61,11 +61,11 @@ where
 {
     fn id(&self) -> &ID<I>;
 
-    fn equals(&self, other: &Self) -> bool {
+    fn eq(&self, other: &Self) -> bool {
         self.id() == other.id()
     }
 
-    fn equals_id(&self, id: I) -> bool {
+    fn eq_id(&self, id: I) -> bool {
         self.id() == &ID::new(id)
     }
 }

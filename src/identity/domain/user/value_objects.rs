@@ -1,6 +1,6 @@
 use crate::common::error::Error;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Username {
     username: String,
 }
@@ -29,7 +29,7 @@ impl Username {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Email {
     email: String,
 }
@@ -58,7 +58,7 @@ impl Email {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Password {
     password: String,
 }

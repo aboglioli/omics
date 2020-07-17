@@ -6,5 +6,5 @@ pub trait Event {
 }
 
 pub trait EventPublisher {
-    fn publish<E: Event>(&self, topic: &str, event: E) -> Result<(), Error>;
+    fn publish<E: Event + 'static>(&self, topic: &str, event: E) -> Result<(), Error>;
 }

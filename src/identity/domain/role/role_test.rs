@@ -8,7 +8,7 @@ fn create_role() -> Result<(), Error> {
     let r = Role::new(RoleID::from("admin"), "Administrator")?;
     assert_eq!(r.id(), &ID::new(RoleID::from("admin")));
     assert_eq!(r.name(), "Administrator");
-    assert!(r.equals_id(RoleID::from("admin")));
+    assert!(r.eq_id(RoleID::from("admin")));
 
     Ok(())
 }
