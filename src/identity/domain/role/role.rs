@@ -29,7 +29,7 @@ impl Role {
                 return true;
             }
         }
-        return false;
+        false
     }
 
     pub fn add_permissions(&mut self, permission: Permission) {

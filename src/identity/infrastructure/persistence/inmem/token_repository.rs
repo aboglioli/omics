@@ -20,7 +20,7 @@ impl InMemTokenRepository {
 impl Cache<TokenID, Data> for InMemTokenRepository {
     fn get(&self, token_id: &TokenID) -> Option<Data> {
         let cache = self.cache.borrow();
-        cache.get(token_id).map(|d| d.clone())
+        cache.get(token_id).cloned()
     }
 
     fn set(&self, token_id: TokenID, data: Data) -> Result<(), Error> {
@@ -44,7 +44,7 @@ mod tests {
 
     #[test]
     fn test() -> Result<(), Error> {
-        fn check_trait_impl<T: TokenRepository>(repo: &T) {}
+        fn check_trait_impl<T: TokenRepository>(_repo: &T) {}
 
         let repo = InMemTokenRepository::new();
         check_trait_impl(&repo);

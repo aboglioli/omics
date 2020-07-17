@@ -42,7 +42,7 @@ impl Permission {
 
         Ok(Permission {
             module: String::from(module),
-            permissions: String::from(permissions),
+            permissions,
         })
     }
 

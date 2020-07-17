@@ -22,14 +22,13 @@ impl UserRepository for InMemUserRepository {
     fn next_id(&self) -> Result<UserID, Error> {
         let uuid = Uuid::new_v4();
         let uuid = uuid.to_string();
-        Ok(UserID::from(uuid))
+        Ok(uuid)
     }
 
     fn find_by_id(&self, id: UserID) -> Result<User, Error> {
         let users = self.users.borrow();
         users
-            .get(&id)
-            .map(|u| u.clone())
+            .get(&id).cloned()
             .ok_or(Error::internal().set_code("not_found").clone())
     }
 
@@ -75,7 +74,7 @@ mod tests {
     #[test]
     fn find_by_id() -> Result<(), Error> {
         let repo = InMemUserRepository::new();
-        let mut user = User::new(
+        let user = User::new(
             repo.next_id()?,
             "username",
             "username@email.com",
@@ -97,8 +96,8 @@ mod tests {
         assert_eq!(changed_user_person.name(), "Name");
         assert_eq!(changed_user_person.lastname(), "Lastname");
 
-        let found_user = repo.find_by_username_or_email("username")?;
-        let found_user = repo.find_by_username_or_email("username@email.com")?;
+        let _found_user = repo.find_by_username_or_email("username")?;
+        let _found_user = repo.find_by_username_or_email("username@email.com")?;
         assert!(repo.find_by_username_or_email("nonexisting").is_err());
         assert!(repo.find_by_username_or_email("username@asd.com").is_err());
 
