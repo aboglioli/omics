@@ -7,9 +7,8 @@ use crate::identity::application::user::{
     ChangePasswordCommand, LoginCommand, RegisterCommand, UpdateCommand,
 };
 use crate::identity::domain::role::RoleRepository;
-use crate::identity::domain::token::{Token, TokenEncoder, TokenRepository};
 use crate::identity::domain::user::{
-    AuthenticationService, AuthorizationService, PasswordHasher, User, UserID, UserRegistered,
+    AuthenticationService, AuthorizationService, User, UserDescriptor, UserID, UserRegistered,
     UserRepository, UserUpdated,
 };
 
@@ -92,7 +91,7 @@ impl<
         Ok(())
     }
 
-    pub fn login(&self, cmd: LoginCommand) -> Result<(User, Token), Error> {
+    pub fn login(&self, cmd: LoginCommand) -> Result<UserDescriptor, Error> {
         self.authentication_service
             .authenticate(&cmd.username_or_email, &cmd.password)
     }

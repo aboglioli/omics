@@ -17,10 +17,7 @@ where
     TTokenEncoder: TokenEncoder,
     TTokenRepository: TokenRepository,
 {
-    pub fn new(
-        token_encoder: TTokenEncoder,
-        token_repository: TTokenRepository,
-    ) -> Self {
+    pub fn new(token_encoder: TTokenEncoder, token_repository: TTokenRepository) -> Self {
         TokenServiceImpl {
             token_encoder,
             token_repository,
@@ -70,13 +67,20 @@ mod tests {
         let repo = InMemTokenRepository::new();
         let serv = TokenServiceImpl::new(enc, repo);
 
-        let data = Data::new();
+        let mut data = Data::new();
         data.add("user_id", "u123");
         data.add("user_username", "admin");
 
         let token = serv.create(data)?;
-
         assert!(token.token().len() > 0);
+
+        let data = serv.validate(token.clone())?;
+        assert_eq!(data.get("user_id"), Some(&"u123".to_owned()));
+        assert_eq!(data.get("user_username"), Some(&"admin".to_owned()));
+
+        assert!(serv.invalidate(token.clone()).is_ok());
+
+        assert!(serv.validate(token.clone()).is_err());
 
         Ok(())
     }
