@@ -103,9 +103,13 @@ impl Error {
     }
 
     pub fn wrap_raw<E: error::Error>(&mut self, err: E) -> &mut Error {
-        let err = Error::internal().set_message(&err.to_string()).clone();
+        let err = Error::internal().set_message(&err.to_string()).build();
         self.cause = Some(Box::new(err));
         self
+    }
+
+    pub fn build(&self) -> Error {
+        self.clone()
     }
 }
 
@@ -140,7 +144,7 @@ mod tests {
             .add_context("k1", "v1")
             .add_context("k2", "v2")
             .add_context("k2", "v3")
-            .clone();
+            .build();
         assert_eq!(err.code().unwrap(), "code");
         assert_eq!(err.message().unwrap(), "message");
         assert_eq!(err.path().unwrap(), "my.path");

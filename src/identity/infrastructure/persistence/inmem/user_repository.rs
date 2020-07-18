@@ -30,7 +30,7 @@ impl UserRepository for InMemUserRepository {
         users
             .get(&id)
             .cloned()
-            .ok_or(Error::internal().set_code("not_found").clone())
+            .ok_or(Error::internal().set_code("not_found").build())
     }
 
     fn find_by_username_or_email(&self, username_or_email: &str) -> Result<User, Error> {
@@ -42,7 +42,7 @@ impl UserRepository for InMemUserRepository {
                 return Ok(user.clone());
             }
         }
-        Err(Error::internal().set_code("not_found").clone())
+        Err(Error::internal().set_code("not_found").build())
     }
 
     fn save(&self, user: &mut User) -> Result<(), Error> {

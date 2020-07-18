@@ -6,8 +6,11 @@ use omics::{
         application::user::UserService,
         domain::{
             role::Role,
-            token::TokenService,
-            user::{AuthenticationService, AuthorizationService, User, UserRepository},
+            token::{TokenService, TokenServiceImpl},
+            user::{
+                AuthenticationService, AuthenticationServiceImpl, AuthorizationService,
+                AuthorizationServiceImpl, User, UserRepository,
+            },
         },
         infrastructure::{mocks::*, persistence::inmem::*},
     },
@@ -17,23 +20,25 @@ struct Container {
     user_repo: Rc<InMemUserRepository>,
     event_pub: Rc<InMemEventPublisher>,
     password_hasher: Rc<FakePasswordHasher>,
-    token_serv: Rc<TokenService<FakeTokenEncoder, InMemTokenRepository>>,
+    token_serv: Rc<TokenServiceImpl<FakeTokenEncoder, InMemTokenRepository>>,
     authentication_serv: Rc<
-        AuthenticationService<
+        AuthenticationServiceImpl<
             InMemUserRepository,
             FakePasswordHasher,
-            FakeTokenEncoder,
-            InMemTokenRepository,
+            TokenServiceImpl<FakeTokenEncoder, InMemTokenRepository>,
         >,
     >,
-    authorization_serv: Rc<AuthorizationService<InMemUserRepository, FakePasswordHasher>>,
+    authorization_serv: Rc<AuthorizationServiceImpl<InMemUserRepository, FakePasswordHasher>>,
     role_repo: Rc<InMemRoleRepository>,
     user_serv: UserService<
         InMemUserRepository,
         InMemEventPublisher,
-        FakePasswordHasher,
-        FakeTokenEncoder,
-        InMemTokenRepository,
+        AuthenticationServiceImpl<
+            InMemUserRepository,
+            FakePasswordHasher,
+            TokenServiceImpl<FakeTokenEncoder, InMemTokenRepository>,
+        >,
+        AuthorizationServiceImpl<InMemUserRepository, FakePasswordHasher>,
         InMemRoleRepository,
     >,
 }
@@ -43,16 +48,16 @@ impl Container {
         let user_repo = Rc::new(InMemUserRepository::new());
         let event_pub = Rc::new(InMemEventPublisher::new());
         let password_hasher = Rc::new(FakePasswordHasher::new());
-        let token_serv = Rc::new(TokenService::new(
+        let token_serv = Rc::new(TokenServiceImpl::new(
             FakeTokenEncoder::new(),
             InMemTokenRepository::new(),
         ));
-        let authentication_serv = Rc::new(AuthenticationService::new(
+        let authentication_serv = Rc::new(AuthenticationServiceImpl::new(
             Rc::clone(&user_repo),
             Rc::clone(&password_hasher),
             Rc::clone(&token_serv),
         ));
-        let authorization_serv = Rc::new(AuthorizationService::new(
+        let authorization_serv = Rc::new(AuthorizationServiceImpl::new(
             Rc::clone(&user_repo),
             Rc::clone(&password_hasher),
         ));

@@ -7,7 +7,7 @@ pub struct Name {
 impl Name {
     pub fn new(name: &str) -> Result<Name, Error> {
         if name.len() < 4 {
-            return Err(Error::application().set_code("name_short").clone());
+            return Err(Error::application().set_code("name_short").build());
         }
 
         Ok(Name {

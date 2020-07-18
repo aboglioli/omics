@@ -16,63 +16,43 @@ use crate::identity::domain::user::{
 pub struct UserService<
     TUserRepository,
     TEventPublisher,
-    TPasswordHasher,
-    TTokenEncoder,
-    TTokenRepository,
+    TAuthenticationService,
+    TAuthorizationService,
     TRoleRepository,
 > {
     user_repository: Rc<TUserRepository>,
     event_publisher: Rc<TEventPublisher>,
-    authentication_service: Rc<
-        AuthenticationService<TUserRepository, TPasswordHasher, TTokenEncoder, TTokenRepository>,
-    >,
-    authorization_service: Rc<AuthorizationService<TUserRepository, TPasswordHasher>>,
+    authentication_service: Rc<TAuthenticationService>,
+    authorization_service: Rc<TAuthorizationService>,
     role_repository: Rc<TRoleRepository>,
 }
 
 impl<
-        TUserRepository,
-        TEventPublisher,
-        TPasswordHasher,
-        TTokenEncoder,
-        TTokenRepository,
-        TRoleRepository,
+        TUserRepository: UserRepository,
+        TEventPublisher: EventPublisher,
+        TAuthenticationService: AuthenticationService,
+        TAuthorizationService: AuthorizationService,
+        TRoleRepository: RoleRepository,
     >
     UserService<
         TUserRepository,
         TEventPublisher,
-        TPasswordHasher,
-        TTokenEncoder,
-        TTokenRepository,
+        TAuthenticationService,
+        TAuthorizationService,
         TRoleRepository,
     >
-where
-    TUserRepository: UserRepository,
-    TEventPublisher: EventPublisher,
-    TPasswordHasher: PasswordHasher,
-    TTokenEncoder: TokenEncoder,
-    TTokenRepository: TokenRepository,
-    TRoleRepository: RoleRepository,
 {
     pub fn new(
         user_repository: Rc<TUserRepository>,
         event_publisher: Rc<TEventPublisher>,
-        authentication_service: Rc<
-            AuthenticationService<
-                TUserRepository,
-                TPasswordHasher,
-                TTokenEncoder,
-                TTokenRepository,
-            >,
-        >,
-        authorization_service: Rc<AuthorizationService<TUserRepository, TPasswordHasher>>,
+        authentication_service: Rc<TAuthenticationService>,
+        authorization_service: Rc<TAuthorizationService>,
         role_repository: Rc<TRoleRepository>,
     ) -> UserService<
         TUserRepository,
         TEventPublisher,
-        TPasswordHasher,
-        TTokenEncoder,
-        TTokenRepository,
+        TAuthenticationService,
+        TAuthorizationService,
         TRoleRepository,
     > {
         UserService {
