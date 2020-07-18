@@ -20,7 +20,7 @@ where
     pub fn new(
         token_encoder: TTokenEncoder,
         token_repository: TTokenRepository,
-    ) -> TokenServiceImpl<TTokenEncoder, TTokenRepository> {
+    ) -> Self {
         TokenServiceImpl {
             token_encoder,
             token_repository,
@@ -53,6 +53,31 @@ where
     fn invalidate(&self, token: Token) -> Result<(), Error> {
         let token_id = self.token_encoder.decode(token)?;
         self.token_repository.delete(&token_id)?;
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use crate::identity::infrastructure::mocks::FakeTokenEncoder;
+    use crate::identity::infrastructure::persistence::inmem::InMemTokenRepository;
+
+    #[test]
+    fn create() -> Result<(), Error> {
+        let enc = FakeTokenEncoder::new();
+        let repo = InMemTokenRepository::new();
+        let serv = TokenServiceImpl::new(enc, repo);
+
+        let data = Data::new();
+        data.add("user_id", "u123");
+        data.add("user_username", "admin");
+
+        let token = serv.create(data)?;
+
+        assert!(token.token().len() > 0);
+
         Ok(())
     }
 }

@@ -48,13 +48,7 @@ impl<
         authentication_service: Rc<TAuthenticationService>,
         authorization_service: Rc<TAuthorizationService>,
         role_repository: Rc<TRoleRepository>,
-    ) -> UserService<
-        TUserRepository,
-        TEventPublisher,
-        TAuthenticationService,
-        TAuthorizationService,
-        TRoleRepository,
-    > {
+    ) -> Self {
         UserService {
             user_repository,
             event_publisher,

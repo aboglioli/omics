@@ -27,7 +27,7 @@ where
         user_repository: Rc<TUserRepository>,
         password_hasher: Rc<TPasswordHasher>,
         token_service: Rc<TTokenService>,
-    ) -> AuthenticationServiceImpl<TUserRepository, TPasswordHasher, TTokenService> {
+    ) -> Self {
         AuthenticationServiceImpl {
             user_repository,
             password_hasher,

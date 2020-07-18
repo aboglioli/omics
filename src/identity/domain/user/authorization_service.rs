@@ -27,7 +27,7 @@ where
     pub fn new(
         user_repository: Rc<TUserRepository>,
         password_hasher: Rc<TPasswordHasher>,
-    ) -> AuthorizationServiceImpl<TUserRepository, TPasswordHasher> {
+    ) -> Self {
         AuthorizationServiceImpl {
             user_repository,
             password_hasher,
