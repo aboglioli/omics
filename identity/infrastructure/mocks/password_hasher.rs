@@ -1,5 +1,5 @@
-use common::error::Error;
 use crate::domain::user::PasswordHasher;
+use common::error::Error;
 
 pub struct FakePasswordHasher;
 
@@ -11,8 +11,6 @@ impl FakePasswordHasher {
 
 impl PasswordHasher for FakePasswordHasher {
     fn hash(&self, plain_pasword: &str) -> Result<String, Error> {
-        // let filled_str = (0..50).map(|_| "X").collect::<String>();
-        // let filled_str = str::repeat(50)
         Ok(format!("$${:X>50}##", plain_pasword))
     }
 

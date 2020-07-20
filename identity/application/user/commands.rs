@@ -1,5 +1,5 @@
-use common::error::Error;
 use crate::domain::role::RoleID;
+use common::error::Error;
 
 pub struct UpdateCommand {
     pub name: String,

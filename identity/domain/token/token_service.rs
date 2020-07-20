@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
-use common::error::Error;
 use crate::domain::token::{Data, Token, TokenEncoder, TokenID, TokenRepository};
+use common::error::Error;
 
 pub trait TokenService {
     fn create(&self, data: Data) -> Result<Token, Error>;
@@ -74,7 +74,7 @@ mod tests {
         data.add("user_username", "admin");
 
         let token = serv.create(data)?;
-        assert!(token.token().len() > 0);
+        assert!(!token.token().is_empty());
 
         let data = serv.validate(token.clone())?;
         assert_eq!(data.get("user_id"), Some(&"u123".to_owned()));
@@ -82,7 +82,7 @@ mod tests {
 
         assert!(serv.invalidate(token.clone()).is_ok());
 
-        assert!(serv.validate(token.clone()).is_err());
+        assert!(serv.validate(token).is_err());
 
         Ok(())
     }

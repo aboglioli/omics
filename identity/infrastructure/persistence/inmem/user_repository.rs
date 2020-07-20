@@ -2,9 +2,9 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use uuid::Uuid;
 
+use crate::domain::user::{User, UserID, UserRepository};
 use common::error::Error;
 use common::model::Entity;
-use crate::domain::user::{User, UserID, UserRepository};
 
 pub struct InMemUserRepository {
     pub users: RefCell<HashMap<UserID, User>>,

@@ -1,5 +1,5 @@
-use common::event::Event;
 use crate::domain::user::UserID;
+use common::event::Event;
 
 pub struct UserUpdated {
     pub id: UserID,

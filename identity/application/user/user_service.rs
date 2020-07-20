@@ -1,16 +1,14 @@
 use std::rc::Rc;
 
-use common::error::Error;
-use common::event::EventPublisher;
-use common::model::Entity;
 use crate::application::user::{
     ChangePasswordCommand, LoginCommand, RegisterCommand, UpdateCommand,
 };
 use crate::domain::role::RoleRepository;
 use crate::domain::token::Token;
-use crate::domain::user::{
-    AuthService, User, UserID, UserRegistered, UserRepository, UserUpdated,
-};
+use crate::domain::user::{AuthService, User, UserID, UserRegistered, UserRepository, UserUpdated};
+use common::error::Error;
+use common::event::EventPublisher;
+use common::model::Entity;
 
 pub struct UserService<TUserRepository, TEventPublisher, TAuthService, TRoleRepository> {
     user_repository: Rc<TUserRepository>,

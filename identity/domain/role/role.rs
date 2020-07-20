@@ -1,6 +1,6 @@
+use crate::domain::role::Permission;
 use common::error::Error;
 use common::model::{Entity, ID};
-use crate::domain::role::Permission;
 
 pub type RoleID = String;
 

@@ -1,9 +1,9 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
 
+use crate::domain::token::{Data, TokenID, TokenRepository};
 use common::cache::Cache;
 use common::error::Error;
-use crate::domain::token::{Data, TokenID, TokenRepository};
 
 pub struct InMemTokenRepository {
     pub cache: RefCell<HashMap<TokenID, Data>>,

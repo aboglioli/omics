@@ -1,7 +1,7 @@
-use common::error::Error;
-use common::model::{Entity, ID};
 use crate::domain::role::{Role, RoleID};
 use crate::domain::user::{Email, Password, Person, Username};
+use common::error::Error;
+use common::model::{Entity, ID};
 
 // User
 pub type UserID = String;

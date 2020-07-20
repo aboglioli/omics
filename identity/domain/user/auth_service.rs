@@ -1,9 +1,9 @@
 use std::rc::Rc;
 
-use common::error::Error;
-use common::model::Entity;
 use crate::domain::token::{Data, Token, TokenService};
 use crate::domain::user::{PasswordHasher, User, UserID, UserRepository};
+use common::error::Error;
+use common::model::Entity;
 
 pub trait AuthService {
     fn authenticate(&self, username_or_email: &str, password: &str) -> Result<Token, Error>;
@@ -132,9 +132,7 @@ mod tests {
     use crate::domain::token::TokenServiceImpl;
     use crate::domain::user::User;
     use crate::infrastructure::mocks::{FakePasswordHasher, FakeTokenEncoder};
-    use crate::infrastructure::persistence::inmem::{
-        InMemTokenRepository, InMemUserRepository,
-    };
+    use crate::infrastructure::persistence::inmem::{InMemTokenRepository, InMemUserRepository};
 
     #[test]
     fn authenticate() -> Result<(), Error> {
@@ -163,10 +161,10 @@ mod tests {
         user_repo.save(&mut user)?;
 
         let token = serv.authenticate("user1", "user123")?;
-        assert!(token.token().len() > 0);
+        assert!(!token.token().is_empty());
 
         let token = serv.authenticate("user@email.com", "user123")?;
-        assert!(token.token().len() > 0);
+        assert!(!token.token().is_empty());
 
         assert!(serv.authenticate("user2", "user123").is_err());
         assert!(serv.authenticate("user1", "user124").is_err());

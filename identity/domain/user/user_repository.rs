@@ -1,5 +1,5 @@
-use common::error::Error;
 use crate::domain::user::{User, UserID};
+use common::error::Error;
 
 pub trait UserRepository {
     fn next_id(&self) -> Result<UserID, Error>;

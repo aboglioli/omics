@@ -1,6 +1,6 @@
+use crate::domain::publication::Name;
 use common::error::Error;
 use common::model::ID;
-use crate::domain::publication::Name;
 
 pub type PublicationID = String;
 
