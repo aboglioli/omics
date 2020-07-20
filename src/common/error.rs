@@ -108,6 +108,11 @@ impl Error {
         self
     }
 
+    pub fn merge(&mut self, err: Error) -> &mut Error {
+        self.context.extend(err.context);
+        self
+    }
+
     pub fn build(&self) -> Error {
         self.clone()
     }
@@ -186,5 +191,26 @@ mod tests {
             &raw_err.error
         );
         assert_eq!(outer_err.cause().unwrap(), &inner_err);
+    }
+
+    #[test]
+    fn merge() {
+        let mut err1 = Error::internal().set_code("err1").build();
+        err1.add_context("e1-key1", "value1");
+        err1.add_context("e1-key2", "value2");
+
+        let mut err2 = Error::internal().set_code("err2").build();
+        err2.add_context("e2-key", "value");
+        err2.merge(err1);
+
+        let mut err3 = Error::application().set_code("err3").build();
+        err3.add_context("e1-key1", "value");
+        err3.add_context("e3-key", "value");
+        err3.merge(err2);
+
+        assert_eq!(err3.context().len(), 4);
+        assert_eq!(err3.context().get("e1-key1"), Some(&"value1".to_owned()));
+        assert_eq!(err3.context().get("e1-key2"), Some(&"value2".to_owned()));
+        assert_eq!(err3.context().get("e1-key2"), Some(&"value2".to_owned()));
     }
 }

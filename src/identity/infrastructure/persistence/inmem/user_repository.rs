@@ -7,7 +7,7 @@ use crate::common::model::Entity;
 use crate::identity::domain::user::{User, UserID, UserRepository};
 
 pub struct InMemUserRepository {
-    users: RefCell<HashMap<UserID, User>>,
+    pub users: RefCell<HashMap<UserID, User>>,
 }
 
 impl InMemUserRepository {

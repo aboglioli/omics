@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::common::error::Error;
 use crate::identity::domain::token::{Data, Token, TokenEncoder, TokenID, TokenRepository};
 
@@ -8,8 +10,8 @@ pub trait TokenService {
 }
 
 pub struct TokenServiceImpl<TTokenEncoder, TTokenRepository> {
-    token_encoder: TTokenEncoder,
-    token_repository: TTokenRepository,
+    token_encoder: Rc<TTokenEncoder>,
+    token_repository: Rc<TTokenRepository>,
 }
 
 impl<TTokenEncoder, TTokenRepository> TokenServiceImpl<TTokenEncoder, TTokenRepository>
@@ -17,7 +19,7 @@ where
     TTokenEncoder: TokenEncoder,
     TTokenRepository: TokenRepository,
 {
-    pub fn new(token_encoder: TTokenEncoder, token_repository: TTokenRepository) -> Self {
+    pub fn new(token_encoder: Rc<TTokenEncoder>, token_repository: Rc<TTokenRepository>) -> Self {
         TokenServiceImpl {
             token_encoder,
             token_repository,
@@ -63,9 +65,9 @@ mod tests {
 
     #[test]
     fn create() -> Result<(), Error> {
-        let enc = FakeTokenEncoder::new();
-        let repo = InMemTokenRepository::new();
-        let serv = TokenServiceImpl::new(enc, repo);
+        let enc = Rc::new(FakeTokenEncoder::new());
+        let repo = Rc::new(InMemTokenRepository::new());
+        let serv = TokenServiceImpl::new(Rc::clone(&enc), Rc::clone(&repo));
 
         let mut data = Data::new();
         data.add("user_id", "u123");

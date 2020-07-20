@@ -6,7 +6,7 @@ use crate::common::error::Error;
 use crate::identity::domain::token::{Data, TokenID, TokenRepository};
 
 pub struct InMemTokenRepository {
-    cache: RefCell<HashMap<TokenID, Data>>,
+    pub cache: RefCell<HashMap<TokenID, Data>>,
 }
 
 impl InMemTokenRepository {

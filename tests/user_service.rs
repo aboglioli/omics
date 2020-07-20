@@ -20,6 +20,8 @@ struct Container {
     user_repo: Rc<InMemUserRepository>,
     event_pub: Rc<InMemEventPublisher>,
     password_hasher: Rc<FakePasswordHasher>,
+    token_enc: Rc<FakeTokenEncoder>,
+    token_repo: Rc<InMemTokenRepository>,
     token_serv: Rc<TokenServiceImpl<FakeTokenEncoder, InMemTokenRepository>>,
     authentication_serv: Rc<
         AuthenticationServiceImpl<
@@ -48,9 +50,11 @@ impl Container {
         let user_repo = Rc::new(InMemUserRepository::new());
         let event_pub = Rc::new(InMemEventPublisher::new());
         let password_hasher = Rc::new(FakePasswordHasher::new());
+        let token_enc = Rc::new(FakeTokenEncoder::new());
+        let token_repo = Rc::new(InMemTokenRepository::new());
         let token_serv = Rc::new(TokenServiceImpl::new(
-            FakeTokenEncoder::new(),
-            InMemTokenRepository::new(),
+            Rc::clone(&token_enc),
+            Rc::clone(&token_repo),
         ));
         let authentication_serv = Rc::new(AuthenticationServiceImpl::new(
             Rc::clone(&user_repo),
@@ -75,6 +79,8 @@ impl Container {
             user_repo,
             event_pub,
             password_hasher,
+            token_enc,
+            token_repo,
             token_serv,
             authentication_serv,
             authorization_serv,

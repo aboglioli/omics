@@ -97,9 +97,11 @@ mod tests {
     fn authenticate() -> Result<(), Error> {
         let user_repo = Rc::new(InMemUserRepository::new());
         let password_hasher = Rc::new(FakePasswordHasher::new());
+        let token_enc = Rc::new(FakeTokenEncoder::new());
+        let token_repo = Rc::new(InMemTokenRepository::new());
         let token_serv = Rc::new(TokenServiceImpl::new(
-            FakeTokenEncoder::new(),
-            InMemTokenRepository::new(),
+            Rc::clone(&token_enc),
+            Rc::clone(&token_repo),
         ));
 
         let serv = AuthenticationServiceImpl::new(

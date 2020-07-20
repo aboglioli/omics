@@ -25,11 +25,41 @@ impl User {
         password: &str,
         role: &Role,
     ) -> Result<User, Error> {
+        let mut err = Error::application().set_code("user").build();
+
+        let username = match Username::new(username) {
+            Ok(username) => Some(username),
+            Err(e) => {
+                err.merge(e);
+                None
+            }
+        };
+
+        let email = match Email::new(email) {
+            Ok(email) => Some(email),
+            Err(e) => {
+                err.merge(e);
+                None
+            }
+        };
+
+        let password = match Password::new(password) {
+            Ok(password) => Some(password),
+            Err(e) => {
+                err.merge(e);
+                None
+            }
+        };
+
+        if err.has_context() {
+            return Err(err.build());
+        }
+
         Ok(User {
             id: ID::new(id),
-            username: Username::new(username)?,
-            email: Email::new(email)?,
-            password: Password::new(password)?,
+            username: username.unwrap(),
+            email: email.unwrap(),
+            password: password.unwrap(),
             person: None,
             role_id: role.id().value(),
             validated: false,
@@ -82,5 +112,20 @@ impl User {
 impl Entity<UserID> for User {
     fn id(&self) -> &ID<String> {
         &self.id
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn create() -> Result<(), Error> {
+        let role = Role::new(RoleID::from("user"), "User")?;
+        let res = User::new(UserID::from(""), "", "", "", &role);
+        assert!(res.is_err());
+        assert_eq!(res.err().unwrap().context().len(), 3);
+
+        Ok(())
     }
 }

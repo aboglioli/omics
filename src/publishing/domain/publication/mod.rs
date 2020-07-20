@@ -1,5 +1,5 @@
-mod name;
 mod publication;
+mod value_objects;
 
-pub use name::*;
 pub use publication::*;
+pub use value_objects::*;
