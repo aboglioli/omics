@@ -1,14 +1,14 @@
 use std::rc::Rc;
 
-use crate::common::error::Error;
-use crate::common::event::EventPublisher;
-use crate::common::model::Entity;
-use crate::identity::application::user::{
+use common::error::Error;
+use common::event::EventPublisher;
+use common::model::Entity;
+use crate::application::user::{
     ChangePasswordCommand, LoginCommand, RegisterCommand, UpdateCommand,
 };
-use crate::identity::domain::role::RoleRepository;
-use crate::identity::domain::token::Token;
-use crate::identity::domain::user::{
+use crate::domain::role::RoleRepository;
+use crate::domain::token::Token;
+use crate::domain::user::{
     AuthService, User, UserID, UserRegistered, UserRepository, UserUpdated,
 };
 

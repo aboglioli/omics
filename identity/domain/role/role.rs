@@ -1,6 +1,6 @@
 use common::error::Error;
 use common::model::{Entity, ID};
-use identity::domain::role::Permission;
+use crate::domain::role::Permission;
 
 pub type RoleID = String;
 
@@ -45,8 +45,8 @@ impl Entity<RoleID> for Role {
 
 #[cfg(test)]
 mod tests {
-    use crate::common::error::Error;
-    use crate::common::model::{Entity, ID};
+    use common::error::Error;
+    use common::model::{Entity, ID};
 
     use super::*;
 

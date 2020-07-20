@@ -1,9 +1,9 @@
 use std::rc::Rc;
 
-use crate::common::error::Error;
-use crate::common::model::Entity;
-use crate::identity::domain::token::{Data, Token, TokenService};
-use crate::identity::domain::user::{PasswordHasher, User, UserID, UserRepository};
+use common::error::Error;
+use common::model::Entity;
+use crate::domain::token::{Data, Token, TokenService};
+use crate::domain::user::{PasswordHasher, User, UserID, UserRepository};
 
 pub trait AuthService {
     fn authenticate(&self, username_or_email: &str, password: &str) -> Result<Token, Error>;
@@ -128,11 +128,11 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::identity::domain::role::Role;
-    use crate::identity::domain::token::TokenServiceImpl;
-    use crate::identity::domain::user::User;
-    use crate::identity::infrastructure::mocks::{FakePasswordHasher, FakeTokenEncoder};
-    use crate::identity::infrastructure::persistence::inmem::{
+    use crate::domain::role::Role;
+    use crate::domain::token::TokenServiceImpl;
+    use crate::domain::user::User;
+    use crate::infrastructure::mocks::{FakePasswordHasher, FakeTokenEncoder};
+    use crate::infrastructure::persistence::inmem::{
         InMemTokenRepository, InMemUserRepository,
     };
 

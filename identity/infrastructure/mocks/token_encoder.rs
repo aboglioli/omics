@@ -1,5 +1,5 @@
-use crate::common::error::Error;
-use crate::identity::domain::token::{Token, TokenEncoder, TokenID};
+use common::error::Error;
+use crate::domain::token::{Token, TokenEncoder, TokenID};
 
 pub struct FakeTokenEncoder;
 

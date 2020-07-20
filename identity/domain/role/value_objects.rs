@@ -1,6 +1,6 @@
 use regex::Regex;
 
-use crate::common::error::Error;
+use common::error::Error;
 
 pub struct Permission {
     module: String,
@@ -67,7 +67,7 @@ impl Permission {
 
 #[cfg(test)]
 mod tests {
-    use crate::common::error::Error;
+    use common::error::Error;
 
     use super::*;
 

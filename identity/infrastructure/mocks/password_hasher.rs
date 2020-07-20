@@ -1,5 +1,5 @@
-use crate::common::error::Error;
-use crate::identity::domain::user::PasswordHasher;
+use common::error::Error;
+use crate::domain::user::PasswordHasher;
 
 pub struct FakePasswordHasher;
 

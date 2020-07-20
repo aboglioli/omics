@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
-use crate::common::error::Error;
-use crate::identity::domain::token::{Data, Token, TokenEncoder, TokenID, TokenRepository};
+use common::error::Error;
+use crate::domain::token::{Data, Token, TokenEncoder, TokenID, TokenRepository};
 
 pub trait TokenService {
     fn create(&self, data: Data) -> Result<Token, Error>;
@@ -60,8 +60,8 @@ where
 mod tests {
     use super::*;
 
-    use crate::identity::infrastructure::mocks::FakeTokenEncoder;
-    use crate::identity::infrastructure::persistence::inmem::InMemTokenRepository;
+    use crate::infrastructure::mocks::FakeTokenEncoder;
+    use crate::infrastructure::persistence::inmem::InMemTokenRepository;
 
     #[test]
     fn create() -> Result<(), Error> {

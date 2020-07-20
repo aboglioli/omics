@@ -2,9 +2,9 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use uuid::Uuid;
 
-use crate::common::error::Error;
-use crate::common::model::Entity;
-use crate::identity::domain::user::{User, UserID, UserRepository};
+use common::error::Error;
+use common::model::Entity;
+use crate::domain::user::{User, UserID, UserRepository};
 
 pub struct InMemUserRepository {
     pub users: RefCell<HashMap<UserID, User>>,
@@ -57,7 +57,7 @@ impl UserRepository for InMemUserRepository {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::identity::domain::role::{Role, RoleID};
+    use crate::domain::role::{Role, RoleID};
 
     #[test]
     fn next_id() -> Result<(), Error> {

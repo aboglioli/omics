@@ -1,5 +1,5 @@
-use crate::common::error::Error;
-use crate::identity::domain::role::{Role, RoleID, RoleRepository};
+use common::error::Error;
+use crate::domain::role::{Role, RoleID, RoleRepository};
 
 pub struct InMemRoleRepository;
 

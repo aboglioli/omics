@@ -1,4 +1,4 @@
-use crate::common::error::Error;
+use common::error::Error;
 
 pub trait PasswordHasher {
     fn hash(&self, plain_password: &str) -> Result<String, Error>;

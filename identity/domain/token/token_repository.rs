@@ -1,5 +1,5 @@
-use crate::common::cache::Cache;
-use crate::identity::domain::token::{Data, TokenID};
+use common::cache::Cache;
+use crate::domain::token::{Data, TokenID};
 
 // pub trait TokenRepository {
 //     fn get(&self, token_id: TokenID) -> Result<Data, Error>;

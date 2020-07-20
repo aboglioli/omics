@@ -1,4 +1,4 @@
-use crate::common::error::Error;
+use common::error::Error;
 
 pub struct Name {
     name: String,
