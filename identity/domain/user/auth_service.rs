@@ -7,11 +7,11 @@ use common::model::Entity;
 
 pub trait AuthService {
     fn authenticate(&self, username_or_email: &str, password: &str) -> Result<Token, Error>;
-    fn authorize(&self, token: Token) -> Result<User, Error>;
+    fn authorize(&self, token: &Token) -> Result<User, Error>;
     fn available(&self, username: &str, email: &str) -> Result<bool, Error>;
     fn change_password(
         &self,
-        user_id: UserID,
+        user_id: &UserID,
         old_password: &str,
         new_password: &str,
     ) -> Result<(), Error>;
@@ -64,10 +64,10 @@ where
         Err(Error::application().set_code("invalid_credentials").build())
     }
 
-    fn authorize(&self, token: Token) -> Result<User, Error> {
+    fn authorize(&self, token: &Token) -> Result<User, Error> {
         let data = self.token_service.validate(token)?;
         if let Some(user_id) = data.get("user_id") {
-            let user = self.user_repository.find_by_id(user_id.to_owned())?;
+            let user = self.user_repository.find_by_id(user_id)?;
             return Ok(user);
         }
         Err(Error::application())
@@ -99,7 +99,7 @@ where
 
     fn change_password(
         &self,
-        user_id: UserID,
+        user_id: &UserID,
         old_password: &str,
         new_password: &str,
     ) -> Result<(), Error> {

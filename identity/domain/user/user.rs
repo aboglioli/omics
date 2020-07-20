@@ -107,6 +107,10 @@ impl User {
     pub fn change_role(&mut self, role: &Role) {
         self.role_id = role.id().value();
     }
+
+    pub fn validate(&mut self) {
+        self.validated = true;
+    }
 }
 
 impl Entity<UserID> for User {

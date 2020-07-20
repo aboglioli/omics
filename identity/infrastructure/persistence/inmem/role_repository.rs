@@ -10,9 +10,9 @@ impl InMemRoleRepository {
 }
 
 impl RoleRepository for InMemRoleRepository {
-    fn get_by_code(&self, code: RoleID) -> Result<Role, Error> {
+    fn get_by_code(&self, code: &RoleID) -> Result<Role, Error> {
         if code == "user" {
-            return Ok(Role::new(code, "User")?);
+            return Ok(Role::new(code.clone(), "User")?);
         }
         Err(Error::internal())
     }
@@ -25,8 +25,8 @@ mod tests {
     #[test]
     fn get() -> Result<(), Error> {
         let repo = InMemRoleRepository::new();
-        repo.get_by_code(RoleID::from("user"))?;
-        assert!(repo.get_by_code(RoleID::from("another")).is_err());
+        repo.get_by_code(&RoleID::from("user"))?;
+        assert!(repo.get_by_code(&RoleID::from("another")).is_err());
 
         Ok(())
     }

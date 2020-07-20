@@ -10,13 +10,13 @@ impl Username {
         if username.len() < 4 {
             return Err(Error::application()
                 .add_context("username", "too_short")
-                .clone());
+                .build());
         }
 
         if username.len() > 24 {
             return Err(Error::application()
                 .add_context("username", "too_long")
-                .clone());
+                .build());
         }
 
         Ok(Username {
@@ -39,13 +39,13 @@ impl Email {
         if email.len() < 4 {
             return Err(Error::application()
                 .add_context("email", "too_short")
-                .clone());
+                .build());
         }
 
         if email.len() > 64 {
             return Err(Error::application()
                 .add_context("email", "too_long")
-                .clone());
+                .build());
         }
 
         Ok(Email {
@@ -68,7 +68,7 @@ impl Password {
         if password.len() < 50 {
             return Err(Error::application()
                 .add_context("password", "not_hashed")
-                .clone());
+                .build());
         }
 
         Ok(Password {

@@ -25,10 +25,10 @@ impl UserRepository for InMemUserRepository {
         Ok(uuid)
     }
 
-    fn find_by_id(&self, id: UserID) -> Result<User, Error> {
+    fn find_by_id(&self, id: &UserID) -> Result<User, Error> {
         let users = self.users.borrow();
         users
-            .get(&id)
+            .get(id)
             .cloned()
             .ok_or(Error::internal().set_code("not_found").build())
     }
@@ -89,7 +89,7 @@ mod tests {
         assert_eq!(repo.users.borrow().len(), 1);
         assert!(user.person().is_none());
 
-        let found_user = repo.find_by_id(user.id().value())?;
+        let found_user = repo.find_by_id(&user.id().value())?;
         assert_eq!(user.id(), found_user.id());
         assert_eq!(changed_user.id(), found_user.id());
 

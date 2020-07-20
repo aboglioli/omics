@@ -14,7 +14,7 @@ impl TokenEncoder for FakeTokenEncoder {
         Ok(Token::new(&format!("<<token::{}", token_id.id())))
     }
 
-    fn decode(&self, token: Token) -> Result<TokenID, Error> {
+    fn decode(&self, token: &Token) -> Result<TokenID, Error> {
         if !token.token().starts_with("<<token::") {
             return Err(Error::internal());
         }
@@ -36,7 +36,7 @@ mod tests {
             Token::new("<<token::t007")
         );
         assert_eq!(
-            enc.decode(Token::new("<<token::t009x"))?,
+            enc.decode(&Token::new("<<token::t009x"))?,
             TokenID::from("t009x")
         );
 

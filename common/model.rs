@@ -54,6 +54,12 @@ impl<T: PartialEq> PartialEq for ID<T> {
     }
 }
 
+impl From<&str> for ID<String> {
+    fn from(s: &str) -> Self {
+        ID::new(s.to_owned())
+    }
+}
+
 // Entity
 pub trait Entity<I>
 where
@@ -63,10 +69,6 @@ where
 
     fn eq(&self, other: &Self) -> bool {
         self.id() == other.id()
-    }
-
-    fn eq_id(&self, id: I) -> bool {
-        self.id() == &ID::new(id)
     }
 }
 
@@ -115,17 +117,17 @@ mod tests {
     #[test]
     fn equals() {
         let e1 = FakeEntityWithStringID {
-            uuid: ID::new("U001".to_string()),
+            uuid: ID::from("U001"),
         };
         let e2 = FakeEntityWithStringID {
-            uuid: ID::new("U001".to_string()),
+            uuid: ID::from("U001"),
         };
         let e3 = FakeEntityWithStringID {
-            uuid: ID::new("U002".to_string()),
+            uuid: ID::from("U002"),
         };
         assert!(e1.eq(&e2));
         assert_eq!(e1.eq(&e3), false);
-        assert!(e1.eq_id("U001".to_string()));
-        assert!(!e1.eq_id("U002".to_string()));
+        assert_eq!(e1.id(), &ID::from("U001"));
+        assert_ne!(e1.id(), &ID::from("U002"));
     }
 }

@@ -3,18 +3,26 @@ use std::rc::Rc;
 use crate::application::user::{
     ChangePasswordCommand, LoginCommand, RegisterCommand, UpdateCommand,
 };
-use crate::domain::role::RoleRepository;
+use crate::domain::role::{RoleID, RoleRepository };
 use crate::domain::token::Token;
 use crate::domain::user::{AuthService, User, UserID, UserRegistered, UserRepository, UserUpdated};
+use crate::domain::validation::{Validation, ValidationCode, ValidationRepository};
 use common::error::Error;
 use common::event::EventPublisher;
 use common::model::Entity;
 
-pub struct UserService<TUserRepository, TEventPublisher, TAuthService, TRoleRepository> {
+pub struct UserService<
+    TUserRepository,
+    TEventPublisher,
+    TAuthService,
+    TRoleRepository,
+    TValidationRepository,
+> {
     user_repository: Rc<TUserRepository>,
     event_publisher: Rc<TEventPublisher>,
     auth_serv: Rc<TAuthService>,
     role_repository: Rc<TRoleRepository>,
+    validation_repository: Rc<TValidationRepository>,
 }
 
 impl<
@@ -22,23 +30,33 @@ impl<
         TEventPublisher: EventPublisher,
         TAuthService: AuthService,
         TRoleRepository: RoleRepository,
-    > UserService<TUserRepository, TEventPublisher, TAuthService, TRoleRepository>
+        TValidationRepository: ValidationRepository,
+    >
+    UserService<
+        TUserRepository,
+        TEventPublisher,
+        TAuthService,
+        TRoleRepository,
+        TValidationRepository,
+    >
 {
     pub fn new(
         user_repository: Rc<TUserRepository>,
         event_publisher: Rc<TEventPublisher>,
         auth_serv: Rc<TAuthService>,
         role_repository: Rc<TRoleRepository>,
+        validation_repository: Rc<TValidationRepository>,
     ) -> Self {
         UserService {
             user_repository,
             event_publisher,
             auth_serv,
             role_repository,
+            validation_repository,
         }
     }
 
-    pub fn get_by_id(&self, user_id: UserID) -> Result<User, Error> {
+    pub fn get_by_id(&self, user_id: &UserID) -> Result<User, Error> {
         let user = self.user_repository.find_by_id(user_id)?;
         Ok(user)
     }
@@ -54,7 +72,7 @@ impl<
             &cmd.username,
             &cmd.email,
             &hashed_password,
-            &self.role_repository.get_by_code("user".to_owned())?,
+            &self.role_repository.get_by_code(&RoleID::from("user"))?,
         )?;
 
         self.user_repository.save(&mut user)?;
@@ -74,10 +92,10 @@ impl<
             .authenticate(&cmd.username_or_email, &cmd.password)
     }
 
-    pub fn update(&self, user_id: UserID, cmd: UpdateCommand) -> Result<(), Error> {
+    pub fn update(&self, user_id: &UserID, cmd: UpdateCommand) -> Result<(), Error> {
         cmd.validate()?;
 
-        let mut user = self.user_repository.find_by_id(user_id)?;
+        let mut user = self.user_repository.find_by_id(&user_id)?;
 
         user.change_name(&cmd.name, &cmd.lastname)?;
 
@@ -93,11 +111,28 @@ impl<
 
     pub fn change_password(
         &self,
-        user_id: UserID,
+        user_id: &UserID,
         cmd: ChangePasswordCommand,
     ) -> Result<(), Error> {
         cmd.validate()?;
         self.auth_serv
             .change_password(user_id, &cmd.old_password, &cmd.new_password)
+    }
+
+    pub fn validate_user(
+        &self,
+        user_id: &UserID,
+        validation_code: &ValidationCode,
+    ) -> Result<(), Error> {
+        let mut user = self.user_repository.find_by_id(user_id)?;
+        let mut validation = self
+            .validation_repository
+            .find_by_code(validation_code)?;
+        validation.validate_user(&mut user, validation_code)?;
+
+        self.user_repository.save(&mut user)?;
+        self.validation_repository.save(&mut validation)?;
+
+        Ok(())
     }
 }

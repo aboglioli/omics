@@ -5,8 +5,8 @@ use common::error::Error;
 
 pub trait TokenService {
     fn create(&self, data: Data) -> Result<Token, Error>;
-    fn validate(&self, token: Token) -> Result<Data, Error>;
-    fn invalidate(&self, token: Token) -> Result<(), Error>;
+    fn validate(&self, token: &Token) -> Result<Data, Error>;
+    fn invalidate(&self, token: &Token) -> Result<(), Error>;
 }
 
 pub struct TokenServiceImpl<TTokenEncoder, TTokenRepository> {
@@ -41,7 +41,7 @@ where
         Ok(token)
     }
 
-    fn validate(&self, token: Token) -> Result<Data, Error> {
+    fn validate(&self, token: &Token) -> Result<Data, Error> {
         let token_id = self.token_encoder.decode(token)?;
         if let Some(data) = self.token_repository.get(&token_id) {
             return Ok(data);
@@ -49,7 +49,7 @@ where
         Err(Error::application().set_code("token_not_found").build())
     }
 
-    fn invalidate(&self, token: Token) -> Result<(), Error> {
+    fn invalidate(&self, token: &Token) -> Result<(), Error> {
         let token_id = self.token_encoder.decode(token)?;
         self.token_repository.delete(&token_id)?;
         Ok(())
@@ -76,13 +76,13 @@ mod tests {
         let token = serv.create(data)?;
         assert!(!token.token().is_empty());
 
-        let data = serv.validate(token.clone())?;
+        let data = serv.validate(&token)?;
         assert_eq!(data.get("user_id"), Some(&"u123".to_owned()));
         assert_eq!(data.get("user_username"), Some(&"admin".to_owned()));
 
-        assert!(serv.invalidate(token.clone()).is_ok());
+        assert!(serv.invalidate(&token).is_ok());
 
-        assert!(serv.validate(token).is_err());
+        assert!(serv.validate(&token).is_err());
 
         Ok(())
     }
