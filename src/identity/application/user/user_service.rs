@@ -7,52 +7,35 @@ use crate::identity::application::user::{
     ChangePasswordCommand, LoginCommand, RegisterCommand, UpdateCommand,
 };
 use crate::identity::domain::role::RoleRepository;
+use crate::identity::domain::token::Token;
 use crate::identity::domain::user::{
-    AuthenticationService, AuthorizationService, User, UserDescriptor, UserID, UserRegistered,
-    UserRepository, UserUpdated,
+    AuthService, User, UserID, UserRegistered, UserRepository, UserUpdated,
 };
 
-pub struct UserService<
-    TUserRepository,
-    TEventPublisher,
-    TAuthenticationService,
-    TAuthorizationService,
-    TRoleRepository,
-> {
+pub struct UserService<TUserRepository, TEventPublisher, TAuthService, TRoleRepository> {
     user_repository: Rc<TUserRepository>,
     event_publisher: Rc<TEventPublisher>,
-    authentication_service: Rc<TAuthenticationService>,
-    authorization_service: Rc<TAuthorizationService>,
+    auth_serv: Rc<TAuthService>,
     role_repository: Rc<TRoleRepository>,
 }
 
 impl<
         TUserRepository: UserRepository,
         TEventPublisher: EventPublisher,
-        TAuthenticationService: AuthenticationService,
-        TAuthorizationService: AuthorizationService,
+        TAuthService: AuthService,
         TRoleRepository: RoleRepository,
-    >
-    UserService<
-        TUserRepository,
-        TEventPublisher,
-        TAuthenticationService,
-        TAuthorizationService,
-        TRoleRepository,
-    >
+    > UserService<TUserRepository, TEventPublisher, TAuthService, TRoleRepository>
 {
     pub fn new(
         user_repository: Rc<TUserRepository>,
         event_publisher: Rc<TEventPublisher>,
-        authentication_service: Rc<TAuthenticationService>,
-        authorization_service: Rc<TAuthorizationService>,
+        auth_serv: Rc<TAuthService>,
         role_repository: Rc<TRoleRepository>,
     ) -> Self {
         UserService {
             user_repository,
             event_publisher,
-            authentication_service,
-            authorization_service,
+            auth_serv,
             role_repository,
         }
     }
@@ -65,11 +48,8 @@ impl<
     pub fn register(&self, cmd: RegisterCommand) -> Result<(), Error> {
         cmd.validate()?;
 
-        self.authorization_service
-            .available(&cmd.username, &cmd.email)?;
-        let hashed_password = self
-            .authorization_service
-            .generate_password(&cmd.password)?;
+        self.auth_serv.available(&cmd.username, &cmd.email)?;
+        let hashed_password = self.auth_serv.generate_password(&cmd.password)?;
 
         let mut user = User::new(
             self.user_repository.next_id()?,
@@ -91,8 +71,8 @@ impl<
         Ok(())
     }
 
-    pub fn login(&self, cmd: LoginCommand) -> Result<UserDescriptor, Error> {
-        self.authentication_service
+    pub fn login(&self, cmd: LoginCommand) -> Result<Token, Error> {
+        self.auth_serv
             .authenticate(&cmd.username_or_email, &cmd.password)
     }
 
@@ -119,7 +99,7 @@ impl<
         cmd: ChangePasswordCommand,
     ) -> Result<(), Error> {
         cmd.validate()?;
-        self.authorization_service
+        self.auth_serv
             .change_password(user_id, &cmd.old_password, &cmd.new_password)
     }
 }

@@ -7,10 +7,7 @@ use omics::{
         domain::{
             role::Role,
             token::{TokenService, TokenServiceImpl},
-            user::{
-                AuthenticationService, AuthenticationServiceImpl, AuthorizationService,
-                AuthorizationServiceImpl, User, UserRepository,
-            },
+            user::{AuthService, AuthServiceImpl, User, UserRepository},
         },
         infrastructure::{mocks::*, persistence::inmem::*},
     },
@@ -23,24 +20,22 @@ struct Container {
     token_enc: Rc<FakeTokenEncoder>,
     token_repo: Rc<InMemTokenRepository>,
     token_serv: Rc<TokenServiceImpl<FakeTokenEncoder, InMemTokenRepository>>,
-    authentication_serv: Rc<
-        AuthenticationServiceImpl<
+    auth_serv: Rc<
+        AuthServiceImpl<
             InMemUserRepository,
-            FakePasswordHasher,
             TokenServiceImpl<FakeTokenEncoder, InMemTokenRepository>,
+            FakePasswordHasher,
         >,
     >,
-    authorization_serv: Rc<AuthorizationServiceImpl<InMemUserRepository, FakePasswordHasher>>,
     role_repo: Rc<InMemRoleRepository>,
     user_serv: UserService<
         InMemUserRepository,
         InMemEventPublisher,
-        AuthenticationServiceImpl<
+        AuthServiceImpl<
             InMemUserRepository,
-            FakePasswordHasher,
             TokenServiceImpl<FakeTokenEncoder, InMemTokenRepository>,
+            FakePasswordHasher,
         >,
-        AuthorizationServiceImpl<InMemUserRepository, FakePasswordHasher>,
         InMemRoleRepository,
     >,
 }
@@ -56,13 +51,9 @@ impl Container {
             Rc::clone(&token_enc),
             Rc::clone(&token_repo),
         ));
-        let authentication_serv = Rc::new(AuthenticationServiceImpl::new(
+        let auth_serv = Rc::new(AuthServiceImpl::new(
             Rc::clone(&user_repo),
-            Rc::clone(&password_hasher),
             Rc::clone(&token_serv),
-        ));
-        let authorization_serv = Rc::new(AuthorizationServiceImpl::new(
-            Rc::clone(&user_repo),
             Rc::clone(&password_hasher),
         ));
         let role_repo = Rc::new(InMemRoleRepository::new());
@@ -70,8 +61,7 @@ impl Container {
         let user_serv = UserService::new(
             Rc::clone(&user_repo),
             Rc::clone(&event_pub),
-            Rc::clone(&authentication_serv),
-            Rc::clone(&authorization_serv),
+            Rc::clone(&auth_serv),
             Rc::clone(&role_repo),
         );
 
@@ -82,8 +72,7 @@ impl Container {
             token_enc,
             token_repo,
             token_serv,
-            authentication_serv,
-            authorization_serv,
+            auth_serv,
             role_repo,
             user_serv,
         }
@@ -99,7 +88,7 @@ fn get_by_id() -> Result<(), Error> {
         user_id.clone(),
         "user12",
         "user@email.com",
-        &c.authorization_serv.generate_password("user123")?,
+        &c.auth_serv.generate_password("user123")?,
         &Role::new("user".to_owned(), "User")?,
     )?;
     c.user_repo.save(&mut user)?;
