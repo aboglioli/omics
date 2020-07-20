@@ -3,7 +3,7 @@ use std::rc::Rc;
 use crate::application::user::{
     ChangePasswordCommand, LoginCommand, RegisterCommand, UpdateCommand,
 };
-use crate::domain::role::{RoleID, RoleRepository };
+use crate::domain::role::{RoleID, RoleRepository};
 use crate::domain::token::Token;
 use crate::domain::user::{AuthService, User, UserID, UserRegistered, UserRepository, UserUpdated};
 use crate::domain::validation::{Validation, ValidationCode, ValidationRepository};
@@ -125,9 +125,7 @@ impl<
         validation_code: &ValidationCode,
     ) -> Result<(), Error> {
         let mut user = self.user_repository.find_by_id(user_id)?;
-        let mut validation = self
-            .validation_repository
-            .find_by_code(validation_code)?;
+        let mut validation = self.validation_repository.find_by_code(validation_code)?;
         validation.validate_user(&mut user, validation_code)?;
 
         self.user_repository.save(&mut user)?;
