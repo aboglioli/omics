@@ -1,0 +1,13 @@
+[package]
+name = "identity"
+version = "0.1.0"
+authors = ["Alan Boglioli <alan.boglioli@gmail.com>"]
+edition = "2018"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+common = { path = "../common" }
+regex = "1"
+uuid = { version = "0.8.1", features = ["serde", "v4"] }

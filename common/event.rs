@@ -1,4 +1,4 @@
-use crate::common::error::Error;
+use common::error::Error;
 
 pub trait Event {
     fn code(&self) -> &str;

@@ -1,0 +1,20 @@
+[package]
+name = "main"
+version = "0.1.0"
+authors = ["Alan Boglioli <alan.boglioli@gmail.com>"]
+edition = "2018"
+
+[[bin]]
+name = "omics"
+path = "main.rs"
+
+[build-dependencies]
+common = { path = "../common" }
+identity = { path = "../identity" }
+publishing = { path = "../publishing" }
+
+
+[dependencies]
+common = { path = "../common" }
+identity = { path = "../identity" }
+publishing = { path = "../publishing" }

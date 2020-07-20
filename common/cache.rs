@@ -1,4 +1,4 @@
-use crate::common::error::Error;
+use common::error::Error;
 
 pub trait Cache<K, V> {
     fn get(&self, k: &K) -> Option<V>;
