@@ -1,5 +1,5 @@
 use crate::domain::role::{Role, RoleID};
-use crate::domain::user::{Email, Password, Person, Username, Provider};
+use crate::domain::user::{Email, Password, Person, Provider, Username};
 use common::error::Error;
 use common::model::{Entity, ID};
 

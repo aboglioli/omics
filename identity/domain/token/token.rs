@@ -1,8 +1,9 @@
-use std::cmp;
+use std::cmp::PartialEq;
 use std::collections::HashMap;
+use std::hash::{Hash, Hasher};
 
 // TokenID
-#[derive(Debug, Clone, Eq, Hash)]
+#[derive(Debug, Clone, Eq)]
 pub struct TokenID {
     id: String,
 }
@@ -19,9 +20,15 @@ impl TokenID {
     }
 }
 
-impl cmp::PartialEq for TokenID {
+impl PartialEq for TokenID {
     fn eq(&self, other: &Self) -> bool {
         self.id == other.id
+    }
+}
+
+impl Hash for TokenID {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
     }
 }
 
@@ -49,7 +56,7 @@ impl Token {
     }
 }
 
-impl cmp::PartialEq for Token {
+impl PartialEq for Token {
     fn eq(&self, other: &Self) -> bool {
         self.token == other.token
     }
