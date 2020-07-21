@@ -13,7 +13,7 @@ impl CategoryName {
         })
     }
 
-    pub fn value(&self) -> &String {
+    pub fn value(&self) -> &str {
         &self.name
     }
 }

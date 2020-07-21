@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::domain::token::{Data, Token, TokenService};
-use crate::domain::user::{PasswordHasher, User, UserID, UserRepository};
+use crate::domain::user::{Password, PasswordHasher, User, UserID, UserRepository};
 use common::error::Error;
 use common::model::Entity;
 
@@ -51,10 +51,13 @@ where
         let user = self
             .user_repository
             .find_by_username_or_email(username_or_email)?;
-        if self
-            .password_hasher
-            .compare(user.password().value(), password)
-        {
+
+        let user_password = match user.identity().password() {
+            Some(password) => password.value(),
+            None => return Err(Error::application()),
+        };
+
+        if self.password_hasher.compare(user_password, password) {
             let mut data = Data::new();
             data.add("user_id", &user.id().value());
             let token = self.token_service.create(data)?;
@@ -104,16 +107,20 @@ where
         new_password: &str,
     ) -> Result<(), Error> {
         let mut user = self.user_repository.find_by_id(user_id)?;
-        if !self
-            .password_hasher
-            .compare(user.password().value(), old_password)
-        {
+
+        let user_password = match user.identity().password() {
+            Some(password) => password.value(),
+            None => return Err(Error::application()),
+        };
+
+        if !self.password_hasher.compare(user_password, old_password) {
             return Err(Error::application().set_code("invalid_password").build());
         }
 
         let hashed_password = self.password_hasher.hash(new_password)?;
 
-        user.set_password(&hashed_password)?;
+        let password = Password::new(&hashed_password)?;
+        user.set_password(password)?;
 
         self.user_repository.save(&mut user)?;
 
@@ -128,11 +135,11 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::domain::role::Role;
-    use crate::domain::token::TokenServiceImpl;
-    use crate::domain::user::User;
-    use crate::infrastructure::mocks::{FakePasswordHasher, FakeTokenEncoder};
-    use crate::infrastructure::persistence::inmem::{InMemTokenRepository, InMemUserRepository};
+    use crate::domain::role::*;
+    use crate::domain::token::*;
+    use crate::domain::user::*;
+    use crate::infrastructure::mocks::{self, *};
+    use crate::infrastructure::persistence::inmem::*;
 
     #[test]
     fn authenticate() -> Result<(), Error> {
@@ -151,20 +158,16 @@ mod tests {
             Rc::clone(&password_hasher),
         );
 
-        let mut user = User::new(
-            "U002".to_owned(),
-            "user1",
-            "user@email.com",
-            &password_hasher.hash("user123")?,
-            &Role::new("user".to_owned(), "User")?,
-        )?;
+        let mut user = mocks::user1()?;
         user_repo.save(&mut user)?;
 
-        let token = serv.authenticate("user1", "user123")?;
-        assert!(!token.token().is_empty());
+        let res = serv.authenticate("username", "P@asswd!");
+        assert!(res.is_ok());
+        assert!(!res.unwrap().token().is_empty());
 
-        let token = serv.authenticate("user@email.com", "user123")?;
-        assert!(!token.token().is_empty());
+        let res = serv.authenticate("username@email.com", "P@asswd!");
+        assert!(res.is_ok());
+        assert!(!res.unwrap().token().is_empty());
 
         assert!(serv.authenticate("user2", "user123").is_err());
         assert!(serv.authenticate("user1", "user124").is_err());

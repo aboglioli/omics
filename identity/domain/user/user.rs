@@ -1,5 +1,5 @@
 use crate::domain::role::{Role, RoleID};
-use crate::domain::user::{Email, Password, Person, Provider, Username};
+use crate::domain::user::{Email, Identity, Password, Person, Provider, Username};
 use common::error::Error;
 use common::model::{Entity, ID};
 
@@ -9,82 +9,32 @@ pub type UserID = String;
 #[derive(Debug, Clone)]
 pub struct User {
     id: ID<UserID>,
-    username: Username,
-    email: Email,
-    password: Password,
+    identity: Identity,
     person: Option<Person>,
     role_id: RoleID,
     validated: bool,
-    provider: Provider,
 }
 
 impl User {
-    pub fn new(
-        id: UserID,
-        username: &str,
-        email: &str,
-        password: &str,
-        role: &Role,
-    ) -> Result<User, Error> {
-        let mut err = Error::application().set_code("user").build();
-
-        let username = match Username::new(username) {
-            Ok(username) => Some(username),
-            Err(e) => {
-                err.merge(e);
-                None
-            }
-        };
-
-        let email = match Email::new(email) {
-            Ok(email) => Some(email),
-            Err(e) => {
-                err.merge(e);
-                None
-            }
-        };
-
-        let password = match Password::new(password) {
-            Ok(password) => Some(password),
-            Err(e) => {
-                err.merge(e);
-                None
-            }
-        };
-
-        if err.has_context() {
-            return Err(err.build());
-        }
-
+    pub fn new(id: UserID, identity: Identity, role: &Role) -> Result<User, Error> {
         Ok(User {
             id: ID::new(id),
-            username: username.unwrap(),
-            email: email.unwrap(),
-            password: password.unwrap(),
+            identity,
             person: None,
             role_id: role.id().value(),
             validated: false,
-            provider: Provider::Local,
         })
     }
 
-    pub fn username(&self) -> &Username {
-        &self.username
-    }
-
-    pub fn email(&self) -> &Email {
-        &self.email
-    }
-
-    pub fn password(&self) -> &Password {
-        &self.password
+    pub fn identity(&self) -> &Identity {
+        &self.identity
     }
 
     pub fn person(&self) -> Option<&Person> {
         self.person.as_ref()
     }
 
-    pub fn role(&self) -> &RoleID {
+    pub fn role_id(&self) -> &RoleID {
         &self.role_id
     }
 
@@ -96,17 +46,17 @@ impl User {
         self.id.deleted_at().is_none() && self.validated
     }
 
-    pub fn set_password(&mut self, hashed_password: &str) -> Result<(), Error> {
-        self.password = Password::new(hashed_password)?;
+    pub fn set_password(&mut self, password: Password) -> Result<(), Error> {
+        self.identity.set_password(password)?;
         Ok(())
     }
 
-    pub fn change_name(&mut self, name: &str, lastname: &str) -> Result<(), Error> {
-        self.person = Some(Person::new(name, lastname)?);
+    pub fn set_person(&mut self, person: Person) -> Result<(), Error> {
+        self.person = Some(person);
         Ok(())
     }
 
-    pub fn change_role(&mut self, role: &Role) {
+    pub fn set_role(&mut self, role: &Role) {
         self.role_id = role.id().value();
     }
 
@@ -128,9 +78,18 @@ mod tests {
     #[test]
     fn create() -> Result<(), Error> {
         let role = Role::new(RoleID::from("user"), "User")?;
-        let res = User::new(UserID::from(""), "", "", "", &role);
-        assert!(res.is_err());
-        assert_eq!(res.err().unwrap().context().len(), 3);
+        let user = User::new(
+            UserID::from("user123"),
+            Identity::new(
+                Provider::new("local")?,
+                Username::new("user1")?,
+                Email::new("email@user.com")?,
+                Some(Password::new(&format!("{:X>50}", "2"))?),
+            )?,
+            &role,
+        )?;
+        assert_eq!(user.identity().username().value(), "user1");
+        assert_eq!(user.identity().email().value(), "email@user.com");
 
         Ok(())
     }

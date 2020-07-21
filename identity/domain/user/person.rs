@@ -1,45 +1,18 @@
 use common::error::Error;
 
+use crate::domain::user::Fullname;
+
 #[derive(Debug, Clone)]
 pub struct Person {
-    name: String,
-    lastname: String,
+    fullname: Fullname,
 }
 
 impl Person {
-    pub fn new(name: &str, lastname: &str) -> Result<Person, Error> {
-        let mut err = Error::application();
-        if name.len() < 4 {
-            err.add_context("name", "too_short");
-        }
-
-        if name.len() > 64 {
-            err.add_context("name", "too_long");
-        }
-
-        if lastname.len() < 4 {
-            err.add_context("lastname", "too_short");
-        }
-
-        if lastname.len() > 64 {
-            err.add_context("lastname", "too_long");
-        }
-
-        if err.has_context() {
-            return Err(err);
-        }
-
-        Ok(Person {
-            name: String::from(name),
-            lastname: String::from(lastname),
-        })
+    pub fn new(fullname: Fullname) -> Result<Person, Error> {
+        Ok(Person { fullname })
     }
 
-    pub fn name(&self) -> &str {
-        &self.name
-    }
-
-    pub fn lastname(&self) -> &str {
-        &self.lastname
+    pub fn fullname(&self) -> &Fullname {
+        &self.fullname
     }
 }

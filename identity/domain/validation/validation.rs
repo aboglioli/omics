@@ -55,17 +55,11 @@ mod tests {
 
     use crate::domain::role::{Role, RoleID};
     use crate::domain::user::User;
+    use crate::infrastructure::mocks;
 
     #[test]
     fn create() -> Result<(), Error> {
-        let role = Role::new(RoleID::from("user"), "User")?;
-        let user = User::new(
-            UserID::from("U001"),
-            "username",
-            "email@email.com",
-            &format!("{:X>50}", "2"),
-            &role,
-        )?;
+        let user = mocks::user1()?;
         let v = Validation::new(&user);
         assert!(!v.code().is_empty());
         assert_eq!(v.user_id(), &user.id().value());

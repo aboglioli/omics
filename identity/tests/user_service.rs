@@ -1,15 +1,12 @@
 use std::rc::Rc;
 
-use omics::{
-    common::{error::Error, model::Entity},
-    identity::{
-        application::user::UserService,
-        domain::{
-            role::Role,
-            token::{TokenService, TokenServiceImpl},
-            user::{AuthService, AuthServiceImpl, User, UserRepository},
-        },
-        infrastructure::{mocks::*, persistence::inmem::*},
+use common::{error::Error, model::Entity};
+use identity::{
+    application::user::UserService,
+    domain::{token::*, user::*},
+    infrastructure::{
+        mocks::{self, *},
+        persistence::inmem::*,
     },
 };
 
@@ -28,6 +25,7 @@ struct Container {
         >,
     >,
     role_repo: Rc<InMemRoleRepository>,
+    validation_repo: Rc<InMemValidationRepository>,
     user_serv: UserService<
         InMemUserRepository,
         InMemEventPublisher,
@@ -37,6 +35,7 @@ struct Container {
             FakePasswordHasher,
         >,
         InMemRoleRepository,
+        InMemValidationRepository,
     >,
 }
 
@@ -57,12 +56,14 @@ impl Container {
             Rc::clone(&password_hasher),
         ));
         let role_repo = Rc::new(InMemRoleRepository::new());
+        let validation_repo = Rc::new(InMemValidationRepository::new());
 
         let user_serv = UserService::new(
             Rc::clone(&user_repo),
             Rc::clone(&event_pub),
             Rc::clone(&auth_serv),
             Rc::clone(&role_repo),
+            Rc::clone(&validation_repo),
         );
 
         Container {
@@ -74,6 +75,7 @@ impl Container {
             token_serv,
             auth_serv,
             role_repo,
+            validation_repo,
             user_serv,
         }
     }
@@ -83,20 +85,13 @@ impl Container {
 fn get_by_id() -> Result<(), Error> {
     let c = Container::new();
 
-    let user_id = c.user_repo.next_id()?;
-    let mut user = User::new(
-        user_id.clone(),
-        "user12",
-        "user@email.com",
-        &c.auth_serv.generate_password("user123")?,
-        &Role::new("user".to_owned(), "User")?,
-    )?;
+    let mut user = mocks::user1()?;
     c.user_repo.save(&mut user)?;
 
-    let found_user = c.user_serv.get_by_id(user_id)?;
+    let found_user = c.user_serv.get_by_id(&user.id().value())?;
     assert_eq!(found_user.id(), user.id());
-    assert_eq!(found_user.username().value(), "user12");
-    assert_eq!(found_user.email().value(), "user@email.com");
+    assert_eq!(found_user.identity().username().value(), "username");
+    assert_eq!(found_user.identity().email().value(), "username@email.com");
 
     Ok(())
 }

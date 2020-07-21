@@ -36,8 +36,8 @@ impl UserRepository for InMemUserRepository {
     fn find_by_username_or_email(&self, username_or_email: &str) -> Result<User, Error> {
         // TODO: can be made functional. Don't be lazy.
         for (_, user) in self.users.borrow().iter() {
-            if user.username().value() == username_or_email
-                || user.email().value() == username_or_email
+            if user.identity().username().value() == username_or_email
+                || user.identity().email().value() == username_or_email
             {
                 return Ok(user.clone());
             }
@@ -58,6 +58,10 @@ impl UserRepository for InMemUserRepository {
 mod tests {
     use super::*;
     use crate::domain::role::{Role, RoleID};
+    use crate::domain::user::{
+        Email, Fullname, Identity, Password, Person, Provider, User, UserID, Username,
+    };
+    use crate::infrastructure::mocks;
 
     #[test]
     fn next_id() -> Result<(), Error> {
@@ -75,15 +79,9 @@ mod tests {
     #[test]
     fn find_by_id() -> Result<(), Error> {
         let repo = InMemUserRepository::new();
-        let user = User::new(
-            repo.next_id()?,
-            "username",
-            "username@email.com",
-            "$2y$12$3JayOCN5w6ROeVieoNA5MuR5pgGaBDjbF/cm/SzgtdPTNUtJYf7vC", // user123
-            &Role::new(RoleID::from("user"), "User")?,
-        )?;
+        let user = mocks::user1()?;
         let mut changed_user = user.clone();
-        changed_user.change_name("Name", "Lastname")?;
+        changed_user.set_person(Person::new(Fullname::new("Name", "Lastname")?)?)?;
 
         repo.save(&mut changed_user)?;
         assert_eq!(repo.users.borrow().len(), 1);
@@ -94,8 +92,8 @@ mod tests {
         assert_eq!(changed_user.id(), found_user.id());
 
         let changed_user_person = found_user.person().ok_or(Error::internal())?;
-        assert_eq!(changed_user_person.name(), "Name");
-        assert_eq!(changed_user_person.lastname(), "Lastname");
+        assert_eq!(changed_user_person.fullname().name(), "Name");
+        assert_eq!(changed_user_person.fullname().lastname(), "Lastname");
 
         let _found_user = repo.find_by_username_or_email("username")?;
         let _found_user = repo.find_by_username_or_email("username@email.com")?;

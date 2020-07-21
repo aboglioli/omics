@@ -5,7 +5,10 @@ use crate::application::user::{
 };
 use crate::domain::role::{RoleID, RoleRepository};
 use crate::domain::token::Token;
-use crate::domain::user::{AuthService, User, UserID, UserRegistered, UserRepository, UserUpdated};
+use crate::domain::user::{
+    AuthService, Email, Fullname, Identity, Password, Person, Provider, User, UserID,
+    UserRegistered, UserRepository, UserUpdated, Username,
+};
 use crate::domain::validation::{Validation, ValidationCode, ValidationRepository};
 use common::error::Error;
 use common::event::EventPublisher;
@@ -68,10 +71,13 @@ impl<
         let hashed_password = self.auth_serv.generate_password(&cmd.password)?;
 
         let mut user = User::new(
-            self.user_repository.next_id()?,
-            &cmd.username,
-            &cmd.email,
-            &hashed_password,
+            UserID::from("user123"),
+            Identity::new(
+                Provider::new("local")?,
+                Username::new(&cmd.username)?,
+                Email::new(&cmd.email)?,
+                Some(Password::new(&hashed_password)?),
+            )?,
             &self.role_repository.get_by_code(&RoleID::from("user"))?,
         )?;
 
@@ -79,8 +85,8 @@ impl<
 
         let event = UserRegistered::new(
             user.id().value(),
-            user.username().value(),
-            user.email().value(),
+            user.identity().username().value(),
+            user.identity().email().value(),
         );
         self.event_publisher.publish("user.registered", event)?;
 
@@ -97,12 +103,16 @@ impl<
 
         let mut user = self.user_repository.find_by_id(&user_id)?;
 
-        user.change_name(&cmd.name, &cmd.lastname)?;
-
+        let person = Person::new(Fullname::new(&cmd.name, &cmd.lastname)?)?;
+        user.set_person(person);
         self.user_repository.save(&mut user)?;
 
         if let Some(person) = user.person() {
-            let event = UserUpdated::new(user.id().value(), person.name(), person.lastname());
+            let event = UserUpdated::new(
+                user.id().value(),
+                person.fullname().name(),
+                person.fullname().lastname(),
+            );
             self.event_publisher.publish("user.updated", event)?;
         }
 
