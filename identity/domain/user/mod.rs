@@ -7,6 +7,7 @@ mod person;
 mod user;
 mod user_repository;
 mod username;
+mod provider;
 
 pub use auth_service::*;
 pub use email::*;
@@ -17,3 +18,4 @@ pub use person::*;
 pub use user::*;
 pub use user_repository::*;
 pub use username::*;
+pub use provider::*;

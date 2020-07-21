@@ -1,5 +1,5 @@
 use crate::domain::role::{Role, RoleID};
-use crate::domain::user::{Email, Password, Person, Username};
+use crate::domain::user::{Email, Password, Person, Username, Provider};
 use common::error::Error;
 use common::model::{Entity, ID};
 
@@ -15,6 +15,7 @@ pub struct User {
     person: Option<Person>,
     role_id: RoleID,
     validated: bool,
+    provider: Provider,
 }
 
 impl User {
@@ -63,6 +64,7 @@ impl User {
             person: None,
             role_id: role.id().value(),
             validated: false,
+            provider: Provider::Local,
         })
     }
 

@@ -1,6 +1,6 @@
 use crate::domain::author::{Author, AuthorID};
-use crate::domain::category::{Category, CategoryID, Tag};
-use crate::domain::publication::{Name, Page, PageNumber, Statistics, Synopsis};
+use crate::domain::category::{Category, CategoryID};
+use crate::domain::publication::{Name, Page, PageNumber, Statistics, Synopsis, Tag};
 use common::error::Error;
 use common::model::{Entity, ID};
 

@@ -44,20 +44,3 @@ impl Entity<CategoryID> for Category {
         &self.id
     }
 }
-
-#[derive(Debug, Clone)]
-pub struct Tag {
-    tag: String,
-}
-
-impl Tag {
-    pub fn new(tag: &str) -> Tag {
-        Tag {
-            tag: tag.to_owned(),
-        }
-    }
-
-    pub fn value(&self) -> &String {
-        &self.tag
-    }
-}

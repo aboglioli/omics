@@ -9,3 +9,4 @@ path = "lib.rs"
 
 [dependencies]
 common = { path = "../common" }
+slug = "0.1.4"
