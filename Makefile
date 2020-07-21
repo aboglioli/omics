@@ -1,11 +1,21 @@
-all: build web
+WEB_DIR = web
+
+SERVICES = \
+	postgres postgres-pgadmin \
+	redis redis-commander
 
 build:
-	cargo build 
+	cargo build --release
+	$(MAKE) -C $(WEB_DIR) build
 
-server:
+server-run:
 	cargo run
 
-front:
-	cd web
-	ng serve
+web-run:
+	$(MAKE) -C $(WEB_DIR) serve
+
+docker-up:
+	docker-compose up -d $(SERVICES)
+
+docker-down:
+	docker-compose down
