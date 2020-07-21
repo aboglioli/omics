@@ -1,9 +1,11 @@
+mod name;
 mod page;
 mod publication;
 mod statistics;
-mod value_objects;
+mod synopsis;
 
+pub use name::*;
 pub use page::*;
 pub use publication::*;
 pub use statistics::*;
-pub use value_objects::*;
+pub use synopsis::*;
