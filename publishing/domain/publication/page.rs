@@ -1,3 +1,5 @@
+use std::cmp::PartialEq;
+
 use common::error::Error;
 
 #[derive(Debug, Clone)]
@@ -17,6 +19,12 @@ impl Position {
     }
 }
 
+impl PartialEq for Position {
+    fn eq(&self, other: &Position) -> bool {
+        self.0 == other.0 && self.1 == other.1
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Size(u32, u32);
 
@@ -31,6 +39,12 @@ impl Size {
 
     pub fn height(&self) -> u32 {
         self.1
+    }
+}
+
+impl PartialEq for Size {
+    fn eq(&self, other: &Size) -> bool {
+        self.0 == other.0 && self.1 == other.1
     }
 }
 
@@ -97,11 +111,17 @@ impl Image {
         &self.size
     }
 
-    pub fn frames(&self) -> &Vec<Frame> {
+    pub fn frames(&self) -> &[Frame] {
         &self.frames
     }
 
     pub fn add_frame(&mut self, frame: Frame) -> Result<(), Error> {
+        for f in self.frames.iter_mut() {
+            if f.order() == frame.order() {
+                *f = frame;
+                return Ok(());
+            }
+        }
         self.frames.push(frame);
         Ok(())
     }
@@ -127,7 +147,7 @@ impl Page {
         &self.number
     }
 
-    pub fn images(&self) -> &Vec<Image> {
+    pub fn images(&self) -> &[Image] {
         &self.images
     }
 
@@ -145,6 +165,41 @@ impl Page {
 
     pub fn remove_image(&mut self, image_id: &ImageID) -> Result<(), Error> {
         self.images.retain(|image| image.id() != image_id);
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn image() -> Result<(), Error> {
+        // New image
+        let mut image = Image::new(ImageID::from("image123"), "host.com/image.jpg", 1024)?;
+        image.add_frame(Frame::new(0, Position::new(0, 0)?, Size::new(800, 600)?)?)?;
+        image.add_frame(Frame::new(1, Position::new(800, 0)?, Size::new(800, 600)?)?)?;
+        image.add_frame(Frame::new(
+            2,
+            Position::new(1600, 0)?,
+            Size::new(800, 600)?,
+        )?)?;
+
+        assert_eq!(image.frames().len(), 3);
+        assert_eq!(image.frames()[0].order(), &0);
+        assert_eq!(image.frames()[1].order(), &1);
+        assert_eq!(image.frames()[2].order(), &2);
+
+        // Replace frame
+        image.add_frame(Frame::new(
+            1,
+            Position::new(600, 600)?,
+            Size::new(600, 600)?,
+        )?)?;
+        assert_eq!(image.frames().len(), 3);
+        assert_eq!(image.frames()[1].order(), &1);
+        assert_eq!(image.frames()[1].position(), &Position::new(600, 600)?);
+
         Ok(())
     }
 }

@@ -54,7 +54,7 @@ impl Publication {
         &self.statistics
     }
 
-    pub fn pages(&self) -> &Vec<Page> {
+    pub fn pages(&self) -> &[Page] {
         &self.pages
     }
 

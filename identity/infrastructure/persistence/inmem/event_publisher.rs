@@ -18,7 +18,7 @@ impl InMemEventPublisher {
         &self.events
     }
 
-    pub fn has<E: Event + 'static>(&self, event: E) -> bool {
+    pub fn has(&self, event: &dyn Event) -> bool {
         for evt in self.events.borrow().iter() {
             if evt.code() == event.code() && evt.payload() == event.payload() {
                 return true;
@@ -41,9 +41,6 @@ mod tests {
 
     #[derive(Debug)]
     struct EntityCreated;
-    #[derive(Debug)]
-    struct EntityUpdated;
-
     impl Event for EntityCreated {
         fn code(&self) -> &str {
             "entity-created"
@@ -53,6 +50,8 @@ mod tests {
         }
     }
 
+    #[derive(Debug)]
+    struct EntityUpdated;
     impl Event for EntityUpdated {
         fn code(&self) -> &str {
             "entity-updated"
@@ -62,17 +61,28 @@ mod tests {
         }
     }
 
+    struct AnotherEvent;
+    impl Event for AnotherEvent {
+        fn code(&self) -> &str {
+            "another"
+        }
+        fn payload(&self) -> Vec<u8> {
+            b"another".to_vec()
+        }
+    }
+
     fn publish() -> Result<(), Error> {
         let event_publisher = InMemEventPublisher::new();
         event_publisher.publish("entity.created", Box::new(EntityCreated))?;
         event_publisher.publish("entity.updated", Box::new(EntityUpdated))?;
         assert_eq!(event_publisher.events().borrow().len(), 2);
-        assert!(event_publisher.has(EntityCreated));
-        assert!(event_publisher.has(EntityUpdated));
+        assert!(event_publisher.has(&EntityCreated));
+        assert!(event_publisher.has(&EntityUpdated));
+        assert!(!event_publisher.has(&AnotherEvent));
 
-        let events = event_publisher.events();
-        assert_eq!(events.borrow().get(0).unwrap().code(), "entitiy-created");
-        assert_eq!(events.borrow().get(1).unwrap().code(), "entitiy-updated");
+        let events = event_publisher.events().borrow();
+        assert_eq!(events.get(0).unwrap().code(), "entitiy-created");
+        assert_eq!(events.get(1).unwrap().code(), "entitiy-updated");
 
         Ok(())
     }
