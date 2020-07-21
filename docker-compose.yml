@@ -1,0 +1,132 @@
+version: '3.5'
+
+services:
+  mongo:
+    image: mongo:latest
+    restart: always
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-admin}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-database}
+    volumes:
+      - mongo:/data/db
+    networks:
+      - mongo
+
+  mongo-express:
+    image: mongo-express:latest
+    restart: always
+    ports:
+      - "${MONGO_EXPRESS_PORT:-8080}:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER:-admin}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD:-admin}
+    networks:
+      - mongo
+    depends_on:
+      - mongo
+
+  adminmongo:
+    image: mrvautin/adminmongo:latest
+    restart: always
+    ports:
+      - "${ADMINMONGO_PORT:-8081}:1234"
+    environment:
+      DB_USERNAME: ${MONGO_USER:-admin}
+      DB_PASSWORD: ${MONGO_PASSWORD:-admin}
+      DB_NAME: ${MONGO_DATABASE:-database}
+    networks:
+      - mongo
+    depends_on:
+      - mongo
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}
+    volumes:
+      - postgres:/var/lib/postgresql
+      - ./migrations:/migrations
+    networks:
+      - postgres
+
+  postgres-pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - "${PGADMIN_PORT:-8080}:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@admin.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+    networks:
+      - postgres
+    depends_on:
+      - postgres
+
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis:/data
+    networks:
+      - redis
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    restart: always
+    ports:
+      - "${REDIS_COMMANDER_PORT:-8081}:8081"
+    environment:
+      REDIS_HOSTS: local:redis:${REDIS_PORT:-6379}
+    networks:
+      - redis
+    depends_on:
+      - redis
+
+  rabbitmq:
+    image: rabbitmq:3.7-management
+    restart: always
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MANAGEMENT_PORT:-8082}:15672"
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq
+    networks:
+      - rabbitmq
+
+  minio:
+    image: minio/minio:latest
+    restart: always
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+    volumes:
+      - minio:/data
+    networks:
+      - minio
+
+volumes:
+  mongo:
+  postgres:
+  redis:
+  rabbitmq:
+  minio:
+
+networks:
+  mongo:
+    driver: bridge
+  postgres:
+    driver: bridge
+  redis:
+    driver: bridge
+  rabbitmq:
+    driver: bridge
+  minio:
+    driver: bridge
