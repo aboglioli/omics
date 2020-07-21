@@ -14,41 +14,21 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::model::Entity;
 
-pub struct UserService<
-    TUserRepository,
-    TEventPublisher,
-    TAuthService,
-    TRoleRepository,
-    TValidationRepository,
-> {
-    user_repository: Rc<TUserRepository>,
-    event_publisher: Rc<TEventPublisher>,
-    auth_serv: Rc<TAuthService>,
-    role_repository: Rc<TRoleRepository>,
-    validation_repository: Rc<TValidationRepository>,
+pub struct UserService {
+    user_repository: Rc<dyn UserRepository>,
+    event_publisher: Rc<dyn EventPublisher>,
+    auth_serv: Rc<AuthService>,
+    role_repository: Rc<dyn RoleRepository>,
+    validation_repository: Rc<dyn ValidationRepository>,
 }
 
-impl<
-        TUserRepository: UserRepository,
-        TEventPublisher: EventPublisher,
-        TAuthService: AuthService,
-        TRoleRepository: RoleRepository,
-        TValidationRepository: ValidationRepository,
-    >
-    UserService<
-        TUserRepository,
-        TEventPublisher,
-        TAuthService,
-        TRoleRepository,
-        TValidationRepository,
-    >
-{
+impl UserService {
     pub fn new(
-        user_repository: Rc<TUserRepository>,
-        event_publisher: Rc<TEventPublisher>,
-        auth_serv: Rc<TAuthService>,
-        role_repository: Rc<TRoleRepository>,
-        validation_repository: Rc<TValidationRepository>,
+        user_repository: Rc<dyn UserRepository>,
+        event_publisher: Rc<dyn EventPublisher>,
+        auth_serv: Rc<AuthService>,
+        role_repository: Rc<dyn RoleRepository>,
+        validation_repository: Rc<dyn ValidationRepository>,
     ) -> Self {
         UserService {
             user_repository,
@@ -88,7 +68,8 @@ impl<
             user.identity().username().value(),
             user.identity().email().value(),
         );
-        self.event_publisher.publish("user.registered", event)?;
+        self.event_publisher
+            .publish("user.registered", Box::new(event))?;
 
         Ok(())
     }
@@ -113,7 +94,8 @@ impl<
                 person.fullname().name(),
                 person.fullname().lastname(),
             );
-            self.event_publisher.publish("user.updated", event)?;
+            self.event_publisher
+                .publish("user.updated", Box::new(event))?;
         }
 
         Ok(())

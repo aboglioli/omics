@@ -2,6 +2,8 @@ use std::cmp::PartialEq;
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 
+use uuid::Uuid;
+
 // TokenID
 #[derive(Debug, Clone, Eq)]
 pub struct TokenID {
@@ -10,9 +12,8 @@ pub struct TokenID {
 
 impl TokenID {
     pub fn new() -> TokenID {
-        TokenID {
-            id: "T001".to_owned(),
-        }
+        let uuid = Uuid::new_v4().to_string();
+        TokenID { id: uuid }
     }
 
     pub fn id(&self) -> &String {

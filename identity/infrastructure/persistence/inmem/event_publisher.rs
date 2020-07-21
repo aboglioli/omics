@@ -29,8 +29,8 @@ impl InMemEventPublisher {
 }
 
 impl EventPublisher for InMemEventPublisher {
-    fn publish<E: Event + 'static>(&self, _: &str, event: E) -> Result<(), Error> {
-        self.events.borrow_mut().push(Box::new(event));
+    fn publish(&self, _: &str, event: Box<dyn Event>) -> Result<(), Error> {
+        self.events.borrow_mut().push(event);
         Ok(())
     }
 }
@@ -64,8 +64,8 @@ mod tests {
 
     fn publish() -> Result<(), Error> {
         let event_publisher = InMemEventPublisher::new();
-        event_publisher.publish("entity.created", EntityCreated)?;
-        event_publisher.publish("entity.updated", EntityUpdated)?;
+        event_publisher.publish("entity.created", Box::new(EntityCreated))?;
+        event_publisher.publish("entity.updated", Box::new(EntityUpdated))?;
         assert_eq!(event_publisher.events().borrow().len(), 2);
         assert!(event_publisher.has(EntityCreated));
         assert!(event_publisher.has(EntityUpdated));

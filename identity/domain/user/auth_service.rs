@@ -5,49 +5,26 @@ use crate::domain::user::{Password, PasswordHasher, User, UserID, UserRepository
 use common::error::Error;
 use common::model::Entity;
 
-pub trait AuthService {
-    fn authenticate(&self, username_or_email: &str, password: &str) -> Result<Token, Error>;
-    fn authorize(&self, token: &Token) -> Result<User, Error>;
-    fn available(&self, username: &str, email: &str) -> Result<bool, Error>;
-    fn change_password(
-        &self,
-        user_id: &UserID,
-        old_password: &str,
-        new_password: &str,
-    ) -> Result<(), Error>;
-    fn generate_password(&self, plain_pasword: &str) -> Result<String, Error>;
+pub struct AuthService {
+    user_repository: Rc<dyn UserRepository>,
+    token_service: Rc<TokenService>,
+    password_hasher: Rc<dyn PasswordHasher>,
 }
 
-pub struct AuthServiceImpl<TUserRepository, TTokenService, TPasswordHasher> {
-    user_repository: Rc<TUserRepository>,
-    token_service: Rc<TTokenService>,
-    password_hasher: Rc<TPasswordHasher>,
-}
-
-impl<TUserRepository, TTokenService, TPasswordHasher>
-    AuthServiceImpl<TUserRepository, TTokenService, TPasswordHasher>
-{
+impl AuthService {
     pub fn new(
-        user_repository: Rc<TUserRepository>,
-        token_service: Rc<TTokenService>,
-        password_hasher: Rc<TPasswordHasher>,
+        user_repository: Rc<dyn UserRepository>,
+        token_service: Rc<TokenService>,
+        password_hasher: Rc<dyn PasswordHasher>,
     ) -> Self {
-        AuthServiceImpl {
+        AuthService {
             user_repository,
             token_service,
             password_hasher,
         }
     }
-}
 
-impl<TUserRepository, TTokenService, TPasswordHasher> AuthService
-    for AuthServiceImpl<TUserRepository, TTokenService, TPasswordHasher>
-where
-    TUserRepository: UserRepository,
-    TTokenService: TokenService,
-    TPasswordHasher: PasswordHasher,
-{
-    fn authenticate(&self, username_or_email: &str, password: &str) -> Result<Token, Error> {
+    pub fn authenticate(&self, username_or_email: &str, password: &str) -> Result<Token, Error> {
         let user = self
             .user_repository
             .find_by_username_or_email(username_or_email)?;
@@ -67,7 +44,7 @@ where
         Err(Error::application().set_code("invalid_credentials").build())
     }
 
-    fn authorize(&self, token: &Token) -> Result<User, Error> {
+    pub fn authorize(&self, token: &Token) -> Result<User, Error> {
         let data = self.token_service.validate(token)?;
         if let Some(user_id) = data.get("user_id") {
             let user = self.user_repository.find_by_id(user_id)?;
@@ -76,7 +53,7 @@ where
         Err(Error::application())
     }
 
-    fn available(&self, username: &str, email: &str) -> Result<bool, Error> {
+    pub fn available(&self, username: &str, email: &str) -> Result<bool, Error> {
         let mut err = Error::application();
         if self
             .user_repository
@@ -100,7 +77,7 @@ where
         Ok(true)
     }
 
-    fn change_password(
+    pub fn change_password(
         &self,
         user_id: &UserID,
         old_password: &str,
@@ -127,7 +104,7 @@ where
         Ok(())
     }
 
-    fn generate_password(&self, plain_pasword: &str) -> Result<String, Error> {
+    pub fn generate_password(&self, plain_pasword: &str) -> Result<String, Error> {
         self.password_hasher.hash(plain_pasword)
     }
 }
@@ -147,15 +124,15 @@ mod tests {
         let password_hasher = Rc::new(FakePasswordHasher::new());
         let token_enc = Rc::new(FakeTokenEncoder::new());
         let token_repo = Rc::new(InMemTokenRepository::new());
-        let token_serv = Rc::new(TokenServiceImpl::new(
-            Rc::clone(&token_enc),
-            Rc::clone(&token_repo),
+        let token_serv = Rc::new(TokenService::new(
+            Rc::clone(&token_enc) as Rc<dyn TokenEncoder>,
+            Rc::clone(&token_repo) as Rc<dyn TokenRepository>,
         ));
 
-        let serv = AuthServiceImpl::new(
-            Rc::clone(&user_repo),
+        let serv = AuthService::new(
+            Rc::clone(&user_repo) as Rc<dyn UserRepository>,
             Rc::clone(&token_serv),
-            Rc::clone(&password_hasher),
+            Rc::clone(&password_hasher) as Rc<dyn PasswordHasher>,
         );
 
         let mut user = mocks::user1()?;

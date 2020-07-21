@@ -5,6 +5,10 @@ pub trait Event {
     fn payload(&self) -> Vec<u8>;
 }
 
+// pub trait EventPublisher {
+//     fn publish<E: Event + 'static>(&self, topic: &str, event: E) -> Result<(), Error>;
+// }
+
 pub trait EventPublisher {
-    fn publish<E: Event + 'static>(&self, topic: &str, event: E) -> Result<(), Error>;
+    fn publish(&self, topic: &str, event: Box<dyn Event>) -> Result<(), Error>;
 }

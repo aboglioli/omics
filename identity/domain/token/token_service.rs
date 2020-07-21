@@ -3,37 +3,23 @@ use std::rc::Rc;
 use crate::domain::token::{Data, Token, TokenEncoder, TokenID, TokenRepository};
 use common::error::Error;
 
-pub trait TokenService {
-    fn create(&self, data: Data) -> Result<Token, Error>;
-    fn validate(&self, token: &Token) -> Result<Data, Error>;
-    fn invalidate(&self, token: &Token) -> Result<(), Error>;
+pub struct TokenService {
+    token_encoder: Rc<dyn TokenEncoder>,
+    token_repository: Rc<dyn TokenRepository>,
 }
 
-pub struct TokenServiceImpl<TTokenEncoder, TTokenRepository> {
-    token_encoder: Rc<TTokenEncoder>,
-    token_repository: Rc<TTokenRepository>,
-}
-
-impl<TTokenEncoder, TTokenRepository> TokenServiceImpl<TTokenEncoder, TTokenRepository>
-where
-    TTokenEncoder: TokenEncoder,
-    TTokenRepository: TokenRepository,
-{
-    pub fn new(token_encoder: Rc<TTokenEncoder>, token_repository: Rc<TTokenRepository>) -> Self {
-        TokenServiceImpl {
+impl TokenService {
+    pub fn new(
+        token_encoder: Rc<dyn TokenEncoder>,
+        token_repository: Rc<dyn TokenRepository>,
+    ) -> Self {
+        TokenService {
             token_encoder,
             token_repository,
         }
     }
-}
 
-impl<TTokenEncoder, TTokenRepository> TokenService
-    for TokenServiceImpl<TTokenEncoder, TTokenRepository>
-where
-    TTokenEncoder: TokenEncoder,
-    TTokenRepository: TokenRepository,
-{
-    fn create(&self, data: Data) -> Result<Token, Error> {
+    pub fn create(&self, data: Data) -> Result<Token, Error> {
         let token_id = TokenID::new();
         let token = self.token_encoder.encode(&token_id)?;
         self.token_repository.set(token_id, data)?;
@@ -41,7 +27,7 @@ where
         Ok(token)
     }
 
-    fn validate(&self, token: &Token) -> Result<Data, Error> {
+    pub fn validate(&self, token: &Token) -> Result<Data, Error> {
         let token_id = self.token_encoder.decode(token)?;
         if let Some(data) = self.token_repository.get(&token_id) {
             return Ok(data);
@@ -49,7 +35,7 @@ where
         Err(Error::application().set_code("token_not_found").build())
     }
 
-    fn invalidate(&self, token: &Token) -> Result<(), Error> {
+    pub fn invalidate(&self, token: &Token) -> Result<(), Error> {
         let token_id = self.token_encoder.decode(token)?;
         self.token_repository.delete(&token_id)?;
         Ok(())
@@ -67,7 +53,10 @@ mod tests {
     fn create() -> Result<(), Error> {
         let enc = Rc::new(FakeTokenEncoder::new());
         let repo = Rc::new(InMemTokenRepository::new());
-        let serv = TokenServiceImpl::new(Rc::clone(&enc), Rc::clone(&repo));
+        let serv = TokenService::new(
+            Rc::clone(&enc) as Rc<dyn TokenEncoder>,
+            Rc::clone(&repo) as Rc<dyn TokenRepository>,
+        );
 
         let mut data = Data::new();
         data.add("user_id", "u123");
