@@ -13,27 +13,39 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Lint
-      run: cargo fmt -- --check
-    - name: Warnings
-      run: cargo clippy -- -Dwarnings
+      - uses: actions/checkout@v2
+      - name: Lint
+        run: cargo fmt -- --check
+      - name: Warnings
+        run: cargo clippy -- -Dwarnings
 
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Tests
-      run: cargo test --verbose
+      - uses: actions/checkout@v2
+      - name: Tests
+        run: cargo test --verbose
 
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Build
-      run: cargo build --verbose
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: server
-        path: target/release/omics
+      - uses: actions/checkout@v2
+      - name: Build
+        run: cargo build --verbose
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: server
+          path: ./target/release/omics
+
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: aboglioli/omics-server
+          tags: latest

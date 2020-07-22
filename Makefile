@@ -21,7 +21,7 @@ server-test:
 server-build: server-dependencies
 	cargo build --release
 
-server-deploy: server-build
+server-deploy:
 	heroku container:push web
 	heroku container:release web
 
@@ -56,7 +56,7 @@ docker-down:
 docker-build: docker-server-build docker-web-build
 
 docker-server-build:
-	docker build -t omics-server:latest .
+	docker build -t aboglioli/omics-server:latest .
 
 docker-web-build:
-	docker build -t omics-web:latest ./web
+	docker build -t aboglioli/omics-web:latest ./web
