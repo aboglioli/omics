@@ -4,8 +4,6 @@ build: build web-build
 
 dependencies: dependencies web-dependencies
 
-deploy: deploy web-deploy
-
 # ----------
 # Server
 # ----------
