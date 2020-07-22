@@ -9,7 +9,7 @@ services:
   web:
     build: ./web
     ports:
-      - "${WEB_PORT:-4000}:80"
+      - "${WEB_PORT:-4000}:4000"
 
   mongo:
     image: mongo:latest
