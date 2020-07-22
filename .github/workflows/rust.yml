@@ -49,3 +49,10 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: aboglioli/omics-server
           tags: latest
+      - name: Build and push Docker image to Heroku
+        uses: akhileshns/heroku-deploy@v3.3.6
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: "omics"
+          heroku_email: "alan.boglioli@gmail.com"
+          usedocker: true

@@ -3,11 +3,12 @@ version: '3.5'
 services:
   server:
     build: .
+    image: aboglioli/omics-server:latest
     ports:
       - "${SERVER_PORT:-3000}:80"
     networks:
-      - backend
       - services
+      - open
     depends_on:
       - postgres
       - redis
@@ -15,10 +16,11 @@ services:
 
   web:
     build: ./web
+    image: aboglioli/omics-web:latest
     ports:
       - "${WEB_PORT:-4000}:80"
     networks:
-      - backend
+      - open
 
   mongo:
     image: mongo:latest
@@ -145,10 +147,6 @@ volumes:
   minio:
 
 networks:
-  backend:
-    driver: bridge
-  frontend:
-    driver: bridge
+  services:
   open:
     driver: bridge
-  services:

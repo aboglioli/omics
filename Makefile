@@ -1,29 +1,25 @@
 WEB_DIR = web
 
-build: server-build web-build
+build: build web-build
 
-dependencies: server-dependencies web-dependencies
+dependencies: dependencies web-dependencies
 
-deploy: server-deploy web-deploy
+deploy: deploy web-deploy
 
 # ----------
 # Server
 # ----------
-server-run:
+run:
 	PORT=3000 cargo run
 
-server-dependencies:
+dependencies:
 	cargo update
 
-server-test:
+test:
 	cargo test
 
-server-build: server-dependencies
+build: dependencies
 	cargo build --release
-
-server-deploy:
-	heroku container:push web
-	heroku container:release web
 
 # ----------
 # Web
@@ -53,10 +49,11 @@ docker-up:
 docker-down:
 	docker-compose down
 
-docker-build: docker-server-build docker-web-build
-
-docker-server-build:
+docker:
 	docker build -t aboglioli/omics-server:latest .
+	docker push aboglioli/omics-server:latest
 
-docker-web-build:
-	docker build -t aboglioli/omics-web:latest ./web
+heroku: docker
+	docker tag aboglioli/omics-server registry.heroku.com/omics/web
+	docker push registry.heroku.com/omics/web
+	heroku container:release web
