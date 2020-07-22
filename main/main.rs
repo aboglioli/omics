@@ -1,9 +1,13 @@
-use hyper::service::{make_service_fn, service_fn};
-use hyper::{Body, Request, Response, Server};
+use std::env;
+use std::error::Error;
 use std::{convert::Infallible, net::SocketAddr};
 
+use hyper::service::{make_service_fn, service_fn};
+use hyper::{Body, Request, Response, Server};
+
 async fn handle(_req: Request<Body>) -> Result<Response<Body>, Infallible> {
-  Ok(Response::new("
+    Ok(Response::new(
+        "
       <html>
         <head>
           <title>Omics</title>
@@ -34,12 +38,20 @@ async fn handle(_req: Request<Body>) -> Result<Response<Body>, Infallible> {
           </b>
         </body>
       </html>
-  ".into()))
+  "
+        .into(),
+    ))
 }
 
 #[tokio::main]
-async fn main() {
-    let port = 3000;
+async fn main() -> Result<(), Box<dyn Error>> {
+    let port: u16 = match env::var("PORT") {
+        Ok(port) => match port.parse() {
+            Ok(port) => port,
+            _ => 80,
+        },
+        _ => 80,
+    };
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
 
     let make_svc = make_service_fn(|_conn| async { Ok::<_, Infallible>(service_fn(handle)) });
@@ -51,4 +63,6 @@ async fn main() {
     if let Err(e) = server.await {
         eprintln!("server error: {}", e);
     }
+
+    Ok(())
 }

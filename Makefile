@@ -18,7 +18,7 @@ server-dependencies:
 	rustup target add $(RUST_TARGET)
 
 server-run:
-	cargo run
+	PORT=3000 cargo run
 
 # ----------
 # Web
@@ -44,3 +44,12 @@ docker-up:
 
 docker-down:
 	docker-compose down
+
+# ----------
+# Deploy
+# ----------
+server-deploy:
+	git push heroku master
+
+web-deploy:
+	$(MAKE) -C $(WEB_DIR) deploy

@@ -13,7 +13,6 @@ services:
       - redis
       - rabbitmq
 
-
   web:
     build: ./web
     ports:
