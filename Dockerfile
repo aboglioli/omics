@@ -12,13 +12,6 @@ RUN rustup target add ${target}
 WORKDIR /src
 COPY . .
 
-# Lint
-RUN cargo fmt -- --check
-RUN cargo clippy -- -Dwarnings
-
-# Test
-RUN cargo test
-
 # Build
 RUN cargo build --release --target ${target}
 RUN rm -f target/x86_64-unknown-linux-musl/release/deps/omics*
