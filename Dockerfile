@@ -1,6 +1,6 @@
-# ----
+# ----------
 # Build stage
-# ----
+# ----------
 FROM rust:latest AS build
 
 ENV target x86_64-unknown-linux-musl
@@ -13,16 +13,18 @@ WORKDIR /src
 COPY . .
 
 # Build
-RUN cargo build --release --target ${target}
-RUN rm -f target/x86_64-unknown-linux-musl/release/deps/omics*
-# RUN cargo install --path ./main
+# RUN cargo build --release --target ${target}
+# RUN rm -f target/x86_64-unknown-linux-musl/release/deps/omics*
+RUN cargo install --path ./main --target ${target}
 
-# ---
+# ----------
 # Final stage
-# ---
+# ----------
 FROM alpine:latest
 
-COPY --from=build /src/target/${target}/release/omics /usr/local/bin/omics
+ENV target x86_64-unknown-linux-musl
+
+COPY --from=build /usr/local/cargo/bin/omics /usr/local/bin/omics
 
 EXPOSE 3000
 

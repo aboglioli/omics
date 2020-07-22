@@ -4,5 +4,5 @@ build:
 dependencies:
 	npm install
 
-serve:
-	ng serve
+run:
+	npm start
