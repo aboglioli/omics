@@ -18,5 +18,5 @@ publishing = { path = "../publishing" }
 common = { path = "../common" }
 identity = { path = "../identity" }
 publishing = { path = "../publishing" }
-hyper = "0.13"
+warp = "0.2"
 tokio = { version = "0.2", features = ["full"] }

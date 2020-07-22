@@ -1,5 +1,5 @@
 build:
-	ng build
+	npm run build
 
 dependencies:
 	npm install
