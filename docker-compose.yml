@@ -4,7 +4,7 @@ services:
   server:
     build: .
     ports:
-      - "${SERVER_PORT:-3000}:3000"
+      - "${SERVER_PORT:-3000}:80"
     networks:
       - backend
       - services
@@ -17,7 +17,7 @@ services:
   web:
     build: ./web
     ports:
-      - "${WEB_PORT:-4000}:4000"
+      - "${WEB_PORT:-4000}:80"
     networks:
       - backend
 

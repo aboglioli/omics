@@ -26,6 +26,6 @@ ENV target x86_64-unknown-linux-musl
 
 COPY --from=build /usr/local/cargo/bin/omics /usr/local/bin/omics
 
-EXPOSE 3000
+EXPOSE 80
 
 CMD ["omics"]
