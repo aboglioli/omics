@@ -1,9 +1,9 @@
-ENV target x86_64-unknown-linux-musl
-
 # ----
 # Build stage
 # ----
 FROM rust:latest AS build
+
+ENV target x86_64-unknown-linux-musl
 
 RUN apt-get update; \
     apt-get install -y musl-tools
