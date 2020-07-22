@@ -3,7 +3,38 @@ use hyper::{Body, Request, Response, Server};
 use std::{convert::Infallible, net::SocketAddr};
 
 async fn handle(_req: Request<Body>) -> Result<Response<Body>, Infallible> {
-    Ok(Response::new("¡Omics!".into()))
+  Ok(Response::new("
+      <html>
+        <head>
+          <title>Omics</title>
+          <style>
+            html, body {
+              padding: 0;
+              margin: 0;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background-color: #1b1b1b;
+            }
+            .text {
+              font-size: 3rem;
+              padding: 3rem;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              background-color: #1f1f1f;
+              color: #942121;
+              border-radius: 3px;
+            }
+          </style>
+        </head>
+        <body>
+          <b class=\"text\">
+            Omics
+          </b>
+        </body>
+      </html>
+  ".into()))
 }
 
 #[tokio::main]

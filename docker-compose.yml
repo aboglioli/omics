@@ -5,11 +5,21 @@ services:
     build: .
     ports:
       - "${SERVER_PORT:-3000}:3000"
+    networks:
+      - backend
+      - services
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+
 
   web:
     build: ./web
     ports:
       - "${WEB_PORT:-4000}:4000"
+    networks:
+      - backend
 
   mongo:
     image: mongo:latest
@@ -23,7 +33,7 @@ services:
     volumes:
       - mongo:/data/db
     networks:
-      - mongo
+      - services
 
   mongo-express:
     image: mongo-express:latest
@@ -34,7 +44,8 @@ services:
       ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER:-admin}
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD:-admin}
     networks:
-      - mongo
+      - services
+      - open
     depends_on:
       - mongo
 
@@ -48,7 +59,8 @@ services:
       DB_PASSWORD: ${MONGO_PASSWORD:-admin}
       DB_NAME: ${MONGO_DATABASE:-database}
     networks:
-      - mongo
+      - services
+      - open
     depends_on:
       - mongo
 
@@ -64,7 +76,7 @@ services:
       - postgres:/var/lib/postgresql
       - ./migrations:/migrations
     networks:
-      - postgres
+      - services
 
   postgres-pgadmin:
     image: dpage/pgadmin4
@@ -75,7 +87,8 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@admin.com}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
     networks:
-      - postgres
+      - services
+      - open
     depends_on:
       - postgres
 
@@ -87,7 +100,7 @@ services:
     volumes:
       - redis:/data
     networks:
-      - redis
+      - services
 
   redis-commander:
     image: rediscommander/redis-commander:latest
@@ -97,7 +110,8 @@ services:
     environment:
       REDIS_HOSTS: local:redis:${REDIS_PORT:-6379}
     networks:
-      - redis
+      - services
+      - open
     depends_on:
       - redis
 
@@ -110,7 +124,8 @@ services:
     volumes:
       - rabbitmq:/var/lib/rabbitmq
     networks:
-      - rabbitmq
+      - services
+      - open
 
   minio:
     image: minio/minio:latest
@@ -120,7 +135,8 @@ services:
     volumes:
       - minio:/data
     networks:
-      - minio
+      - services
+      - open
 
 volumes:
   mongo:
@@ -130,13 +146,10 @@ volumes:
   minio:
 
 networks:
-  mongo:
+  backend:
     driver: bridge
-  postgres:
+  frontend:
     driver: bridge
-  redis:
+  open:
     driver: bridge
-  rabbitmq:
-    driver: bridge
-  minio:
-    driver: bridge
+  services:
