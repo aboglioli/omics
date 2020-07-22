@@ -1,6 +1,3 @@
-RUST_TARGET = x86_64-unknown-linux-musl
-RUST_BIN = omics
-
 WEB_DIR = web
 
 build: server-build web-build
@@ -17,15 +14,14 @@ server-run:
 
 server-dependencies:
 	cargo update
-	rustup target add $(RUST_TARGET)
 
 server-test:
 	cargo test
 
 server-build: server-dependencies
-	cargo build --release --target $(RUST_TARGET)
+	cargo build --release
 
-server-deploy:
+server-deploy: server-build
 	heroku container:push web
 	heroku container:release web
 
@@ -41,7 +37,7 @@ web-dependencies:
 web-build: web-dependencies
 	$(MAKE) -C $(WEB_DIR) build
 
-web-deploy:
+web-deploy: web-build
 	$(MAKE) -C $(WEB_DIR) deploy
 
 # ----------
