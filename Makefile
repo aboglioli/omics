@@ -26,8 +26,8 @@ server-build: server-dependencies
 	cargo build --release --target $(RUST_TARGET)
 
 server-deploy:
-	heroku container:push server
-	heroku container:release server
+	heroku container:push web
+	heroku container:release web
 
 # ----------
 # Web
