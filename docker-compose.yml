@@ -1,6 +1,16 @@
 version: '3.5'
 
 services:
+  server:
+    build: .
+    ports:
+      - "${SERVER_PORT:-3000}:3000"
+
+  web:
+    build: ./web
+    ports:
+      - "${WEB_PORT:-4000}:80"
+
   mongo:
     image: mongo:latest
     restart: always
