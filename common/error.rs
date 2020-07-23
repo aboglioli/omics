@@ -33,6 +33,10 @@ impl Error {
         }
     }
 
+    pub fn pair(k: &str, v: &str) -> Error {
+        Error::application().add_context(k, v).build()
+    }
+
     pub fn internal() -> Error {
         Error::new(ErrorKind::Internal)
     }

@@ -4,4 +4,5 @@ members = [
   "common",
   "identity",
   "publishing",
+  "payment",
 ]
