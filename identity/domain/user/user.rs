@@ -1,4 +1,4 @@
-use crate::domain::role::{Role, RoleID};
+use crate::domain::role::RoleID;
 use crate::domain::user::{Email, Identity, Password, Person, Provider, Username};
 use common::error::Error;
 use common::model::{Entity, ID};
@@ -16,12 +16,12 @@ pub struct User {
 }
 
 impl User {
-    pub fn new(id: UserID, identity: Identity, role: &Role) -> Result<User, Error> {
+    pub fn new(id: UserID, identity: Identity, role_id: RoleID) -> Result<User, Error> {
         Ok(User {
             id: ID::new(id),
             identity,
             person: None,
-            role_id: role.id().value(),
+            role_id,
             validated: false,
         })
     }
@@ -56,8 +56,8 @@ impl User {
         Ok(())
     }
 
-    pub fn set_role(&mut self, role: &Role) {
-        self.role_id = role.id().value();
+    pub fn set_role(&mut self, role_id: RoleID) {
+        self.role_id = role_id
     }
 
     pub fn validate(&mut self) {

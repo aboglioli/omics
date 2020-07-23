@@ -16,15 +16,15 @@ pub struct Summary {
 }
 
 impl Summary {
-    pub fn new(id: SummaryID, contract: &Contract) -> Result<Summary, Error> {
+    pub fn new(id: SummaryID, contract_id: ContractID) -> Result<Summary, Error> {
         Ok(Summary {
             id: ID::new(id),
-            contract_id: contract.id().value(),
+            contract_id,
             status: StatusHistory::init(SummaryStatus::Open),
         })
     }
 
-    pub fn contract(&self) -> &ContractID {
+    pub fn contract_id(&self) -> &ContractID {
         &self.contract_id
     }
 

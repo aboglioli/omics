@@ -2,7 +2,7 @@ use common::error::Error;
 use common::model::{Entity, ID};
 
 use crate::domain::interaction::Like;
-use crate::domain::publication::Publication;
+use crate::domain::publication::PublicationID;
 
 pub type ReaderID = String;
 
@@ -19,8 +19,8 @@ impl Reader {
         })
     }
 
-    pub fn like(&self, publication: &Publication) -> Result<Like, Error> {
-        Ok(Like::new(self, publication)?)
+    pub fn like(&self, publication_id: PublicationID) -> Result<Like, Error> {
+        Ok(Like::new(self.id().value(), publication_id)?)
     }
 }
 

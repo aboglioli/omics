@@ -13,10 +13,10 @@ pub struct Like {
 }
 
 impl Like {
-    pub fn new(reader: &Reader, publication: &Publication) -> Result<Like, Error> {
+    pub fn new(reader_id: ReaderID, publication_id: PublicationID) -> Result<Like, Error> {
         Ok(Like {
-            reader_id: reader.id().value(),
-            publication_id: publication.id().value(),
+            reader_id,
+            publication_id,
             date: Utc::now(),
         })
     }

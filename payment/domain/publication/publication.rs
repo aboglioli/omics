@@ -12,10 +12,10 @@ pub struct Publication {
 }
 
 impl Publication {
-    pub fn new(id: PublicationID, author: &User, name: &str) -> Result<Publication, Error> {
+    pub fn new(id: PublicationID, author_id: UserID, name: &str) -> Result<Publication, Error> {
         Ok(Publication {
             id: ID::new(id),
-            author_id: author.id().value(),
+            author_id,
             name: name.to_owned(),
         })
     }

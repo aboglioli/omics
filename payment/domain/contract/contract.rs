@@ -2,7 +2,7 @@ use common::error::Error;
 use common::model::{Entity, StatusHistory, ID};
 
 use crate::domain::contract::ContractStatus;
-use crate::domain::publication::{Publication, PublicationID};
+use crate::domain::publication::PublicationID;
 use crate::domain::summary::Summary;
 
 pub type ContractID = String;
@@ -15,16 +15,16 @@ pub struct Contract {
 }
 
 impl Contract {
-    pub fn new(id: ContractID, publication: &Publication) -> Result<Contract, Error> {
+    pub fn new(id: ContractID, publication_id: PublicationID) -> Result<Contract, Error> {
         Ok(Contract {
             id: ID::new(id),
-            publication_id: publication.id().value(),
+            publication_id,
             status: StatusHistory::init(ContractStatus::Requested),
             summaries: Vec::new(),
         })
     }
 
-    pub fn publication(&self) -> &PublicationID {
+    pub fn publication_id(&self) -> &PublicationID {
         &self.publication_id
     }
 

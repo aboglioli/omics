@@ -13,11 +13,11 @@ pub struct Validation {
 }
 
 impl Validation {
-    pub fn new(user: &User) -> Validation {
+    pub fn new(user_id: UserID) -> Validation {
         let uuid = Uuid::new_v4();
         Validation {
             code: uuid.to_string(),
-            user_id: user.id().value(),
+            user_id,
             used: false,
         }
     }

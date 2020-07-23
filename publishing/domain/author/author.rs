@@ -21,10 +21,10 @@ pub struct Author {
 }
 
 impl Author {
-    pub fn new(id: AuthorID, name: &str) -> Result<Author, Error> {
+    pub fn new(id: AuthorID, name: Name) -> Result<Author, Error> {
         Ok(Author {
             id: ID::new(id),
-            name: Name::new(name)?,
+            name,
         })
     }
 }

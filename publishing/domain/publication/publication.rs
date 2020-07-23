@@ -22,18 +22,18 @@ impl Publication {
         id: PublicationID,
         name: &str,
         synopsis: &str,
-        author: &Author,
+        author_id: AuthorID,
         statistics: Statistics,
-        category: &Category,
+        category_id: CategoryID,
     ) -> Result<Publication, Error> {
         Ok(Publication {
             id: ID::new(id),
             name: Name::new(name)?,
             synopsis: Synopsis::new(synopsis)?,
-            author_id: author.id().value(),
+            author_id,
             statistics: Statistics::new(),
             pages: Vec::new(),
-            category_id: category.id().value(),
+            category_id,
             tags: Vec::new(),
         })
     }

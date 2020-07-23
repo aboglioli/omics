@@ -27,10 +27,10 @@ pub struct Category {
 }
 
 impl Category {
-    pub fn new(id: CategoryID, name: &str) -> Result<Category, Error> {
+    pub fn new(id: CategoryID, name: CategoryName) -> Result<Category, Error> {
         Ok(Category {
             id: ID::new(id),
-            name: CategoryName::new(name)?,
+            name,
         })
     }
 
