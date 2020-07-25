@@ -1,8 +1,8 @@
 use common::error::Error;
 
-use crate::domain::author::{Author, AuthorID};
+use crate::domain::author::{Author, AuthorId};
 
 pub trait AuthorRepository {
-    fn find_by_id(&self, id: &AuthorID) -> Result<Author, Error>;
+    fn find_by_id(&self, id: &AuthorId) -> Result<Author, Error>;
     fn save(&self, author: &mut Author) -> Result<(), Error>;
 }

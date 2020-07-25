@@ -1,8 +1,8 @@
 use common::error::Error;
 use common::model::AggregateRoot;
 
-pub type PlanID = String;
+pub type PlanId = String;
 
 pub struct Plan {
-    base: AggregateRoot<PlanID>,
+    base: AggregateRoot<PlanId>,
 }

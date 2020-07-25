@@ -1,4 +1,4 @@
-use crate::domain::role::RoleID;
+use crate::domain::role::RoleId;
 use common::error::Error;
 
 pub struct UpdateCommand {
@@ -21,7 +21,7 @@ pub struct RegisterCommand {
     pub username: String,
     pub email: String,
     pub password: String,
-    pub role: RoleID,
+    pub role: RoleId,
 }
 
 impl RegisterCommand {

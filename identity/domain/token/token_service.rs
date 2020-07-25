@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::domain::token::{Data, Token, TokenEncoder, TokenID, TokenRepository};
+use crate::domain::token::{Data, Token, TokenEncoder, TokenId, TokenRepository};
 use common::error::Error;
 
 pub struct TokenService {
@@ -20,7 +20,7 @@ impl TokenService {
     }
 
     pub fn create(&self, data: Data) -> Result<Token, Error> {
-        let token_id = TokenID::new();
+        let token_id = TokenId::new();
         let token = self.token_encoder.encode(&token_id)?;
         self.token_repository.set(token_id, data)?;
 

@@ -1,16 +1,16 @@
 use common::event::Event;
 
-use crate::domain::user::UserID;
+use crate::domain::user::UserId;
 
 #[derive(Debug)]
 pub struct UserUpdated {
-    pub id: UserID,
+    pub id: UserId,
     pub name: String,
     pub lastname: String,
 }
 
 impl UserUpdated {
-    pub fn new(id: UserID, name: &str, lastname: &str) -> UserUpdated {
+    pub fn new(id: UserId, name: &str, lastname: &str) -> UserUpdated {
         UserUpdated {
             id,
             name: name.to_owned(),
@@ -31,13 +31,13 @@ impl Event for UserUpdated {
 
 #[derive(Debug)]
 pub struct UserRegistered {
-    pub id: UserID,
+    pub id: UserId,
     pub username: String,
     pub email: String,
 }
 
 impl UserRegistered {
-    pub fn new(id: UserID, username: &str, email: &str) -> UserRegistered {
+    pub fn new(id: UserId, username: &str, email: &str) -> UserRegistered {
         UserRegistered {
             id,
             username: username.to_owned(),

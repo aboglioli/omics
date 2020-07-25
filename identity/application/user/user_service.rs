@@ -6,10 +6,10 @@ use common::event::EventPublisher;
 use crate::application::user::{
     ChangePasswordCommand, LoginCommand, RegisterCommand, UpdateCommand,
 };
-use crate::domain::role::{RoleID, RoleRepository};
+use crate::domain::role::{RoleId, RoleRepository};
 use crate::domain::token::Token;
 use crate::domain::user::{
-    AuthService, Email, Fullname, Identity, Password, Person, Provider, User, UserID,
+    AuthService, Email, Fullname, Identity, Password, Person, Provider, User, UserId,
     UserRegistered, UserRepository, UserUpdated, Username,
 };
 use crate::domain::validation::{Validation, ValidationCode, ValidationRepository};
@@ -39,7 +39,7 @@ impl UserService {
         }
     }
 
-    pub fn get_by_id(&self, user_id: &UserID) -> Result<User, Error> {
+    pub fn get_by_id(&self, user_id: &UserId) -> Result<User, Error> {
         let user = self.user_repository.find_by_id(user_id)?;
         Ok(user)
     }
@@ -58,7 +58,7 @@ impl UserService {
                 Email::new(&cmd.email)?,
                 Some(Password::new(&hashed_password)?),
             )?,
-            RoleID::from("user"),
+            RoleId::from("user"),
         )?;
 
         self.user_repository.save(&mut user)?;
@@ -79,7 +79,7 @@ impl UserService {
             .authenticate(&cmd.username_or_email, &cmd.password)
     }
 
-    pub fn update(&self, user_id: &UserID, cmd: UpdateCommand) -> Result<(), Error> {
+    pub fn update(&self, user_id: &UserId, cmd: UpdateCommand) -> Result<(), Error> {
         cmd.validate()?;
 
         let mut user = self.user_repository.find_by_id(&user_id)?;
@@ -103,7 +103,7 @@ impl UserService {
 
     pub fn change_password(
         &self,
-        user_id: &UserID,
+        user_id: &UserId,
         cmd: ChangePasswordCommand,
     ) -> Result<(), Error> {
         cmd.validate()?;
@@ -113,7 +113,7 @@ impl UserService {
 
     pub fn validate_user(
         &self,
-        user_id: &UserID,
+        user_id: &UserId,
         validation_code: &ValidationCode,
     ) -> Result<(), Error> {
         let mut user = self.user_repository.find_by_id(user_id)?;

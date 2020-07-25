@@ -4,16 +4,16 @@ use std::hash::{Hash, Hasher};
 
 use uuid::Uuid;
 
-// TokenID
+// TokenId
 #[derive(Debug, Clone, Eq)]
-pub struct TokenID {
+pub struct TokenId {
     id: String,
 }
 
-impl TokenID {
-    pub fn new() -> TokenID {
+impl TokenId {
+    pub fn new() -> TokenId {
         let uuid = Uuid::new_v4().to_string();
-        TokenID { id: uuid }
+        TokenId { id: uuid }
     }
 
     pub fn id(&self) -> &String {
@@ -21,21 +21,21 @@ impl TokenID {
     }
 }
 
-impl PartialEq for TokenID {
+impl PartialEq for TokenId {
     fn eq(&self, other: &Self) -> bool {
         self.id == other.id
     }
 }
 
-impl Hash for TokenID {
+impl Hash for TokenId {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.id.hash(state);
     }
 }
 
-impl From<&str> for TokenID {
-    fn from(s: &str) -> TokenID {
-        TokenID { id: s.to_owned() }
+impl From<&str> for TokenId {
+    fn from(s: &str) -> TokenId {
+        TokenId { id: s.to_owned() }
     }
 }
 

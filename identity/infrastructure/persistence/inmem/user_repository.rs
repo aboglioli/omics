@@ -5,10 +5,10 @@ use uuid::Uuid;
 
 use common::error::Error;
 
-use crate::domain::user::{User, UserID, UserRepository};
+use crate::domain::user::{User, UserId, UserRepository};
 
 pub struct InMemUserRepository {
-    pub users: RefCell<HashMap<UserID, User>>,
+    pub users: RefCell<HashMap<UserId, User>>,
 }
 
 impl InMemUserRepository {
@@ -20,13 +20,13 @@ impl InMemUserRepository {
 }
 
 impl UserRepository for InMemUserRepository {
-    fn next_id(&self) -> Result<UserID, Error> {
+    fn next_id(&self) -> Result<UserId, Error> {
         let uuid = Uuid::new_v4();
         let uuid = uuid.to_string();
         Ok(uuid)
     }
 
-    fn find_by_id(&self, id: &UserID) -> Result<User, Error> {
+    fn find_by_id(&self, id: &UserId) -> Result<User, Error> {
         let users = self.users.borrow();
         users
             .get(id)
@@ -58,9 +58,9 @@ impl UserRepository for InMemUserRepository {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::domain::role::{Role, RoleID};
+    use crate::domain::role::{Role, RoleId};
     use crate::domain::user::{
-        Email, Fullname, Identity, Password, Person, Provider, User, UserID, Username,
+        Email, Fullname, Identity, Password, Person, Provider, User, UserId, Username,
     };
     use crate::infrastructure::mocks;
 

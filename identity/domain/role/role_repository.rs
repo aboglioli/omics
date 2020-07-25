@@ -1,6 +1,6 @@
-use crate::domain::role::{Role, RoleID};
+use crate::domain::role::{Role, RoleId};
 use common::error::Error;
 
 pub trait RoleRepository {
-    fn get_by_code(&self, code: &RoleID) -> Result<Role, Error>;
+    fn get_by_code(&self, code: &RoleId) -> Result<Role, Error>;
 }

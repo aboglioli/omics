@@ -3,18 +3,18 @@ use uuid::Uuid;
 use common::error::Error;
 use common::model::AggregateRoot;
 
-use crate::domain::user::{User, UserID};
+use crate::domain::user::{User, UserId};
 
 pub type ValidationCode = String;
 
 pub struct Validation {
     base: AggregateRoot<ValidationCode>,
-    user_id: UserID,
+    user_id: UserId,
     used: bool,
 }
 
 impl Validation {
-    pub fn new(code: ValidationCode, user_id: UserID) -> Result<Validation, Error> {
+    pub fn new(code: ValidationCode, user_id: UserId) -> Result<Validation, Error> {
         let uuid = Uuid::new_v4();
         Ok(Validation {
             base: AggregateRoot::new(code),
@@ -27,7 +27,7 @@ impl Validation {
         &self.base
     }
 
-    pub fn user_id(&self) -> &UserID {
+    pub fn user_id(&self) -> &UserId {
         &self.user_id
     }
 
@@ -54,7 +54,7 @@ impl Validation {
 mod tests {
     use super::*;
 
-    use crate::domain::role::RoleID;
+    use crate::domain::role::RoleId;
     use crate::domain::user::User;
     use crate::infrastructure::mocks;
 

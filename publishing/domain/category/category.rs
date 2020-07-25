@@ -18,16 +18,16 @@ impl CategoryName {
     }
 }
 
-pub type CategoryID = String;
+pub type CategoryId = String;
 
 #[derive(Debug, Clone)]
 pub struct Category {
-    base: AggregateRoot<CategoryID>,
+    base: AggregateRoot<CategoryId>,
     name: CategoryName,
 }
 
 impl Category {
-    pub fn new(id: CategoryID, name: CategoryName) -> Result<Category, Error> {
+    pub fn new(id: CategoryId, name: CategoryName) -> Result<Category, Error> {
         Ok(Category {
             base: AggregateRoot::new(id),
             name,

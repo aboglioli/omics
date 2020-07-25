@@ -2,20 +2,20 @@ use common::error::Error;
 use common::model::{AggregateRoot, StatusHistory};
 
 use crate::domain::contract::ContractStatus;
-use crate::domain::publication::PublicationID;
+use crate::domain::publication::PublicationId;
 use crate::domain::summary::Summary;
 
-pub type ContractID = String;
+pub type ContractId = String;
 
 pub struct Contract {
-    base: AggregateRoot<ContractID>,
-    publication_id: PublicationID,
+    base: AggregateRoot<ContractId>,
+    publication_id: PublicationId,
     status: StatusHistory<ContractStatus, String>,
     summaries: Vec<Summary>,
 }
 
 impl Contract {
-    pub fn new(id: ContractID, publication_id: PublicationID) -> Result<Contract, Error> {
+    pub fn new(id: ContractId, publication_id: PublicationId) -> Result<Contract, Error> {
         Ok(Contract {
             base: AggregateRoot::new(id),
             publication_id,
@@ -24,11 +24,11 @@ impl Contract {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<ContractID> {
+    pub fn base(&self) -> &AggregateRoot<ContractId> {
         &self.base
     }
 
-    pub fn publication_id(&self) -> &PublicationID {
+    pub fn publication_id(&self) -> &PublicationId {
         &self.publication_id
     }
 

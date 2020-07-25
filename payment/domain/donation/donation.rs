@@ -1,11 +1,11 @@
 use common::model::AggregateRoot;
 
-use crate::domain::user::{User, UserID};
+use crate::domain::user::{User, UserId};
 
-pub type DonationID = String;
+pub type DonationId = String;
 
 pub struct Donation {
-    base: AggregateRoot<DonationID>,
-    issuer_id: UserID,
-    receiver_id: UserID,
+    base: AggregateRoot<DonationId>,
+    issuer_id: UserId,
+    receiver_id: UserId,
 }

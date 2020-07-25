@@ -1,31 +1,31 @@
 use common::error::Error;
 use common::model::AggregateRoot;
 
-use crate::domain::author::{Author, AuthorID};
-use crate::domain::category::{Category, CategoryID};
+use crate::domain::author::{Author, AuthorId};
+use crate::domain::category::{Category, CategoryId};
 use crate::domain::publication::{Name, Page, PageNumber, Statistics, Synopsis, Tag};
 
-pub type PublicationID = String;
+pub type PublicationId = String;
 
 pub struct Publication {
-    base: AggregateRoot<PublicationID>,
+    base: AggregateRoot<PublicationId>,
     name: Name,
     synopsis: Synopsis,
-    author_id: AuthorID,
+    author_id: AuthorId,
     statistics: Statistics,
     pages: Vec<Page>,
-    category_id: CategoryID,
+    category_id: CategoryId,
     tags: Vec<Tag>,
 }
 
 impl Publication {
     pub fn new(
-        id: PublicationID,
+        id: PublicationId,
         name: &str,
         synopsis: &str,
-        author_id: AuthorID,
+        author_id: AuthorId,
         statistics: Statistics,
-        category_id: CategoryID,
+        category_id: CategoryId,
     ) -> Result<Publication, Error> {
         Ok(Publication {
             base: AggregateRoot::new(id),
@@ -47,7 +47,7 @@ impl Publication {
         &self.synopsis
     }
 
-    pub fn author(&self) -> &AuthorID {
+    pub fn author(&self) -> &AuthorId {
         &self.author_id
     }
 

@@ -3,16 +3,16 @@ use common::model::{AggregateRoot, StatusHistory};
 
 use crate::domain::payment::{Amount, PaymentStatus};
 
-pub type PaymentID = String;
+pub type PaymentId = String;
 
 pub struct Payment {
-    base: AggregateRoot<PaymentID>,
+    base: AggregateRoot<PaymentId>,
     amount: Amount,
     status: StatusHistory<PaymentStatus, String>,
 }
 
 impl Payment {
-    pub fn new(id: PaymentID, amount: Amount) -> Result<Payment, Error> {
+    pub fn new(id: PaymentId, amount: Amount) -> Result<Payment, Error> {
         Ok(Payment {
             base: AggregateRoot::new(id),
             amount,

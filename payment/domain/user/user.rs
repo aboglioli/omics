@@ -1,18 +1,22 @@
 use common::error::Error;
 use common::model::AggregateRoot;
 
-pub type UserID = String;
+use crate::domain::user::PaymentMethod;
+
+pub type UserId = String;
 
 pub struct User {
-    base: AggregateRoot<UserID>,
+    base: AggregateRoot<UserId>,
     name: String,
+    payment_methods: Vec<PaymentMethod>,
 }
 
 impl User {
-    pub fn new(id: UserID, name: &str) -> Result<User, Error> {
+    pub fn new(id: UserId, name: &str) -> Result<User, Error> {
         Ok(User {
             base: AggregateRoot::new(id),
             name: name.to_owned(),
+            payment_methods: Vec::new(),
         })
     }
 }

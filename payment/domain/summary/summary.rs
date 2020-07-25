@@ -3,20 +3,20 @@ use chrono::{DateTime, Utc};
 use common::error::Error;
 use common::model::{AggregateRoot, StatusHistory};
 
-use crate::domain::contract::{Contract, ContractID};
+use crate::domain::contract::{Contract, ContractId};
 use crate::domain::summary::SummaryStatus;
 
-type SummaryID = String;
+type SummaryId = String;
 
 #[derive(Debug, Clone)]
 pub struct Summary {
-    base: AggregateRoot<SummaryID>,
-    contract_id: ContractID,
+    base: AggregateRoot<SummaryId>,
+    contract_id: ContractId,
     status: StatusHistory<SummaryStatus, ()>,
 }
 
 impl Summary {
-    pub fn new(id: SummaryID, contract_id: ContractID) -> Result<Summary, Error> {
+    pub fn new(id: SummaryId, contract_id: ContractId) -> Result<Summary, Error> {
         Ok(Summary {
             base: AggregateRoot::new(id),
             contract_id,
@@ -24,7 +24,7 @@ impl Summary {
         })
     }
 
-    pub fn contract_id(&self) -> &ContractID {
+    pub fn contract_id(&self) -> &ContractId {
         &self.contract_id
     }
 
@@ -64,12 +64,12 @@ impl Summary {
 mod tests {
     use super::*;
 
-    use crate::domain::publication::{Publication, PublicationID};
-    use crate::domain::user::{User, UserID};
+    use crate::domain::publication::{Publication, PublicationId};
+    use crate::domain::user::{User, UserId};
 
     #[test]
     fn create() {
-        let s_res = Summary::new(SummaryID::from("S002"), ContractID::from("C122"));
+        let s_res = Summary::new(SummaryId::from("S002"), ContractId::from("C122"));
         assert!(s_res.is_ok());
 
         let s = s_res.unwrap();
@@ -78,7 +78,7 @@ mod tests {
 
     #[test]
     fn statuses_ok() {
-        let mut s = Summary::new(SummaryID::from("S005"), ContractID::from("C623")).unwrap();
+        let mut s = Summary::new(SummaryId::from("S005"), ContractId::from("C623")).unwrap();
 
         s.ready_to_pay().unwrap();
         s.pay().unwrap();
@@ -87,7 +87,7 @@ mod tests {
 
     #[test]
     fn invalid_statuses() {
-        let mut s = Summary::new(SummaryID::from("S005"), ContractID::from("C62")).unwrap();
+        let mut s = Summary::new(SummaryId::from("S005"), ContractId::from("C62")).unwrap();
         assert!(s.pay().is_err());
 
         s.ready_to_pay().unwrap();

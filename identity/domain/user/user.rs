@@ -1,23 +1,23 @@
 use common::error::Error;
 use common::model::AggregateRoot;
 
-use crate::domain::role::RoleID;
+use crate::domain::role::RoleId;
 use crate::domain::user::{Email, Identity, Password, Person, Provider, Username};
 
 // User
-pub type UserID = String;
+pub type UserId = String;
 
 #[derive(Debug, Clone)]
 pub struct User {
-    base: AggregateRoot<UserID>,
+    base: AggregateRoot<UserId>,
     identity: Identity,
     person: Option<Person>,
-    role_id: RoleID,
+    role_id: RoleId,
     validated: bool,
 }
 
 impl User {
-    pub fn new(id: UserID, identity: Identity, role_id: RoleID) -> Result<User, Error> {
+    pub fn new(id: UserId, identity: Identity, role_id: RoleId) -> Result<User, Error> {
         Ok(User {
             base: AggregateRoot::new(id),
             identity,
@@ -27,7 +27,7 @@ impl User {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<UserID> {
+    pub fn base(&self) -> &AggregateRoot<UserId> {
         &self.base
     }
 
@@ -39,7 +39,7 @@ impl User {
         self.person.as_ref()
     }
 
-    pub fn role_id(&self) -> &RoleID {
+    pub fn role_id(&self) -> &RoleId {
         &self.role_id
     }
 
@@ -61,7 +61,7 @@ impl User {
         Ok(())
     }
 
-    pub fn set_role(&mut self, role_id: RoleID) {
+    pub fn set_role(&mut self, role_id: RoleId) {
         self.role_id = role_id
     }
 
@@ -77,14 +77,14 @@ mod tests {
     #[test]
     fn create() -> Result<(), Error> {
         let user = User::new(
-            UserID::from("user123"),
+            UserId::from("user123"),
             Identity::new(
                 Provider::Local,
                 Username::new("user1")?,
                 Email::new("email@user.com")?,
                 Some(Password::new(&format!("{:X>50}", "2"))?),
             )?,
-            RoleID::from("user"),
+            RoleId::from("user"),
         )?;
         assert_eq!(user.base().id(), "user123");
         assert_eq!(user.identity().username().value(), "user1");

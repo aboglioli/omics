@@ -3,7 +3,7 @@ use std::rc::Rc;
 use common::error::Error;
 
 use crate::domain::token::{Data, Token, TokenService};
-use crate::domain::user::{Password, PasswordHasher, User, UserID, UserRepository};
+use crate::domain::user::{Password, PasswordHasher, User, UserId, UserRepository};
 
 pub struct AuthService {
     user_repository: Rc<dyn UserRepository>,
@@ -79,7 +79,7 @@ impl AuthService {
 
     pub fn change_password(
         &self,
-        user_id: &UserID,
+        user_id: &UserId,
         old_password: &str,
         new_password: &str,
     ) -> Result<(), Error> {

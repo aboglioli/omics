@@ -77,20 +77,20 @@ impl Frame {
     }
 }
 
-pub type ImageID = String;
+pub type ImageId = String;
 
 pub type ImageURL = String;
 
 #[derive(Debug, Clone)]
 pub struct Image {
-    id: ImageID,
+    id: ImageId,
     url: ImageURL,
     size: u32,
     frames: Vec<Frame>,
 }
 
 impl Image {
-    pub fn new(id: ImageID, url: &str, size: u32) -> Result<Image, Error> {
+    pub fn new(id: ImageId, url: &str, size: u32) -> Result<Image, Error> {
         Ok(Image {
             id,
             url: url.to_owned(),
@@ -99,7 +99,7 @@ impl Image {
         })
     }
 
-    pub fn id(&self) -> &ImageID {
+    pub fn id(&self) -> &ImageId {
         &self.id
     }
 
@@ -163,7 +163,7 @@ impl Page {
         Ok(())
     }
 
-    pub fn remove_image(&mut self, image_id: &ImageID) -> Result<(), Error> {
+    pub fn remove_image(&mut self, image_id: &ImageId) -> Result<(), Error> {
         self.images.retain(|image| image.id() != image_id);
         Ok(())
     }
@@ -176,7 +176,7 @@ mod tests {
     #[test]
     fn image() -> Result<(), Error> {
         // New image
-        let mut image = Image::new(ImageID::from("image123"), "host.com/image.jpg", 1024)?;
+        let mut image = Image::new(ImageId::from("image123"), "host.com/image.jpg", 1024)?;
         image.add_frame(Frame::new(0, Position::new(0, 0)?, Size::new(800, 600)?)?)?;
         image.add_frame(Frame::new(1, Position::new(800, 0)?, Size::new(800, 600)?)?)?;
         image.add_frame(Frame::new(

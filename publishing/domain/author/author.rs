@@ -1,7 +1,7 @@
 use common::error::Error;
 use common::model::AggregateRoot;
 
-pub type AuthorID = String;
+pub type AuthorId = String;
 
 pub struct Name {
     name: String,
@@ -16,12 +16,12 @@ impl Name {
 }
 
 pub struct Author {
-    base: AggregateRoot<AuthorID>,
+    base: AggregateRoot<AuthorId>,
     name: Name,
 }
 
 impl Author {
-    pub fn new(id: AuthorID, name: Name) -> Result<Author, Error> {
+    pub fn new(id: AuthorId, name: Name) -> Result<Author, Error> {
         Ok(Author {
             base: AggregateRoot::new(id),
             name,

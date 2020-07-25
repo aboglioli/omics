@@ -3,17 +3,17 @@ use common::model::AggregateRoot;
 
 use crate::domain::role::Permission;
 
-pub type RoleID = String;
+pub type RoleId = String;
 
 #[derive(Debug, Clone)]
 pub struct Role {
-    base: AggregateRoot<RoleID>,
+    base: AggregateRoot<RoleId>,
     name: String,
     permissions: Vec<Permission>,
 }
 
 impl Role {
-    pub fn new(code: RoleID, name: &str) -> Result<Role, Error> {
+    pub fn new(code: RoleId, name: &str) -> Result<Role, Error> {
         Ok(Role {
             base: AggregateRoot::new(code),
             name: String::from(name),
@@ -21,7 +21,7 @@ impl Role {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<RoleID> {
+    pub fn base(&self) -> &AggregateRoot<RoleId> {
         &self.base
     }
 
@@ -51,10 +51,10 @@ mod tests {
 
     #[test]
     fn create_role() -> Result<(), Error> {
-        let r = Role::new(RoleID::from("admin"), "Administrator")?;
-        assert_eq!(r.base(), &AggregateRoot::new(RoleID::from("admin")));
+        let r = Role::new(RoleId::from("admin"), "Administrator")?;
+        assert_eq!(r.base(), &AggregateRoot::new(RoleId::from("admin")));
         assert_eq!(r.name(), "Administrator");
-        assert_eq!(r.base(), &AggregateRoot::new(RoleID::from("admin")));
+        assert_eq!(r.base(), &AggregateRoot::new(RoleId::from("admin")));
 
         Ok(())
     }
@@ -64,7 +64,7 @@ mod tests {
         let pmod1 = Permission::new("mod1", "CRUD")?;
         let pmod2 = Permission::new("mod2", "CRD")?;
         let pmod3 = Permission::new("mod3", "R")?;
-        let mut r = Role::new(RoleID::from("user"), "User")?;
+        let mut r = Role::new(RoleId::from("user"), "User")?;
         r.add_permissions(pmod1);
         r.add_permissions(pmod2);
         r.add_permissions(pmod3);
