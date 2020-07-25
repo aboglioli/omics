@@ -61,6 +61,7 @@ mod tests {
         }
     }
 
+    #[derive(Debug)]
     struct AnotherEvent;
     impl Event for AnotherEvent {
         fn code(&self) -> &str {

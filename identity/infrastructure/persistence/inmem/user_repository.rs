@@ -1,10 +1,11 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
+
 use uuid::Uuid;
 
-use crate::domain::user::{User, UserID, UserRepository};
 use common::error::Error;
-use common::model::Entity;
+
+use crate::domain::user::{User, UserID, UserRepository};
 
 pub struct InMemUserRepository {
     pub users: RefCell<HashMap<UserID, User>>,
@@ -49,7 +50,7 @@ impl UserRepository for InMemUserRepository {
         // user.id().updated();
         self.users
             .borrow_mut()
-            .insert(user.id().value(), user.clone());
+            .insert(user.base().id(), user.clone());
         Ok(())
     }
 }
@@ -87,9 +88,9 @@ mod tests {
         assert_eq!(repo.users.borrow().len(), 1);
         assert!(user.person().is_none());
 
-        let found_user = repo.find_by_id(&user.id().value())?;
-        assert_eq!(user.id(), found_user.id());
-        assert_eq!(changed_user.id(), found_user.id());
+        let found_user = repo.find_by_id(&user.base().id())?;
+        assert_eq!(user.base(), found_user.base());
+        assert_eq!(changed_user.base(), found_user.base());
 
         let changed_user_person = found_user.person().ok_or(Error::internal())?;
         assert_eq!(changed_user_person.fullname().name(), "Name");

@@ -2,6 +2,7 @@ use common::event::Event;
 
 use crate::domain::user::UserID;
 
+#[derive(Debug)]
 pub struct UserUpdated {
     pub id: UserID,
     pub name: String,
@@ -28,6 +29,7 @@ impl Event for UserUpdated {
     }
 }
 
+#[derive(Debug)]
 pub struct UserRegistered {
     pub id: UserID,
     pub username: String,

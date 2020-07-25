@@ -1,5 +1,5 @@
 use common::error::Error;
-use common::model::{Entity, StatusHistory, ID};
+use common::model::{AggregateRoot, StatusHistory};
 
 use crate::domain::contract::ContractStatus;
 use crate::domain::publication::PublicationID;
@@ -8,7 +8,7 @@ use crate::domain::summary::Summary;
 pub type ContractID = String;
 
 pub struct Contract {
-    id: ID<ContractID>,
+    base: AggregateRoot<ContractID>,
     publication_id: PublicationID,
     status: StatusHistory<ContractStatus, String>,
     summaries: Vec<Summary>,
@@ -17,11 +17,15 @@ pub struct Contract {
 impl Contract {
     pub fn new(id: ContractID, publication_id: PublicationID) -> Result<Contract, Error> {
         Ok(Contract {
-            id: ID::new(id),
+            base: AggregateRoot::new(id),
             publication_id,
             status: StatusHistory::init(ContractStatus::Requested),
             summaries: Vec::new(),
         })
+    }
+
+    pub fn base(&self) -> &AggregateRoot<ContractID> {
+        &self.base
     }
 
     pub fn publication_id(&self) -> &PublicationID {
@@ -73,11 +77,5 @@ impl Contract {
             return Ok(());
         }
         Err(Error::application())
-    }
-}
-
-impl Entity<ContractID> for Contract {
-    fn id(&self) -> &ID<ContractID> {
-        &self.id
     }
 }

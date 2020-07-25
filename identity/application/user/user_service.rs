@@ -1,5 +1,8 @@
 use std::rc::Rc;
 
+use common::error::Error;
+use common::event::EventPublisher;
+
 use crate::application::user::{
     ChangePasswordCommand, LoginCommand, RegisterCommand, UpdateCommand,
 };
@@ -10,9 +13,6 @@ use crate::domain::user::{
     UserRegistered, UserRepository, UserUpdated, Username,
 };
 use crate::domain::validation::{Validation, ValidationCode, ValidationRepository};
-use common::error::Error;
-use common::event::EventPublisher;
-use common::model::Entity;
 
 pub struct UserService {
     user_repository: Rc<dyn UserRepository>,
@@ -51,20 +51,20 @@ impl UserService {
         let hashed_password = self.auth_serv.generate_password(&cmd.password)?;
 
         let mut user = User::new(
-            UserID::from("user123"),
+            self.user_repository.next_id()?,
             Identity::new(
-                Provider::new("local")?,
+                Provider::Local,
                 Username::new(&cmd.username)?,
                 Email::new(&cmd.email)?,
                 Some(Password::new(&hashed_password)?),
             )?,
-            &self.role_repository.get_by_code(&RoleID::from("user"))?,
+            RoleID::from("user"),
         )?;
 
         self.user_repository.save(&mut user)?;
 
         let event = UserRegistered::new(
-            user.id().value(),
+            user.base().id(),
             user.identity().username().value(),
             user.identity().email().value(),
         );
@@ -90,7 +90,7 @@ impl UserService {
 
         if let Some(person) = user.person() {
             let event = UserUpdated::new(
-                user.id().value(),
+                user.base().id(),
                 person.fullname().name(),
                 person.fullname().lastname(),
             );

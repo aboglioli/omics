@@ -1,9 +1,9 @@
 use std::rc::Rc;
 
+use common::error::Error;
+
 use crate::domain::token::{Data, Token, TokenService};
 use crate::domain::user::{Password, PasswordHasher, User, UserID, UserRepository};
-use common::error::Error;
-use common::model::Entity;
 
 pub struct AuthService {
     user_repository: Rc<dyn UserRepository>,
@@ -36,7 +36,7 @@ impl AuthService {
 
         if self.password_hasher.compare(user_password, password) {
             let mut data = Data::new();
-            data.add("user_id", &user.id().value());
+            data.add("user_id", &user.base().id());
             let token = self.token_service.create(data)?;
 
             return Ok(token);

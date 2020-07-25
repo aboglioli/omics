@@ -1,13 +1,14 @@
+use common::error::Error;
+use common::model::AggregateRoot;
+
 use crate::domain::author::{Author, AuthorID};
 use crate::domain::category::{Category, CategoryID};
 use crate::domain::publication::{Name, Page, PageNumber, Statistics, Synopsis, Tag};
-use common::error::Error;
-use common::model::{Entity, ID};
 
 pub type PublicationID = String;
 
 pub struct Publication {
-    id: ID<PublicationID>,
+    base: AggregateRoot<PublicationID>,
     name: Name,
     synopsis: Synopsis,
     author_id: AuthorID,
@@ -27,7 +28,7 @@ impl Publication {
         category_id: CategoryID,
     ) -> Result<Publication, Error> {
         Ok(Publication {
-            id: ID::new(id),
+            base: AggregateRoot::new(id),
             name: Name::new(name)?,
             synopsis: Synopsis::new(synopsis)?,
             author_id,
@@ -93,11 +94,5 @@ impl Publication {
     pub fn set_tags(&mut self, tags: Vec<Tag>) -> Result<(), Error> {
         self.tags = tags;
         Ok(())
-    }
-}
-
-impl Entity<PublicationID> for Publication {
-    fn id(&self) -> &ID<PublicationID> {
-        &self.id
     }
 }

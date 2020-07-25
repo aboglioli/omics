@@ -1,5 +1,5 @@
 use common::error::Error;
-use common::model::{Entity, ID};
+use common::model::AggregateRoot;
 
 pub type AuthorID = String;
 
@@ -16,21 +16,15 @@ impl Name {
 }
 
 pub struct Author {
-    id: ID<AuthorID>,
+    base: AggregateRoot<AuthorID>,
     name: Name,
 }
 
 impl Author {
     pub fn new(id: AuthorID, name: Name) -> Result<Author, Error> {
         Ok(Author {
-            id: ID::new(id),
+            base: AggregateRoot::new(id),
             name,
         })
-    }
-}
-
-impl Entity<AuthorID> for Author {
-    fn id(&self) -> &ID<AuthorID> {
-        &self.id
     }
 }

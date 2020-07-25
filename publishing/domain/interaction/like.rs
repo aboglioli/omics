@@ -1,7 +1,6 @@
 use chrono::{DateTime, Utc};
 
 use common::error::Error;
-use common::model::{Entity, ID};
 
 use crate::domain::publication::{Publication, PublicationID};
 use crate::domain::reader::{Reader, ReaderID};

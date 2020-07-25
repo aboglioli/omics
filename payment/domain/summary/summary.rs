@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 
 use common::error::Error;
-use common::model::{Entity, StatusHistory, StatusItem, ID};
+use common::model::{AggregateRoot, StatusHistory};
 
 use crate::domain::contract::{Contract, ContractID};
 use crate::domain::summary::SummaryStatus;
@@ -10,7 +10,7 @@ type SummaryID = String;
 
 #[derive(Debug, Clone)]
 pub struct Summary {
-    id: ID<SummaryID>,
+    base: AggregateRoot<SummaryID>,
     contract_id: ContractID,
     status: StatusHistory<SummaryStatus, ()>,
 }
@@ -18,7 +18,7 @@ pub struct Summary {
 impl Summary {
     pub fn new(id: SummaryID, contract_id: ContractID) -> Result<Summary, Error> {
         Ok(Summary {
-            id: ID::new(id),
+            base: AggregateRoot::new(id),
             contract_id,
             status: StatusHistory::init(SummaryStatus::Open),
         })
@@ -60,12 +60,6 @@ impl Summary {
     }
 }
 
-impl Entity<SummaryID> for Summary {
-    fn id(&self) -> &ID<SummaryID> {
-        &self.id
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -75,17 +69,7 @@ mod tests {
 
     #[test]
     fn create() {
-        let c = Contract::new(
-            ContractID::from("C007"),
-            &Publication::new(
-                PublicationID::from("P001"),
-                &User::new(UserID::from("U055"), "User").unwrap(),
-                "Pub. 1",
-            )
-            .unwrap(),
-        )
-        .unwrap();
-        let s_res = Summary::new(SummaryID::from("S002"), &c);
+        let s_res = Summary::new(SummaryID::from("S002"), ContractID::from("C122"));
         assert!(s_res.is_ok());
 
         let s = s_res.unwrap();
@@ -94,11 +78,7 @@ mod tests {
 
     #[test]
     fn statuses_ok() {
-        let mut s = Summary::new(
-            SummaryID::from("S005"),
-            &Contract::new(ContractID::from("C012")).unwrap(),
-        )
-        .unwrap();
+        let mut s = Summary::new(SummaryID::from("S005"), ContractID::from("C623")).unwrap();
 
         s.ready_to_pay().unwrap();
         s.pay().unwrap();
@@ -107,11 +87,7 @@ mod tests {
 
     #[test]
     fn invalid_statuses() {
-        let mut s = Summary::new(
-            SummaryID::from("S005"),
-            &Contract::new(ContractID::from("C012")).unwrap(),
-        )
-        .unwrap();
+        let mut s = Summary::new(SummaryID::from("S005"), ContractID::from("C62")).unwrap();
         assert!(s.pay().is_err());
 
         s.ready_to_pay().unwrap();

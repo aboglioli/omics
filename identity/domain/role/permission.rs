@@ -2,6 +2,7 @@ use regex::Regex;
 
 use common::error::Error;
 
+#[derive(Debug, Clone)]
 pub struct Permission {
     module: String,
     permissions: String,

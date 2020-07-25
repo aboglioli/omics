@@ -1,6 +1,8 @@
+use std::fmt::Debug;
+
 use crate::error::Error;
 
-pub trait Event {
+pub trait Event: Debug {
     fn code(&self) -> &str;
     fn payload(&self) -> Vec<u8>;
 }

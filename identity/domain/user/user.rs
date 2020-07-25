@@ -1,14 +1,15 @@
+use common::error::Error;
+use common::model::AggregateRoot;
+
 use crate::domain::role::RoleID;
 use crate::domain::user::{Email, Identity, Password, Person, Provider, Username};
-use common::error::Error;
-use common::model::{Entity, ID};
 
 // User
 pub type UserID = String;
 
 #[derive(Debug, Clone)]
 pub struct User {
-    id: ID<UserID>,
+    base: AggregateRoot<UserID>,
     identity: Identity,
     person: Option<Person>,
     role_id: RoleID,
@@ -18,12 +19,16 @@ pub struct User {
 impl User {
     pub fn new(id: UserID, identity: Identity, role_id: RoleID) -> Result<User, Error> {
         Ok(User {
-            id: ID::new(id),
+            base: AggregateRoot::new(id),
             identity,
             person: None,
             role_id,
             validated: false,
         })
+    }
+
+    pub fn base(&self) -> &AggregateRoot<UserID> {
+        &self.base
     }
 
     pub fn identity(&self) -> &Identity {
@@ -43,7 +48,7 @@ impl User {
     }
 
     pub fn is_active(&self) -> bool {
-        self.id.deleted_at().is_none() && self.validated
+        self.base.deleted_at().is_none() && self.validated
     }
 
     pub fn set_password(&mut self, password: Password) -> Result<(), Error> {
@@ -65,29 +70,23 @@ impl User {
     }
 }
 
-impl Entity<UserID> for User {
-    fn id(&self) -> &ID<String> {
-        &self.id
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn create() -> Result<(), Error> {
-        let role = Role::new(RoleID::from("user"), "User")?;
         let user = User::new(
             UserID::from("user123"),
             Identity::new(
-                Provider::new("local")?,
+                Provider::Local,
                 Username::new("user1")?,
                 Email::new("email@user.com")?,
                 Some(Password::new(&format!("{:X>50}", "2"))?),
             )?,
-            &role,
+            RoleID::from("user"),
         )?;
+        assert_eq!(user.base().id(), "user123");
         assert_eq!(user.identity().username().value(), "user1");
         assert_eq!(user.identity().email().value(), "email@user.com");
 

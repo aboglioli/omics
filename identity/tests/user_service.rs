@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use common::{error::Error, event::EventPublisher, model::Entity};
+use common::{error::Error, event::EventPublisher};
 use identity::{
     application::user::UserService,
     domain::{role::*, token::*, user::*, validation::*},
@@ -72,8 +72,8 @@ fn get_by_id() -> Result<(), Error> {
     let mut user = mocks::user1()?;
     c.user_repo.save(&mut user)?;
 
-    let found_user = c.user_serv.get_by_id(&user.id().value())?;
-    assert_eq!(found_user.id(), user.id());
+    let found_user = c.user_serv.get_by_id(&user.base().id())?;
+    assert_eq!(found_user.base().id(), user.base().id());
     assert_eq!(found_user.identity().username().value(), "username");
     assert_eq!(found_user.identity().email().value(), "username@email.com");
 

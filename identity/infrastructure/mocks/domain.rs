@@ -11,11 +11,11 @@ pub fn user1() -> Result<User, Error> {
     User::new(
         UserID::from("user123"),
         Identity::new(
-            Provider::new("local")?,
+            Provider::Local,
             Username::new("username")?,
             Email::new("username@email.com")?,
             Some(Password::new(&ph.hash("P@asswd!")?)?),
         )?,
-        &Role::new(RoleID::from("user"), "User")?,
+        RoleID::from("user"),
     )
 }

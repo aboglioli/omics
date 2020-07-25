@@ -1,5 +1,5 @@
-mod model;
+mod aggregate_root;
 mod status_history;
 
-pub use model::*;
+pub use aggregate_root::*;
 pub use status_history::*;

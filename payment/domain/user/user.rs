@@ -1,24 +1,18 @@
 use common::error::Error;
-use common::model::{Entity, ID};
+use common::model::AggregateRoot;
 
 pub type UserID = String;
 
 pub struct User {
-    id: ID<UserID>,
+    base: AggregateRoot<UserID>,
     name: String,
 }
 
 impl User {
     pub fn new(id: UserID, name: &str) -> Result<User, Error> {
         Ok(User {
-            id: ID::new(id),
+            base: AggregateRoot::new(id),
             name: name.to_owned(),
         })
-    }
-}
-
-impl Entity<UserID> for User {
-    fn id(&self) -> &ID<UserID> {
-        &self.id
     }
 }

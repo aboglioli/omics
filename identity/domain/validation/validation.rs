@@ -1,29 +1,30 @@
 use uuid::Uuid;
 
-use crate::domain::user::{User, UserID};
 use common::error::Error;
-use common::model::Entity;
+use common::model::AggregateRoot;
+
+use crate::domain::user::{User, UserID};
 
 pub type ValidationCode = String;
 
 pub struct Validation {
-    code: ValidationCode,
+    base: AggregateRoot<ValidationCode>,
     user_id: UserID,
     used: bool,
 }
 
 impl Validation {
-    pub fn new(user_id: UserID) -> Validation {
+    pub fn new(code: ValidationCode, user_id: UserID) -> Result<Validation, Error> {
         let uuid = Uuid::new_v4();
-        Validation {
-            code: uuid.to_string(),
+        Ok(Validation {
+            base: AggregateRoot::new(code),
             user_id,
             used: false,
-        }
+        })
     }
 
-    pub fn code(&self) -> &ValidationCode {
-        &self.code
+    pub fn base(&self) -> &AggregateRoot<ValidationCode> {
+        &self.base
     }
 
     pub fn user_id(&self) -> &UserID {
@@ -39,7 +40,7 @@ impl Validation {
             return Err(Error::application());
         }
 
-        if self.code == *code && user.id().value() == self.user_id {
+        if self.base().id() == *code && user.base().id() == self.user_id {
             user.validate();
             self.used = true;
             return Ok(());
@@ -53,16 +54,16 @@ impl Validation {
 mod tests {
     use super::*;
 
-    use crate::domain::role::{Role, RoleID};
+    use crate::domain::role::RoleID;
     use crate::domain::user::User;
     use crate::infrastructure::mocks;
 
     #[test]
     fn create() -> Result<(), Error> {
         let user = mocks::user1()?;
-        let v = Validation::new(&user);
-        assert!(!v.code().is_empty());
-        assert_eq!(v.user_id(), &user.id().value());
+        let v = Validation::new(ValidationCode::from("cod47"), user.base().id()).unwrap();
+        assert!(!v.base().id().is_empty());
+        assert_eq!(v.user_id(), &user.base().id());
 
         Ok(())
     }

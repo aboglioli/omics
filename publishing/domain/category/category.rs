@@ -1,5 +1,5 @@
 use common::error::Error;
-use common::model::{Entity, ID};
+use common::model::AggregateRoot;
 
 #[derive(Debug, Clone)]
 pub struct CategoryName {
@@ -22,25 +22,19 @@ pub type CategoryID = String;
 
 #[derive(Debug, Clone)]
 pub struct Category {
-    id: ID<CategoryID>,
+    base: AggregateRoot<CategoryID>,
     name: CategoryName,
 }
 
 impl Category {
     pub fn new(id: CategoryID, name: CategoryName) -> Result<Category, Error> {
         Ok(Category {
-            id: ID::new(id),
+            base: AggregateRoot::new(id),
             name,
         })
     }
 
     pub fn name(&self) -> &CategoryName {
         &self.name
-    }
-}
-
-impl Entity<CategoryID> for Category {
-    fn id(&self) -> &ID<CategoryID> {
-        &self.id
     }
 }

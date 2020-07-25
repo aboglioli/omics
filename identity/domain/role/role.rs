@@ -1,11 +1,13 @@
-use crate::domain::role::Permission;
 use common::error::Error;
-use common::model::{Entity, ID};
+use common::model::AggregateRoot;
+
+use crate::domain::role::Permission;
 
 pub type RoleID = String;
 
+#[derive(Debug, Clone)]
 pub struct Role {
-    code: ID<RoleID>,
+    base: AggregateRoot<RoleID>,
     name: String,
     permissions: Vec<Permission>,
 }
@@ -13,10 +15,14 @@ pub struct Role {
 impl Role {
     pub fn new(code: RoleID, name: &str) -> Result<Role, Error> {
         Ok(Role {
-            code: ID::new(code),
+            base: AggregateRoot::new(code),
             name: String::from(name),
             permissions: Vec::new(),
         })
+    }
+
+    pub fn base(&self) -> &AggregateRoot<RoleID> {
+        &self.base
     }
 
     pub fn name(&self) -> &String {
@@ -37,25 +43,18 @@ impl Role {
     }
 }
 
-impl Entity<RoleID> for Role {
-    fn id(&self) -> &ID<RoleID> {
-        &self.code
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use common::error::Error;
-    use common::model::{Entity, ID};
 
     use super::*;
 
     #[test]
     fn create_role() -> Result<(), Error> {
         let r = Role::new(RoleID::from("admin"), "Administrator")?;
-        assert_eq!(r.id(), &ID::new(RoleID::from("admin")));
+        assert_eq!(r.base(), &AggregateRoot::new(RoleID::from("admin")));
         assert_eq!(r.name(), "Administrator");
-        assert_eq!(r.id(), &ID::new(RoleID::from("admin")));
+        assert_eq!(r.base(), &AggregateRoot::new(RoleID::from("admin")));
 
         Ok(())
     }

@@ -814,6 +814,7 @@ dependencies = [
 name = "publishing"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "common",
  "slug",
 ]
