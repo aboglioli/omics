@@ -65,7 +65,7 @@ mod tests {
     use super::*;
 
     use crate::domain::publication::{Publication, PublicationId};
-    use crate::domain::user::{User, UserId};
+    use common::domain::user::UserId;
 
     #[test]
     fn create() {

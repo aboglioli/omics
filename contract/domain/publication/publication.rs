@@ -1,7 +1,6 @@
+use common::domain::user::UserId;
 use common::error::Error;
 use common::model::AggregateRoot;
-
-use crate::domain::user::{User, UserId};
 
 pub type PublicationId = String;
 

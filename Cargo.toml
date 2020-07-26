@@ -1,8 +1,11 @@
 [workspace]
 members = [
-  "main",
   "common",
+  "contract",
+  "donation",
   "identity",
-  "publishing",
+  "main",
   "payment",
+  "publishing",
+  "subscription",
 ]

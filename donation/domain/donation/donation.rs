@@ -1,6 +1,6 @@
 use common::model::AggregateRoot;
 
-use crate::domain::user::{User, UserId};
+use common::domain::user::UserId;
 
 pub type DonationId = String;
 

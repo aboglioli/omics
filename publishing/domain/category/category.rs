@@ -2,13 +2,13 @@ use common::error::Error;
 use common::model::AggregateRoot;
 
 #[derive(Debug, Clone)]
-pub struct CategoryName {
+pub struct Name {
     name: String,
 }
 
-impl CategoryName {
-    pub fn new(name: &str) -> Result<CategoryName, Error> {
-        Ok(CategoryName {
+impl Name {
+    pub fn new(name: &str) -> Result<Name, Error> {
+        Ok(Name {
             name: name.to_owned(),
         })
     }
@@ -23,18 +23,18 @@ pub type CategoryId = String;
 #[derive(Debug, Clone)]
 pub struct Category {
     base: AggregateRoot<CategoryId>,
-    name: CategoryName,
+    name: Name,
 }
 
 impl Category {
-    pub fn new(id: CategoryId, name: CategoryName) -> Result<Category, Error> {
+    pub fn new(id: CategoryId, name: Name) -> Result<Category, Error> {
         Ok(Category {
             base: AggregateRoot::new(id),
             name,
         })
     }
 
-    pub fn name(&self) -> &CategoryName {
+    pub fn name(&self) -> &Name {
         &self.name
     }
 }

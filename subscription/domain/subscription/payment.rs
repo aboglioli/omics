@@ -1,4 +1,4 @@
-use crate::domain::payment::PaymentId;
+use common::domain::payment::PaymentId;
 
 pub struct SubscriptionPayment {
     id: PaymentId,

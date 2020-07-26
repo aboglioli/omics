@@ -1,0 +1,12 @@
+[package]
+name = "contract"
+version = "0.1.0"
+authors = ["Alan Boglioli <alan.boglioli@gmail.com>"]
+edition = "2018"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+common = { path = "../common" }
+chrono = "0.4"

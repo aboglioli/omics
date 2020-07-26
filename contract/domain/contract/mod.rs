@@ -1,5 +1,5 @@
 mod contract;
 mod status;
 
-pub use contract::*;
+pub use self::contract::*;
 pub use status::*;
