@@ -20,15 +20,13 @@ impl PublicError {
                 ErrorKind::Internal if include_internal => {
                     match PublicError::from(err, include_internal) {
                         Some(pub_err) => Some(Box::new(pub_err)),
-                        _ => None
+                        _ => None,
                     }
                 }
-                ErrorKind::Application => {
-                    match PublicError::from(err, include_internal) {
-                        Some(pub_err) => Some(Box::new(pub_err)),
-                        _ => None
-                    }
-                }
+                ErrorKind::Application => match PublicError::from(err, include_internal) {
+                    Some(pub_err) => Some(Box::new(pub_err)),
+                    _ => None,
+                },
                 _ => None,
             },
             _ => None,
