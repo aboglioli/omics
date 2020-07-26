@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::error;
 use std::fmt;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ErrorKind {
     Internal,
     Application,
@@ -43,6 +43,10 @@ impl Error {
 
     pub fn application() -> Error {
         Error::new(ErrorKind::Application)
+    }
+
+    pub fn kind(&self) -> &ErrorKind {
+        &self.kind
     }
 
     pub fn code(&self) -> Option<&String> {
@@ -163,6 +167,13 @@ mod tests {
         assert_eq!(err.context().get("k2").unwrap(), "v3");
     }
 
+    #[test]
+    fn pair() {
+        let err = Error::pair("property", "error_code");
+        assert_eq!(err.context().len(), 1);
+        assert_eq!(err.context().get("property").unwrap(), "error_code");
+    }
+
     #[derive(Debug, Clone)]
     struct StringError {
         error: String,
@@ -184,11 +195,11 @@ mod tests {
         let inner_err = Error::internal()
             .set_code("inner")
             .wrap_raw(raw_err.clone())
-            .clone();
+            .build();
         let outer_err = Error::application()
             .set_code("outer")
-            .wrap(inner_err.clone())
-            .clone();
+            .wrap(inner_err.build())
+            .build();
 
         assert_eq!(
             inner_err.cause().unwrap().message().unwrap(),
@@ -215,6 +226,7 @@ mod tests {
         assert_eq!(err3.context().len(), 4);
         assert_eq!(err3.context().get("e1-key1"), Some(&"value1".to_owned()));
         assert_eq!(err3.context().get("e1-key2"), Some(&"value2".to_owned()));
-        assert_eq!(err3.context().get("e1-key2"), Some(&"value2".to_owned()));
+        assert_eq!(err3.context().get("e2-key"), Some(&"value".to_owned()));
+        assert_eq!(err3.context().get("e3-key"), Some(&"value".to_owned()));
     }
 }
