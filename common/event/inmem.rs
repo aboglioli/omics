@@ -1,19 +1,41 @@
 use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
 
-use glob::glob;
+use glob::Pattern;
 
 use crate::error::Error;
 use crate::event::{Event, EventPublisher, EventSubscriber, Subscription};
 
+struct SubscriptionItem<'a> {
+    topic: String,
+    subscription: Subscription<'a>,
+}
+
+impl<'a> SubscriptionItem<'a> {
+    fn new(topic: &str, subscription: Subscription<'a>) -> Self {
+        SubscriptionItem {
+            topic: topic.to_owned(),
+            subscription,
+        }
+    }
+
+    fn topic(&self) -> &str {
+        &self.topic
+    }
+
+    fn exec(&mut self, event: &dyn Event) -> Result<(), Error> {
+        (self.subscription)(event)
+    }
+}
+
 pub struct InMemEventBus<'a> {
-    subscriptions: RefCell<HashMap<String, Vec<Subscription<'a>>>>,
+    subscriptions: RefCell<Vec<SubscriptionItem<'a>>>,
 }
 
 impl InMemEventBus<'_> {
     pub fn new() -> Self {
         Self {
-            subscriptions: RefCell::new(HashMap::new()),
+            subscriptions: RefCell::new(Vec::new()),
         }
     }
 }
@@ -29,12 +51,12 @@ impl EventPublisher for InMemEventBus<'_> {
 
     fn publish(&self, topic: &str, event: &dyn Event) -> Result<Self::Output, Error> {
         let mut count = 0;
-
         let mut errs = Error::internal();
 
-        if let Some(subs) = self.subscriptions.borrow_mut().get_mut(topic) {
-            for sub in subs.iter_mut() {
-                if let Err(err) = sub(event) {
+        for sub_item in self.subscriptions.borrow_mut().iter_mut() {
+            let pattern = Pattern::new(&sub_item.topic).unwrap();
+            if pattern.matches(topic) {
+                if let Err(err) = (sub_item.subscription)(event) {
                     errs.merge(err);
                 }
                 count += 1;
@@ -50,22 +72,15 @@ impl EventPublisher for InMemEventBus<'_> {
 }
 
 impl<'a> EventSubscriber<'a> for InMemEventBus<'a> {
-    type Output = usize;
+    type Output = bool;
 
     fn subscribe(&self, topic: &str, cb: Subscription<'a>) -> Result<Self::Output, Error> {
-        let mut subscribed = 0;
-
         if let Ok(mut subscriptions) = self.subscriptions.try_borrow_mut() {
-            if let Some(subs) = subscriptions.get_mut(topic) {
-                subs.push(cb);
-                subscribed = subs.len();
-            } else {
-                subscriptions.insert(topic.to_owned(), vec![cb]);
-                subscribed = 1;
-            }
+            subscriptions.push(SubscriptionItem::new(topic, cb));
+            return Ok(true);
         }
 
-        Ok(subscribed)
+        Ok(false)
     }
 }
 
@@ -127,7 +142,7 @@ mod tests {
         let (mut called1, mut called2, mut called3, mut called4) = (false, false, false, false);
         {
             let eb = InMemEventBus::new();
-            assert_eq!(
+            assert!(
                 eb.subscribe(
                     "ent1.created",
                     Box::new(|event| {
@@ -137,9 +152,8 @@ mod tests {
                     }),
                 )
                 .unwrap(),
-                1
             );
-            assert_eq!(
+            assert!(
                 eb.subscribe(
                     "ent1.created",
                     Box::new(|event| {
@@ -149,9 +163,8 @@ mod tests {
                     }),
                 )
                 .unwrap(),
-                2
             );
-            assert_eq!(
+            assert!(
                 eb.subscribe(
                     "ent1.updated",
                     Box::new(|event| {
@@ -161,9 +174,8 @@ mod tests {
                     }),
                 )
                 .unwrap(),
-                1
             );
-            assert_eq!(
+            assert!(
                 eb.subscribe(
                     "ent2.created",
                     Box::new(|event| {
@@ -173,10 +185,17 @@ mod tests {
                     }),
                 )
                 .unwrap(),
+            );
+            assert_eq!(
+                eb.publish("ent1.created", &BasicEvent::new("ent1.created"))
+                    .unwrap(),
+                2
+            );
+            assert_eq!(
+                eb.publish("ent2.created", &BasicEvent::new("ent2.created"))
+                    .unwrap(),
                 1
             );
-            assert_eq!(eb.publish("ent1.created", &BasicEvent::new("ent1.created")).unwrap(), 2);
-            assert_eq!(eb.publish("ent2.created", &BasicEvent::new("ent2.created")).unwrap(), 1);
         }
         assert!(called1);
         assert!(called2);
@@ -186,7 +205,8 @@ mod tests {
 
     #[test]
     fn glob() {
-        let (mut calls1, mut calls2, mut calls3, mut calls4, mut calls5, mut calls6) = (0, 0, 0, 0, 0, 0);
+        let (mut calls1, mut calls2, mut calls3, mut calls4, mut calls5, mut calls6) =
+            (0, 0, 0, 0, 0, 0);
         {
             let eb = InMemEventBus::new();
             eb.subscribe(
@@ -237,9 +257,21 @@ mod tests {
                 }),
             )
             .unwrap();
-            assert_eq!(eb.publish("ent.created", &BasicEvent::new("ent.created")).unwrap(), 4);
-            assert_eq!(eb.publish("ent.updated", &BasicEvent::new("ent.updated")).unwrap(), 3);
-            assert_eq!(eb.publish("another.created", &BasicEvent::new("another.created")).unwrap(), 2);
+            assert_eq!(
+                eb.publish("ent.created", &BasicEvent::new("ent.created"))
+                    .unwrap(),
+                4
+            );
+            assert_eq!(
+                eb.publish("ent.updated", &BasicEvent::new("ent.updated"))
+                    .unwrap(),
+                3
+            );
+            assert_eq!(
+                eb.publish("another.created", &BasicEvent::new("another.created"))
+                    .unwrap(),
+                2
+            );
         }
         assert_eq!(calls1, 1);
         assert_eq!(calls2, 1);
