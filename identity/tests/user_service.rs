@@ -1,6 +1,9 @@
 use std::rc::Rc;
 
-use common::{error::Error, event::EventPublisher};
+use common::{
+    error::Error,
+    event::{EventPublisher, InMemEventBus},
+};
 use identity::{
     application::user::UserService,
     domain::{role::*, token::*, user::*, validation::*},
@@ -12,7 +15,7 @@ use identity::{
 
 struct Container {
     user_repo: Rc<InMemUserRepository>,
-    event_pub: Rc<InMemEventPublisher>,
+    event_pub: Rc<InMemEventBus<'static>>,
     password_hasher: Rc<FakePasswordHasher>,
     token_enc: Rc<FakeTokenEncoder>,
     token_repo: Rc<InMemTokenRepository>,
@@ -26,7 +29,7 @@ struct Container {
 impl Container {
     fn new() -> Container {
         let user_repo = Rc::new(InMemUserRepository::new());
-        let event_pub = Rc::new(InMemEventPublisher::new());
+        let event_pub = Rc::new(InMemEventBus::new());
         let password_hasher = Rc::new(FakePasswordHasher::new());
         let token_enc = Rc::new(FakeTokenEncoder::new());
         let token_repo = Rc::new(InMemTokenRepository::new());

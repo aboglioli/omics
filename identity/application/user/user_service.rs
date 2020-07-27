@@ -68,8 +68,7 @@ impl UserService {
             user.identity().username().value(),
             user.identity().email().value(),
         );
-        self.event_publisher
-            .publish("user.registered", Box::new(event))?;
+        self.event_publisher.publish("user.registered", &event)?;
 
         Ok(())
     }
@@ -94,8 +93,7 @@ impl UserService {
                 person.fullname().name(),
                 person.fullname().lastname(),
             );
-            self.event_publisher
-                .publish("user.updated", Box::new(event))?;
+            self.event_publisher.publish("user.updated", &event)?;
         }
 
         Ok(())
