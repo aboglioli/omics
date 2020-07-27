@@ -7,6 +7,7 @@ pub trait Event: Debug {
     fn payload(&self) -> Vec<u8>;
 }
 
+#[derive(Debug)]
 pub struct EventWithTopic {
     topic: String,
     event: Box<dyn Event>,

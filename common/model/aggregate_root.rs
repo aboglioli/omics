@@ -3,7 +3,7 @@ use std::cmp::PartialEq;
 
 use chrono::{DateTime, Utc};
 
-use crate::event::Event;
+use crate::event::EventWithTopic;
 
 #[derive(Debug)]
 pub struct AggregateRoot<ID> {
@@ -11,7 +11,7 @@ pub struct AggregateRoot<ID> {
     created_at: DateTime<Utc>,
     updated_at: Option<DateTime<Utc>>,
     deleted_at: Option<DateTime<Utc>>,
-    events: Vec<Box<dyn Event>>,
+    events: Vec<EventWithTopic>,
 }
 
 impl<ID: Clone> AggregateRoot<ID> {
@@ -49,12 +49,16 @@ impl<ID: Clone> AggregateRoot<ID> {
         self.updated_at = Some(Utc::now());
     }
 
-    pub fn record_event(&mut self, event: Box<dyn Event>) {
+    pub fn record_event(&mut self, event: EventWithTopic) {
         self.events.push(event);
     }
 
-    pub fn events(&self) -> &[Box<dyn Event>] {
+    pub fn events(&self) -> &[EventWithTopic] {
         &self.events
+    }
+
+    pub fn clean_events(&mut self) {
+        self.events.clear();
     }
 }
 
