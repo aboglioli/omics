@@ -8,11 +8,15 @@ pub trait Event: Debug {
 }
 
 pub trait EventPublisher {
-    fn publish(&self, topic: &str, event: Box<dyn Event>) -> Result<(), Error>;
+    type Output;
+
+    fn publish(&self, topic: &str, event: &dyn Event) -> Result<Self::Output, Error>;
 }
 
-pub type Subscription = Box<dyn FnMut(&dyn Event) -> Result<(), Error>>;
+pub type Subscription<'a> = Box<dyn FnMut(&dyn Event) -> Result<(), Error> + 'a>;
 
-pub trait EventSubscriber {
-    fn subscribe(&self, topic: &str, cb: Subscription) -> Result<(), Error>;
+pub trait EventSubscriber<'a> {
+    type Output;
+
+    fn subscribe(&self, topic: &str, cb: Subscription<'a>) -> Result<Self::Output, Error>;
 }
