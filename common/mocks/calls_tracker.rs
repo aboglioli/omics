@@ -1,19 +1,19 @@
-use std::cell::RefCell;
 use std::collections::HashMap;
+use std::sync::Mutex;
 
 pub struct CallsTracker<T> {
-    calls: RefCell<HashMap<String, Vec<T>>>,
+    calls: Mutex<HashMap<String, Vec<T>>>,
 }
 
 impl<T: Clone> CallsTracker<T> {
     pub fn new() -> Self {
         CallsTracker {
-            calls: RefCell::new(HashMap::new()),
+            calls: Mutex::new(HashMap::new()),
         }
     }
 
     pub fn register(&self, name: &str, v: T) {
-        let mut calls = self.calls.borrow_mut();
+        let mut calls = self.calls.lock().unwrap();
         if let Some(calls) = calls.get_mut(name) {
             calls.push(v);
             return;
@@ -25,7 +25,7 @@ impl<T: Clone> CallsTracker<T> {
     pub fn get(&self, name: &str) -> Vec<T> {
         let mut vec = Vec::new();
 
-        if let Some(calls) = self.calls.borrow().get(name) {
+        if let Some(calls) = self.calls.lock().unwrap().get(name) {
             for v in calls.iter() {
                 vec.push(v.clone());
             }

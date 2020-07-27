@@ -4,14 +4,14 @@ pub struct DonateCommand {
 }
 
 pub struct DonateToAuthor {
-    user_repository: Rc<dyn UserRepository>,
-    donation_repository: Rc<dyn DonationRepository>,
+    user_repository: Arc<dyn UserRepository>,
+    donation_repository: Arc<dyn DonationRepository>,
 }
 
 impl DonateToAuthor {
     pub fn new(
-        user_repository: Rc<dyn UserRepository>,
-        donation_repository: Rc<dyn DonationRepository>,
+        user_repository: Arc<dyn UserRepository>,
+        donation_repository: Arc<dyn DonationRepository>,
     ) -> Self {
         DonateToAuthor {
             user_repository,

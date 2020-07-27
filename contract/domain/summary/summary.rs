@@ -1,9 +1,7 @@
-use chrono::{DateTime, Utc};
-
 use common::error::Error;
 use common::model::{AggregateRoot, StatusHistory};
 
-use crate::domain::contract::{Contract, ContractId};
+use crate::domain::contract::ContractId;
 use crate::domain::summary::SummaryStatus;
 
 type SummaryId = String;
@@ -63,9 +61,6 @@ impl Summary {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    use crate::domain::publication::{Publication, PublicationId};
-    use common::domain::user::UserId;
 
     #[test]
     fn create() {

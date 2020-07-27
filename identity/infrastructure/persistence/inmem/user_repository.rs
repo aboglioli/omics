@@ -1,20 +1,20 @@
-use std::cell::RefCell;
 use std::collections::HashMap;
+use std::sync::Mutex;
 
 use uuid::Uuid;
 
 use common::error::Error;
 
-use crate::domain::user::{User, UserId, UserRepository};
+use crate::domain::user::{Email, User, UserId, UserRepository, Username};
 
 pub struct InMemUserRepository {
-    pub users: RefCell<HashMap<UserId, User>>,
+    pub users: Mutex<HashMap<UserId, User>>,
 }
 
 impl InMemUserRepository {
     pub fn new() -> InMemUserRepository {
         InMemUserRepository {
-            users: RefCell::new(HashMap::new()),
+            users: Mutex::new(HashMap::new()),
         }
     }
 }
@@ -27,19 +27,25 @@ impl UserRepository for InMemUserRepository {
     }
 
     fn find_by_id(&self, id: &UserId) -> Result<User, Error> {
-        let users = self.users.borrow();
+        let users = self.users.lock().unwrap();
         users
             .get(id)
             .cloned()
             .ok_or(Error::internal().set_code("not_found").build())
     }
 
-    fn find_by_username_or_email(&self, username_or_email: &str) -> Result<User, Error> {
-        // TODO: can be made functional. Don't be lazy.
-        for (_, user) in self.users.borrow().iter() {
-            if user.identity().username().value() == username_or_email
-                || user.identity().email().value() == username_or_email
-            {
+    fn find_by_username(&self, username: &Username) -> Result<User, Error> {
+        for (_, user) in self.users.lock().unwrap().iter() {
+            if user.identity().username().value() == username.value() {
+                return Ok(user.clone());
+            }
+        }
+        Err(Error::internal().set_code("not_found").build())
+    }
+
+    fn find_by_email(&self, email: &Email) -> Result<User, Error> {
+        for (_, user) in self.users.lock().unwrap().iter() {
+            if user.identity().email().value() == email.value() {
                 return Ok(user.clone());
             }
         }
@@ -49,7 +55,8 @@ impl UserRepository for InMemUserRepository {
     fn save(&self, user: &mut User) -> Result<(), Error> {
         // user.id().updated();
         self.users
-            .borrow_mut()
+            .lock()
+            .unwrap()
             .insert(user.base().id(), user.clone());
         Ok(())
     }
@@ -58,7 +65,7 @@ impl UserRepository for InMemUserRepository {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::domain::role::{Role, RoleId};
+
     use crate::domain::user::{
         Email, Fullname, Identity, Password, Person, Provider, User, UserId, Username,
     };
@@ -85,7 +92,7 @@ mod tests {
         changed_user.set_person(Person::new(Fullname::new("Name", "Lastname")?)?)?;
 
         repo.save(&mut changed_user)?;
-        assert_eq!(repo.users.borrow().len(), 1);
+        assert_eq!(repo.users.lock().unwrap().len(), 1);
         assert!(user.person().is_none());
 
         let found_user = repo.find_by_id(&user.base().id())?;
@@ -96,10 +103,18 @@ mod tests {
         assert_eq!(changed_user_person.fullname().name(), "Name");
         assert_eq!(changed_user_person.fullname().lastname(), "Lastname");
 
-        let _found_user = repo.find_by_username_or_email("username")?;
-        let _found_user = repo.find_by_username_or_email("username@email.com")?;
-        assert!(repo.find_by_username_or_email("nonexisting").is_err());
-        assert!(repo.find_by_username_or_email("username@asd.com").is_err());
+        assert!(repo
+            .find_by_username(&Username::new("username").unwrap())
+            .is_ok());
+        assert!(repo
+            .find_by_email(&Email::new("username@email.com").unwrap())
+            .is_ok());
+        assert!(repo
+            .find_by_username(&Username::new("nonexisting").unwrap())
+            .is_err());
+        assert!(repo
+            .find_by_email(&Email::new("username@asd.com").unwrap())
+            .is_err());
 
         Ok(())
     }

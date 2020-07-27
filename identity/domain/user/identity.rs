@@ -18,11 +18,7 @@ impl Identity {
     ) -> Result<Identity, Error> {
         let password = match provider {
             Provider::Local => match password {
-                None => {
-                    return Err(Error::application()
-                        .add_context("password", "required")
-                        .build())
-                }
+                None => return Err(Error::pair("password", "required")),
                 password => password,
             },
             _ => None,
@@ -30,9 +26,9 @@ impl Identity {
 
         Ok(Identity {
             provider,
-            username: username,
-            email: email,
-            password: password,
+            username,
+            email,
+            password,
         })
     }
 

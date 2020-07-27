@@ -1,5 +1,4 @@
-use std::cell::{Cell, RefCell};
-use std::collections::HashMap;
+use std::sync::Mutex;
 
 use glob::Pattern;
 
@@ -29,13 +28,13 @@ impl<'a> SubscriptionWithTopic<'a> {
 }
 
 pub struct InMemEventBus<'a> {
-    subscriptions: RefCell<Vec<SubscriptionWithTopic<'a>>>,
+    subscriptions: Mutex<Vec<SubscriptionWithTopic<'a>>>,
 }
 
 impl InMemEventBus<'_> {
     pub fn new() -> Self {
         Self {
-            subscriptions: RefCell::new(Vec::new()),
+            subscriptions: Mutex::new(Vec::new()),
         }
     }
 }
@@ -53,7 +52,7 @@ impl EventPublisher for InMemEventBus<'_> {
         let mut count = 0;
         let mut errs = Error::internal();
 
-        for sub_item in self.subscriptions.borrow_mut().iter_mut() {
+        for sub_item in self.subscriptions.lock().unwrap().iter_mut() {
             let pattern = Pattern::new(sub_item.topic()).unwrap();
             if pattern.matches(topic) {
                 if let Err(err) = (sub_item.subscription())(topic, event) {
@@ -71,11 +70,11 @@ impl EventPublisher for InMemEventBus<'_> {
     }
 
     fn publish_all(&self, events_with_topic: &[EventWithTopic]) -> Result<Self::Output, Error> {
-        let mut count = 0;
+        let count = 0;
         let mut errs = Error::internal();
 
         for ewt in events_with_topic.iter() {
-            let count = match self.publish(ewt.topic(), ewt.event()) {
+            let _count = match self.publish(ewt.topic(), ewt.event()) {
                 Ok(c) => count + c,
                 Err(err) => {
                     errs.merge(err);
@@ -96,12 +95,9 @@ impl<'a> EventSubscriber<'a> for InMemEventBus<'a> {
     type Output = bool;
 
     fn subscribe(&self, topic: &str, cb: Subscription<'a>) -> Result<Self::Output, Error> {
-        if let Ok(mut subscriptions) = self.subscriptions.try_borrow_mut() {
-            subscriptions.push(SubscriptionWithTopic::new(topic, cb));
-            return Ok(true);
-        }
-
-        Ok(false)
+        let mut subscriptions = self.subscriptions.lock().unwrap();
+        subscriptions.push(SubscriptionWithTopic::new(topic, cb));
+        Ok(true)
     }
 }
 
@@ -109,8 +105,8 @@ impl<'a> EventSubscriber<'a> for InMemEventBus<'a> {
 mod tests {
     use super::*;
 
-    use std::cell::Cell;
-    use std::rc::Rc;
+    use std::sync::Arc;
+    use std::thread;
 
     use crate::mocks::{CallsTracker, Counter};
 
@@ -139,7 +135,7 @@ mod tests {
     #[test]
     fn create() {
         let eb = InMemEventBus::new();
-        assert_eq!(eb.subscriptions.borrow().len(), 0);
+        assert_eq!(eb.subscriptions.lock().unwrap().len(), 0);
     }
 
     #[test]
@@ -164,6 +160,8 @@ mod tests {
                 .unwrap(),
             3
         );
+
+        let _emitter: Box<dyn EventPublisher<Output = _>> = Box::new(InMemEventBus::new());
     }
 
     #[test]
@@ -339,5 +337,34 @@ mod tests {
         assert_eq!(codes[0], "code1");
         assert_eq!(codes[1], "code2");
         assert_eq!(codes[2], "code3");
+    }
+
+    #[test]
+    fn multithreading() {
+        let eb = Arc::new(InMemEventBus::new());
+        let c = Arc::new(Mutex::new(Counter::new()));
+
+        let c1 = Arc::clone(&c);
+        eb.subscribe(
+            "thread*.event",
+            Box::new(move |_, _| {
+                c1.lock().unwrap().inc("c");
+                Ok(())
+            }),
+        );
+
+        let eb1 = Arc::clone(&eb);
+        thread::spawn(move || {
+            eb1.publish("thread1.event", &BasicEvent::new("event"));
+        })
+        .join();
+
+        let eb2 = Arc::clone(&eb);
+        thread::spawn(move || {
+            eb2.publish("thread1.event", &BasicEvent::new("event"));
+        })
+        .join();
+
+        assert_eq!(c.lock().unwrap().count("c"), 2);
     }
 }

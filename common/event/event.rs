@@ -38,7 +38,7 @@ pub trait EventPublisher {
     fn publish_all(&self, events_with_topic: &[EventWithTopic]) -> Result<Self::Output, Error>;
 }
 
-pub type Subscription<'a> = Box<dyn FnMut(&str, &dyn Event) -> Result<(), Error> + 'a>;
+pub type Subscription<'a> = Box<dyn Fn(&str, &dyn Event) -> Result<(), Error> + Send + 'a>;
 
 pub trait EventSubscriber<'a> {
     type Output;

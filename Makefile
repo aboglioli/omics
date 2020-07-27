@@ -1,12 +1,12 @@
 WEB_DIR = web
 
-build: build web-build
-
-dependencies: dependencies web-dependencies
-
 # ----------
 # Server
 # ----------
+fix:
+	cargo fmt
+	cargo fix --allow-dirty
+
 run:
 	PORT=3000 cargo run
 

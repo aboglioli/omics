@@ -1,6 +1,5 @@
 use common::error::Error;
 
-use crate::domain::user::UserId;
 use crate::domain::validation::{Validation, ValidationCode, ValidationRepository};
 use crate::infrastructure::mocks;
 

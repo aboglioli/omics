@@ -1,6 +1,6 @@
 use common::error::Error;
 
-use crate::domain::role::{Role, RoleId};
+use crate::domain::role::RoleId;
 use crate::domain::user::{
     Email, Identity, Password, PasswordHasher, Provider, User, UserId, Username,
 };

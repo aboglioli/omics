@@ -3,15 +3,13 @@ use std::cmp::PartialEq;
 
 use chrono::{DateTime, Utc};
 
-use crate::event::EventWithTopic;
-
 #[derive(Debug)]
 pub struct AggregateRoot<ID> {
     id: ID,
     created_at: DateTime<Utc>,
     updated_at: Option<DateTime<Utc>>,
     deleted_at: Option<DateTime<Utc>>,
-    events: Vec<EventWithTopic>,
+    events: Vec<String>, // TODO: change to real implementation
 }
 
 impl<ID: Clone> AggregateRoot<ID> {
@@ -49,11 +47,11 @@ impl<ID: Clone> AggregateRoot<ID> {
         self.updated_at = Some(Utc::now());
     }
 
-    pub fn record_event(&mut self, event: EventWithTopic) {
+    pub fn record_event(&mut self, event: String) {
         self.events.push(event);
     }
 
-    pub fn events(&self) -> &[EventWithTopic] {
+    pub fn events(&self) -> &[String] {
         &self.events
     }
 
@@ -133,8 +131,8 @@ mod tests {
 
     #[test]
     fn equals() {
-        let mut ag1 = AggRoot::new(AggRootID::from("AR_101"), "Agg 1");
-        let mut ag2 = AggRoot::new(AggRootID::from("AR_101"), "Agg 2");
+        let ag1 = AggRoot::new(AggRootID::from("AR_101"), "Agg 1");
+        let ag2 = AggRoot::new(AggRootID::from("AR_101"), "Agg 2");
 
         assert_eq!(ag1.base(), ag2.base());
     }

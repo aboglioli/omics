@@ -1,17 +1,17 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::domain::token::{Data, Token, TokenEncoder, TokenId, TokenRepository};
 use common::error::Error;
 
 pub struct TokenService {
-    token_encoder: Rc<dyn TokenEncoder>,
-    token_repository: Rc<dyn TokenRepository>,
+    token_encoder: Arc<dyn TokenEncoder>,
+    token_repository: Arc<dyn TokenRepository>,
 }
 
 impl TokenService {
     pub fn new(
-        token_encoder: Rc<dyn TokenEncoder>,
-        token_repository: Rc<dyn TokenRepository>,
+        token_encoder: Arc<dyn TokenEncoder>,
+        token_repository: Arc<dyn TokenRepository>,
     ) -> Self {
         TokenService {
             token_encoder,
@@ -51,11 +51,11 @@ mod tests {
 
     #[test]
     fn create() -> Result<(), Error> {
-        let enc = Rc::new(FakeTokenEncoder::new());
-        let repo = Rc::new(InMemTokenRepository::new());
+        let enc = Arc::new(FakeTokenEncoder::new());
+        let repo = Arc::new(InMemTokenRepository::new());
         let serv = TokenService::new(
-            Rc::clone(&enc) as Rc<dyn TokenEncoder>,
-            Rc::clone(&repo) as Rc<dyn TokenRepository>,
+            Arc::clone(&enc) as Arc<dyn TokenEncoder>,
+            Arc::clone(&repo) as Arc<dyn TokenRepository>,
         );
 
         let mut data = Data::new();

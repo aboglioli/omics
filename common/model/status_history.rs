@@ -2,8 +2,6 @@ use std::cmp::PartialEq;
 
 use chrono::{DateTime, Utc};
 
-use crate::error::Error;
-
 #[derive(Debug, Clone)]
 pub struct StatusItem<S, M> {
     date: DateTime<Utc>,
@@ -111,7 +109,7 @@ mod tests {
 
         assert_eq!(sh.history().len(), 3);
 
-        let mut sh: StatusHistory<_, ()> = StatusHistory::init(Status::Open);
+        let sh: StatusHistory<_, ()> = StatusHistory::init(Status::Open);
         assert_eq!(sh.history().len(), 1);
         assert_eq!(sh.current().unwrap().status(), &Status::Open);
     }

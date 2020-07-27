@@ -20,7 +20,7 @@ impl Email {
         }
 
         Ok(Email {
-            email: String::from(email),
+            email: email.to_owned(),
         })
     }
 

@@ -15,7 +15,7 @@ pub struct Validation {
 
 impl Validation {
     pub fn new(code: ValidationCode, user_id: UserId) -> Result<Validation, Error> {
-        let uuid = Uuid::new_v4();
+        let _uuid = Uuid::new_v4();
         Ok(Validation {
             base: AggregateRoot::new(code),
             user_id,
@@ -54,8 +54,6 @@ impl Validation {
 mod tests {
     use super::*;
 
-    use crate::domain::role::RoleId;
-    use crate::domain::user::User;
     use crate::infrastructure::mocks;
 
     #[test]

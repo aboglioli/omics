@@ -1,19 +1,19 @@
-use std::cell::RefCell;
 use std::collections::HashMap;
+use std::sync::Mutex;
 
 pub struct Counter {
-    counts: RefCell<HashMap<String, u32>>,
+    counts: Mutex<HashMap<String, u32>>,
 }
 
 impl Counter {
     pub fn new() -> Self {
         Counter {
-            counts: RefCell::new(HashMap::new()),
+            counts: Mutex::new(HashMap::new()),
         }
     }
 
     pub fn inc(&self, name: &str) {
-        let mut counts = self.counts.borrow_mut();
+        let mut counts = self.counts.lock().unwrap();
         if let Some(count) = counts.get_mut(name) {
             *count += 1;
             return;
@@ -22,7 +22,7 @@ impl Counter {
     }
 
     pub fn count(&self, name: &str) -> u32 {
-        if let Some(count) = self.counts.borrow().get(name) {
+        if let Some(count) = self.counts.lock().unwrap().get(name) {
             *count
         } else {
             0

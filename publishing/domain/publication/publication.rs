@@ -1,8 +1,8 @@
 use common::error::Error;
 use common::model::AggregateRoot;
 
-use crate::domain::author::{Author, AuthorId};
-use crate::domain::category::{Category, CategoryId};
+use crate::domain::author::AuthorId;
+use crate::domain::category::CategoryId;
 use crate::domain::publication::{Name, Page, PageNumber, Statistics, Synopsis, Tag};
 
 pub type PublicationId = String;
@@ -24,7 +24,7 @@ impl Publication {
         name: &str,
         synopsis: &str,
         author_id: AuthorId,
-        statistics: Statistics,
+        _statistics: Statistics,
         category_id: CategoryId,
     ) -> Result<Publication, Error> {
         Ok(Publication {

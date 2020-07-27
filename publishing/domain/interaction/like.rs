@@ -2,8 +2,8 @@ use chrono::{DateTime, Utc};
 
 use common::error::Error;
 
-use crate::domain::publication::{Publication, PublicationId};
-use crate::domain::reader::{Reader, ReaderId};
+use crate::domain::publication::PublicationId;
+use crate::domain::reader::ReaderId;
 
 pub struct Like {
     reader_id: ReaderId,
