@@ -44,7 +44,7 @@ impl Container {
 
         let user_serv = UserService::new(
             Rc::clone(&user_repo) as Rc<dyn UserRepository>,
-            Rc::clone(&event_pub) as Rc<dyn EventPublisher>,
+            Rc::clone(&event_pub) as Rc<dyn EventPublisher<Output = usize>>,
             Rc::clone(&auth_serv),
             Rc::clone(&role_repo) as Rc<dyn RoleRepository>,
             Rc::clone(&validation_repo) as Rc<dyn ValidationRepository>,

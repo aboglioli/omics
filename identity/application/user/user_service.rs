@@ -16,7 +16,7 @@ use crate::domain::validation::{Validation, ValidationCode, ValidationRepository
 
 pub struct UserService {
     user_repository: Rc<dyn UserRepository>,
-    event_publisher: Rc<dyn EventPublisher>,
+    event_publisher: Rc<dyn EventPublisher<Output = usize>>,
     auth_serv: Rc<AuthService>,
     role_repository: Rc<dyn RoleRepository>,
     validation_repository: Rc<dyn ValidationRepository>,
@@ -25,7 +25,7 @@ pub struct UserService {
 impl UserService {
     pub fn new(
         user_repository: Rc<dyn UserRepository>,
-        event_publisher: Rc<dyn EventPublisher>,
+        event_publisher: Rc<dyn EventPublisher<Output = usize>>,
         auth_serv: Rc<AuthService>,
         role_repository: Rc<dyn RoleRepository>,
         validation_repository: Rc<dyn ValidationRepository>,
