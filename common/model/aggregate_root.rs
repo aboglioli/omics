@@ -3,17 +3,29 @@ use std::cmp::PartialEq;
 
 use chrono::{DateTime, Utc};
 
+use crate::error::Error;
+use crate::event::{Event, ToEvent};
+
 #[derive(Debug)]
-pub struct AggregateRoot<ID> {
+pub struct DefaultEvent;
+
+impl ToEvent for DefaultEvent {
+    fn to_event(&self) -> Result<Event, Error> {
+        Err(Error::internal().set_code("not_implemented").build())
+    }
+}
+
+#[derive(Debug)]
+pub struct AggregateRoot<ID, E> {
     id: ID,
     created_at: DateTime<Utc>,
     updated_at: Option<DateTime<Utc>>,
     deleted_at: Option<DateTime<Utc>>,
-    events: Vec<String>, // TODO: change to real implementation
+    events: Vec<E>,
 }
 
-impl<ID: Clone> AggregateRoot<ID> {
-    pub fn new(id: ID) -> AggregateRoot<ID> {
+impl<ID: Clone, E: ToEvent> AggregateRoot<ID, E> {
+    pub fn new(id: ID) -> AggregateRoot<ID, E> {
         AggregateRoot {
             id,
             created_at: Utc::now(),
@@ -47,26 +59,26 @@ impl<ID: Clone> AggregateRoot<ID> {
         self.updated_at = Some(Utc::now());
     }
 
-    pub fn record_event(&mut self, event: String) {
+    pub fn record_event(&mut self, event: E) {
         self.events.push(event);
     }
 
-    pub fn events(&self) -> &[String] {
-        &self.events
-    }
-
-    pub fn clean_events(&mut self) {
-        self.events.clear();
+    pub fn events(&self) -> Result<Vec<Event>, Error> {
+        let mut events = Vec::new();
+        for event in self.events.iter() {
+            events.push(event.to_event()?);
+        }
+        Ok(events)
     }
 }
 
-impl<ID: PartialEq> PartialEq for AggregateRoot<ID> {
+impl<ID: PartialEq, E> PartialEq for AggregateRoot<ID, E> {
     fn eq(&self, other: &Self) -> bool {
         self.id == other.id
     }
 }
 
-impl<ID: Clone> Clone for AggregateRoot<ID> {
+impl<ID: Clone, E> Clone for AggregateRoot<ID, E> {
     fn clone(&self) -> Self {
         AggregateRoot {
             id: self.id.clone(),
@@ -82,38 +94,61 @@ impl<ID: Clone> Clone for AggregateRoot<ID> {
 mod tests {
     use super::*;
 
+    #[derive(Debug)]
+    enum AggRootEvent {
+        Created { text: String },
+        Updated { num: u32 },
+        Deleted(bool),
+    }
+
+    impl ToEvent for AggRootEvent {
+        fn to_event(&self) -> Result<Event, Error> {
+            Ok(match self {
+                AggRootEvent::Created { text } => {
+                    Event::new("agg_root.created", "", text.as_bytes().to_vec())
+                }
+                AggRootEvent::Updated { num } => Event::new(
+                    "agg_root.updated",
+                    "",
+                    vec![if num < &255 { 255 } else { 0 }],
+                ),
+                AggRootEvent::Deleted(_v) => Event::new("agg_root.deleted", "", vec![1]),
+            })
+        }
+    }
+
     type AggRootID = String;
+
+    #[derive(Debug)]
     struct AggRoot {
-        base: AggregateRoot<AggRootID>,
-        name: String,
+        base: AggregateRoot<AggRootID, AggRootEvent>,
     }
 
     impl AggRoot {
-        fn new(id: AggRootID, name: &str) -> AggRoot {
+        fn new(id: AggRootID) -> AggRoot {
             AggRoot {
                 base: AggregateRoot::new(id),
-                name: name.to_owned(),
             }
         }
 
-        fn base(&self) -> &AggregateRoot<AggRootID> {
+        fn base(&self) -> &AggregateRoot<AggRootID, AggRootEvent> {
             &self.base
         }
 
-        fn base_mut(&mut self) -> &mut AggregateRoot<AggRootID> {
+        fn base_mut(&mut self) -> &mut AggregateRoot<AggRootID, AggRootEvent> {
             &mut self.base
         }
     }
 
     #[test]
     fn create() {
-        let e = AggRoot::new(AggRootID::from("AR_022"), "I'm an aggregate root");
+        let e = AggRoot::new(AggRootID::from("AR_022"));
         assert_eq!(e.base().id(), "AR_022");
     }
 
     #[test]
     fn properties() {
-        let mut e = AggRoot::new(AggRootID::from("AR_022"), "I'm an aggregate root");
+        let mut e = AggRoot::new(AggRootID::from("AR_022"));
         assert_eq!(e.base().id(), "AR_022");
         assert_ne!(e.base().created_at(), &Utc::now());
         assert!(e.base().created_at() < &Utc::now());
@@ -131,9 +166,27 @@ mod tests {
 
     #[test]
     fn equals() {
-        let ag1 = AggRoot::new(AggRootID::from("AR_101"), "Agg 1");
-        let ag2 = AggRoot::new(AggRootID::from("AR_101"), "Agg 2");
+        let ag1 = AggRoot::new(AggRootID::from("AR_101"));
+        let ag2 = AggRoot::new(AggRootID::from("AR_101"));
 
         assert_eq!(ag1.base(), ag2.base());
+    }
+
+    #[test]
+    fn events() {
+        let mut ag = AggRoot::new(AggRootID::from("AR_08"));
+        ag.base_mut().record_event(AggRootEvent::Created {
+            text: "agg_root.created".to_owned(),
+        });
+        ag.base_mut()
+            .record_event(AggRootEvent::Updated { num: 32 });
+        ag.base_mut().record_event(AggRootEvent::Deleted(true));
+
+        let events = ag.base().events().unwrap();
+        assert_eq!(events.len(), 3);
+        assert_eq!(events[0].topic(), "agg_root.created");
+        assert_eq!(events[0].payload(), &"agg_root.created".as_bytes().to_vec());
+        assert_eq!(events[1].topic(), "agg_root.updated");
+        assert_eq!(events[2].topic(), "agg_root.deleted");
     }
 }

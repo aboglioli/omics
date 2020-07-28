@@ -36,32 +36,11 @@ impl Event {
         &self.timestamp
     }
 
-    pub fn payload(self) -> EventPayload {
-        self.payload
+    pub fn payload(&self) -> &EventPayload {
+        &self.payload
     }
 }
 
-pub trait EventPublisher {
-    type Output;
-
-    fn publish(&self, event: Event) -> Result<Self::Output, Error>;
-
-    fn publish_all(&self, events: Vec<Event>) -> Result<Self::Output, Error>;
-}
-
-pub trait EventSubscriber {
-    type Output;
-
-    fn subscribe(
-        &self,
-        handler: Box<dyn EventHandler<Output = Self::Output>>,
-    ) -> Result<Self::Output, Error>;
-}
-
-pub trait EventHandler: Send {
-    type Output;
-
-    fn topic(&self) -> &str;
-
-    fn handle(&mut self, event: &Event) -> Result<Self::Output, Error>;
+pub trait ToEvent {
+    fn to_event(&self) -> Result<Event, Error>;
 }

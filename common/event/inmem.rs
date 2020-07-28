@@ -288,13 +288,15 @@ mod tests {
             .subscribe(Box::new(handler.clone_with_topic(r"ent.+|.+.created")))
             .is_ok());
 
-        assert!(eb.publish_all(vec![
+        assert!(eb
+            .publish_all(vec![
                 create_event("another.created"),
                 create_event("ent.created"),
                 create_event("ent.updated"),
                 create_event("ent.deleted"),
                 create_event("another.updated"),
-        ]).is_ok());
+            ])
+            .is_ok());
 
         assert!(eb.stop().is_ok());
 

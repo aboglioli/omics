@@ -1,57 +1,24 @@
-use common::event::Event;
+use common::error::Error;
+use common::event::{Event, ToEvent};
 
 use crate::domain::user::UserId;
 
 #[derive(Debug)]
-pub struct UserUpdated {
-    pub id: UserId,
-    pub name: String,
-    pub lastname: String,
+pub enum UserEvent {
+    Updated {
+        id: UserId,
+        name: String,
+        lastname: String,
+    },
+    Registered {
+        id: UserId,
+        username: String,
+        email: String,
+    },
 }
 
-impl UserUpdated {
-    pub fn new(id: UserId, name: &str, lastname: &str) -> UserUpdated {
-        UserUpdated {
-            id,
-            name: name.to_owned(),
-            lastname: lastname.to_owned(),
-        }
-    }
-}
-
-impl Event for UserUpdated {
-    fn code(&self) -> &str {
-        "user-created"
-    }
-
-    fn payload(&self) -> Vec<u8> {
-        Vec::new()
-    }
-}
-
-#[derive(Debug)]
-pub struct UserRegistered {
-    pub id: UserId,
-    pub username: String,
-    pub email: String,
-}
-
-impl UserRegistered {
-    pub fn new(id: UserId, username: &str, email: &str) -> UserRegistered {
-        UserRegistered {
-            id,
-            username: username.to_owned(),
-            email: email.to_owned(),
-        }
-    }
-}
-
-impl Event for UserRegistered {
-    fn code(&self) -> &str {
-        "user-registered"
-    }
-
-    fn payload(&self) -> Vec<u8> {
-        Vec::new()
+impl ToEvent for UserEvent {
+    fn to_event(&self) -> Result<Event, Error> {
+        Ok(Event::new("", "", Vec::new()))
     }
 }

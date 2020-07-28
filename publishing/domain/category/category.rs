@@ -1,5 +1,5 @@
 use common::error::Error;
-use common::model::AggregateRoot;
+use common::model::{AggregateRoot, DefaultEvent};
 
 #[derive(Debug, Clone)]
 pub struct Name {
@@ -22,7 +22,7 @@ pub type CategoryId = String;
 
 #[derive(Debug, Clone)]
 pub struct Category {
-    base: AggregateRoot<CategoryId>,
+    base: AggregateRoot<CategoryId, DefaultEvent>,
     name: Name,
 }
 

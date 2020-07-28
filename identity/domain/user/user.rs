@@ -2,14 +2,14 @@ use common::error::Error;
 use common::model::AggregateRoot;
 
 use crate::domain::role::RoleId;
-use crate::domain::user::{Email, Identity, Password, Person, Provider, Username};
+use crate::domain::user::{Identity, Password, Person, UserEvent};
 
 // User
 pub type UserId = String;
 
 #[derive(Debug, Clone)]
 pub struct User {
-    base: AggregateRoot<UserId>,
+    base: AggregateRoot<UserId, UserEvent>,
     identity: Identity,
     person: Option<Person>,
     role_id: RoleId,
@@ -27,7 +27,7 @@ impl User {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<UserId> {
+    pub fn base(&self) -> &AggregateRoot<UserId, UserEvent> {
         &self.base
     }
 
@@ -74,22 +74,24 @@ impl User {
 mod tests {
     use super::*;
 
+    use crate::domain::user::{Email, Provider, Username};
+
     #[test]
-    fn create() -> Result<(), Error> {
+    fn create() {
         let user = User::new(
             UserId::from("user123"),
             Identity::new(
                 Provider::Local,
-                Username::new("user1")?,
-                Email::new("email@user.com")?,
-                Some(Password::new(&format!("{:X>50}", "2"))?),
-            )?,
+                Username::new("user1").unwrap(),
+                Email::new("email@user.com").unwrap(),
+                Some(Password::new(&format!("{:X>50}", "2")).unwrap()),
+            )
+            .unwrap(),
             RoleId::from("user"),
-        )?;
+        )
+        .unwrap();
         assert_eq!(user.base().id(), "user123");
         assert_eq!(user.identity().username().value(), "user1");
         assert_eq!(user.identity().email().value(), "email@user.com");
-
-        Ok(())
     }
 }

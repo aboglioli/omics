@@ -1,5 +1,5 @@
 use common::error::Error;
-use common::model::AggregateRoot;
+use common::model::{AggregateRoot, DefaultEvent};
 
 use crate::domain::interaction::Like;
 use crate::domain::publication::PublicationId;
@@ -7,7 +7,7 @@ use crate::domain::publication::PublicationId;
 pub type ReaderId = String;
 
 pub struct Reader {
-    base: AggregateRoot<ReaderId>,
+    base: AggregateRoot<ReaderId, DefaultEvent>,
     name: String,
 }
 

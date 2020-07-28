@@ -1,11 +1,11 @@
 use common::domain::user::UserId;
 use common::error::Error;
-use common::model::AggregateRoot;
+use common::model::{AggregateRoot, DefaultEvent};
 
 pub type PublicationId = String;
 
 pub struct Publication {
-    base: AggregateRoot<PublicationId>,
+    base: AggregateRoot<PublicationId, DefaultEvent>,
     author_id: UserId,
     name: String,
 }

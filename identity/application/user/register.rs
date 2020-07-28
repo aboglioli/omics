@@ -1,12 +1,11 @@
 use std::sync::Arc;
 
 use common::error::Error;
-use common::event::EventPublisher;
+use common::event::{EventPublisher, ToEvent};
 
 use crate::domain::role::RoleId;
 use crate::domain::user::{
-    AuthService, Email, Identity, Password, Provider, User, UserRegistered, UserRepository,
-    Username,
+    AuthService, Email, Identity, Password, Provider, User, UserEvent, UserRepository, Username,
 };
 
 pub struct RegisterCommand {
@@ -60,12 +59,13 @@ impl Register {
 
         self.user_repo.save(&mut user)?;
 
-        let event = UserRegistered::new(
-            user.base().id(),
-            user.identity().username().value(),
-            user.identity().email().value(),
-        );
-        self.event_pub.publish("user.registered", &event)?;
+        let event = UserEvent::Registered {
+            id: user.base().id(),
+            username: user.identity().username().value().to_owned(),
+            email: user.identity().email().value().to_owned(),
+        }
+        .to_event()?;
+        self.event_pub.publish(event)?;
 
         Ok(())
     }

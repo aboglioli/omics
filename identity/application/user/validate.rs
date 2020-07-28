@@ -4,7 +4,7 @@ use common::error::Error;
 
 use crate::domain::user::{
     AuthService, Email, Fullname, Identity, Password, Person, Provider, User, UserId,
-    UserRepository, UserUpdated, Username,
+    UserRepository, Username,
 };
 use crate::domain::validation::{ValidationCode, ValidationRepository};
 

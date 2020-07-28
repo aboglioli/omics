@@ -3,8 +3,7 @@ use std::sync::Arc;
 use common::error::Error;
 
 use crate::domain::user::{
-    AuthService, Email, Identity, Password, Provider, User, UserId, UserRegistered, UserRepository,
-    Username,
+    AuthService, Email, Identity, Password, Provider, User, UserId, UserRepository, Username,
 };
 
 pub struct GetById {

@@ -1,12 +1,12 @@
 use common::error::Error;
-use common::model::AggregateRoot;
+use common::model::{AggregateRoot, DefaultEvent};
 
 use crate::domain::user::PaymentMethod;
 
 pub type UserId = String;
 
 pub struct User {
-    base: AggregateRoot<UserId>,
+    base: AggregateRoot<UserId, DefaultEvent>,
     name: String,
     payment_methods: Vec<PaymentMethod>,
 }

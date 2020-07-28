@@ -1,5 +1,5 @@
 use common::error::Error;
-use common::model::AggregateRoot;
+use common::model::{AggregateRoot, DefaultEvent};
 
 pub type AuthorId = String;
 
@@ -16,7 +16,7 @@ impl Name {
 }
 
 pub struct Author {
-    base: AggregateRoot<AuthorId>,
+    base: AggregateRoot<AuthorId, DefaultEvent>,
     name: Name,
 }
 

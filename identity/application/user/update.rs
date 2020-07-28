@@ -1,11 +1,11 @@
 use std::sync::Arc;
 
 use common::error::Error;
-use common::event::EventPublisher;
+use common::event::{EventPublisher, ToEvent};
 
 use crate::domain::user::{
-    AuthService, Email, Fullname, Identity, Password, Person, Provider, User, UserId,
-    UserRepository, UserUpdated, Username,
+    AuthService, Email, Fullname, Identity, Password, Person, Provider, User, UserEvent, UserId,
+    UserRepository, Username,
 };
 
 pub struct UpdateCommand {
@@ -48,12 +48,13 @@ impl Update {
         self.user_repo.save(&mut user)?;
 
         if let Some(person) = user.person() {
-            let event = UserUpdated::new(
-                user.base().id(),
-                person.fullname().name(),
-                person.fullname().lastname(),
-            );
-            self.event_pub.publish("user.updated", &event)?;
+            let event = UserEvent::Updated {
+                id: user.base().id(),
+                name: person.fullname().name().to_owned(),
+                lastname: person.fullname().lastname().to_owned(),
+            }
+            .to_event()?;
+            self.event_pub.publish(event)?;
         }
 
         Ok(())

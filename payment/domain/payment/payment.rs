@@ -1,12 +1,12 @@
 use common::error::Error;
-use common::model::{AggregateRoot, StatusHistory};
+use common::model::{AggregateRoot, DefaultEvent, StatusHistory};
 
 use crate::domain::payment::{Amount, PaymentStatus};
 
 pub type PaymentId = String;
 
 pub struct Payment {
-    base: AggregateRoot<PaymentId>,
+    base: AggregateRoot<PaymentId, DefaultEvent>,
     amount: Amount,
     status: StatusHistory<PaymentStatus, String>,
 }

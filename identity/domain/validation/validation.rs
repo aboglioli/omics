@@ -1,14 +1,14 @@
 use uuid::Uuid;
 
 use common::error::Error;
-use common::model::AggregateRoot;
+use common::model::{AggregateRoot, DefaultEvent};
 
 use crate::domain::user::{User, UserId};
 
 pub type ValidationCode = String;
 
 pub struct Validation {
-    base: AggregateRoot<ValidationCode>,
+    base: AggregateRoot<ValidationCode, DefaultEvent>,
     user_id: UserId,
     used: bool,
 }
@@ -23,7 +23,7 @@ impl Validation {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<ValidationCode> {
+    pub fn base(&self) -> &AggregateRoot<ValidationCode, DefaultEvent> {
         &self.base
     }
 
