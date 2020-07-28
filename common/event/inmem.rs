@@ -1,102 +1,108 @@
-use std::sync::Mutex;
+use std::sync::atomic::{AtomicU32, Ordering};
+use std::sync::mpsc::{self, Sender};
+use std::sync::{Arc, Mutex};
+use std::thread;
 
-use glob::Pattern;
+use regex::Regex;
 
 use crate::error::Error;
-use crate::event::{Event, EventPublisher, EventSubscriber, EventWithTopic, Subscription};
+use crate::event::{Event, EventHandler, EventPublisher, EventSubscriber};
 
-struct SubscriptionWithTopic<'a> {
-    topic: String,
-    subscription: Subscription<'a>,
+pub struct InMemEventBus {
+    handlers: Arc<Mutex<Vec<Box<dyn EventHandler<Output = bool>>>>>,
+    emitter: Option<Sender<Event>>,
+    pending_events: Arc<AtomicU32>,
 }
 
-impl<'a> SubscriptionWithTopic<'a> {
-    fn new(topic: &str, subscription: Subscription<'a>) -> Self {
-        SubscriptionWithTopic {
-            topic: topic.to_owned(),
-            subscription,
-        }
-    }
-
-    fn topic(&self) -> &str {
-        &self.topic
-    }
-
-    fn subscription(&mut self) -> &mut Subscription<'a> {
-        &mut self.subscription
-    }
-}
-
-pub struct InMemEventBus<'a> {
-    subscriptions: Mutex<Vec<SubscriptionWithTopic<'a>>>,
-}
-
-impl InMemEventBus<'_> {
+impl InMemEventBus {
     pub fn new() -> Self {
         Self {
-            subscriptions: Mutex::new(Vec::new()),
+            handlers: Arc::new(Mutex::new(Vec::new())),
+            emitter: None,
+            pending_events: Arc::new(AtomicU32::new(0)),
         }
+    }
+
+    pub fn pending_events(&self) -> u32 {
+        self.pending_events.load(Ordering::Relaxed)
+    }
+
+    pub fn run(&mut self) {
+        let (emitter, rx) = mpsc::channel();
+
+        self.emitter = Some(emitter);
+
+        let handlers = Arc::clone(&self.handlers);
+        let pending_events = Arc::clone(&self.pending_events);
+
+        thread::spawn(move || {
+            for event in rx.iter() {
+                if event.code() == "__quit" {
+                    pending_events.store(0, Ordering::Relaxed);
+                    return;
+                }
+
+                for handler in handlers.lock().unwrap().iter_mut() {
+                    if let Ok(re) = Regex::new(handler.topic()) {
+                        if re.is_match(event.topic()) {
+                            if let Err(err) = handler.handle(&event) {
+                                println!("{}", err);
+                            }
+                        }
+                    }
+                }
+
+                pending_events.fetch_sub(1, Ordering::Relaxed);
+            }
+        });
+    }
+
+    pub fn stop(&self) -> Result<bool, Error> {
+        self.publish(Event::new("", "__quit", Vec::new()))
     }
 }
 
-impl Default for InMemEventBus<'_> {
+impl Default for InMemEventBus {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl EventPublisher for InMemEventBus<'_> {
-    type Output = usize;
+impl EventPublisher for InMemEventBus {
+    type Output = bool;
 
-    fn publish(&self, topic: &str, event: &dyn Event) -> Result<Self::Output, Error> {
-        let mut count = 0;
-        let mut errs = Error::internal();
-
-        for sub_item in self.subscriptions.lock().unwrap().iter_mut() {
-            let pattern = Pattern::new(sub_item.topic()).unwrap();
-            if pattern.matches(topic) {
-                if let Err(err) = (sub_item.subscription())(topic, event) {
-                    errs.merge(err);
-                }
-                count += 1;
+    fn publish(&self, event: Event) -> Result<Self::Output, Error> {
+        if let Some(emitter) = &self.emitter {
+            if let Err(err) = emitter.send(event) {
+                return Err(Error::internal().wrap_raw(err).build());
             }
+            self.pending_events.fetch_add(1, Ordering::Relaxed);
+            return Ok(true);
         }
-
-        if errs.has_context() {
-            return Err(errs);
-        }
-
-        Ok(count)
+        Err(Error::internal()
+            .set_code("event_bus")
+            .set_message("not_initialized")
+            .build())
     }
 
-    fn publish_all(&self, events_with_topic: &[EventWithTopic]) -> Result<Self::Output, Error> {
-        let count = 0;
-        let mut errs = Error::internal();
-
-        for ewt in events_with_topic.iter() {
-            let _count = match self.publish(ewt.topic(), ewt.event()) {
-                Ok(c) => count + c,
-                Err(err) => {
-                    errs.merge(err);
-                    0
-                }
-            };
+    fn publish_all(&self, events: Vec<Event>) -> Result<Self::Output, Error> {
+        for event in events.into_iter() {
+            self.publish(event)?;
         }
 
-        if errs.has_context() {
-            return Err(errs);
-        }
-
-        Ok(count)
+        Ok(true)
     }
 }
 
-impl<'a> EventSubscriber<'a> for InMemEventBus<'a> {
+impl EventSubscriber for InMemEventBus {
     type Output = bool;
 
-    fn subscribe(&self, topic: &str, cb: Subscription<'a>) -> Result<Self::Output, Error> {
-        let mut subscriptions = self.subscriptions.lock().unwrap();
-        subscriptions.push(SubscriptionWithTopic::new(topic, cb));
+    fn subscribe(
+        &self,
+        handler: Box<dyn EventHandler<Output = Self::Output>>,
+    ) -> Result<Self::Output, Error> {
+        let mut handlers = self.handlers.lock().unwrap();
+        handlers.push(handler);
         Ok(true)
     }
 }
@@ -106,265 +112,202 @@ mod tests {
     use super::*;
 
     use std::sync::Arc;
-    use std::thread;
 
-    use crate::mocks::{CallsTracker, Counter};
+    use crate::mocks::Counter;
 
-    #[derive(Debug)]
-    struct BasicEvent {
-        code: String,
+    fn create_event(topic: &str) -> Event {
+        Event::new(topic, topic, topic.as_bytes().to_vec())
     }
 
-    impl BasicEvent {
-        fn new(code: &str) -> Self {
-            BasicEvent {
-                code: code.to_owned(),
+    struct BasicHandler {
+        counter: Arc<Counter>,
+        topic: String,
+    }
+
+    impl BasicHandler {
+        fn new(topic: &str) -> Self {
+            BasicHandler {
+                counter: Arc::new(Counter::new()),
+                topic: topic.to_owned(),
             }
         }
+
+        pub fn counter(&self) -> &Counter {
+            &self.counter
+        }
+
+        pub fn clone_with_topic(&self, topic: &str) -> Self {
+            BasicHandler {
+                counter: Arc::clone(&self.counter),
+                topic: topic.to_owned(),
+            }
+        }
+
+        pub fn clone(&self) -> Self {
+            self.clone_with_topic(&self.topic)
+        }
     }
 
-    impl Event for BasicEvent {
-        fn code(&self) -> &str {
-            &self.code
+    impl EventHandler for BasicHandler {
+        type Output = bool;
+
+        fn topic(&self) -> &str {
+            &self.topic
         }
-        fn payload(&self) -> Vec<u8> {
-            self.code.as_bytes().to_vec()
+
+        fn handle(&mut self, event: &Event) -> Result<Self::Output, Error> {
+            self.counter.inc(event.topic());
+            Ok(true)
         }
     }
 
     #[test]
     fn create() {
         let eb = InMemEventBus::new();
-        assert_eq!(eb.subscriptions.lock().unwrap().len(), 0);
+        assert_eq!(eb.handlers.lock().unwrap().len(), 0);
     }
 
     #[test]
     fn polymorphic() {
-        let eb = InMemEventBus::new();
+        let mut eb = InMemEventBus::new();
+        assert!(eb.publish(create_event("evented")).is_err());
 
-        let emitter: &dyn EventPublisher<Output = _> = &eb;
+        eb.run();
+
+        let publisher: &dyn EventPublisher<Output = _> = &eb;
         let subscriber: &dyn EventSubscriber<Output = _> = &eb;
+        let _counter = Arc::new(Counter::new());
+        let handler = BasicHandler::new(".*");
 
-        subscriber
-            .subscribe("topic", Box::new(|_, _| Ok(())))
-            .unwrap();
-        subscriber
-            .subscribe("topic", Box::new(|_, _| Ok(())))
-            .unwrap();
-        subscriber
-            .subscribe("topic", Box::new(|_, _| Ok(())))
-            .unwrap();
-        assert_eq!(
-            emitter
-                .publish("topic", &BasicEvent::new("evented"))
-                .unwrap(),
-            3
-        );
+        subscriber.subscribe(Box::new(handler.clone())).unwrap();
+        subscriber.subscribe(Box::new(handler.clone())).unwrap();
+        subscriber.subscribe(Box::new(handler.clone())).unwrap();
+        subscriber.subscribe(Box::new(handler.clone())).unwrap();
 
-        let _emitter: Box<dyn EventPublisher<Output = _>> = Box::new(InMemEventBus::new());
+        assert!(publisher.publish(create_event("evented")).is_ok());
+        assert!(eb.stop().is_ok());
+
+        loop {
+            if eb.pending_events() == 0 {
+                break;
+            }
+        }
+
+        assert_eq!(handler.counter().count("evented"), 4);
+
+        let _: Box<dyn EventPublisher<Output = _>> = Box::new(InMemEventBus::new());
     }
 
     #[test]
     fn publish_subscribe() {
-        let c = Counter::new();
-        let eb = InMemEventBus::new();
+        let mut eb = InMemEventBus::new();
+        eb.run();
+
+        let handler = BasicHandler::new("*");
+
         assert!(eb
-            .subscribe(
-                "ent1.created",
-                Box::new(|topic, event| {
-                    c.inc("c1");
-                    assert_eq!(topic, "ent1.created");
-                    assert_eq!(event.code(), "ent1.created");
-                    Ok(())
-                }),
-            )
-            .unwrap(),);
+            .subscribe(Box::new(handler.clone_with_topic("ent1.created")))
+            .is_ok());
         assert!(eb
-            .subscribe(
-                "ent1.created",
-                Box::new(|topic, event| {
-                    c.inc("c2");
-                    assert_eq!(topic, "ent1.created");
-                    assert_eq!(event.code(), "ent1.created");
-                    Ok(())
-                }),
-            )
-            .unwrap(),);
+            .subscribe(Box::new(handler.clone_with_topic("ent1.created")))
+            .is_ok());
         assert!(eb
-            .subscribe(
-                "ent1.updated",
-                Box::new(|topic, event| {
-                    c.inc("c3");
-                    assert_eq!(topic, "ent1.updated");
-                    assert_eq!(event.code(), "ent1.updated");
-                    Ok(())
-                }),
-            )
-            .unwrap(),);
+            .subscribe(Box::new(handler.clone_with_topic("ent1.updated")))
+            .is_ok());
         assert!(eb
-            .subscribe(
-                "ent2.created",
-                Box::new(|topic, event| {
-                    c.inc("c4");
-                    assert_eq!(topic, "ent2.created");
-                    assert_eq!(event.code(), "ent2.created");
-                    Ok(())
-                }),
-            )
-            .unwrap(),);
-        assert_eq!(
-            eb.publish("ent1.created", &BasicEvent::new("ent1.created"))
-                .unwrap(),
-            2
-        );
-        assert_eq!(
-            eb.publish("ent2.created", &BasicEvent::new("ent2.created"))
-                .unwrap(),
-            1
-        );
-        assert_eq!(c.count("c1"), 1);
-        assert_eq!(c.count("c2"), 1);
-        assert_eq!(c.count("c3"), 0);
-        assert_eq!(c.count("c4"), 1);
+            .subscribe(Box::new(handler.clone_with_topic("ent2.created")))
+            .is_ok());
+
+        assert!(eb.publish(create_event("ent1.created")).is_ok());
+        assert!(eb.publish(create_event("ent2.created")).is_ok());
+
+        assert!(eb.stop().is_ok());
+
+        loop {
+            if eb.pending_events() == 0 {
+                break;
+            }
+        }
+
+        assert_eq!(handler.counter().count("ent1.created"), 2);
+        assert_eq!(handler.counter().count("ent1.updated"), 0);
+        assert_eq!(handler.counter().count("ent2.created"), 1);
     }
 
     #[test]
-    fn glob_topics() {
-        let c = Counter::new();
-        let eb = InMemEventBus::new();
-        eb.subscribe(
-            "ent.created",
-            Box::new(|_, _| {
-                c.inc("c1");
-                Ok(())
-            }),
-        )
-        .unwrap();
-        eb.subscribe(
-            "ent.updated",
-            Box::new(|_, _| {
-                c.inc("c2");
-                Ok(())
-            }),
-        )
-        .unwrap();
-        eb.subscribe(
-            "ent.deleted",
-            Box::new(|_, _| {
-                c.inc("c3");
-                Ok(())
-            }),
-        )
-        .unwrap();
-        eb.subscribe(
-            "ent.*",
-            Box::new(|_, _| {
-                c.inc("c4");
-                Ok(())
-            }),
-        )
-        .unwrap();
-        eb.subscribe(
-            "*.created",
-            Box::new(|_, _| {
-                c.inc("c5");
-                Ok(())
-            }),
-        )
-        .unwrap();
-        eb.subscribe(
-            "*.*",
-            Box::new(|_, _| {
-                c.inc("c6");
-                Ok(())
-            }),
-        )
-        .unwrap();
-        assert_eq!(
-            eb.publish("ent.created", &BasicEvent::new("ent.created"))
-                .unwrap(),
-            4
-        );
-        assert_eq!(
-            eb.publish("ent.updated", &BasicEvent::new("ent.updated"))
-                .unwrap(),
-            3
-        );
-        assert_eq!(
-            eb.publish("another.created", &BasicEvent::new("another.created"))
-                .unwrap(),
-            2
-        );
-        assert_eq!(c.count("c1"), 1);
-        assert_eq!(c.count("c2"), 1);
-        assert_eq!(c.count("c3"), 0);
-        assert_eq!(c.count("c4"), 2);
-        assert_eq!(c.count("c5"), 2);
-        assert_eq!(c.count("c6"), 3);
+    fn match_topics_with_regex() {
+        let mut eb = InMemEventBus::new();
+        eb.run();
+
+        let handler = BasicHandler::new(".+");
+
+        assert!(eb
+            .subscribe(Box::new(handler.clone_with_topic(".+")))
+            .is_ok());
+        assert!(eb
+            .subscribe(Box::new(handler.clone_with_topic(".+.created")))
+            .is_ok());
+        assert!(eb
+            .subscribe(Box::new(handler.clone_with_topic("ent.+")))
+            .is_ok());
+        assert!(eb
+            .subscribe(Box::new(handler.clone_with_topic("ent.created")))
+            .is_ok());
+        assert!(eb
+            .subscribe(Box::new(handler.clone_with_topic("ent.updated")))
+            .is_ok());
+        assert!(eb
+            .subscribe(Box::new(handler.clone_with_topic("ent.(deleted|updated)")))
+            .is_ok());
+
+        assert!(eb.publish(create_event("ent.created")).is_ok());
+        assert!(eb.publish(create_event("ent.updated")).is_ok());
+        assert!(eb.publish(create_event("ent.deleted")).is_ok());
+
+        assert!(eb.stop().is_ok());
+
+        loop {
+            if eb.pending_events() == 0 {
+                break;
+            }
+        }
+
+        assert_eq!(handler.counter().count("ent.created"), 4);
+        assert_eq!(handler.counter().count("ent.updated"), 4);
+        assert_eq!(handler.counter().count("ent.deleted"), 3);
     }
 
     #[test]
     fn publish_all() {
-        let c = Counter::new();
-        let ct = CallsTracker::new();
+        let mut eb = InMemEventBus::new();
+        eb.run();
 
-        let eb = InMemEventBus::new();
-        let events_with_topic = vec![
-            EventWithTopic::new("evt1.created", BasicEvent::new("code1")),
-            EventWithTopic::new("evt2.created", BasicEvent::new("code2")),
-            EventWithTopic::new("evt1.updated", BasicEvent::new("code3")),
-        ];
+        let handler = BasicHandler::new(".+");
 
-        eb.subscribe(
-            "*.*",
-            Box::new(|topic, event| {
-                ct.register("topics", topic.to_owned());
-                ct.register("codes", event.code().to_owned());
-                c.inc("c");
-                Ok(())
-            }),
-        );
+        assert!(eb
+            .subscribe(Box::new(handler.clone_with_topic(r"ent.+|.+.created")))
+            .is_ok());
 
-        eb.publish_all(&events_with_topic);
-        assert_eq!(c.count("c"), 3);
+        assert!(eb.publish_all(vec![
+                create_event("another.created"),
+                create_event("ent.created"),
+                create_event("ent.updated"),
+                create_event("ent.deleted"),
+                create_event("another.updated"),
+        ]).is_ok());
 
-        let topics = ct.get("topics");
-        assert_eq!(topics[0], "evt1.created");
-        assert_eq!(topics[1], "evt2.created");
-        assert_eq!(topics[2], "evt1.updated");
+        assert!(eb.stop().is_ok());
 
-        let codes = ct.get("codes");
-        assert_eq!(codes[0], "code1");
-        assert_eq!(codes[1], "code2");
-        assert_eq!(codes[2], "code3");
-    }
+        loop {
+            if eb.pending_events() == 0 {
+                break;
+            }
+        }
 
-    #[test]
-    fn multithreading() {
-        let eb = Arc::new(InMemEventBus::new());
-        let c = Arc::new(Mutex::new(Counter::new()));
-
-        let c1 = Arc::clone(&c);
-        eb.subscribe(
-            "thread*.event",
-            Box::new(move |_, _| {
-                c1.lock().unwrap().inc("c");
-                Ok(())
-            }),
-        );
-
-        let eb1 = Arc::clone(&eb);
-        thread::spawn(move || {
-            eb1.publish("thread1.event", &BasicEvent::new("event"));
-        })
-        .join();
-
-        let eb2 = Arc::clone(&eb);
-        thread::spawn(move || {
-            eb2.publish("thread1.event", &BasicEvent::new("event"));
-        })
-        .join();
-
-        assert_eq!(c.lock().unwrap().count("c"), 2);
+        assert_eq!(handler.counter().count("ent.created"), 1);
+        assert_eq!(handler.counter().count("ent.updated"), 1);
+        assert_eq!(handler.counter().count("ent.deleted"), 1);
+        assert_eq!(handler.counter().count("another.created"), 1);
+        assert_eq!(handler.counter().count("another.updated"), 0);
     }
 }

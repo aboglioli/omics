@@ -1,23 +1,26 @@
 use std::fmt::Debug;
 
+use chrono::{DateTime, Utc};
+
 use crate::error::Error;
 
-pub trait Event: Debug {
-    fn code(&self) -> &str;
-    fn payload(&self) -> Vec<u8>;
-}
+pub type EventPayload = Vec<u8>;
 
 #[derive(Debug)]
-pub struct EventWithTopic {
+pub struct Event {
     topic: String,
-    event: Box<dyn Event>,
+    code: String,
+    timestamp: DateTime<Utc>,
+    payload: EventPayload,
 }
 
-impl EventWithTopic {
-    pub fn new<E: Event + 'static>(topic: &str, event: E) -> Self {
-        EventWithTopic {
+impl Event {
+    pub fn new(topic: &str, code: &str, payload: EventPayload) -> Self {
+        Event {
             topic: topic.to_owned(),
-            event: Box::new(event),
+            code: code.to_owned(),
+            timestamp: Utc::now(),
+            payload,
         }
     }
 
@@ -25,23 +28,40 @@ impl EventWithTopic {
         &self.topic
     }
 
-    pub fn event(&self) -> &dyn Event {
-        self.event.as_ref()
+    pub fn code(&self) -> &str {
+        &self.code
+    }
+
+    pub fn timestamp(&self) -> &DateTime<Utc> {
+        &self.timestamp
+    }
+
+    pub fn payload(self) -> EventPayload {
+        self.payload
     }
 }
 
 pub trait EventPublisher {
     type Output;
 
-    fn publish(&self, topic: &str, event: &dyn Event) -> Result<Self::Output, Error>;
+    fn publish(&self, event: Event) -> Result<Self::Output, Error>;
 
-    fn publish_all(&self, events_with_topic: &[EventWithTopic]) -> Result<Self::Output, Error>;
+    fn publish_all(&self, events: Vec<Event>) -> Result<Self::Output, Error>;
 }
 
-pub type Subscription<'a> = Box<dyn Fn(&str, &dyn Event) -> Result<(), Error> + Send + 'a>;
-
-pub trait EventSubscriber<'a> {
+pub trait EventSubscriber {
     type Output;
 
-    fn subscribe(&self, topic: &str, cb: Subscription<'a>) -> Result<Self::Output, Error>;
+    fn subscribe(
+        &self,
+        handler: Box<dyn EventHandler<Output = Self::Output>>,
+    ) -> Result<Self::Output, Error>;
+}
+
+pub trait EventHandler: Send {
+    type Output;
+
+    fn topic(&self) -> &str;
+
+    fn handle(&mut self, event: &Event) -> Result<Self::Output, Error>;
 }
