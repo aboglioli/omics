@@ -1,5 +1,6 @@
 use common::error::Error;
-use common::model::{AggregateRoot, DefaultEvent, StatusHistory};
+use common::event::BasicEvent;
+use common::model::{AggregateRoot, StatusHistory};
 
 use crate::domain::contract::ContractId;
 use crate::domain::summary::SummaryStatus;
@@ -8,7 +9,7 @@ type SummaryId = String;
 
 #[derive(Debug, Clone)]
 pub struct Summary {
-    base: AggregateRoot<SummaryId, DefaultEvent>,
+    base: AggregateRoot<SummaryId, BasicEvent>,
     contract_id: ContractId,
     status: StatusHistory<SummaryStatus, ()>,
 }

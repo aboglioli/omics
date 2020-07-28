@@ -1,7 +1,8 @@
-use common::model::{AggregateRoot, DefaultEvent};
+use common::event::BasicEvent;
+use common::model::AggregateRoot;
 
 pub type PlanId = String;
 
 pub struct Plan {
-    base: AggregateRoot<PlanId, DefaultEvent>,
+    base: AggregateRoot<PlanId, BasicEvent>,
 }

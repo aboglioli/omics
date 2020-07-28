@@ -66,9 +66,7 @@ impl UserRepository for InMemUserRepository {
 mod tests {
     use super::*;
 
-    use crate::domain::user::{
-        Email, Fullname, Identity, Password, Person, Provider, User, UserId, Username,
-    };
+    use crate::domain::user::*;
     use crate::infrastructure::mocks;
 
     #[test]

@@ -2,10 +2,7 @@ use std::sync::Arc;
 
 use common::error::Error;
 
-use crate::domain::user::{
-    AuthService, Email, Fullname, Identity, Password, Person, Provider, User, UserId,
-    UserRepository, Username,
-};
+use crate::domain::user::{UserId, UserRepository};
 use crate::domain::validation::{ValidationCode, ValidationRepository};
 
 pub struct Validate {

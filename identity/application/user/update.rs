@@ -3,10 +3,7 @@ use std::sync::Arc;
 use common::error::Error;
 use common::event::{EventPublisher, ToEvent};
 
-use crate::domain::user::{
-    AuthService, Email, Fullname, Identity, Password, Person, Provider, User, UserEvent, UserId,
-    UserRepository, Username,
-};
+use crate::domain::user::{Fullname, Person, UserEvent, UserId, UserRepository};
 
 pub struct UpdateCommand {
     pub name: String,
@@ -20,19 +17,16 @@ impl UpdateCommand {
 }
 
 pub struct Update {
-    auth_serv: Arc<AuthService>,
     event_pub: Arc<dyn EventPublisher<Output = usize>>,
     user_repo: Arc<dyn UserRepository>,
 }
 
 impl Update {
     pub fn new(
-        auth_serv: Arc<AuthService>,
         event_pub: Arc<dyn EventPublisher<Output = usize>>,
         user_repo: Arc<dyn UserRepository>,
     ) -> Self {
         Update {
-            auth_serv,
             event_pub,
             user_repo,
         }
@@ -44,7 +38,7 @@ impl Update {
         let mut user = self.user_repo.find_by_id(&user_id)?;
 
         let person = Person::new(Fullname::new(&cmd.name, &cmd.lastname)?)?;
-        user.set_person(person);
+        user.set_person(person)?;
         self.user_repo.save(&mut user)?;
 
         if let Some(person) = user.person() {

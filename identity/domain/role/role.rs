@@ -1,5 +1,6 @@
 use common::error::Error;
-use common::model::{AggregateRoot, DefaultEvent};
+use common::event::BasicEvent;
+use common::model::AggregateRoot;
 
 use crate::domain::role::Permission;
 
@@ -7,7 +8,7 @@ pub type RoleId = String;
 
 #[derive(Debug, Clone)]
 pub struct Role {
-    base: AggregateRoot<RoleId, DefaultEvent>,
+    base: AggregateRoot<RoleId, BasicEvent>,
     name: String,
     permissions: Vec<Permission>,
 }
@@ -21,7 +22,7 @@ impl Role {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<RoleId, DefaultEvent> {
+    pub fn base(&self) -> &AggregateRoot<RoleId, BasicEvent> {
         &self.base
     }
 

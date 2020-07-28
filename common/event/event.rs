@@ -44,3 +44,15 @@ impl Event {
 pub trait ToEvent {
     fn to_event(&self) -> Result<Event, Error>;
 }
+
+#[derive(Debug)]
+pub struct BasicEvent {
+    topic: String,
+    code: String,
+}
+
+impl ToEvent for BasicEvent {
+    fn to_event(&self) -> Result<Event, Error> {
+        Ok(Event::new(&self.topic, &self.code, Vec::new()))
+    }
+}

@@ -7,9 +7,9 @@ use crate::error::Error;
 use crate::event::{Event, ToEvent};
 
 #[derive(Debug)]
-pub struct DefaultEvent;
+pub struct BasicEvent;
 
-impl ToEvent for DefaultEvent {
+impl ToEvent for BasicEvent {
     fn to_event(&self) -> Result<Event, Error> {
         Err(Error::internal().set_code("not_implemented").build())
     }

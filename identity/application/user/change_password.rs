@@ -2,10 +2,7 @@ use std::sync::Arc;
 
 use common::error::Error;
 
-use crate::domain::user::{
-    AuthService, Email, Fullname, Identity, Password, Person, Provider, User, UserId,
-    UserRepository, Username,
-};
+use crate::domain::user::{AuthService, UserId};
 
 pub struct ChangePasswordCommand {
     pub old_password: String,

@@ -2,9 +2,7 @@ use std::sync::Arc;
 
 use common::error::Error;
 
-use crate::domain::user::{
-    AuthService, Email, Identity, Password, Provider, User, UserId, UserRepository, Username,
-};
+use crate::domain::user::{User, UserId, UserRepository};
 
 pub struct GetById {
     user_repo: Arc<dyn UserRepository>,

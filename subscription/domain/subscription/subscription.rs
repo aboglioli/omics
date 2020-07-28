@@ -1,7 +1,8 @@
 use chrono::{DateTime, Utc};
 
 use common::error::Error;
-use common::model::{AggregateRoot, DefaultEvent, StatusHistory};
+use common::event::BasicEvent;
+use common::model::{AggregateRoot, StatusHistory};
 
 use crate::domain::plan::PlanId;
 use crate::domain::subscription::{SubscriptionPayment, SubscriptionPlan, SubscriptionStatus};
@@ -10,7 +11,7 @@ use crate::domain::user::UserId;
 pub type SubscriptionId = String;
 
 pub struct Subscription {
-    base: AggregateRoot<SubscriptionId, DefaultEvent>,
+    base: AggregateRoot<SubscriptionId, BasicEvent>,
     subscribed_at: DateTime<Utc>,
     user_id: UserId,
     plan: SubscriptionPlan,
@@ -34,11 +35,11 @@ impl Subscription {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<SubscriptionId, DefaultEvent> {
+    pub fn base(&self) -> &AggregateRoot<SubscriptionId, BasicEvent> {
         &self.base
     }
 
-    pub fn base_mut(&mut self) -> &mut AggregateRoot<SubscriptionId, DefaultEvent> {
+    pub fn base_mut(&mut self) -> &mut AggregateRoot<SubscriptionId, BasicEvent> {
         &mut self.base
     }
 

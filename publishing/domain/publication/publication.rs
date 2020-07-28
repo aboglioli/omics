@@ -1,5 +1,6 @@
 use common::error::Error;
-use common::model::{AggregateRoot, DefaultEvent};
+use common::event::BasicEvent;
+use common::model::AggregateRoot;
 
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
@@ -8,7 +9,7 @@ use crate::domain::publication::{Name, Page, PageNumber, Statistics, Synopsis, T
 pub type PublicationId = String;
 
 pub struct Publication {
-    base: AggregateRoot<PublicationId, DefaultEvent>,
+    base: AggregateRoot<PublicationId, BasicEvent>,
     name: Name,
     synopsis: Synopsis,
     author_id: AuthorId,
