@@ -1,5 +1,8 @@
-use crate::domain::role::{Role, RoleId, RoleRepository};
+use async_trait::async_trait;
+
 use common::error::Error;
+
+use crate::domain::role::{Role, RoleId, RoleRepository};
 
 pub struct InMemRoleRepository;
 
@@ -9,6 +12,7 @@ impl InMemRoleRepository {
     }
 }
 
+#[async_trait]
 impl RoleRepository for InMemRoleRepository {
     fn get_by_code(&self, code: &RoleId) -> Result<Role, Error> {
         if code == "user" {

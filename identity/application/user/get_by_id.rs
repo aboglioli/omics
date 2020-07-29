@@ -13,8 +13,8 @@ impl GetById {
         GetById { user_repo }
     }
 
-    pub fn exec(&self, user_id: &UserId) -> Result<User, Error> {
-        let user = self.user_repo.find_by_id(user_id)?;
+    pub async fn exec(&self, user_id: &UserId) -> Result<User, Error> {
+        let user = self.user_repo.find_by_id(user_id).await?;
         Ok(user)
     }
 }

@@ -24,9 +24,10 @@ impl ChangePassword {
         ChangePassword { auth_serv }
     }
 
-    pub fn exec(&self, user_id: &UserId, cmd: ChangePasswordCommand) -> Result<(), Error> {
+    pub async fn exec(&self, user_id: &UserId, cmd: ChangePasswordCommand) -> Result<(), Error> {
         cmd.validate()?;
         self.auth_serv
             .change_password(user_id, &cmd.old_password, &cmd.new_password)
+            .await
     }
 }

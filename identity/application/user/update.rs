@@ -32,14 +32,14 @@ impl Update {
         }
     }
 
-    pub fn exec(&self, user_id: &UserId, cmd: UpdateCommand) -> Result<(), Error> {
+    pub async fn exec(&self, user_id: &UserId, cmd: UpdateCommand) -> Result<(), Error> {
         cmd.validate()?;
 
-        let mut user = self.user_repo.find_by_id(&user_id)?;
+        let mut user = self.user_repo.find_by_id(&user_id).await?;
 
         let person = Person::new(Fullname::new(&cmd.name, &cmd.lastname)?)?;
         user.set_person(person)?;
-        self.user_repo.save(&mut user)?;
+        self.user_repo.save(&mut user).await?;
 
         if let Some(person) = user.person() {
             let event = UserEvent::Updated {

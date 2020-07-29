@@ -9,3 +9,4 @@ path = "lib.rs"
 
 [dependencies]
 common = { path = "../common" }
+async-trait = "0.1.36"

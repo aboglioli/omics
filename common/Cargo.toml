@@ -8,5 +8,7 @@ edition = "2018"
 path = "lib.rs"
 
 [dependencies]
+async-trait = "0.1.36"
 chrono = "0.4"
 regex = "1"
+tokio = { version = "0.2", features = ["full"] }

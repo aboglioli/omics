@@ -1,3 +1,5 @@
+use async_trait::async_trait;
+
 use common::error::Error;
 
 use crate::domain::validation::{Validation, ValidationCode, ValidationRepository};
@@ -11,8 +13,9 @@ impl InMemValidationRepository {
     }
 }
 
+#[async_trait]
 impl ValidationRepository for InMemValidationRepository {
-    fn find_by_code(&self, code: &ValidationCode) -> Result<Validation, Error> {
+    async fn find_by_code(&self, code: &ValidationCode) -> Result<Validation, Error> {
         if code == "valid-code" {
             let user = mocks::user1()?;
             return Validation::new(ValidationCode::from("valid-code"), user.base().id());
@@ -20,7 +23,7 @@ impl ValidationRepository for InMemValidationRepository {
 
         Err(Error::internal())
     }
-    fn save(&self, validation: &mut Validation) -> Result<(), Error> {
+    async fn save(&self, validation: &mut Validation) -> Result<(), Error> {
         if validation.base().id() != "valid-code" {
             return Err(Error::internal());
         }

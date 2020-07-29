@@ -22,10 +22,11 @@ impl Login {
         Login { auth_serv }
     }
 
-    pub fn exec(&self, cmd: LoginCommand) -> Result<LoginResponse, Error> {
+    pub async fn exec(&self, cmd: LoginCommand) -> Result<LoginResponse, Error> {
         match self
             .auth_serv
             .authenticate(&cmd.username_or_email, &cmd.password)
+            .await
         {
             Ok(token) => Ok(LoginResponse {
                 auth_token: token.token().to_owned(),

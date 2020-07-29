@@ -21,13 +21,17 @@ impl Validate {
         }
     }
 
-    pub fn exec(&self, user_id: &UserId, validation_code: &ValidationCode) -> Result<(), Error> {
-        let mut user = self.user_repo.find_by_id(user_id)?;
-        let mut validation = self.validation_repo.find_by_code(validation_code)?;
+    pub async fn exec(
+        &self,
+        user_id: &UserId,
+        validation_code: &ValidationCode,
+    ) -> Result<(), Error> {
+        let mut user = self.user_repo.find_by_id(user_id).await?;
+        let mut validation = self.validation_repo.find_by_code(validation_code).await?;
         validation.validate_user(&mut user, validation_code)?;
 
-        self.user_repo.save(&mut user)?;
-        self.validation_repo.save(&mut validation)?;
+        self.user_repo.save(&mut user).await?;
+        self.validation_repo.save(&mut validation).await?;
 
         Ok(())
     }
