@@ -22,6 +22,7 @@ services:
     networks:
       - open
 
+  # Core
   mongo:
     image: mongo:latest
     restart: always
@@ -35,35 +36,6 @@ services:
       - mongo:/data/db
     networks:
       - services
-
-  mongo-express:
-    image: mongo-express:latest
-    restart: always
-    ports:
-      - "${MONGO_EXPRESS_PORT:-8080}:8081"
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER:-admin}
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD:-admin}
-    networks:
-      - services
-      - open
-    depends_on:
-      - mongo
-
-  adminmongo:
-    image: mrvautin/adminmongo:latest
-    restart: always
-    ports:
-      - "${ADMINMONGO_PORT:-8081}:1234"
-    environment:
-      DB_USERNAME: ${MONGO_USER:-admin}
-      DB_PASSWORD: ${MONGO_PASSWORD:-admin}
-      DB_NAME: ${MONGO_DATABASE:-database}
-    networks:
-      - services
-      - open
-    depends_on:
-      - mongo
 
   postgres:
     image: postgres:latest
@@ -79,20 +51,6 @@ services:
     networks:
       - services
 
-  postgres-pgadmin:
-    image: dpage/pgadmin4
-    restart: always
-    ports:
-      - "${PGADMIN_PORT:-8080}:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@admin.com}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
-    networks:
-      - services
-      - open
-    depends_on:
-      - postgres
-
   redis:
     image: redis
     restart: always
@@ -102,19 +60,6 @@ services:
       - redis:/data
     networks:
       - services
-
-  redis-commander:
-    image: rediscommander/redis-commander:latest
-    restart: always
-    ports:
-      - "${REDIS_COMMANDER_PORT:-8081}:8081"
-    environment:
-      REDIS_HOSTS: local:redis:${REDIS_PORT:-6379}
-    networks:
-      - services
-      - open
-    depends_on:
-      - redis
 
   rabbitmq:
     image: rabbitmq:3.7-management
@@ -137,6 +82,79 @@ services:
       - minio:/data
     networks:
       - services
+      - open
+
+  # Administration
+  mongo-express:
+    image: mongo-express:latest
+    restart: always
+    ports:
+      - "${MONGO_EXPRESS_PORT:-8080}:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER:-admin}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD:-admin}
+    networks:
+      - services
+      - open
+    depends_on:
+      - mongo
+
+  adminmongo:
+    image: mrvautin/adminmongo:latest
+    restart: always
+    ports:
+      - "${ADMINMONGO_PORT:-8080}:1234"
+    environment:
+      DB_USERNAME: ${MONGO_USER:-admin}
+      DB_PASSWORD: ${MONGO_PASSWORD:-admin}
+      DB_NAME: ${MONGO_DATABASE:-database}
+    networks:
+      - services
+      - open
+    depends_on:
+      - mongo
+
+  postgres-pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - "${PGADMIN_PORT:-8080}:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@admin.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+    networks:
+      - services
+      - open
+    depends_on:
+      - postgres
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    restart: always
+    ports:
+      - "${REDIS_COMMANDER_PORT:-8081}:8081"
+    environment:
+      REDIS_HOSTS: local:redis:${REDIS_PORT:-6379}
+    networks:
+      - services
+      - open
+    depends_on:
+      - redis
+
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    restart: always
+    ports:
+      - "${SWAGGER_UI_PORT:-8080}:8080"
+    networks:
+      - open
+
+  swagger-editor:
+    image: swaggerapi/swagger-editor
+    restart: always
+    ports:
+      - "${SWAGGER_UI_PORT:-8080}:8080"
+    networks:
       - open
 
 volumes:
