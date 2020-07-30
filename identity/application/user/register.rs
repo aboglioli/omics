@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use serde::Deserialize;
 
 use common::error::Error;
@@ -25,13 +23,13 @@ impl RegisterCommand {
     }
 }
 
-pub struct Register<EPub, URepo, PHasher, TRepo, TEnc> {
-    event_pub: Arc<EPub>,
-    auth_serv: Arc<AuthService<URepo, PHasher, TRepo, TEnc>>,
-    user_repo: Arc<URepo>,
+pub struct Register<'a, EPub, URepo, PHasher, TRepo, TEnc> {
+    event_pub: &'a EPub,
+    auth_serv: AuthService<'a, URepo, PHasher, TRepo, TEnc>,
+    user_repo: &'a URepo,
 }
 
-impl<EPub, URepo, PHasher, TRepo, TEnc> Register<EPub, URepo, PHasher, TRepo, TEnc>
+impl<'a, EPub, URepo, PHasher, TRepo, TEnc> Register<'a, EPub, URepo, PHasher, TRepo, TEnc>
 where
     EPub: EventPublisher,
     URepo: UserRepository,
@@ -40,9 +38,9 @@ where
     TEnc: TokenEncoder,
 {
     pub fn new(
-        event_pub: Arc<EPub>,
-        auth_serv: Arc<AuthService<URepo, PHasher, TRepo, TEnc>>,
-        user_repo: Arc<URepo>,
+        event_pub: &'a EPub,
+        auth_serv: AuthService<'a, URepo, PHasher, TRepo, TEnc>,
+        user_repo: &'a URepo,
     ) -> Self {
         Register {
             event_pub,
@@ -70,13 +68,13 @@ where
 
         self.user_repo.save(&mut user).await?;
 
-        let _event = UserEvent::Registered {
+        let event = UserEvent::Registered {
             id: user.base().id(),
             username: user.identity().username().value().to_owned(),
             email: user.identity().email().value().to_owned(),
         }
         .to_event()?;
-        // self.event_pub.publish(event)?;
+        self.event_pub.publish(event).await?;
 
         Ok(())
     }

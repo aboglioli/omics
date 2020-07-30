@@ -1,20 +1,19 @@
-use std::sync::Arc;
-
 use common::error::Error;
 
 use crate::domain::user::{UserId, UserRepository};
 use crate::domain::validation::{ValidationCode, ValidationRepository};
 
-pub struct Validate {
-    user_repo: Arc<dyn UserRepository>,
-    validation_repo: Arc<dyn ValidationRepository>,
+pub struct Validate<'a, URepo, VRepo> {
+    user_repo: &'a URepo,
+    validation_repo: &'a VRepo,
 }
 
-impl Validate {
-    pub fn new(
-        user_repo: Arc<dyn UserRepository>,
-        validation_repo: Arc<dyn ValidationRepository>,
-    ) -> Self {
+impl<'a, URepo, VRepo> Validate<'a, URepo, VRepo>
+where
+    URepo: UserRepository,
+    VRepo: ValidationRepository,
+{
+    pub fn new(user_repo: &'a URepo, validation_repo: &'a VRepo) -> Self {
         Validate {
             user_repo,
             validation_repo,

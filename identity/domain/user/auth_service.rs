@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use common::error::Error;
 
 use crate::domain::token::{Data, Token, TokenEncoder, TokenRepository, TokenService};
@@ -7,13 +5,13 @@ use crate::domain::user::{
     Email, Password, PasswordHasher, User, UserId, UserRepository, Username,
 };
 
-pub struct AuthService<URepo, PHasher, TRepo, TEnc> {
-    user_repo: Arc<URepo>,
-    password_hasher: Arc<PHasher>,
-    token_serv: Arc<TokenService<TRepo, TEnc>>,
+pub struct AuthService<'a, URepo, PHasher, TRepo, TEnc> {
+    user_repo: &'a URepo,
+    password_hasher: &'a PHasher,
+    token_serv: TokenService<'a, TRepo, TEnc>,
 }
 
-impl<URepo, PHasher, TRepo, TEnc> AuthService<URepo, PHasher, TRepo, TEnc>
+impl<'a, URepo, PHasher, TRepo, TEnc> AuthService<'a, URepo, PHasher, TRepo, TEnc>
 where
     URepo: UserRepository,
     PHasher: PasswordHasher,
@@ -21,9 +19,9 @@ where
     TEnc: TokenEncoder,
 {
     pub fn new(
-        user_repo: Arc<URepo>,
-        token_serv: Arc<TokenService<TRepo, TEnc>>,
-        password_hasher: Arc<PHasher>,
+        user_repo: &'a URepo,
+        token_serv: TokenService<'a, TRepo, TEnc>,
+        password_hasher: &'a PHasher,
     ) -> Self {
         AuthService {
             user_repo,

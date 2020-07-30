@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use common::error::Error;
 use common::event::{EventPublisher, ToEvent};
 
@@ -16,16 +14,17 @@ impl UpdateCommand {
     }
 }
 
-pub struct Update {
-    event_pub: Arc<dyn EventPublisher<Output = usize>>,
-    user_repo: Arc<dyn UserRepository>,
+pub struct Update<'a, EPub, URepo> {
+    event_pub: &'a EPub,
+    user_repo: &'a URepo,
 }
 
-impl Update {
-    pub fn new(
-        event_pub: Arc<dyn EventPublisher<Output = usize>>,
-        user_repo: Arc<dyn UserRepository>,
-    ) -> Self {
+impl<'a, EPub, URepo> Update<'a, EPub, URepo>
+where
+    EPub: EventPublisher,
+    URepo: UserRepository,
+{
+    pub fn new(event_pub: &'a EPub, user_repo: &'a URepo) -> Self {
         Update {
             event_pub,
             user_repo,
@@ -48,7 +47,7 @@ impl Update {
                 lastname: person.fullname().lastname().to_owned(),
             }
             .to_event()?;
-            self.event_pub.publish(event)?;
+            self.event_pub.publish(event).await?;
         }
 
         Ok(())

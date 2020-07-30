@@ -1,20 +1,30 @@
-use std::sync::Arc;
+use serde::Serialize;
 
 use common::error::Error;
 
-use crate::domain::user::{User, UserId, UserRepository};
+use crate::domain::user::{UserId, UserRepository};
 
-pub struct GetById {
-    user_repo: Arc<dyn UserRepository>,
+#[derive(Serialize)]
+pub struct GetByIdResponse {
+    username: String,
 }
 
-impl GetById {
-    pub fn new(user_repo: Arc<dyn UserRepository>) -> Self {
+pub struct GetById<'a, URepo> {
+    user_repo: &'a URepo,
+}
+
+impl<'a, URepo> GetById<'a, URepo>
+where
+    URepo: UserRepository,
+{
+    pub fn new(user_repo: &'a URepo) -> Self {
         GetById { user_repo }
     }
 
-    pub async fn exec(&self, user_id: &UserId) -> Result<User, Error> {
+    pub async fn exec(&self, user_id: &UserId) -> Result<GetByIdResponse, Error> {
         let user = self.user_repo.find_by_id(user_id).await?;
-        Ok(user)
+        Ok(GetByIdResponse {
+            username: user.identity().username().value().to_owned(),
+        })
     }
 }

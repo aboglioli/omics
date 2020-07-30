@@ -1,24 +1,33 @@
-use std::sync::Arc;
+use serde::{Deserialize, Serialize};
 
 use common::error::Error;
 
-use crate::domain::user::AuthService;
+use crate::domain::token::{TokenEncoder, TokenRepository};
+use crate::domain::user::{AuthService, PasswordHasher, UserRepository};
 
+#[derive(Deserialize)]
 pub struct LoginCommand {
     pub username_or_email: String,
     pub password: String,
 }
 
+#[derive(Serialize)]
 pub struct LoginResponse {
     pub auth_token: String,
 }
 
-pub struct Login {
-    auth_serv: Arc<AuthService>,
+pub struct Login<'a, URepo, PHasher, TRepo, TEnc> {
+    auth_serv: AuthService<'a, URepo, PHasher, TRepo, TEnc>,
 }
 
-impl Login {
-    pub fn new(auth_serv: Arc<AuthService>) -> Self {
+impl<'a, URepo, PHasher, TRepo, TEnc> Login<'a, URepo, PHasher, TRepo, TEnc>
+where
+    URepo: UserRepository,
+    PHasher: PasswordHasher,
+    TRepo: TokenRepository,
+    TEnc: TokenEncoder,
+{
+    pub fn new(auth_serv: AuthService<'a, URepo, PHasher, TRepo, TEnc>) -> Self {
         Login { auth_serv }
     }
 

@@ -10,41 +10,24 @@ use identity::infrastructure::mocks::{FakePasswordHasher, FakeTokenEncoder};
 use identity::infrastructure::persistence::inmem::{InMemTokenRepository, InMemUserRepository};
 
 pub struct Context {
-    event_bus: Arc<InMemEventBus>,
+    event_bus: InMemEventBus,
 
-    user_repo: Arc<InMemUserRepository>,
-    token_repo: Arc<InMemTokenRepository>,
+    user_repo: InMemUserRepository,
+    token_repo: InMemTokenRepository,
 
-    password_hasher: Arc<FakePasswordHasher>,
-    token_enc: Arc<FakeTokenEncoder>,
-
-    token_serv: Arc<TokenService<InMemTokenRepository, FakeTokenEncoder>>,
-    auth_serv: Arc<
-        AuthService<
-            InMemUserRepository,
-            FakePasswordHasher,
-            InMemTokenRepository,
-            FakeTokenEncoder,
-        >,
-    >,
+    password_hasher: FakePasswordHasher,
+    token_enc: FakeTokenEncoder,
 }
 
 impl Context {
     pub fn new() -> Context {
-        let event_bus = Arc::new(InMemEventBus::new());
+        let event_bus = InMemEventBus::new();
 
-        let user_repo = Arc::new(InMemUserRepository::new());
-        let token_repo = Arc::new(InMemTokenRepository::new());
+        let user_repo = InMemUserRepository::new();
+        let token_repo = InMemTokenRepository::new();
 
-        let password_hasher = Arc::new(FakePasswordHasher::new());
-        let token_enc = Arc::new(FakeTokenEncoder::new());
-
-        let token_serv = Arc::new(TokenService::new(token_repo.clone(), token_enc.clone()));
-        let auth_serv = Arc::new(AuthService::new(
-            user_repo.clone(),
-            token_serv.clone(),
-            password_hasher.clone(),
-        ));
+        let password_hasher = FakePasswordHasher::new();
+        let token_enc = FakeTokenEncoder::new();
 
         Context {
             event_bus,
@@ -54,31 +37,43 @@ impl Context {
 
             password_hasher,
             token_enc,
-
-            token_serv,
-            auth_serv,
         }
     }
 
-    pub fn event_bus(&self) -> Arc<InMemEventBus> {
-        self.event_bus.clone()
+    pub fn event_bus(&self) -> &InMemEventBus {
+        &self.event_bus
+    }
+
+    pub fn user_repo(&self) -> &InMemUserRepository {
+        &self.user_repo
+    }
+
+    pub fn token_repo(&self) -> &InMemTokenRepository {
+        &self.token_repo
+    }
+
+    pub fn password_hasher(&self) -> &FakePasswordHasher {
+        &self.password_hasher
+    }
+
+    pub fn token_enc(&self) -> &FakeTokenEncoder {
+        &self.token_enc
     }
 
     pub fn auth_serv(
         &self,
-    ) -> Arc<
-        AuthService<
-            InMemUserRepository,
-            FakePasswordHasher,
-            InMemTokenRepository,
-            FakeTokenEncoder,
-        >,
+    ) -> AuthService<
+        '_,
+        InMemUserRepository,
+        FakePasswordHasher,
+        InMemTokenRepository,
+        FakeTokenEncoder,
     > {
-        self.auth_serv.clone()
+        AuthService::new(self.user_repo(), self.token_serv(), self.password_hasher())
     }
 
-    pub fn user_repo(&self) -> Arc<InMemUserRepository> {
-        self.user_repo.clone()
+    pub fn token_serv(&self) -> TokenService<'_, InMemTokenRepository, FakeTokenEncoder> {
+        TokenService::new(self.token_repo(), self.token_enc())
     }
 }
 

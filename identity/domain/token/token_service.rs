@@ -1,15 +1,13 @@
-use std::sync::Arc;
-
 use crate::domain::token::{Data, Token, TokenEncoder, TokenId, TokenRepository};
 use common::error::Error;
 
-pub struct TokenService<TRepo, TEnc> {
-    token_repository: Arc<TRepo>,
-    token_encoder: Arc<TEnc>,
+pub struct TokenService<'a, TRepo, TEnc> {
+    token_repository: &'a TRepo,
+    token_encoder: &'a TEnc,
 }
 
-impl<TRepo: TokenRepository, TEnc: TokenEncoder> TokenService<TRepo, TEnc> {
-    pub fn new(token_repository: Arc<TRepo>, token_encoder: Arc<TEnc>) -> Self {
+impl<'a, TRepo: TokenRepository, TEnc: TokenEncoder> TokenService<'a, TRepo, TEnc> {
+    pub fn new(token_repository: &'a TRepo, token_encoder: &'a TEnc) -> Self {
         TokenService {
             token_encoder,
             token_repository,

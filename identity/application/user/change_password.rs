@@ -1,8 +1,7 @@
-use std::sync::Arc;
-
 use common::error::Error;
 
-use crate::domain::user::{AuthService, UserId};
+use crate::domain::token::{TokenEncoder, TokenRepository};
+use crate::domain::user::{AuthService, PasswordHasher, UserId, UserRepository};
 
 pub struct ChangePasswordCommand {
     pub old_password: String,
@@ -15,12 +14,18 @@ impl ChangePasswordCommand {
     }
 }
 
-pub struct ChangePassword {
-    auth_serv: Arc<AuthService>,
+pub struct ChangePassword<'a, URepo, PHasher, TRepo, TEnc> {
+    auth_serv: AuthService<'a, URepo, PHasher, TRepo, TEnc>,
 }
 
-impl ChangePassword {
-    pub fn new(auth_serv: Arc<AuthService>) -> Self {
+impl<'a, URepo, PHasher, TRepo, TEnc> ChangePassword<'a, URepo, PHasher, TRepo, TEnc>
+where
+    URepo: UserRepository,
+    PHasher: PasswordHasher,
+    TRepo: TokenRepository,
+    TEnc: TokenEncoder,
+{
+    pub fn new(auth_serv: AuthService<'a, URepo, PHasher, TRepo, TEnc>) -> Self {
         ChangePassword { auth_serv }
     }
 
