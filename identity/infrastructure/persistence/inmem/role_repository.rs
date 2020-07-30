@@ -14,7 +14,7 @@ impl InMemRoleRepository {
 
 #[async_trait]
 impl RoleRepository for InMemRoleRepository {
-    fn get_by_code(&self, code: &RoleId) -> Result<Role, Error> {
+    async fn get_by_code(&self, code: &RoleId) -> Result<Role, Error> {
         if code == "user" {
             return Ok(Role::new(code.clone(), "User")?);
         }
@@ -26,12 +26,10 @@ impl RoleRepository for InMemRoleRepository {
 mod tests {
     use super::*;
 
-    #[test]
-    fn get() -> Result<(), Error> {
+    #[tokio::test]
+    async fn get() {
         let repo = InMemRoleRepository::new();
-        repo.get_by_code(&RoleId::from("user"))?;
-        assert!(repo.get_by_code(&RoleId::from("another")).is_err());
-
-        Ok(())
+        repo.get_by_code(&RoleId::from("user")).await.unwrap();
+        assert!(repo.get_by_code(&RoleId::from("another")).await.is_err());
     }
 }

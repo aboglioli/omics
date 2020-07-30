@@ -49,4 +49,3 @@ pub async fn login(cmd: LoginCommand, ctx: Arc<Context>) -> Result<impl Reply, R
 
     Ok(warp::reply::json(&res))
 }
-

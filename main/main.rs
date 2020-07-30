@@ -6,9 +6,7 @@ use std::sync::Arc;
 
 use warp::Filter;
 
-
-
-use handlers::context::{Context};
+use handlers::context::Context;
 use handlers::user;
 
 #[tokio::main]

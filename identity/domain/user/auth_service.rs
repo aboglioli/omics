@@ -131,45 +131,46 @@ where
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//
-//
-//     use crate::domain::user::*;
-//     use crate::infrastructure::mocks::{self, *};
-//     use crate::infrastructure::persistence::inmem::*;
-//
-//     #[test]
-//     fn authenticate() -> Result<(), Error> {
-//         let user_repo = Arc::new(InMemUserRepository::new());
-//         let password_hasher = Arc::new(FakePasswordHasher::new());
-//         let token_enc = Arc::new(FakeTokenEncoder::new());
-//         let token_repo = Arc::new(InMemTokenRepository::new());
-//         let token_serv = Arc::new(TokenService::new(token_enc.clone(), token_repo.clone()));
-//
-//         let serv = AuthService::new(
-//             user_repo.clone(),
-//             token_serv.clone(),
-//             password_hasher.clone(),
-//         );
-//
-//         let mut user = mocks::user1()?;
-//         user_repo.save(&mut user)?;
-//
-//         let res = serv.authenticate("username", "P@asswd!");
-//         assert!(res.is_ok());
-//         assert!(!res.unwrap().token().is_empty());
-//
-//         let res = serv.authenticate("username@email.com", "P@asswd!");
-//         assert!(res.is_ok());
-//         assert!(!res.unwrap().token().is_empty());
-//
-//         assert!(serv.authenticate("user2", "user123").is_err());
-//         assert!(serv.authenticate("user1", "user124").is_err());
-//         assert!(serv.authenticate("user@email.com.ar", "user123").is_err());
-//         assert!(serv.authenticate("user@email.com", "user124").is_err());
-//
-//         Ok(())
-//     }
-// }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use crate::domain::user::*;
+    use crate::infrastructure::mocks::{self, *};
+    use crate::infrastructure::persistence::inmem::*;
+
+    #[tokio::test]
+    async fn authenticate() -> Result<(), Error> {
+        let user_repo = InMemUserRepository::new();
+        let password_hasher = FakePasswordHasher::new();
+        let token_enc = FakeTokenEncoder::new();
+        let token_repo = InMemTokenRepository::new();
+        let token_serv = TokenService::new(&token_repo, &token_enc);
+
+        let serv = AuthService::new(&user_repo, token_serv, &password_hasher);
+
+        let mut user = mocks::user1()?;
+        user_repo.save(&mut user).await?;
+
+        let res = serv.authenticate("username", "P@asswd!").await;
+        assert!(res.is_ok());
+        assert!(!res.unwrap().token().is_empty());
+
+        let res = serv.authenticate("username@email.com", "P@asswd!").await;
+        assert!(res.is_ok());
+        assert!(!res.unwrap().token().is_empty());
+
+        assert!(serv.authenticate("user2", "user123").await.is_err());
+        assert!(serv.authenticate("user1", "user124").await.is_err());
+        assert!(serv
+            .authenticate("user@email.com.ar", "user123")
+            .await
+            .is_err());
+        assert!(serv
+            .authenticate("user@email.com", "user124")
+            .await
+            .is_err());
+
+        Ok(())
+    }
+}

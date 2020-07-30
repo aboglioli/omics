@@ -37,34 +37,34 @@ impl<'a, TRepo: TokenRepository, TEnc: TokenEncoder> TokenService<'a, TRepo, TEn
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//
-//     use crate::infrastructure::mocks::FakeTokenEncoder;
-//     use crate::infrastructure::persistence::inmem::InMemTokenRepository;
-//
-//     #[test]
-//     fn create() -> Result<(), Error> {
-//         let enc = Arc::new(FakeTokenEncoder::new());
-//         let repo = Arc::new(InMemTokenRepository::new());
-//         let serv = TokenService::new(enc.clone(), repo.clone());
-//
-//         let mut data = Data::new();
-//         data.add("user_id", "u123");
-//         data.add("user_username", "admin");
-//
-//         let token = serv.create(data)?;
-//         assert!(!token.token().is_empty());
-//
-//         let data = serv.validate(&token)?;
-//         assert_eq!(data.get("user_id"), Some(&"u123".to_owned()));
-//         assert_eq!(data.get("user_username"), Some(&"admin".to_owned()));
-//
-//         assert!(serv.invalidate(&token).is_ok());
-//
-//         assert!(serv.validate(&token).is_err());
-//
-//         Ok(())
-//     }
-// }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use crate::infrastructure::mocks::FakeTokenEncoder;
+    use crate::infrastructure::persistence::inmem::InMemTokenRepository;
+
+    #[tokio::test]
+    async fn create() -> Result<(), Error> {
+        let enc = FakeTokenEncoder::new();
+        let repo = InMemTokenRepository::new();
+        let serv = TokenService::new(&repo, &enc);
+
+        let mut data = Data::new();
+        data.add("user_id", "u123");
+        data.add("user_username", "admin");
+
+        let token = serv.create(data).await?;
+        assert!(!token.token().is_empty());
+
+        let data = serv.validate(&token).await?;
+        assert_eq!(data.get("user_id"), Some(&"u123".to_owned()));
+        assert_eq!(data.get("user_username"), Some(&"admin".to_owned()));
+
+        assert!(serv.invalidate(&token).await.is_ok());
+
+        assert!(serv.validate(&token).await.is_err());
+
+        Ok(())
+    }
+}
