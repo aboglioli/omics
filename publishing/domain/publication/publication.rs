@@ -1,10 +1,12 @@
 use common::error::Error;
 use common::event::BasicEvent;
-use common::model::AggregateRoot;
+use common::model::{AggregateRoot, StatusHistory};
 
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
-use crate::domain::publication::{Name, Page, PageNumber, Statistics, Synopsis, Tag};
+use crate::domain::publication::{
+    Name, Page, PageNumber, PublicationStatus, Statistics, Synopsis, Tag,
+};
 
 pub type PublicationId = String;
 
@@ -17,6 +19,7 @@ pub struct Publication {
     pages: Vec<Page>,
     category_id: CategoryId,
     tags: Vec<Tag>,
+    status: StatusHistory<PublicationStatus, String>,
 }
 
 impl Publication {
@@ -25,7 +28,6 @@ impl Publication {
         name: &str,
         synopsis: &str,
         author_id: AuthorId,
-        _statistics: Statistics,
         category_id: CategoryId,
     ) -> Result<Publication, Error> {
         Ok(Publication {
@@ -37,7 +39,12 @@ impl Publication {
             pages: Vec::new(),
             category_id,
             tags: Vec::new(),
+            status: StatusHistory::init(PublicationStatus::Draft),
         })
+    }
+
+    pub fn base(&self) -> &AggregateRoot<PublicationId, BasicEvent> {
+        &self.base
     }
 
     pub fn name(&self) -> &Name {
@@ -48,7 +55,7 @@ impl Publication {
         &self.synopsis
     }
 
-    pub fn author(&self) -> &AuthorId {
+    pub fn author_id(&self) -> &AuthorId {
         &self.author_id
     }
 
@@ -60,13 +67,25 @@ impl Publication {
         &self.pages
     }
 
-    pub fn set_name(&mut self, name: &str) -> Result<(), Error> {
-        self.name = Name::new(name)?;
+    pub fn category_id(&self) -> &CategoryId {
+        &self.category_id
+    }
+
+    pub fn tags(&self) -> &[Tag] {
+        &self.tags
+    }
+
+    pub fn status(&self) -> &StatusHistory<PublicationStatus, String> {
+        &self.status
+    }
+
+    pub fn set_name(&mut self, name: Name) -> Result<(), Error> {
+        self.name = name;
         Ok(())
     }
 
-    pub fn set_synopsis(&mut self, synopsis: &str) -> Result<(), Error> {
-        self.synopsis = Synopsis::new(synopsis)?;
+    pub fn set_synopsis(&mut self, synopsis: Synopsis) -> Result<(), Error> {
+        self.synopsis = synopsis;
         Ok(())
     }
 

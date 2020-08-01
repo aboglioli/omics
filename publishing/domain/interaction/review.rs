@@ -2,20 +2,27 @@ use chrono::{DateTime, Utc};
 
 use common::error::Error;
 
+use crate::domain::interaction::Stars;
 use crate::domain::publication::PublicationId;
 use crate::domain::reader::ReaderId;
 
-pub struct Like {
+pub struct Review {
     reader_id: ReaderId,
     publication_id: PublicationId,
+    stars: Stars,
     date: DateTime<Utc>,
 }
 
-impl Like {
-    pub fn new(reader_id: ReaderId, publication_id: PublicationId) -> Result<Like, Error> {
-        Ok(Like {
+impl Review {
+    pub fn new(
+        reader_id: ReaderId,
+        publication_id: PublicationId,
+        stars: Stars,
+    ) -> Result<Review, Error> {
+        Ok(Review {
             reader_id,
             publication_id,
+            stars,
             date: Utc::now(),
         })
     }
@@ -26,6 +33,10 @@ impl Like {
 
     pub fn publication_id(&self) -> &PublicationId {
         &self.publication_id
+    }
+
+    pub fn stars(&self) -> &Stars {
+        &self.stars
     }
 
     pub fn date(&self) -> &DateTime<Utc> {

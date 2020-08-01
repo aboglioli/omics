@@ -39,10 +39,6 @@ impl Subscription {
         &self.base
     }
 
-    pub fn base_mut(&mut self) -> &mut AggregateRoot<SubscriptionId, BasicEvent> {
-        &mut self.base
-    }
-
     pub fn subscribed_at(&self) -> &DateTime<Utc> {
         &self.subscribed_at
     }

@@ -42,7 +42,10 @@ impl Contract {
     }
 
     pub fn approve(&mut self) -> Result<(), Error> {
-        if self.status().is_current_any(&[&ContractStatus::Requested]) {
+        if self.status().is_current(|s| match s {
+            ContractStatus::Requested => true,
+            _ => false,
+        }) {
             self.status.add_status(ContractStatus::Approved);
             return Ok(());
         }
@@ -50,7 +53,10 @@ impl Contract {
     }
 
     pub fn reject(&mut self) -> Result<(), Error> {
-        if self.status.is_current_any(&[&ContractStatus::Requested]) {
+        if self.status.is_current(|s| match s {
+            ContractStatus::Requested => true,
+            _ => false,
+        }) {
             self.status.add_status(ContractStatus::Rejected);
             return Ok(());
         }
@@ -58,10 +64,10 @@ impl Contract {
     }
 
     pub fn request(&mut self) -> Result<(), Error> {
-        if self
-            .status
-            .is_current_any(&[&ContractStatus::Rejected, &ContractStatus::Cancelled])
-        {
+        if self.status.is_current(|s| match s {
+            ContractStatus::Requested | ContractStatus::Cancelled => true,
+            _ => false,
+        }) {
             self.status.add_status(ContractStatus::Requested);
             return Ok(());
         }
@@ -69,11 +75,10 @@ impl Contract {
     }
 
     pub fn cancel(&mut self) -> Result<(), Error> {
-        if self.status.is_current_any(&[
-            &ContractStatus::Requested,
-            &ContractStatus::Approved,
-            &ContractStatus::Requested,
-        ]) {
+        if self.status.is_current(|s| match s {
+            ContractStatus::Requested | ContractStatus::Approved => true,
+            _ => false,
+        }) {
             self.status.add_status(ContractStatus::Cancelled);
             return Ok(());
         }

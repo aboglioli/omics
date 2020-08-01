@@ -852,6 +852,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "common",
+ "serde",
  "slug",
 ]
 

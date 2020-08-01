@@ -1,5 +1,3 @@
-use std::cmp::PartialEq;
-
 use chrono::{DateTime, Utc};
 
 #[derive(Debug, Clone)]
@@ -9,7 +7,7 @@ pub struct StatusItem<S, M> {
     status: S,
 }
 
-impl<S: PartialEq, M> StatusItem<S, M> {
+impl<S, M> StatusItem<S, M> {
     pub fn new(status: S) -> Self {
         StatusItem {
             date: Utc::now(),
@@ -37,10 +35,6 @@ impl<S: PartialEq, M> StatusItem<S, M> {
     pub fn status(&self) -> &S {
         &self.status
     }
-
-    pub fn is(&self, status: &S) -> bool {
-        &self.status == status
-    }
 }
 
 #[derive(Debug, Clone)]
@@ -48,7 +42,7 @@ pub struct StatusHistory<S, M> {
     history: Vec<StatusItem<S, M>>,
 }
 
-impl<S: PartialEq, M> StatusHistory<S, M> {
+impl<S, M> StatusHistory<S, M> {
     pub fn new() -> Self {
         StatusHistory {
             history: Vec::new(),
@@ -78,11 +72,14 @@ impl<S: PartialEq, M> StatusHistory<S, M> {
         self.history.last()
     }
 
-    pub fn is_current_any(&self, statuses: &[&S]) -> bool {
-        match self.current() {
-            Some(status_item) if statuses.iter().any(|s| status_item.is(s)) => true,
-            _ => false,
+    pub fn is_current<P>(&self, predicate: P) -> bool
+    where
+        P: Fn(&S) -> bool,
+    {
+        if let Some(current) = self.current() {
+            return predicate(current.status());
         }
+        return false;
     }
 }
 
@@ -94,7 +91,6 @@ mod tests {
     enum Status {
         Open,
         Closed,
-        Cancelled,
     }
 
     #[test]
@@ -146,7 +142,14 @@ mod tests {
         sh.add_status_with_motive(Status::Closed, "invalid");
         sh.add_status_with_motive(Status::Open, "revalid");
 
-        assert!(sh.is_current_any(&[&Status::Open]));
-        assert!(!sh.is_current_any(&[&Status::Closed]));
+        assert!(sh.is_current(|s| match s {
+            Status::Open => true,
+            _ => false,
+        }));
+
+        assert!(!sh.is_current(|s| match s {
+            Status::Closed => true,
+            _ => false,
+        }));
     }
 }

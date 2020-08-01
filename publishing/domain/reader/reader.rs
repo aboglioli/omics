@@ -1,14 +1,15 @@
 use common::error::Error;
-use common::event::BasicEvent;
+
 use common::model::AggregateRoot;
 
-use crate::domain::interaction::Like;
+use crate::domain::interaction::{Like, Read, Review, Stars};
 use crate::domain::publication::PublicationId;
+use crate::domain::reader::ReaderEvent;
 
 pub type ReaderId = String;
 
 pub struct Reader {
-    base: AggregateRoot<ReaderId, BasicEvent>,
+    base: AggregateRoot<ReaderId, ReaderEvent>,
     name: String,
 }
 
@@ -20,7 +21,19 @@ impl Reader {
         })
     }
 
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn read(&self, publication_id: PublicationId) -> Result<Read, Error> {
+        Ok(Read::new(self.base.id(), publication_id)?)
+    }
+
     pub fn like(&self, publication_id: PublicationId) -> Result<Like, Error> {
         Ok(Like::new(self.base.id(), publication_id)?)
+    }
+
+    pub fn review(&self, publication_id: PublicationId, stars: Stars) -> Result<Review, Error> {
+        Ok(Review::new(self.base.id(), publication_id, stars)?)
     }
 }

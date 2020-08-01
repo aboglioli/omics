@@ -270,7 +270,7 @@ mod tests {
             sub_eb.publish(create_event("topic2")).await.unwrap();
         });
 
-        tokio::join!(j1, j2);
+        let (_, _) = tokio::join!(j1, j2);
 
         assert_eq!(h.counter().count("topic007"), 1);
         assert_eq!(h.counter().count("topic1"), 1);

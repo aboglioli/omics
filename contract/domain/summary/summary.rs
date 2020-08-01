@@ -32,7 +32,10 @@ impl Summary {
     }
 
     pub fn ready_to_pay(&mut self) -> Result<(), Error> {
-        if self.status.is_current_any(&[&SummaryStatus::Open]) {
+        if self.status.is_current(|s| match s {
+            SummaryStatus::Open | SummaryStatus::ReadyToPay => true,
+            _ => false,
+        }) {
             self.status.add_status(SummaryStatus::ReadyToPay);
             return Ok(());
         }
@@ -40,7 +43,10 @@ impl Summary {
     }
 
     pub fn pay(&mut self) -> Result<(), Error> {
-        if self.status.is_current_any(&[&SummaryStatus::ReadyToPay]) {
+        if self.status.is_current(|s| match s {
+            SummaryStatus::ReadyToPay => true,
+            _ => false,
+        }) {
             self.status.add_status(SummaryStatus::Paid);
             return Ok(());
         }
@@ -48,10 +54,10 @@ impl Summary {
     }
 
     pub fn cancel(&mut self) -> Result<(), Error> {
-        if self
-            .status
-            .is_current_any(&[&SummaryStatus::Open, &SummaryStatus::ReadyToPay])
-        {
+        if self.status.is_current(|s| match s {
+            SummaryStatus::Open | SummaryStatus::ReadyToPay => true,
+            _ => false,
+        }) {
             self.status.add_status(SummaryStatus::Cancelled);
             return Ok(());
         }
