@@ -1,6 +1,7 @@
 use regex::Regex;
 
 use common::error::Error;
+use common::result::Result;
 
 #[derive(Debug, Clone)]
 pub struct Permission {
@@ -9,7 +10,7 @@ pub struct Permission {
 }
 
 impl Permission {
-    pub fn new(module: &str, permissions: &str) -> Result<Permission, Error> {
+    pub fn new(module: &str, permissions: &str) -> Result<Permission> {
         let mut err = Error::application();
         if module.is_empty() {
             err.add_context("module", "empty");
@@ -68,12 +69,13 @@ impl Permission {
 
 #[cfg(test)]
 mod tests {
-    use common::error::Error;
+
+    use common::result::Result;
 
     use super::*;
 
     #[test]
-    fn create_permissions() -> Result<(), Error> {
+    fn create_permissions() -> Result<()> {
         assert!(Permission::new("", "").is_err());
         assert!(Permission::new("module", "").is_err());
         assert!(Permission::new("module", "A").is_err());
@@ -91,7 +93,7 @@ mod tests {
     }
 
     #[test]
-    fn permission_contains() -> Result<(), Error> {
+    fn permission_contains() -> Result<()> {
         let p = Permission::new("mod", "CRD")?;
         assert!(p.contains("C"));
         assert!(p.contains("R"));

@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-use common::error::Error;
+use common::result::Result;
 
 use crate::domain::user::{UserId, UserRepository};
 
@@ -21,7 +21,7 @@ where
         GetById { user_repo }
     }
 
-    pub async fn exec(&self, user_id: &UserId) -> Result<GetByIdResponse, Error> {
+    pub async fn exec(&self, user_id: &UserId) -> Result<GetByIdResponse> {
         let user = self.user_repo.find_by_id(user_id).await?;
         Ok(GetByIdResponse {
             username: user.identity().username().value().to_owned(),

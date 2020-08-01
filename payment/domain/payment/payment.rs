@@ -1,6 +1,6 @@
-use common::error::Error;
 use common::event::BasicEvent;
 use common::model::{AggregateRoot, StatusHistory};
+use common::result::Result;
 
 use crate::domain::payment::{Amount, PaymentStatus};
 
@@ -13,11 +13,23 @@ pub struct Payment {
 }
 
 impl Payment {
-    pub fn new(id: PaymentId, amount: Amount) -> Result<Payment, Error> {
+    pub fn new(id: PaymentId, amount: Amount) -> Result<Payment> {
         Ok(Payment {
             base: AggregateRoot::new(id),
             amount,
             status: StatusHistory::init(PaymentStatus::Pending),
         })
+    }
+
+    pub fn base(&self) -> &AggregateRoot<PaymentId, BasicEvent> {
+        &self.base
+    }
+
+    pub fn amount(&self) -> &Amount {
+        &self.amount
+    }
+
+    pub fn status(&self) -> &StatusHistory<PaymentStatus, String> {
+        &self.status
     }
 }

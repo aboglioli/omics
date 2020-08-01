@@ -1,4 +1,5 @@
 use common::error::Error;
+use common::result::Result;
 
 #[derive(Debug, Clone)]
 pub struct Fullname {
@@ -7,7 +8,7 @@ pub struct Fullname {
 }
 
 impl Fullname {
-    pub fn new(name: &str, lastname: &str) -> Result<Fullname, Error> {
+    pub fn new(name: &str, lastname: &str) -> Result<Fullname> {
         let mut err = Error::application();
 
         if name.len() < 4 {

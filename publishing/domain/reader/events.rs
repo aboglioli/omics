@@ -1,5 +1,5 @@
-use common::error::Error;
 use common::event::{Event, ToEvent};
+use common::result::Result;
 
 use crate::domain::publication::PublicationId;
 use crate::domain::reader::ReaderId;
@@ -29,7 +29,7 @@ pub enum ReaderEvent {
 }
 
 impl ToEvent for ReaderEvent {
-    fn to_event(&self) -> Result<Event, Error> {
+    fn to_event(&self) -> Result<Event> {
         Ok(Event::new("", "", Vec::new()))
     }
 }

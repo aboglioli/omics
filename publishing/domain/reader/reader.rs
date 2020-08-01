@@ -1,4 +1,4 @@
-use common::error::Error;
+use common::result::Result;
 
 use common::model::AggregateRoot;
 
@@ -14,7 +14,7 @@ pub struct Reader {
 }
 
 impl Reader {
-    pub fn new(id: ReaderId, name: &str) -> Result<Reader, Error> {
+    pub fn new(id: ReaderId, name: &str) -> Result<Reader> {
         Ok(Reader {
             base: AggregateRoot::new(id),
             name: name.to_owned(),
@@ -25,15 +25,15 @@ impl Reader {
         &self.name
     }
 
-    pub fn read(&self, publication_id: PublicationId) -> Result<Read, Error> {
+    pub fn read(&self, publication_id: PublicationId) -> Result<Read> {
         Ok(Read::new(self.base.id(), publication_id)?)
     }
 
-    pub fn like(&self, publication_id: PublicationId) -> Result<Like, Error> {
+    pub fn like(&self, publication_id: PublicationId) -> Result<Like> {
         Ok(Like::new(self.base.id(), publication_id)?)
     }
 
-    pub fn review(&self, publication_id: PublicationId, stars: Stars) -> Result<Review, Error> {
+    pub fn review(&self, publication_id: PublicationId, stars: Stars) -> Result<Review> {
         Ok(Review::new(self.base.id(), publication_id, stars)?)
     }
 }

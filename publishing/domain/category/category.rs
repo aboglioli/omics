@@ -1,6 +1,6 @@
-use common::error::Error;
 use common::event::BasicEvent;
 use common::model::AggregateRoot;
+use common::result::Result;
 
 #[derive(Debug, Clone)]
 pub struct Name {
@@ -8,7 +8,7 @@ pub struct Name {
 }
 
 impl Name {
-    pub fn new(name: &str) -> Result<Name, Error> {
+    pub fn new(name: &str) -> Result<Name> {
         Ok(Name {
             name: name.to_owned(),
         })
@@ -28,7 +28,7 @@ pub struct Category {
 }
 
 impl Category {
-    pub fn new(id: CategoryId, name: Name) -> Result<Category, Error> {
+    pub fn new(id: CategoryId, name: Name) -> Result<Category> {
         Ok(Category {
             base: AggregateRoot::new(id),
             name,

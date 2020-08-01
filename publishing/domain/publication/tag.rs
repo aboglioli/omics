@@ -1,4 +1,5 @@
 use common::error::Error;
+use common::result::Result;
 use slug::slugify;
 
 #[derive(Debug, Clone)]
@@ -8,7 +9,7 @@ pub struct Tag {
 }
 
 impl Tag {
-    pub fn new(name: &str) -> Result<Tag, Error> {
+    pub fn new(name: &str) -> Result<Tag> {
         if name.is_empty() {
             return Err(Error::application().add_context("name", "empty").build());
         }
@@ -34,7 +35,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn create() -> Result<(), Error> {
+    fn create() -> Result<()> {
         let tag = Tag::new("New fancy tag")?;
         assert_eq!(tag.name(), "New fancy tag");
         assert_eq!(tag.slug(), "new-fancy-tag");

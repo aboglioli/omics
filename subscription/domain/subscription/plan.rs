@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 
-use common::error::Error;
+use common::result::Result;
 
 use crate::domain::plan::PlanId;
 
@@ -15,7 +15,7 @@ pub struct SubscriptionPlan {
 }
 
 impl SubscriptionPlan {
-    pub fn new(id: PlanId) -> Result<SubscriptionPlan, Error> {
+    pub fn new(id: PlanId) -> Result<SubscriptionPlan> {
         Ok(SubscriptionPlan {
             id,
             status: SubscriptionPlanStatus::AssignedAt(Utc::now()),
@@ -37,7 +37,7 @@ impl SubscriptionPlan {
         }
     }
 
-    pub fn confirm(&self) -> Result<SubscriptionPlan, Error> {
+    pub fn confirm(&self) -> Result<SubscriptionPlan> {
         Ok(SubscriptionPlan {
             id: self.id.clone(),
             status: SubscriptionPlanStatus::ConfirmedAt(Utc::now()),

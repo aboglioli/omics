@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use common::error::Error;
+use common::result::Result;
 
 #[derive(Deserialize)]
 pub struct PublishCommand {
@@ -9,7 +9,7 @@ pub struct PublishCommand {
 }
 
 impl PublishCommand {
-    pub fn validate(&self) -> Result<(), Error> {
+    pub fn validate(&self) -> Result<()> {
         Ok(())
     }
 }
@@ -17,7 +17,7 @@ impl PublishCommand {
 pub struct Publish {}
 
 impl Publish {
-    pub async fn exec(&self, cmd: PublishCommand) -> Result<(), Error> {
+    pub async fn exec(&self, cmd: PublishCommand) -> Result<()> {
         cmd.validate()?;
         Ok(())
     }

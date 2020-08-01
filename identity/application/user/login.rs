@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use common::error::Error;
+use common::result::Result;
 
 use crate::domain::token::{TokenEncoder, TokenRepository};
 use crate::domain::user::{AuthService, PasswordHasher, UserRepository};
@@ -31,7 +31,7 @@ where
         Login { auth_serv }
     }
 
-    pub async fn exec(&self, cmd: LoginCommand) -> Result<LoginResponse, Error> {
+    pub async fn exec(&self, cmd: LoginCommand) -> Result<LoginResponse> {
         match self
             .auth_serv
             .authenticate(&cmd.username_or_email, &cmd.password)

@@ -1,6 +1,6 @@
-use common::error::Error;
 use common::event::BasicEvent;
 use common::model::{AggregateRoot, StatusHistory};
+use common::result::Result;
 
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
@@ -29,7 +29,7 @@ impl Publication {
         synopsis: &str,
         author_id: AuthorId,
         category_id: CategoryId,
-    ) -> Result<Publication, Error> {
+    ) -> Result<Publication> {
         Ok(Publication {
             base: AggregateRoot::new(id),
             name: Name::new(name)?,
@@ -79,22 +79,22 @@ impl Publication {
         &self.status
     }
 
-    pub fn set_name(&mut self, name: Name) -> Result<(), Error> {
+    pub fn set_name(&mut self, name: Name) -> Result<()> {
         self.name = name;
         Ok(())
     }
 
-    pub fn set_synopsis(&mut self, synopsis: Synopsis) -> Result<(), Error> {
+    pub fn set_synopsis(&mut self, synopsis: Synopsis) -> Result<()> {
         self.synopsis = synopsis;
         Ok(())
     }
 
-    pub fn set_statistics(&mut self, statistics: Statistics) -> Result<(), Error> {
+    pub fn set_statistics(&mut self, statistics: Statistics) -> Result<()> {
         self.statistics = statistics;
         Ok(())
     }
 
-    pub fn add_page(&mut self, page: Page) -> Result<(), Error> {
+    pub fn add_page(&mut self, page: Page) -> Result<()> {
         for p in self.pages.iter_mut() {
             if p.number() == page.number() {
                 *p = page;
@@ -106,12 +106,12 @@ impl Publication {
         Ok(())
     }
 
-    pub fn remove_page(&mut self, number: &PageNumber) -> Result<(), Error> {
+    pub fn remove_page(&mut self, number: &PageNumber) -> Result<()> {
         self.pages.retain(|page| page.number() != number);
         Ok(())
     }
 
-    pub fn set_tags(&mut self, tags: Vec<Tag>) -> Result<(), Error> {
+    pub fn set_tags(&mut self, tags: Vec<Tag>) -> Result<()> {
         self.tags = tags;
         Ok(())
     }

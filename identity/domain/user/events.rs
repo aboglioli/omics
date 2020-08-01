@@ -1,5 +1,5 @@
-use common::error::Error;
 use common::event::{Event, ToEvent};
+use common::result::Result;
 
 use crate::domain::user::UserId;
 
@@ -18,7 +18,7 @@ pub enum UserEvent {
 }
 
 impl ToEvent for UserEvent {
-    fn to_event(&self) -> Result<Event, Error> {
+    fn to_event(&self) -> Result<Event> {
         Ok(Event::new("", "", Vec::new()))
     }
 }

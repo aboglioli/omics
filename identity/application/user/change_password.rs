@@ -1,4 +1,4 @@
-use common::error::Error;
+use common::result::Result;
 
 use crate::domain::token::{TokenEncoder, TokenRepository};
 use crate::domain::user::{AuthService, PasswordHasher, UserId, UserRepository};
@@ -9,7 +9,7 @@ pub struct ChangePasswordCommand {
 }
 
 impl ChangePasswordCommand {
-    pub fn validate(&self) -> Result<(), Error> {
+    pub fn validate(&self) -> Result<()> {
         Ok(())
     }
 }
@@ -29,7 +29,7 @@ where
         ChangePassword { auth_serv }
     }
 
-    pub async fn exec(&self, user_id: &UserId, cmd: ChangePasswordCommand) -> Result<(), Error> {
+    pub async fn exec(&self, user_id: &UserId, cmd: ChangePasswordCommand) -> Result<()> {
         cmd.validate()?;
         self.auth_serv
             .change_password(user_id, &cmd.old_password, &cmd.new_password)

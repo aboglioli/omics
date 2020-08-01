@@ -1,4 +1,5 @@
 use common::error::Error;
+use common::result::Result;
 
 #[derive(Debug, Clone)]
 pub struct Password {
@@ -6,7 +7,7 @@ pub struct Password {
 }
 
 impl Password {
-    pub fn new(password: &str) -> Result<Password, Error> {
+    pub fn new(password: &str) -> Result<Password> {
         if password.len() < 50 {
             return Err(Error::application()
                 .add_context("password", "not_hashed")

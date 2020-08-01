@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 
-use common::error::Error;
+use common::result::Result;
 
 use crate::domain::interaction::{Like, Read, Review};
 use crate::domain::publication::PublicationId;
@@ -13,11 +13,11 @@ pub struct FindOpts {
 
 #[async_trait]
 pub trait InteractionRepository {
-    async fn find_likes(&self, opts: &FindOpts) -> Result<Vec<Like>, Error>;
-    async fn find_reads(&self, opts: &FindOpts) -> Result<Vec<Read>, Error>;
-    async fn find_reviews(&self, opts: &FindOpts) -> Result<Vec<Review>, Error>;
+    async fn find_likes(&self, opts: &FindOpts) -> Result<Vec<Like>>;
+    async fn find_reads(&self, opts: &FindOpts) -> Result<Vec<Read>>;
+    async fn find_reviews(&self, opts: &FindOpts) -> Result<Vec<Review>>;
 
-    async fn save_like(&self, like: &mut Like) -> Result<(), Error>;
-    async fn save_read(&self, read: &mut Read) -> Result<(), Error>;
-    async fn save_review(&self, review: &mut Review) -> Result<(), Error>;
+    async fn save_like(&self, like: &mut Like) -> Result<()>;
+    async fn save_read(&self, read: &mut Read) -> Result<()>;
+    async fn save_review(&self, review: &mut Review) -> Result<()>;
 }

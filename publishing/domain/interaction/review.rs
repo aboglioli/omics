@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 
-use common::error::Error;
+use common::result::Result;
 
 use crate::domain::interaction::Stars;
 use crate::domain::publication::PublicationId;
@@ -14,11 +14,7 @@ pub struct Review {
 }
 
 impl Review {
-    pub fn new(
-        reader_id: ReaderId,
-        publication_id: PublicationId,
-        stars: Stars,
-    ) -> Result<Review, Error> {
+    pub fn new(reader_id: ReaderId, publication_id: PublicationId, stars: Stars) -> Result<Review> {
         Ok(Review {
             reader_id,
             publication_id,

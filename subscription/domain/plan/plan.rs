@@ -6,3 +6,9 @@ pub type PlanId = String;
 pub struct Plan {
     base: AggregateRoot<PlanId, BasicEvent>,
 }
+
+impl Plan {
+    pub fn base(&self) -> &AggregateRoot<PlanId, BasicEvent> {
+        &self.base
+    }
+}

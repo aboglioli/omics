@@ -12,4 +12,16 @@ impl Statistics {
             unique_views: 0,
         }
     }
+
+    pub fn likes(&self) -> u32 {
+        self.likes
+    }
+
+    pub fn views(&self) -> u32 {
+        self.views
+    }
+
+    pub fn unique_views(&self) -> u32 {
+        self.unique_views
+    }
 }

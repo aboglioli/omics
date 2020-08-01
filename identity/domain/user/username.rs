@@ -1,4 +1,5 @@
 use common::error::Error;
+use common::result::Result;
 
 #[derive(Debug, Clone)]
 pub struct Username {
@@ -6,7 +7,7 @@ pub struct Username {
 }
 
 impl Username {
-    pub fn new(username: &str) -> Result<Username, Error> {
+    pub fn new(username: &str) -> Result<Username> {
         if username.len() < 4 {
             return Err(Error::application()
                 .add_context("username", "too_short")

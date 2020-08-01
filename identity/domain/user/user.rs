@@ -1,5 +1,5 @@
-use common::error::Error;
 use common::model::AggregateRoot;
+use common::result::Result;
 
 use crate::domain::role::RoleId;
 use crate::domain::user::{Identity, Password, Person, UserEvent};
@@ -17,7 +17,7 @@ pub struct User {
 }
 
 impl User {
-    pub fn new(id: UserId, identity: Identity, role_id: RoleId) -> Result<User, Error> {
+    pub fn new(id: UserId, identity: Identity, role_id: RoleId) -> Result<User> {
         Ok(User {
             base: AggregateRoot::new(id),
             identity,
@@ -51,12 +51,12 @@ impl User {
         self.base.deleted_at().is_none() && self.validated
     }
 
-    pub fn set_password(&mut self, password: Password) -> Result<(), Error> {
+    pub fn set_password(&mut self, password: Password) -> Result<()> {
         self.identity.set_password(password)?;
         Ok(())
     }
 
-    pub fn set_person(&mut self, person: Person) -> Result<(), Error> {
+    pub fn set_person(&mut self, person: Person) -> Result<()> {
         self.person = Some(person);
         Ok(())
     }

@@ -1,7 +1,8 @@
 use async_trait::async_trait;
 
 use common::cache::{Cache, InMemCache};
-use common::error::Error;
+
+use common::result::Result;
 
 use crate::domain::token::{Data, TokenId, TokenRepository};
 
@@ -23,11 +24,11 @@ impl Cache<TokenId, Data> for InMemTokenRepository {
         self.cache.get(token_id).await
     }
 
-    async fn set(&self, token_id: TokenId, data: Data) -> Result<(), Error> {
+    async fn set(&self, token_id: TokenId, data: Data) -> Result<()> {
         self.cache.set(token_id, data).await
     }
 
-    async fn delete(&self, token_id: &TokenId) -> Result<(), Error> {
+    async fn delete(&self, token_id: &TokenId) -> Result<()> {
         self.cache.delete(token_id).await
     }
 }
@@ -38,8 +39,10 @@ impl TokenRepository for InMemTokenRepository {}
 mod tests {
     use super::*;
 
+    use common::error::Error;
+
     #[tokio::test]
-    async fn test() -> Result<(), Error> {
+    async fn test() -> Result<()> {
         fn check_trait_impl<T: TokenRepository>(_repo: &T) {}
 
         let repo = InMemTokenRepository::new();

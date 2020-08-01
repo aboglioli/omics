@@ -1,4 +1,5 @@
 use common::error::Error;
+use common::result::Result;
 
 use crate::domain::token::{Data, Token, TokenEncoder, TokenRepository, TokenService};
 use crate::domain::user::{
@@ -30,11 +31,7 @@ where
         }
     }
 
-    pub async fn authenticate(
-        &self,
-        username_or_email: &str,
-        password: &str,
-    ) -> Result<Token, Error> {
+    pub async fn authenticate(&self, username_or_email: &str, password: &str) -> Result<Token> {
         let mut err = Error::pair("credentials", "invalid");
 
         let user = self
@@ -64,7 +61,7 @@ where
         Err(Error::application().set_code("invalid_credentials").build())
     }
 
-    pub async fn authorize(&self, token: &Token) -> Result<User, Error> {
+    pub async fn authorize(&self, token: &Token) -> Result<User> {
         let data = self.token_serv.validate(token).await?;
         if let Some(user_id) = data.get("user_id") {
             let user = self.user_repo.find_by_id(user_id).await?;
@@ -73,7 +70,7 @@ where
         Err(Error::application())
     }
 
-    pub async fn available(&self, username: &str, email: &str) -> Result<bool, Error> {
+    pub async fn available(&self, username: &str, email: &str) -> Result<bool> {
         let mut err = Error::application();
         if self
             .user_repo
@@ -104,7 +101,7 @@ where
         user_id: &UserId,
         old_password: &str,
         new_password: &str,
-    ) -> Result<(), Error> {
+    ) -> Result<()> {
         let mut user = self.user_repo.find_by_id(user_id).await?;
 
         let user_password = match user.identity().password() {
@@ -126,7 +123,7 @@ where
         Ok(())
     }
 
-    pub fn generate_password(&self, plain_pasword: &str) -> Result<String, Error> {
+    pub fn generate_password(&self, plain_pasword: &str) -> Result<String> {
         self.password_hasher.hash(plain_pasword)
     }
 }
@@ -140,7 +137,7 @@ mod tests {
     use crate::infrastructure::persistence::inmem::*;
 
     #[tokio::test]
-    async fn authenticate() -> Result<(), Error> {
+    async fn authenticate() -> Result<()> {
         let user_repo = InMemUserRepository::new();
         let password_hasher = FakePasswordHasher::new();
         let token_enc = FakeTokenEncoder::new();

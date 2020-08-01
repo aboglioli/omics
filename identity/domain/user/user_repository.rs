@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 
 use common::error::Error;
+use common::result::Result;
 
 use crate::domain::user::{Email, User, UserId, Username};
 
@@ -13,11 +14,11 @@ pub trait UserRepository {
             .build()
     }
 
-    async fn next_id(&self) -> Result<UserId, Error>;
+    async fn next_id(&self) -> Result<UserId>;
 
-    async fn find_by_id(&self, id: &UserId) -> Result<User, Error>;
-    async fn find_by_username(&self, username: &Username) -> Result<User, Error>;
-    async fn find_by_email(&self, email: &Email) -> Result<User, Error>;
+    async fn find_by_id(&self, id: &UserId) -> Result<User>;
+    async fn find_by_username(&self, username: &Username) -> Result<User>;
+    async fn find_by_email(&self, email: &Email) -> Result<User>;
 
-    async fn save(&self, user: &mut User) -> Result<(), Error>;
+    async fn save(&self, user: &mut User) -> Result<()>;
 }

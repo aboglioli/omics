@@ -1,5 +1,5 @@
-use common::error::Error;
 use common::event::{Event, ToEvent};
+use common::result::Result;
 
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
@@ -27,7 +27,7 @@ pub enum PublicationEvent {
 }
 
 impl ToEvent for PublicationEvent {
-    fn to_event(&self) -> Result<Event, Error> {
+    fn to_event(&self) -> Result<Event> {
         Ok(Event::new("", "", Vec::new()))
     }
 }

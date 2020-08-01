@@ -5,12 +5,13 @@ use chrono::{DateTime, Utc};
 
 use crate::error::Error;
 use crate::event::{Event, ToEvent};
+use crate::result::Result;
 
 #[derive(Debug)]
 pub struct BasicEvent;
 
 impl ToEvent for BasicEvent {
-    fn to_event(&self) -> Result<Event, Error> {
+    fn to_event(&self) -> Result<Event> {
         Err(Error::internal().set_code("not_implemented").build())
     }
 }
@@ -63,7 +64,7 @@ impl<ID: Clone, E: ToEvent> AggregateRoot<ID, E> {
         self.events.push(event);
     }
 
-    pub fn events(&self) -> Result<Vec<Event>, Error> {
+    pub fn events(&self) -> Result<Vec<Event>> {
         let mut events = Vec::new();
         for event in self.events.iter() {
             events.push(event.to_event()?);
@@ -102,7 +103,7 @@ mod tests {
     }
 
     impl ToEvent for AggRootEvent {
-        fn to_event(&self) -> Result<Event, Error> {
+        fn to_event(&self) -> Result<Event> {
             Ok(match self {
                 AggRootEvent::Created { text } => {
                     Event::new("agg_root.created", "", text.as_bytes().to_vec())

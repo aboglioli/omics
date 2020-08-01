@@ -1,6 +1,6 @@
-use common::error::Error;
 use common::event::BasicEvent;
 use common::model::AggregateRoot;
+use common::result::Result;
 
 pub type AuthorId = String;
 
@@ -9,10 +9,14 @@ pub struct Name {
 }
 
 impl Name {
-    pub fn new(name: &str) -> Result<Name, Error> {
+    pub fn new(name: &str) -> Result<Name> {
         Ok(Name {
             name: name.to_owned(),
         })
+    }
+
+    pub fn value(&self) -> &str {
+        &self.name
     }
 }
 
@@ -22,10 +26,18 @@ pub struct Author {
 }
 
 impl Author {
-    pub fn new(id: AuthorId, name: Name) -> Result<Author, Error> {
+    pub fn new(id: AuthorId, name: Name) -> Result<Author> {
         Ok(Author {
             base: AggregateRoot::new(id),
             name,
         })
+    }
+
+    pub fn base(&self) -> &AggregateRoot<AuthorId, BasicEvent> {
+        &self.base
+    }
+
+    pub fn name(&self) -> &Name {
+        &self.name
     }
 }

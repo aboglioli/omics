@@ -1,6 +1,6 @@
-use common::error::Error;
 use common::event::BasicEvent;
 use common::model::AggregateRoot;
+use common::result::Result;
 
 use crate::domain::role::Permission;
 
@@ -14,7 +14,7 @@ pub struct Role {
 }
 
 impl Role {
-    pub fn new(code: RoleId, name: &str) -> Result<Role, Error> {
+    pub fn new(code: RoleId, name: &str) -> Result<Role> {
         Ok(Role {
             base: AggregateRoot::new(code),
             name: String::from(name),
@@ -46,12 +46,13 @@ impl Role {
 
 #[cfg(test)]
 mod tests {
-    use common::error::Error;
+
+    use common::result::Result;
 
     use super::*;
 
     #[test]
-    fn create_role() -> Result<(), Error> {
+    fn create_role() -> Result<()> {
         let r = Role::new(RoleId::from("admin"), "Administrator")?;
         assert_eq!(r.base(), &AggregateRoot::new(RoleId::from("admin")));
         assert_eq!(r.name(), "Administrator");
@@ -61,7 +62,7 @@ mod tests {
     }
 
     #[test]
-    fn permissions() -> Result<(), Error> {
+    fn permissions() -> Result<()> {
         let pmod1 = Permission::new("mod1", "CRUD")?;
         let pmod2 = Permission::new("mod2", "CRD")?;
         let pmod3 = Permission::new("mod3", "R")?;

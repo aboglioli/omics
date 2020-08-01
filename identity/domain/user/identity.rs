@@ -1,5 +1,6 @@
 use crate::domain::user::{Email, Password, Provider, Username};
 use common::error::Error;
+use common::result::Result;
 
 #[derive(Debug, Clone)]
 pub struct Identity {
@@ -15,7 +16,7 @@ impl Identity {
         username: Username,
         email: Email,
         password: Option<Password>,
-    ) -> Result<Identity, Error> {
+    ) -> Result<Identity> {
         let password = match provider {
             Provider::Local => match password {
                 None => return Err(Error::pair("password", "required")),
@@ -48,7 +49,7 @@ impl Identity {
         self.password.as_ref()
     }
 
-    pub fn set_password(&mut self, password: Password) -> Result<(), Error> {
+    pub fn set_password(&mut self, password: Password) -> Result<()> {
         self.password = match self.provider {
             Provider::Local => Some(password),
             _ => return Err(Error::application()),

@@ -6,6 +6,7 @@ use tokio::sync::Mutex;
 
 use crate::error::Error;
 use crate::event::{Event, EventHandler, EventPublisher, EventSubscriber};
+use crate::result::Result;
 
 pub struct InMemEventBus {
     handlers: Arc<Mutex<Vec<Box<dyn EventHandler<Output = bool> + Sync>>>>,
@@ -23,7 +24,7 @@ impl InMemEventBus {
 impl EventPublisher for InMemEventBus {
     type Output = bool;
 
-    async fn publish(&self, event: Event) -> Result<Self::Output, Error> {
+    async fn publish(&self, event: Event) -> Result<Self::Output> {
         let mut handlers = self.handlers.lock().await;
         for handler in handlers.iter_mut() {
             if let Ok(re) = Regex::new(handler.topic()) {
@@ -40,7 +41,7 @@ impl EventPublisher for InMemEventBus {
         Ok(true)
     }
 
-    async fn publish_all(&self, events: Vec<Event>) -> Result<Self::Output, Error> {
+    async fn publish_all(&self, events: Vec<Event>) -> Result<Self::Output> {
         for event in events.into_iter() {
             self.publish(event).await?;
         }
@@ -56,7 +57,7 @@ impl EventSubscriber for InMemEventBus {
     async fn subscribe(
         &self,
         handler: Box<dyn EventHandler<Output = Self::Output> + Sync>,
-    ) -> Result<Self::Output, Error> {
+    ) -> Result<Self::Output> {
         let mut handlers = self.handlers.lock().await;
         handlers.push(handler);
         Ok(true)
@@ -112,7 +113,7 @@ mod tests {
             &self.topic
         }
 
-        async fn handle(&mut self, event: &Event) -> Result<Self::Output, Error> {
+        async fn handle(&mut self, event: &Event) -> Result<Self::Output> {
             self.counter.inc(event.topic());
             Ok(true)
         }

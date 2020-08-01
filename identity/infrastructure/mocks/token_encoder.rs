@@ -1,5 +1,6 @@
 use crate::domain::token::{Token, TokenEncoder, TokenId};
 use common::error::Error;
+use common::result::Result;
 
 pub struct FakeTokenEncoder;
 
@@ -10,11 +11,11 @@ impl FakeTokenEncoder {
 }
 
 impl TokenEncoder for FakeTokenEncoder {
-    fn encode(&self, token_id: &TokenId) -> Result<Token, Error> {
+    fn encode(&self, token_id: &TokenId) -> Result<Token> {
         Ok(Token::new(&format!("<<token::{}", token_id.id())))
     }
 
-    fn decode(&self, token: &Token) -> Result<TokenId, Error> {
+    fn decode(&self, token: &Token) -> Result<TokenId> {
         if !token.token().starts_with("<<token::") {
             return Err(Error::internal());
         }
@@ -28,7 +29,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test() -> Result<(), Error> {
+    fn test() -> Result<()> {
         let enc = FakeTokenEncoder::new();
 
         assert_eq!(

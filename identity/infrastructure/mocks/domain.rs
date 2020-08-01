@@ -1,4 +1,4 @@
-use common::error::Error;
+use common::result::Result;
 
 use crate::domain::role::RoleId;
 use crate::domain::user::{
@@ -6,7 +6,7 @@ use crate::domain::user::{
 };
 use crate::infrastructure::mocks::FakePasswordHasher;
 
-pub fn user1() -> Result<User, Error> {
+pub fn user1() -> Result<User> {
     let ph = FakePasswordHasher::new();
     User::new(
         UserId::from("user123"),

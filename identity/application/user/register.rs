@@ -1,7 +1,7 @@
 use serde::Deserialize;
 
-use common::error::Error;
 use common::event::{EventPublisher, ToEvent};
+use common::result::Result;
 
 use crate::domain::role::RoleId;
 use crate::domain::token::{TokenEncoder, TokenRepository};
@@ -18,7 +18,7 @@ pub struct RegisterCommand {
 }
 
 impl RegisterCommand {
-    pub fn validate(&self) -> Result<(), Error> {
+    pub fn validate(&self) -> Result<()> {
         Ok(())
     }
 }
@@ -49,7 +49,7 @@ where
         }
     }
 
-    pub async fn exec(&self, cmd: RegisterCommand) -> Result<(), Error> {
+    pub async fn exec(&self, cmd: RegisterCommand) -> Result<()> {
         cmd.validate()?;
 
         self.auth_serv.available(&cmd.username, &cmd.email).await?;

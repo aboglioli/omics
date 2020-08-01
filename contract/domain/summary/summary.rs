@@ -1,6 +1,7 @@
 use common::error::Error;
 use common::event::BasicEvent;
 use common::model::{AggregateRoot, StatusHistory};
+use common::result::Result;
 
 use crate::domain::contract::ContractId;
 use crate::domain::summary::SummaryStatus;
@@ -15,7 +16,7 @@ pub struct Summary {
 }
 
 impl Summary {
-    pub fn new(id: SummaryId, contract_id: ContractId) -> Result<Summary, Error> {
+    pub fn new(id: SummaryId, contract_id: ContractId) -> Result<Summary> {
         Ok(Summary {
             base: AggregateRoot::new(id),
             contract_id,
@@ -31,7 +32,7 @@ impl Summary {
         &self.status
     }
 
-    pub fn ready_to_pay(&mut self) -> Result<(), Error> {
+    pub fn ready_to_pay(&mut self) -> Result<()> {
         if self.status.is_current(|s| match s {
             SummaryStatus::Open | SummaryStatus::ReadyToPay => true,
             _ => false,
@@ -42,7 +43,7 @@ impl Summary {
         Err(Error::application())
     }
 
-    pub fn pay(&mut self) -> Result<(), Error> {
+    pub fn pay(&mut self) -> Result<()> {
         if self.status.is_current(|s| match s {
             SummaryStatus::ReadyToPay => true,
             _ => false,
@@ -53,7 +54,7 @@ impl Summary {
         Err(Error::application())
     }
 
-    pub fn cancel(&mut self) -> Result<(), Error> {
+    pub fn cancel(&mut self) -> Result<()> {
         if self.status.is_current(|s| match s {
             SummaryStatus::Open | SummaryStatus::ReadyToPay => true,
             _ => false,

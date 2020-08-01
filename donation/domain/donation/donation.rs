@@ -10,3 +10,17 @@ pub struct Donation {
     issuer_id: UserId,
     receiver_id: UserId,
 }
+
+impl Donation {
+    pub fn base(&self) -> &AggregateRoot<DonationId, BasicEvent> {
+        &self.base
+    }
+
+    pub fn issuer_id(&self) -> &UserId {
+        &self.issuer_id
+    }
+
+    pub fn receiver_id(&self) -> &UserId {
+        &self.receiver_id
+    }
+}

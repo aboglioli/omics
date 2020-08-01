@@ -1,5 +1,6 @@
 use crate::domain::user::PasswordHasher;
-use common::error::Error;
+
+use common::result::Result;
 
 pub struct FakePasswordHasher;
 
@@ -10,7 +11,7 @@ impl FakePasswordHasher {
 }
 
 impl PasswordHasher for FakePasswordHasher {
-    fn hash(&self, plain_pasword: &str) -> Result<String, Error> {
+    fn hash(&self, plain_pasword: &str) -> Result<String> {
         Ok(format!("$${:X>50}##", plain_pasword))
     }
 
@@ -24,7 +25,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test() -> Result<(), Error> {
+    fn test() -> Result<()> {
         let ph = FakePasswordHasher::new();
         let hashed_password = ph.hash("abc123")?;
         assert!(hashed_password.contains("abc123"));

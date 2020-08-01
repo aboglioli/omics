@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use chrono::{DateTime, Utc};
 
-use crate::error::Error;
+use crate::result::Result;
 
 pub type EventPayload = Vec<u8>;
 
@@ -42,7 +42,7 @@ impl Event {
 }
 
 pub trait ToEvent {
-    fn to_event(&self) -> Result<Event, Error>;
+    fn to_event(&self) -> Result<Event>;
 }
 
 #[derive(Debug)]
@@ -52,7 +52,7 @@ pub struct BasicEvent {
 }
 
 impl ToEvent for BasicEvent {
-    fn to_event(&self) -> Result<Event, Error> {
+    fn to_event(&self) -> Result<Event> {
         Ok(Event::new(&self.topic, &self.code, Vec::new()))
     }
 }

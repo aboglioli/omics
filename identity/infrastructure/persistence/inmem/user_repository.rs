@@ -2,7 +2,8 @@ use async_trait::async_trait;
 use uuid::Uuid;
 
 use common::cache::{Cache, InMemCache};
-use common::error::Error;
+
+use common::result::Result;
 
 use crate::domain::user::{Email, User, UserId, UserRepository, Username};
 
@@ -20,34 +21,34 @@ impl InMemUserRepository {
 
 #[async_trait]
 impl UserRepository for InMemUserRepository {
-    async fn next_id(&self) -> Result<UserId, Error> {
+    async fn next_id(&self) -> Result<UserId> {
         let uuid = Uuid::new_v4();
         let uuid = uuid.to_string();
         Ok(uuid)
     }
 
-    async fn find_by_id(&self, id: &UserId) -> Result<User, Error> {
+    async fn find_by_id(&self, id: &UserId) -> Result<User> {
         self.cache
             .get(id)
             .await
             .ok_or_else(|| Self::err_not_found())
     }
 
-    async fn find_by_username(&self, username: &Username) -> Result<User, Error> {
+    async fn find_by_username(&self, username: &Username) -> Result<User> {
         self.cache
             .find(|(_, user)| user.identity().username().value() == username.value())
             .await
             .ok_or_else(|| Self::err_not_found())
     }
 
-    async fn find_by_email(&self, email: &Email) -> Result<User, Error> {
+    async fn find_by_email(&self, email: &Email) -> Result<User> {
         self.cache
             .find(|(_, user)| user.identity().email().value() == email.value())
             .await
             .ok_or_else(|| Self::err_not_found())
     }
 
-    async fn save(&self, user: &mut User) -> Result<(), Error> {
+    async fn save(&self, user: &mut User) -> Result<()> {
         self.cache.set(user.base().id(), user.clone()).await
     }
 }
@@ -56,7 +57,7 @@ impl UserRepository for InMemUserRepository {
 mod tests {
     use super::*;
 
-    use tokio;
+    use common::error::Error;
 
     use crate::domain::user::*;
     use crate::infrastructure::mocks;

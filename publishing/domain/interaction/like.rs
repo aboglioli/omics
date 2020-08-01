@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 
-use common::error::Error;
+use common::result::Result;
 
 use crate::domain::publication::PublicationId;
 use crate::domain::reader::ReaderId;
@@ -12,7 +12,7 @@ pub struct Like {
 }
 
 impl Like {
-    pub fn new(reader_id: ReaderId, publication_id: PublicationId) -> Result<Like, Error> {
+    pub fn new(reader_id: ReaderId, publication_id: PublicationId) -> Result<Like> {
         Ok(Like {
             reader_id,
             publication_id,

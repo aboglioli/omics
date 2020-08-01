@@ -5,7 +5,8 @@ use async_trait::async_trait;
 use tokio::sync::Mutex;
 
 use crate::cache::Cache;
-use crate::error::Error;
+
+use crate::result::Result;
 
 pub struct InMemCache<K, V> {
     data: Mutex<HashMap<K, V>>,
@@ -55,13 +56,13 @@ impl<K: Hash + Eq + Send + Sync, V: Clone + Send + Sync> Cache<K, V> for InMemCa
         cache.get(k).cloned()
     }
 
-    async fn set(&self, k: K, v: V) -> Result<(), Error> {
+    async fn set(&self, k: K, v: V) -> Result<()> {
         let mut cache = self.data.lock().await;
         cache.insert(k, v);
         Ok(())
     }
 
-    async fn delete(&self, k: &K) -> Result<(), Error> {
+    async fn delete(&self, k: &K) -> Result<()> {
         let mut cache = self.data.lock().await;
         cache.remove(k);
         Ok(())

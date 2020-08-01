@@ -1,4 +1,4 @@
-use common::error::Error;
+use common::result::Result;
 
 use crate::domain::user::Fullname;
 
@@ -8,7 +8,7 @@ pub struct Person {
 }
 
 impl Person {
-    pub fn new(fullname: Fullname) -> Result<Person, Error> {
+    pub fn new(fullname: Fullname) -> Result<Person> {
         Ok(Person { fullname })
     }
 

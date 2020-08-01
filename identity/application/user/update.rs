@@ -1,5 +1,5 @@
-use common::error::Error;
 use common::event::{EventPublisher, ToEvent};
+use common::result::Result;
 
 use crate::domain::user::{Fullname, Person, UserEvent, UserId, UserRepository};
 
@@ -9,7 +9,7 @@ pub struct UpdateCommand {
 }
 
 impl UpdateCommand {
-    pub fn validate(&self) -> Result<(), Error> {
+    pub fn validate(&self) -> Result<()> {
         Ok(())
     }
 }
@@ -31,7 +31,7 @@ where
         }
     }
 
-    pub async fn exec(&self, user_id: &UserId, cmd: UpdateCommand) -> Result<(), Error> {
+    pub async fn exec(&self, user_id: &UserId, cmd: UpdateCommand) -> Result<()> {
         cmd.validate()?;
 
         let mut user = self.user_repo.find_by_id(&user_id).await?;

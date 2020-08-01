@@ -1,4 +1,4 @@
-use common::error::Error;
+use common::result::Result;
 
 use crate::domain::user::{UserId, UserRepository};
 use crate::domain::validation::{ValidationCode, ValidationRepository};
@@ -20,11 +20,7 @@ where
         }
     }
 
-    pub async fn exec(
-        &self,
-        user_id: &UserId,
-        validation_code: &ValidationCode,
-    ) -> Result<(), Error> {
+    pub async fn exec(&self, user_id: &UserId, validation_code: &ValidationCode) -> Result<()> {
         let mut user = self.user_repo.find_by_id(user_id).await?;
         let mut validation = self.validation_repo.find_by_code(validation_code).await?;
         validation.validate_user(&mut user, validation_code)?;

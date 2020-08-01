@@ -1,4 +1,5 @@
 use common::error::Error;
+use common::result::Result;
 
 #[derive(Debug, Clone)]
 pub struct Email {
@@ -6,7 +7,7 @@ pub struct Email {
 }
 
 impl Email {
-    pub fn new(email: &str) -> Result<Email, Error> {
+    pub fn new(email: &str) -> Result<Email> {
         if email.len() < 4 {
             return Err(Error::application()
                 .add_context("email", "too_short")

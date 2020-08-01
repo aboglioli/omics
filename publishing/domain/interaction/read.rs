@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 
-use common::error::Error;
+use common::result::Result;
 
 use crate::domain::publication::PublicationId;
 use crate::domain::reader::ReaderId;
@@ -12,7 +12,7 @@ pub struct Read {
 }
 
 impl Read {
-    pub fn new(reader_id: ReaderId, publication_id: PublicationId) -> Result<Read, Error> {
+    pub fn new(reader_id: ReaderId, publication_id: PublicationId) -> Result<Read> {
         Ok(Read {
             reader_id,
             publication_id,

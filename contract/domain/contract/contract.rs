@@ -1,6 +1,7 @@
 use common::error::Error;
 use common::event::BasicEvent;
 use common::model::{AggregateRoot, StatusHistory};
+use common::result::Result;
 
 use crate::domain::contract::ContractStatus;
 use crate::domain::publication::PublicationId;
@@ -16,7 +17,7 @@ pub struct Contract {
 }
 
 impl Contract {
-    pub fn new(id: ContractId, publication_id: PublicationId) -> Result<Contract, Error> {
+    pub fn new(id: ContractId, publication_id: PublicationId) -> Result<Contract> {
         Ok(Contract {
             base: AggregateRoot::new(id),
             publication_id,
@@ -41,7 +42,7 @@ impl Contract {
         &self.summaries
     }
 
-    pub fn approve(&mut self) -> Result<(), Error> {
+    pub fn approve(&mut self) -> Result<()> {
         if self.status().is_current(|s| match s {
             ContractStatus::Requested => true,
             _ => false,
@@ -52,7 +53,7 @@ impl Contract {
         Err(Error::application())
     }
 
-    pub fn reject(&mut self) -> Result<(), Error> {
+    pub fn reject(&mut self) -> Result<()> {
         if self.status.is_current(|s| match s {
             ContractStatus::Requested => true,
             _ => false,
@@ -63,7 +64,7 @@ impl Contract {
         Err(Error::application())
     }
 
-    pub fn request(&mut self) -> Result<(), Error> {
+    pub fn request(&mut self) -> Result<()> {
         if self.status.is_current(|s| match s {
             ContractStatus::Requested | ContractStatus::Cancelled => true,
             _ => false,
@@ -74,7 +75,7 @@ impl Contract {
         Err(Error::application())
     }
 
-    pub fn cancel(&mut self) -> Result<(), Error> {
+    pub fn cancel(&mut self) -> Result<()> {
         if self.status.is_current(|s| match s {
             ContractStatus::Requested | ContractStatus::Approved => true,
             _ => false,

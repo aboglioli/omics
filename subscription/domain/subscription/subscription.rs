@@ -1,11 +1,11 @@
 use chrono::{DateTime, Utc};
 
-use common::error::Error;
 use common::event::BasicEvent;
 use common::model::{AggregateRoot, StatusHistory};
+use common::result::Result;
 
 use crate::domain::plan::PlanId;
-use crate::domain::subscription::{SubscriptionPayment, SubscriptionPlan, SubscriptionStatus};
+use crate::domain::subscription::{SubscriptionPlan, SubscriptionStatus};
 use crate::domain::user::UserId;
 
 pub type SubscriptionId = String;
@@ -16,15 +16,11 @@ pub struct Subscription {
     user_id: UserId,
     plan: SubscriptionPlan,
     status: StatusHistory<SubscriptionStatus, String>,
-    payments: Vec<SubscriptionPayment>,
+    payments: Vec<String>,
 }
 
 impl Subscription {
-    pub fn new(
-        id: SubscriptionId,
-        user_id: UserId,
-        plan_id: PlanId,
-    ) -> Result<Subscription, Error> {
+    pub fn new(id: SubscriptionId, user_id: UserId, plan_id: PlanId) -> Result<Subscription> {
         Ok(Subscription {
             base: AggregateRoot::new(id),
             subscribed_at: Utc::now(),
@@ -55,12 +51,16 @@ impl Subscription {
         &self.status
     }
 
-    pub fn confirm_plan(&mut self) -> Result<(), Error> {
+    pub fn payments(&self) -> &[String] {
+        &self.payments
+    }
+
+    pub fn confirm_plan(&mut self) -> Result<()> {
         self.plan = self.plan.confirm()?;
         Ok(())
     }
 
-    pub fn change_plan(&mut self, plan_id: PlanId) -> Result<(), Error> {
+    pub fn change_plan(&mut self, plan_id: PlanId) -> Result<()> {
         self.plan = SubscriptionPlan::new(plan_id)?;
         Ok(())
     }

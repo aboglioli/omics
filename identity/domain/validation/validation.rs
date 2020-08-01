@@ -3,6 +3,7 @@ use uuid::Uuid;
 use common::error::Error;
 use common::event::BasicEvent;
 use common::model::AggregateRoot;
+use common::result::Result;
 
 use crate::domain::user::{User, UserId};
 
@@ -15,7 +16,7 @@ pub struct Validation {
 }
 
 impl Validation {
-    pub fn new(code: ValidationCode, user_id: UserId) -> Result<Validation, Error> {
+    pub fn new(code: ValidationCode, user_id: UserId) -> Result<Validation> {
         let _uuid = Uuid::new_v4();
         Ok(Validation {
             base: AggregateRoot::new(code),
@@ -36,7 +37,7 @@ impl Validation {
         self.used
     }
 
-    pub fn validate_user(&mut self, user: &mut User, code: &ValidationCode) -> Result<(), Error> {
+    pub fn validate_user(&mut self, user: &mut User, code: &ValidationCode) -> Result<()> {
         if self.used {
             return Err(Error::application());
         }
@@ -58,7 +59,7 @@ mod tests {
     use crate::infrastructure::mocks;
 
     #[test]
-    fn create() -> Result<(), Error> {
+    fn create() -> Result<()> {
         let user = mocks::user1()?;
         let v = Validation::new(ValidationCode::from("cod47"), user.base().id()).unwrap();
         assert!(!v.base().id().is_empty());

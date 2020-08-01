@@ -1,6 +1,6 @@
-use common::error::Error;
 use common::event::BasicEvent;
 use common::model::AggregateRoot;
+use common::result::Result;
 
 use crate::domain::user::PaymentMethod;
 
@@ -13,11 +13,23 @@ pub struct User {
 }
 
 impl User {
-    pub fn new(id: UserId, name: &str) -> Result<User, Error> {
+    pub fn new(id: UserId, name: &str) -> Result<User> {
         Ok(User {
             base: AggregateRoot::new(id),
             name: name.to_owned(),
             payment_methods: Vec::new(),
         })
+    }
+
+    pub fn base(&self) -> &AggregateRoot<UserId, BasicEvent> {
+        &self.base
+    }
+
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn payment_methods(&self) -> &[PaymentMethod] {
+        &self.payment_methods
     }
 }

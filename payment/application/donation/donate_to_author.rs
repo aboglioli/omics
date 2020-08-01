@@ -19,7 +19,7 @@ impl DonateToAuthor {
         }
     }
 
-    pub fn execute(&self, cmd: DonateCommand) -> Result<(), Error> {
+    pub fn execute(&self, cmd: DonateCommand) -> Result<()> {
         let _ = Donation::new(
             self.donation_repository.next_id()?,
             UserId::from(cmd.issuer_id),

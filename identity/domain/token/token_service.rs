@@ -1,5 +1,6 @@
 use crate::domain::token::{Data, Token, TokenEncoder, TokenId, TokenRepository};
 use common::error::Error;
+use common::result::Result;
 
 pub struct TokenService<'a, TRepo, TEnc> {
     token_repository: &'a TRepo,
@@ -14,7 +15,7 @@ impl<'a, TRepo: TokenRepository, TEnc: TokenEncoder> TokenService<'a, TRepo, TEn
         }
     }
 
-    pub async fn create(&self, data: Data) -> Result<Token, Error> {
+    pub async fn create(&self, data: Data) -> Result<Token> {
         let token_id = TokenId::new();
         let token = self.token_encoder.encode(&token_id)?;
         self.token_repository.set(token_id, data).await?;
@@ -22,7 +23,7 @@ impl<'a, TRepo: TokenRepository, TEnc: TokenEncoder> TokenService<'a, TRepo, TEn
         Ok(token)
     }
 
-    pub async fn validate(&self, token: &Token) -> Result<Data, Error> {
+    pub async fn validate(&self, token: &Token) -> Result<Data> {
         let token_id = self.token_encoder.decode(token)?;
         if let Some(data) = self.token_repository.get(&token_id).await {
             return Ok(data);
@@ -30,7 +31,7 @@ impl<'a, TRepo: TokenRepository, TEnc: TokenEncoder> TokenService<'a, TRepo, TEn
         Err(Error::application().set_code("token_not_found").build())
     }
 
-    pub async fn invalidate(&self, token: &Token) -> Result<(), Error> {
+    pub async fn invalidate(&self, token: &Token) -> Result<()> {
         let token_id = self.token_encoder.decode(token)?;
         self.token_repository.delete(&token_id).await?;
         Ok(())
@@ -45,7 +46,7 @@ mod tests {
     use crate::infrastructure::persistence::inmem::InMemTokenRepository;
 
     #[tokio::test]
-    async fn create() -> Result<(), Error> {
+    async fn create() -> Result<()> {
         let enc = FakeTokenEncoder::new();
         let repo = InMemTokenRepository::new();
         let serv = TokenService::new(&repo, &enc);

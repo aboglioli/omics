@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 
 use common::error::Error;
+use common::result::Result;
 
 use crate::domain::role::{Role, RoleId, RoleRepository};
 
@@ -14,7 +15,7 @@ impl InMemRoleRepository {
 
 #[async_trait]
 impl RoleRepository for InMemRoleRepository {
-    async fn get_by_code(&self, code: &RoleId) -> Result<Role, Error> {
+    async fn get_by_code(&self, code: &RoleId) -> Result<Role> {
         if code == "user" {
             return Ok(Role::new(code.clone(), "User")?);
         }
