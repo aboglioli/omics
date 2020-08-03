@@ -10,6 +10,7 @@ mod provider;
 mod user;
 mod user_repository;
 mod username;
+mod validation;
 
 pub use self::identity::*;
 pub use auth_service::*;
@@ -23,3 +24,4 @@ pub use provider::*;
 pub use user::*;
 pub use user_repository::*;
 pub use username::*;
+pub use validation::*;

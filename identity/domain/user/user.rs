@@ -1,8 +1,9 @@
+use common::error::Error;
 use common::model::AggregateRoot;
 use common::result::Result;
 
 use crate::domain::role::RoleId;
-use crate::domain::user::{Identity, Password, Person, UserEvent};
+use crate::domain::user::{Identity, Password, Person, UserEvent, Validation, ValidationCode};
 
 // User
 pub type UserId = String;
@@ -13,7 +14,7 @@ pub struct User {
     identity: Identity,
     person: Option<Person>,
     role_id: RoleId,
-    validated: bool,
+    validation: Validation,
 }
 
 impl User {
@@ -23,7 +24,7 @@ impl User {
             identity,
             person: None,
             role_id,
-            validated: false,
+            validation: Validation::new()?,
         })
     }
 
@@ -43,12 +44,16 @@ impl User {
         &self.role_id
     }
 
+    pub fn validation(&self) -> &Validation {
+        &self.validation
+    }
+
     pub fn is_validated(&self) -> bool {
-        self.validated
+        self.validation.validated()
     }
 
     pub fn is_active(&self) -> bool {
-        self.base.deleted_at().is_none() && self.validated
+        self.base.deleted_at().is_none() && self.is_validated()
     }
 
     pub fn set_password(&mut self, password: Password) -> Result<()> {
@@ -65,8 +70,13 @@ impl User {
         self.role_id = role_id
     }
 
-    pub fn validate(&mut self) {
-        self.validated = true;
+    pub fn validate(&mut self, code: &ValidationCode) -> Result<()> {
+        if self.is_validated() {
+            return Err(Error::pair("user", "already_validated"));
+        }
+
+        self.validation = self.validation.validate(code)?;
+        Ok(())
     }
 }
 
@@ -93,5 +103,33 @@ mod tests {
         assert_eq!(user.base().id(), "user123");
         assert_eq!(user.identity().username().value(), "user1");
         assert_eq!(user.identity().email().value(), "email@user.com");
+    }
+
+    #[test]
+    fn validate() {
+        let mut user = User::new(
+            UserId::from("user123"),
+            Identity::new(
+                Provider::Local,
+                Username::new("user1").unwrap(),
+                Email::new("email@user.com").unwrap(),
+                Some(Password::new(&format!("{:X>50}", "2")).unwrap()),
+            )
+            .unwrap(),
+            RoleId::from("user"),
+        )
+        .unwrap();
+
+        assert_eq!(user.is_validated(), false);
+        assert_eq!(user.is_active(), false);
+
+        let code = user.validation().code().clone();
+
+        assert!(user.validate(&code).is_ok());
+
+        assert_eq!(user.is_validated(), true);
+        assert_eq!(user.is_active(), true);
+
+        assert!(user.validate(&code).is_err());
     }
 }
