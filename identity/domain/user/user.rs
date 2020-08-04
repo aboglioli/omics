@@ -14,7 +14,7 @@ pub struct User {
     identity: Identity,
     person: Option<Person>,
     role_id: RoleId,
-    validation: Validation,
+    validation: Option<Validation>,
 }
 
 impl User {
@@ -24,7 +24,7 @@ impl User {
             identity,
             person: None,
             role_id,
-            validation: Validation::new()?,
+            validation: Some(Validation::new()?),
         })
     }
 
@@ -44,12 +44,12 @@ impl User {
         &self.role_id
     }
 
-    pub fn validation(&self) -> &Validation {
-        &self.validation
+    pub fn validation(&self) -> Option<&Validation> {
+        self.validation.as_ref()
     }
 
     pub fn is_validated(&self) -> bool {
-        self.validation.validated()
+        self.validation.is_none()
     }
 
     pub fn is_active(&self) -> bool {
@@ -75,7 +75,21 @@ impl User {
             return Err(Error::pair("user", "already_validated"));
         }
 
-        self.validation = self.validation.validate(code)?;
+        self.validation = match self.validation.take() {
+            Some(validation) => {
+                if validation.validate(code) {
+                    None
+                } else {
+                    Some(validation)
+                }
+            }
+            None => None,
+        };
+
+        if !self.is_validated() {
+            return Err(Error::pair("validation", "invalid"));
+        }
+
         Ok(())
     }
 }
@@ -120,16 +134,19 @@ mod tests {
         )
         .unwrap();
 
-        assert_eq!(user.is_validated(), false);
-        assert_eq!(user.is_active(), false);
+        assert!(!user.is_validated());
+        assert!(!user.is_active());
+        assert!(user.validation().is_some());
 
-        let code = user.validation().code().clone();
+        let code = user.validation().unwrap().code().clone();
 
         assert!(user.validate(&code).is_ok());
 
-        assert_eq!(user.is_validated(), true);
-        assert_eq!(user.is_active(), true);
+        assert!(user.is_validated());
+        assert!(user.is_active());
+        assert!(user.validation().is_none());
 
         assert!(user.validate(&code).is_err());
+        assert!(user.validation().is_none());
     }
 }

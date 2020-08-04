@@ -33,6 +33,11 @@ impl Error {
         }
     }
 
+    // TODO: create app errors with code and message
+    // pub fn new(k: &str, v: &str) -> Error {
+    //     Error::pair(k, v)
+    // }
+
     pub fn pair(k: &str, v: &str) -> Error {
         Error::application().add_context(k, v).build()
     }
