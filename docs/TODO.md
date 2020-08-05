@@ -1,6 +1,5 @@
 # All
 
-x Pass Entity IDs to make relation through constructors in Aggregates instead
-of whole Entity.
-- Error handling. Custom errors.
-- API
+- [x] Consider custom Errors as application errors (except raw errors).
+- [x] Rename Error::pair to Error::new(k, v).
+- [ ] Rename interaction/Read to interaction/Reading.

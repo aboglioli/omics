@@ -8,7 +8,7 @@ pub struct Amount {
 impl Amount {
     pub fn new(amount: f64) -> Result<Amount> {
         if amount < 0.0 {
-            return Err(Error::application());
+            return Err(Error::new("amount", "negative"));
         }
 
         Ok(Amount { amount })

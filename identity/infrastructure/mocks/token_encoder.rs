@@ -17,7 +17,7 @@ impl TokenEncoder for FakeTokenEncoder {
 
     fn decode(&self, token: &Token) -> Result<TokenId> {
         if !token.token().starts_with("<<token::") {
-            return Err(Error::internal());
+            return Err(Error::internal("token_encoder", "cannot_decode"));
         }
 
         Ok(TokenId::from(token.token().split_at(9).1))

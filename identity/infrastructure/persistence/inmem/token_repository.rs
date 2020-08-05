@@ -39,10 +39,8 @@ impl TokenRepository for InMemTokenRepository {}
 mod tests {
     use super::*;
 
-    use common::error::Error;
-
     #[tokio::test]
-    async fn test() -> Result<()> {
+    async fn test() {
         fn check_trait_impl<T: TokenRepository>(_repo: &T) {}
 
         let repo = InMemTokenRepository::new();
@@ -54,10 +52,7 @@ mod tests {
         repo.set(TokenId::from("T123"), data.clone()).await.unwrap();
         repo.set(TokenId::from("T124"), data.clone()).await.unwrap();
 
-        let saved_data = repo
-            .get(&TokenId::from("T123"))
-            .await
-            .ok_or(Error::internal())?;
+        let saved_data = repo.get(&TokenId::from("T123")).await.unwrap();
         assert!(saved_data.get("user_id").is_some());
         assert_eq!(data.get("user_id"), saved_data.get("user_id"));
 
@@ -66,7 +61,5 @@ mod tests {
 
         assert!(repo.delete(&TokenId::from("T123")).await.is_ok());
         assert!(repo.get(&TokenId::from("T124")).await.is_some());
-
-        Ok(())
     }
 }

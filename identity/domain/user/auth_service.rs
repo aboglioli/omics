@@ -32,7 +32,7 @@ where
     }
 
     pub async fn authenticate(&self, username_or_email: &str, password: &str) -> Result<Token> {
-        let mut err = Error::pair("credentials", "invalid");
+        let mut err = Error::new("credentials", "invalid");
 
         let user = self
             .user_repo
@@ -58,7 +58,7 @@ where
 
             return Ok(token);
         }
-        Err(Error::application().set_code("invalid_credentials").build())
+        Err(err)
     }
 
     pub async fn authorize(&self, token: &Token) -> Result<User> {
@@ -67,11 +67,11 @@ where
             let user = self.user_repo.find_by_id(user_id).await?;
             return Ok(user);
         }
-        Err(Error::application())
+        Err(Error::new("authorization", "unauthorized"))
     }
 
     pub async fn available(&self, username: &str, email: &str) -> Result<bool> {
-        let mut err = Error::application();
+        let mut err = Error::new("identity", "invalid");
         if self
             .user_repo
             .find_by_username(&Username::new(username)?)
@@ -106,11 +106,11 @@ where
 
         let user_password = match user.identity().password() {
             Some(password) => password.value(),
-            None => return Err(Error::pair("password", "unavailable")),
+            None => return Err(Error::new("password", "unavailable")),
         };
 
         if !self.password_hasher.compare(user_password, old_password) {
-            return Err(Error::application().set_code("invalid_password").build());
+            return Err(Error::new("password", "invalid"));
         }
 
         let hashed_password = self.password_hasher.hash(new_password)?;

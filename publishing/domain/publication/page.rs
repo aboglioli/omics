@@ -64,8 +64,8 @@ impl Frame {
         })
     }
 
-    pub fn order(&self) -> &u32 {
-        &self.order
+    pub fn order(&self) -> u32 {
+        self.order
     }
 
     pub fn position(&self) -> &Position {
@@ -107,8 +107,8 @@ impl Image {
         &self.url
     }
 
-    pub fn size(&self) -> &u32 {
-        &self.size
+    pub fn size(&self) -> u32 {
+        self.size
     }
 
     pub fn frames(&self) -> &[Frame] {
@@ -182,8 +182,8 @@ mod tests {
         image.set_frames(frames).unwrap();
 
         assert_eq!(image.frames().len(), 3);
-        assert_eq!(image.frames()[0].order(), &0);
-        assert_eq!(image.frames()[1].order(), &1);
-        assert_eq!(image.frames()[2].order(), &2);
+        assert_eq!(image.frames()[0].order(), 0);
+        assert_eq!(image.frames()[1].order(), 1);
+        assert_eq!(image.frames()[2].order(), 2);
     }
 }

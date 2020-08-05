@@ -19,7 +19,7 @@ impl RoleRepository for InMemRoleRepository {
         if code == "user" {
             return Ok(Role::new(code.clone(), "User")?);
         }
-        Err(Error::internal())
+        Err(Error::new("role", "not_found"))
     }
 }
 

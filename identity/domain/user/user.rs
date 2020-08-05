@@ -72,7 +72,7 @@ impl User {
 
     pub fn validate(&mut self, code: &ValidationCode) -> Result<()> {
         if self.is_validated() {
-            return Err(Error::pair("user", "already_validated"));
+            return Err(Error::new("user", "already_validated"));
         }
 
         self.validation = match self.validation.take() {
@@ -87,7 +87,7 @@ impl User {
         };
 
         if !self.is_validated() {
-            return Err(Error::pair("validation", "invalid"));
+            return Err(Error::new("validation", "not_validated"));
         }
 
         Ok(())

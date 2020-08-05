@@ -8,7 +8,7 @@ pub struct Name {
 impl Name {
     pub fn new(name: &str) -> Result<Name> {
         if name.len() < 4 {
-            return Err(Error::application().set_code("name_short").build());
+            return Err(Error::new("name", "too_short"));
         }
 
         Ok(Name {

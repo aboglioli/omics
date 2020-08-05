@@ -18,6 +18,7 @@ pub struct Publication {
     category_id: CategoryId,
     tags: Vec<Tag>,
     status: StatusHistory<PublicationStatus, String>,
+    contract: bool,
 }
 
 impl Publication {
@@ -33,11 +34,12 @@ impl Publication {
             name,
             synopsis,
             author_id,
-            statistics: Statistics::new(),
+            statistics: Statistics::default(),
             pages: Vec::new(),
             category_id,
             tags: Vec::new(),
-            status: StatusHistory::init(PublicationStatus::Draft),
+            status: StatusHistory::new(PublicationStatus::Draft),
+            contract: false,
         })
     }
 
@@ -77,6 +79,10 @@ impl Publication {
         &self.status
     }
 
+    pub fn has_contract(&self) -> bool {
+        self.contract
+    }
+
     pub fn set_name(&mut self, name: Name) -> Result<()> {
         self.name = name;
         Ok(())
@@ -97,8 +103,23 @@ impl Publication {
         Ok(())
     }
 
+    pub fn set_cateogry(&mut self, category_id: CategoryId) -> Result<()> {
+        self.category_id = category_id;
+        Ok(())
+    }
+
     pub fn set_tags(&mut self, tags: Vec<Tag>) -> Result<()> {
         self.tags = tags;
+        Ok(())
+    }
+
+    pub fn add_contract(&mut self) -> Result<()> {
+        self.contract = true;
+        Ok(())
+    }
+
+    pub fn remove_contract(&mut self) -> Result<()> {
+        self.contract = false;
         Ok(())
     }
 }

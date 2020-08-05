@@ -17,7 +17,7 @@ impl Role {
     pub fn new(code: RoleId, name: &str) -> Result<Role> {
         Ok(Role {
             base: AggregateRoot::new(code),
-            name: String::from(name),
+            name: name.to_owned(),
             permissions: Vec::new(),
         })
     }

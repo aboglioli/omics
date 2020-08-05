@@ -30,7 +30,9 @@ impl EventPublisher for InMemEventBus {
             if let Ok(re) = Regex::new(handler.topic()) {
                 if re.is_match(event.topic()) {
                     if let Err(err) = handler.handle(&event).await {
-                        return Err(Error::internal().wrap(err).build());
+                        return Err(Error::internal("event_publisher", "handler_error")
+                            .wrap(err)
+                            .build());
                     }
                 }
             } else {

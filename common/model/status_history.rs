@@ -8,7 +8,7 @@ pub struct StatusItem<S, M> {
 }
 
 impl<S, M> StatusItem<S, M> {
-    pub fn new(status: S) -> Self {
+    fn new(status: S) -> Self {
         StatusItem {
             date: Utc::now(),
             meta: None,
@@ -16,7 +16,7 @@ impl<S, M> StatusItem<S, M> {
         }
     }
 
-    pub fn new_with_meta(status: S, meta: M) -> Self {
+    fn new_with_meta(status: S, meta: M) -> Self {
         StatusItem {
             date: Utc::now(),
             meta: Some(meta),
@@ -43,16 +43,10 @@ pub struct StatusHistory<S, M> {
 }
 
 impl<S, M> StatusHistory<S, M> {
-    pub fn new() -> Self {
+    pub fn new(status: S) -> Self {
         StatusHistory {
-            history: Vec::new(),
+            history: vec![StatusItem::new(status)],
         }
-    }
-
-    pub fn init(status: S) -> Self {
-        let mut sh = StatusHistory::new();
-        sh.add_status(status);
-        sh
     }
 
     pub fn add_status(&mut self, status: S) {
@@ -88,55 +82,58 @@ mod tests {
 
     #[derive(Debug, PartialEq)]
     enum Status {
+        Init,
         Open,
         Closed,
     }
 
     #[test]
     fn create() {
-        assert_eq!(StatusHistory::<Status, ()>::new().history().len(), 0);
-        assert!(StatusHistory::<Status, ()>::new().current().is_none());
+        assert_eq!(StatusHistory::<_, ()>::new(Status::Init).history().len(), 1);
+        assert!(StatusHistory::<_, ()>::new(Status::Init)
+            .current()
+            .is_some());
 
-        let mut sh: StatusHistory<_, ()> = StatusHistory::new();
+        let mut sh: StatusHistory<_, ()> = StatusHistory::new(Status::Init);
         sh.add_status(Status::Open);
         sh.add_status(Status::Closed);
         sh.add_status(Status::Open);
+        assert_eq!(sh.history().len(), 4);
+        assert_eq!(sh.current().unwrap().status(), &Status::Open);
 
-        assert_eq!(sh.history().len(), 3);
-
-        let sh: StatusHistory<_, ()> = StatusHistory::init(Status::Open);
+        let sh: StatusHistory<_, ()> = StatusHistory::new(Status::Open);
         assert_eq!(sh.history().len(), 1);
         assert_eq!(sh.current().unwrap().status(), &Status::Open);
     }
 
     #[test]
     fn history() {
-        let mut sh: StatusHistory<_, ()> = StatusHistory::new();
+        let mut sh: StatusHistory<_, ()> = StatusHistory::new(Status::Init);
         sh.add_status(Status::Open);
         sh.add_status(Status::Closed);
         sh.add_status(Status::Open);
         sh.add_status(Status::Closed);
-
         assert_eq!(sh.current().unwrap().status(), &Status::Closed);
     }
 
     #[test]
     fn meta() {
-        let mut sh = StatusHistory::new();
+        let mut sh = StatusHistory::new(Status::Init);
         sh.add_status(Status::Open);
         sh.add_status_with_meta(Status::Closed, "invalid");
         sh.add_status_with_meta(Status::Open, "revalid");
 
         let history = sh.history();
-        assert_eq!(history.len(), 3);
+        assert_eq!(history.len(), 4);
         assert!(history[0].meta().is_none());
-        assert_eq!(history[1].meta().unwrap(), &"invalid");
-        assert_eq!(history[2].meta().unwrap(), &"revalid");
+        assert!(history[1].meta().is_none());
+        assert_eq!(history[2].meta().unwrap(), &"invalid");
+        assert_eq!(history[3].meta().unwrap(), &"revalid");
     }
 
     #[test]
     fn compare() {
-        let mut sh = StatusHistory::new();
+        let mut sh = StatusHistory::new(Status::Init);
         sh.add_status(Status::Open);
         sh.add_status_with_meta(Status::Closed, "invalid");
         sh.add_status_with_meta(Status::Open, "revalid");

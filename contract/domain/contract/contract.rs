@@ -21,7 +21,7 @@ impl Contract {
         Ok(Contract {
             base: AggregateRoot::new(id),
             publication_id,
-            status: StatusHistory::init(ContractStatus::Requested),
+            status: StatusHistory::new(ContractStatus::Requested),
             summaries: Vec::new(),
         })
     }
@@ -50,7 +50,7 @@ impl Contract {
             self.status.add_status(ContractStatus::Approved);
             return Ok(());
         }
-        Err(Error::application())
+        Err(Error::new("contract", "cannot_be_approved"))
     }
 
     pub fn reject(&mut self) -> Result<()> {
@@ -61,7 +61,7 @@ impl Contract {
             self.status.add_status(ContractStatus::Rejected);
             return Ok(());
         }
-        Err(Error::application())
+        Err(Error::new("contract", "cannto_be_rejected"))
     }
 
     pub fn request(&mut self) -> Result<()> {
@@ -72,7 +72,7 @@ impl Contract {
             self.status.add_status(ContractStatus::Requested);
             return Ok(());
         }
-        Err(Error::application())
+        Err(Error::new("contract", "cannot_be_requested"))
     }
 
     pub fn cancel(&mut self) -> Result<()> {
@@ -83,6 +83,6 @@ impl Contract {
             self.status.add_status(ContractStatus::Cancelled);
             return Ok(());
         }
-        Err(Error::application())
+        Err(Error::new("contract", "cannot_be_cancelled"))
     }
 }

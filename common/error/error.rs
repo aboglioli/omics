@@ -9,11 +9,20 @@ pub enum ErrorKind {
     Application,
 }
 
+impl ToString for ErrorKind {
+    fn to_string(&self) -> String {
+        match self {
+            ErrorKind::Internal => "internal".to_owned(),
+            ErrorKind::Application => "application".to_owned(),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Error {
     kind: ErrorKind,
-    code: Option<String>,
-    path: Option<String>,
+    path: String,
+    code: String,
     status: Option<i32>,
     message: Option<String>,
     context: HashMap<String, String>,
@@ -21,11 +30,11 @@ pub struct Error {
 }
 
 impl Error {
-    fn new(kind: ErrorKind) -> Error {
+    pub fn new(path: &str, code: &str) -> Error {
         Error {
-            kind,
-            code: None,
-            path: None,
+            kind: ErrorKind::Application,
+            path: path.to_owned(),
+            code: code.to_owned(),
             status: None,
             message: None,
             context: HashMap::new(),
@@ -33,33 +42,28 @@ impl Error {
         }
     }
 
-    // TODO: create app errors with code and message
-    // pub fn new(k: &str, v: &str) -> Error {
-    //     Error::pair(k, v)
-    // }
-
-    pub fn pair(k: &str, v: &str) -> Error {
-        Error::application().add_context(k, v).build()
-    }
-
-    pub fn internal() -> Error {
-        Error::new(ErrorKind::Internal)
-    }
-
-    pub fn application() -> Error {
-        Error::new(ErrorKind::Application)
+    pub fn internal(path: &str, code: &str) -> Error {
+        Error {
+            kind: ErrorKind::Internal,
+            path: path.to_owned(),
+            code: code.to_owned(),
+            status: None,
+            message: None,
+            context: HashMap::new(),
+            cause: None,
+        }
     }
 
     pub fn kind(&self) -> &ErrorKind {
         &self.kind
     }
 
-    pub fn code(&self) -> Option<&String> {
-        self.code.as_ref()
+    pub fn code(&self) -> &str {
+        &self.code
     }
 
-    pub fn path(&self) -> Option<&String> {
-        self.path.as_ref()
+    pub fn path(&self) -> &str {
+        &self.path
     }
 
     pub fn status(&self) -> Option<&i32> {
@@ -85,13 +89,13 @@ impl Error {
         }
     }
 
-    pub fn set_code(&mut self, code: &str) -> &mut Error {
-        self.code = Some(String::from(code));
+    pub fn set_path(&mut self, path: &str) -> &mut Error {
+        self.path = path.to_owned();
         self
     }
 
-    pub fn set_path(&mut self, path: &str) -> &mut Error {
-        self.path = Some(String::from(path));
+    pub fn set_code(&mut self, code: &str) -> &mut Error {
+        self.code = code.to_owned();
         self
     }
 
@@ -101,12 +105,12 @@ impl Error {
     }
 
     pub fn set_message(&mut self, message: &str) -> &mut Error {
-        self.message = Some(String::from(message));
+        self.message = Some(message.to_owned());
         self
     }
 
     pub fn add_context(&mut self, k: &str, v: &str) -> &mut Error {
-        self.context.insert(String::from(k), String::from(v));
+        self.context.insert(k.to_owned(), v.to_owned());
         self
     }
 
@@ -116,12 +120,21 @@ impl Error {
     }
 
     pub fn wrap_raw<E: error::Error>(&mut self, err: E) -> &mut Error {
-        let err = Error::internal().set_message(&err.to_string()).build();
+        let err = Error {
+            kind: ErrorKind::Internal,
+            path: "".to_owned(),
+            code: "raw".to_owned(),
+            status: None,
+            message: Some(err.to_string()),
+            context: HashMap::new(),
+            cause: None,
+        };
         self.cause = Some(Box::new(err));
         self
     }
 
     pub fn merge(&mut self, err: Error) -> &mut Error {
+        self.add_context(err.path(), err.code());
         self.context.extend(err.context);
         self
     }
@@ -154,29 +167,20 @@ mod tests {
 
     #[test]
     fn basic() {
-        let err = Error::internal()
-            .set_code("code")
+        let err = Error::new("my.path", "code")
             .set_message("message")
-            .set_path("my.path")
             .set_status(404)
             .add_context("k1", "v1")
             .add_context("k2", "v2")
             .add_context("k2", "v3")
             .build();
-        assert_eq!(err.code().unwrap(), "code");
+        assert_eq!(err.code(), "code");
         assert_eq!(err.message().unwrap(), "message");
-        assert_eq!(err.path().unwrap(), "my.path");
+        assert_eq!(err.path(), "my.path");
         assert_eq!(err.status().unwrap(), &404);
         assert_eq!(err.context().len(), 2);
         assert_eq!(err.context().get("k1").unwrap(), "v1");
         assert_eq!(err.context().get("k2").unwrap(), "v3");
-    }
-
-    #[test]
-    fn pair() {
-        let err = Error::pair("property", "error_code");
-        assert_eq!(err.context().len(), 1);
-        assert_eq!(err.context().get("property").unwrap(), "error_code");
     }
 
     #[derive(Debug, Clone)]
@@ -197,11 +201,10 @@ mod tests {
         let raw_err = StringError {
             error: "raw_err".to_owned(),
         };
-        let inner_err = Error::internal()
-            .set_code("inner")
+        let inner_err = Error::new("inner", "inner")
             .wrap_raw(raw_err.clone())
             .build();
-        let outer_err = Error::application()
+        let outer_err = Error::new("outer", "outer")
             .set_code("outer")
             .wrap(inner_err.build())
             .build();
@@ -215,20 +218,22 @@ mod tests {
 
     #[test]
     fn merge() {
-        let mut err1 = Error::internal().set_code("err1").build();
+        let mut err1 = Error::internal("err1", "err1");
         err1.add_context("e1-key1", "value1");
         err1.add_context("e1-key2", "value2");
 
-        let mut err2 = Error::internal().set_code("err2").build();
+        let mut err2 = Error::internal("err2", "err2");
         err2.add_context("e2-key", "value");
         err2.merge(err1);
 
-        let mut err3 = Error::application().set_code("err3").build();
+        let mut err3 = Error::new("err3", "err3");
         err3.add_context("e1-key1", "value");
         err3.add_context("e3-key", "value");
         err3.merge(err2);
 
-        assert_eq!(err3.context().len(), 4);
+        assert_eq!(err3.context().len(), 6);
+        assert_eq!(err3.context().get("err1"), Some(&"err1".to_owned()));
+        assert_eq!(err3.context().get("err2"), Some(&"err2".to_owned()));
         assert_eq!(err3.context().get("e1-key1"), Some(&"value1".to_owned()));
         assert_eq!(err3.context().get("e1-key2"), Some(&"value2".to_owned()));
         assert_eq!(err3.context().get("e2-key"), Some(&"value".to_owned()));

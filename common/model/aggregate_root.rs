@@ -12,7 +12,7 @@ pub struct BasicEvent;
 
 impl ToEvent for BasicEvent {
     fn to_event(&self) -> Result<Event> {
-        Err(Error::internal().set_code("not_implemented").build())
+        Err(Error::internal("to_event", "not_implemented"))
     }
 }
 

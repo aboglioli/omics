@@ -28,7 +28,7 @@ impl<'a, TRepo: TokenRepository, TEnc: TokenEncoder> TokenService<'a, TRepo, TEn
         if let Some(data) = self.token_repository.get(&token_id).await {
             return Ok(data);
         }
-        Err(Error::application().set_code("token_not_found").build())
+        Err(Error::new("token", "not_found"))
     }
 
     pub async fn invalidate(&self, token: &Token) -> Result<()> {

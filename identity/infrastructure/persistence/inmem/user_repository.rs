@@ -54,8 +54,6 @@ impl UserRepository for InMemUserRepository {
 mod tests {
     use super::*;
 
-    use common::error::Error;
-
     use crate::domain::user::*;
     use crate::infrastructure::mocks;
 
@@ -87,7 +85,7 @@ mod tests {
         assert_eq!(user.base(), found_user.base());
         assert_eq!(changed_user.base(), found_user.base());
 
-        let changed_user_person = found_user.person().ok_or(Error::internal()).unwrap();
+        let changed_user_person = found_user.person().unwrap();
         assert_eq!(changed_user_person.fullname().name(), "Name");
         assert_eq!(changed_user_person.fullname().lastname(), "Lastname");
 

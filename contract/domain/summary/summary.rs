@@ -20,7 +20,7 @@ impl Summary {
         Ok(Summary {
             base: AggregateRoot::new(id),
             contract_id,
-            status: StatusHistory::init(SummaryStatus::Open),
+            status: StatusHistory::new(SummaryStatus::Open),
         })
     }
 
@@ -40,7 +40,7 @@ impl Summary {
             self.status.add_status(SummaryStatus::ReadyToPay);
             return Ok(());
         }
-        Err(Error::application())
+        Err(Error::new("summary", "invalid_status"))
     }
 
     pub fn pay(&mut self) -> Result<()> {
@@ -51,7 +51,7 @@ impl Summary {
             self.status.add_status(SummaryStatus::Paid);
             return Ok(());
         }
-        Err(Error::application())
+        Err(Error::new("summary", "invalid_status"))
     }
 
     pub fn cancel(&mut self) -> Result<()> {
@@ -62,7 +62,7 @@ impl Summary {
             self.status.add_status(SummaryStatus::Cancelled);
             return Ok(());
         }
-        Err(Error::application())
+        Err(Error::new("summary", "invalid_status"))
     }
 }
 

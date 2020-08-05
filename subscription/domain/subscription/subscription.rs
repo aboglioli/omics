@@ -26,7 +26,7 @@ impl Subscription {
             subscribed_at: Utc::now(),
             user_id,
             plan: SubscriptionPlan::new(plan_id)?,
-            status: StatusHistory::init(SubscriptionStatus::Active),
+            status: StatusHistory::new(SubscriptionStatus::Active),
             payments: Vec::new(),
         })
     }

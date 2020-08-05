@@ -2,10 +2,9 @@ use serde::Deserialize;
 
 use common::result::Result;
 
-use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
 use crate::domain::publication::{
-    Image, Name, Page, Publication, PublicationRepository, Synopsis, Tag,
+    Image, Name, Page, PublicationId, PublicationRepository, Synopsis, Tag,
 };
 
 #[derive(Deserialize)]
@@ -20,8 +19,7 @@ pub struct PageDto {
 }
 
 #[derive(Deserialize)]
-pub struct PublishCommand {
-    author_id: AuthorId,
+pub struct EditPublicationCommand {
     name: String,
     synopsis: String,
     pages: Vec<PageDto>,
@@ -29,29 +27,33 @@ pub struct PublishCommand {
     tags: Vec<String>,
 }
 
-impl PublishCommand {
+impl EditPublicationCommand {
     pub fn validate(&self) -> Result<()> {
         Ok(())
     }
 }
 
-pub struct Publish<'a, PRepo> {
+pub struct EditPublication<'a, PRepo> {
     publication_repo: &'a PRepo,
 }
 
-impl<'a, PRepo> Publish<'a, PRepo>
+impl<'a, PRepo> EditPublication<'a, PRepo>
 where
     PRepo: PublicationRepository,
 {
     pub fn new(publication_repo: &'a PRepo) -> Self {
-        Publish { publication_repo }
+        EditPublication { publication_repo }
     }
 
-    pub async fn exec(&self, cmd: PublishCommand) -> Result<()> {
+    pub async fn exec(&self, id: &PublicationId, cmd: EditPublicationCommand) -> Result<()> {
         cmd.validate()?;
 
+        let mut publication = self.publication_repo.find_by_id(id).await?;
+
         let name = Name::new(&cmd.name)?;
+        publication.set_name(name)?;
         let synopsis = Synopsis::new(&cmd.synopsis)?;
+        publication.set_synopsis(synopsis)?;
 
         let pages = Vec::new();
         for (page_n, page) in cmd.pages.iter().enumerate() {
@@ -63,17 +65,12 @@ where
             let mut page = Page::new(page_n as u32)?;
             page.set_images(images)?;
         }
-        let tags: Vec<Tag> = cmd.tags.iter().map(|t| Tag::new(t).unwrap()).collect();
-
-        let mut publication = Publication::new(
-            self.publication_repo.next_id().await?,
-            name,
-            synopsis,
-            cmd.author_id,
-            cmd.category_id,
-        )?;
         publication.set_pages(pages)?;
-        publication.set_tags(tags)?;
+
+        let tags: Vec<Tag> = cmd.tags.iter().map(|t| Tag::new(t).unwrap()).collect();
+        publication.set_tags(tags);
+
+        publication.set_cateogry(cmd.category_id)?;
 
         self.publication_repo.save(&mut publication).await?;
 

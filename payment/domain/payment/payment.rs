@@ -17,7 +17,7 @@ impl Payment {
         Ok(Payment {
             base: AggregateRoot::new(id),
             amount,
-            status: StatusHistory::init(PaymentStatus::Pending),
+            status: StatusHistory::new(PaymentStatus::Pending),
         })
     }
 

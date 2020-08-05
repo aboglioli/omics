@@ -14,7 +14,7 @@ dependencies:
 	cargo update
 
 test:
-	cargo test
+	cargo test --color always
 
 build: dependencies
 	cargo build --release

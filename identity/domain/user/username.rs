@@ -9,19 +9,15 @@ pub struct Username {
 impl Username {
     pub fn new(username: &str) -> Result<Username> {
         if username.len() < 4 {
-            return Err(Error::application()
-                .add_context("username", "too_short")
-                .build());
+            return Err(Error::new("username", "too_short"));
         }
 
         if username.len() > 24 {
-            return Err(Error::application()
-                .add_context("username", "too_long")
-                .build());
+            return Err(Error::new("username", "too_long"));
         }
 
         Ok(Username {
-            username: String::from(username),
+            username: username.to_owned(),
         })
     }
 
