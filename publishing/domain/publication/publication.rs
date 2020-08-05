@@ -4,9 +4,7 @@ use common::result::Result;
 
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
-use crate::domain::publication::{
-    Name, Page, PageNumber, PublicationStatus, Statistics, Synopsis, Tag,
-};
+use crate::domain::publication::{Name, Page, PublicationStatus, Statistics, Synopsis, Tag};
 
 pub type PublicationId = String;
 
@@ -25,15 +23,15 @@ pub struct Publication {
 impl Publication {
     pub fn new(
         id: PublicationId,
-        name: &str,
-        synopsis: &str,
+        name: Name,
+        synopsis: Synopsis,
         author_id: AuthorId,
         category_id: CategoryId,
     ) -> Result<Publication> {
         Ok(Publication {
             base: AggregateRoot::new(id),
-            name: Name::new(name)?,
-            synopsis: Synopsis::new(synopsis)?,
+            name,
+            synopsis,
             author_id,
             statistics: Statistics::new(),
             pages: Vec::new(),
@@ -94,20 +92,8 @@ impl Publication {
         Ok(())
     }
 
-    pub fn add_page(&mut self, page: Page) -> Result<()> {
-        for p in self.pages.iter_mut() {
-            if p.number() == page.number() {
-                *p = page;
-                return Ok(());
-            }
-        }
-
-        self.pages.push(page);
-        Ok(())
-    }
-
-    pub fn remove_page(&mut self, number: &PageNumber) -> Result<()> {
-        self.pages.retain(|page| page.number() != number);
+    pub fn set_pages(&mut self, pages: Vec<Page>) -> Result<()> {
+        self.pages = pages;
         Ok(())
     }
 

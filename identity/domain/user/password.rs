@@ -15,7 +15,7 @@ impl Password {
         }
 
         Ok(Password {
-            password: String::from(password),
+            password: password.to_owned(),
         })
     }
 

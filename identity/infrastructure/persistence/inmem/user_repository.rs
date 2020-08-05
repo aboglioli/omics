@@ -28,24 +28,21 @@ impl UserRepository for InMemUserRepository {
     }
 
     async fn find_by_id(&self, id: &UserId) -> Result<User> {
-        self.cache
-            .get(id)
-            .await
-            .ok_or_else(|| Self::err_not_found())
+        self.cache.get(id).await.ok_or_else(Self::err_not_found)
     }
 
     async fn find_by_username(&self, username: &Username) -> Result<User> {
         self.cache
             .find(|(_, user)| user.identity().username().value() == username.value())
             .await
-            .ok_or_else(|| Self::err_not_found())
+            .ok_or_else(Self::err_not_found)
     }
 
     async fn find_by_email(&self, email: &Email) -> Result<User> {
         self.cache
             .find(|(_, user)| user.identity().email().value() == email.value())
             .await
-            .ok_or_else(|| Self::err_not_found())
+            .ok_or_else(Self::err_not_found)
     }
 
     async fn save(&self, user: &mut User) -> Result<()> {

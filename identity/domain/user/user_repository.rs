@@ -9,7 +9,7 @@ use crate::domain::user::{Email, User, UserId, Username};
 pub trait UserRepository {
     fn err_not_found() -> Error {
         Error::internal()
-            .set_path("user-repository")
+            .set_path("user.repository")
             .set_code("not_found")
             .build()
     }

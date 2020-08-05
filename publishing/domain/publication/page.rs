@@ -79,12 +79,12 @@ impl Frame {
 
 pub type ImageId = String;
 
-pub type ImageURL = String;
+pub type ImageUrl = String;
 
 #[derive(Debug, Clone)]
 pub struct Image {
     id: ImageId,
-    url: ImageURL,
+    url: ImageUrl,
     size: u32,
     frames: Vec<Frame>,
 }
@@ -103,7 +103,7 @@ impl Image {
         &self.id
     }
 
-    pub fn url(&self) -> &ImageURL {
+    pub fn url(&self) -> &ImageUrl {
         &self.url
     }
 
@@ -115,14 +115,8 @@ impl Image {
         &self.frames
     }
 
-    pub fn add_frame(&mut self, frame: Frame) -> Result<()> {
-        for f in self.frames.iter_mut() {
-            if f.order() == frame.order() {
-                *f = frame;
-                return Ok(());
-            }
-        }
-        self.frames.push(frame);
+    pub fn set_frames(&mut self, frames: Vec<Frame>) -> Result<()> {
+        self.frames = frames;
         Ok(())
     }
 }
@@ -151,20 +145,8 @@ impl Page {
         &self.images
     }
 
-    pub fn add_image(&mut self, image: Image) -> Result<()> {
-        for i in self.images.iter_mut() {
-            if i.id() == image.id() {
-                *i = image;
-                return Ok(());
-            }
-        }
-
-        self.images.push(image);
-        Ok(())
-    }
-
-    pub fn remove_image(&mut self, image_id: &ImageId) -> Result<()> {
-        self.images.retain(|image| image.id() != image_id);
+    pub fn set_images(&mut self, images: Vec<Image>) -> Result<()> {
+        self.images = images;
         Ok(())
     }
 }
@@ -174,32 +156,34 @@ mod tests {
     use super::*;
 
     #[test]
-    fn image() -> Result<()> {
+    fn image() {
         // New image
-        let mut image = Image::new(ImageId::from("image123"), "host.com/image.jpg", 1024)?;
-        image.add_frame(Frame::new(0, Position::new(0, 0)?, Size::new(800, 600)?)?)?;
-        image.add_frame(Frame::new(1, Position::new(800, 0)?, Size::new(800, 600)?)?)?;
-        image.add_frame(Frame::new(
-            2,
-            Position::new(1600, 0)?,
-            Size::new(800, 600)?,
-        )?)?;
+        let mut image = Image::new(ImageId::from("image123"), "host.com/image.jpg", 1024).unwrap();
+        let frames = vec![
+            Frame::new(
+                0,
+                Position::new(0, 0).unwrap(),
+                Size::new(800, 600).unwrap(),
+            )
+            .unwrap(),
+            Frame::new(
+                1,
+                Position::new(800, 0).unwrap(),
+                Size::new(800, 600).unwrap(),
+            )
+            .unwrap(),
+            Frame::new(
+                2,
+                Position::new(1600, 0).unwrap(),
+                Size::new(800, 600).unwrap(),
+            )
+            .unwrap(),
+        ];
+        image.set_frames(frames).unwrap();
 
         assert_eq!(image.frames().len(), 3);
         assert_eq!(image.frames()[0].order(), &0);
         assert_eq!(image.frames()[1].order(), &1);
         assert_eq!(image.frames()[2].order(), &2);
-
-        // Replace frame
-        image.add_frame(Frame::new(
-            1,
-            Position::new(600, 600)?,
-            Size::new(600, 600)?,
-        )?)?;
-        assert_eq!(image.frames().len(), 3);
-        assert_eq!(image.frames()[1].order(), &1);
-        assert_eq!(image.frames()[1].position(), &Position::new(600, 600)?);
-
-        Ok(())
     }
 }
