@@ -25,7 +25,7 @@
 Build backend and frontend:
 
 ```
-docker-compose build 
+docker-compose build
 ```
 
 Run backend and frontend:
@@ -35,7 +35,7 @@ docker-compose up
 ```
 
 - Build and run frontend image: `docker-compose up web`
-- Build and run backend image: `docker-compose up server`
+- Build and run backend image: `docker-compose up server` (test in localhost:3000/api)
 
 ## Rust
 
@@ -63,7 +63,7 @@ cargo build --release
 
 See [web/README.md](./web/README.md).
 
-Install dependencies: 
+Install dependencies:
 
 ```
 npm install
