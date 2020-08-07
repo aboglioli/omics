@@ -9,7 +9,7 @@ use identity::domain::user::AuthService;
 use identity::infrastructure::mocks::{FakePasswordHasher, FakeTokenEncoder};
 use identity::infrastructure::persistence::inmem::{InMemTokenRepository, InMemUserRepository};
 
-pub struct Context {
+pub struct Container {
     event_bus: InMemEventBus,
 
     user_repo: InMemUserRepository,
@@ -19,8 +19,8 @@ pub struct Context {
     token_enc: FakeTokenEncoder,
 }
 
-impl Context {
-    pub fn new() -> Context {
+impl Container {
+    pub fn new() -> Container {
         let event_bus = InMemEventBus::new();
 
         let user_repo = InMemUserRepository::new();
@@ -29,7 +29,7 @@ impl Context {
         let password_hasher = FakePasswordHasher::new();
         let token_enc = FakeTokenEncoder::new();
 
-        Context {
+        Container {
             event_bus,
 
             user_repo,
@@ -77,8 +77,8 @@ impl Context {
     }
 }
 
-pub fn with_context(
-    ctx: Arc<Context>,
-) -> impl Filter<Extract = (Arc<Context>,), Error = Infallible> + Clone {
-    warp::any().map(move || Arc::clone(&ctx))
+pub fn with_container(
+    container: Arc<Container>,
+) -> impl Filter<Extract = (Arc<Container>,), Error = Infallible> + Clone {
+    warp::any().map(move || Arc::clone(&container))
 }
