@@ -68,7 +68,7 @@ where
         publication.set_pages(pages)?;
 
         let tags: Vec<Tag> = cmd.tags.iter().map(|t| Tag::new(t).unwrap()).collect();
-        publication.set_tags(tags);
+        publication.set_tags(tags)?;
 
         publication.set_cateogry(cmd.category_id)?;
 

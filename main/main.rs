@@ -7,7 +7,7 @@ use std::sync::Arc;
 use warp::Filter;
 
 use handlers::context::Context;
-use handlers::user;
+use handlers::{contract, donation, publication, subscription, user};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -17,7 +17,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let health = warp::path::end().map(|| "Omics");
 
     // Routes
-    let routes = warp::path("api").and(health.or(user::routes(&ctx)));
+    let routes = warp::path("api").and(
+        health
+            .or(user::routes(&ctx))
+            .or(publication::routes(&ctx))
+            .or(contract::routes(&ctx))
+            .or(subscription::routes(&ctx))
+            .or(donation::routes(&ctx)),
+    );
 
     // Server
     let port: u16 = port::get();

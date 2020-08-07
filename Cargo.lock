@@ -544,8 +544,11 @@ name = "main"
 version = "0.1.0"
 dependencies = [
  "common",
+ "contract",
  "identity",
  "publishing",
+ "serde",
+ "subscription",
  "tokio",
  "warp",
 ]
