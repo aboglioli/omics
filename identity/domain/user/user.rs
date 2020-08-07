@@ -2,7 +2,7 @@ use common::error::Error;
 use common::model::AggregateRoot;
 use common::result::Result;
 
-use crate::domain::role::RoleId;
+use crate::domain::role::Role;
 use crate::domain::user::{Identity, Password, Person, UserEvent, Validation, ValidationCode};
 
 // User
@@ -13,19 +13,27 @@ pub struct User {
     base: AggregateRoot<UserId, UserEvent>,
     identity: Identity,
     person: Option<Person>,
-    role_id: RoleId,
+    role: Role,
     validation: Option<Validation>,
 }
 
 impl User {
-    pub fn new(id: UserId, identity: Identity, role_id: RoleId) -> Result<User> {
-        Ok(User {
+    pub fn new(id: UserId, identity: Identity, role: Role) -> Result<User> {
+        let mut user = User {
             base: AggregateRoot::new(id),
             identity,
             person: None,
-            role_id,
+            role,
             validation: Some(Validation::new()?),
-        })
+        };
+
+        user.base.record_event(UserEvent::Registered {
+            id: user.base().id(),
+            username: user.identity().username().value().to_owned(),
+            email: user.identity().username().value().to_owned(),
+        });
+
+        Ok(user)
     }
 
     pub fn base(&self) -> &AggregateRoot<UserId, UserEvent> {
@@ -40,8 +48,8 @@ impl User {
         self.person.as_ref()
     }
 
-    pub fn role_id(&self) -> &RoleId {
-        &self.role_id
+    pub fn role(&self) -> &Role {
+        &self.role
     }
 
     pub fn validation(&self) -> Option<&Validation> {
@@ -63,11 +71,18 @@ impl User {
 
     pub fn set_person(&mut self, person: Person) -> Result<()> {
         self.person = Some(person);
+
+        self.base.record_event(UserEvent::Updated {
+            id: self.base().id(),
+            name: self.person().unwrap().fullname().name().to_owned(),
+            lastname: self.person().unwrap().fullname().lastname().to_owned(),
+        });
+
         Ok(())
     }
 
-    pub fn set_role(&mut self, role_id: RoleId) {
-        self.role_id = role_id
+    pub fn set_role(&mut self, role: Role) {
+        self.role = role;
     }
 
     pub fn validate(&mut self, code: &ValidationCode) -> Result<()> {
@@ -87,8 +102,32 @@ impl User {
         };
 
         if !self.is_validated() {
-            return Err(Error::new("validation", "not_validated"));
+            return Err(Error::new("user", "not_validated"));
         }
+
+        self.base.record_event(UserEvent::Validated {
+            id: self.base().id(),
+        });
+
+        Ok(())
+    }
+
+    pub fn login(&mut self) -> Result<()> {
+        self.base.record_event(UserEvent::LoggedIn {
+            id: self.base().id(),
+        });
+
+        Ok(())
+    }
+
+    pub fn recover_password(&mut self, password: Password, temp_password: &str) -> Result<()> {
+        self.identity.set_password(password)?;
+        self.base
+            .record_event(UserEvent::PasswordRecoveryRequested {
+                id: self.base().id(),
+                temp_password: temp_password.to_owned(),
+                email: self.identity().email().value().to_owned(),
+            });
 
         Ok(())
     }
@@ -98,6 +137,7 @@ impl User {
 mod tests {
     use super::*;
 
+    use crate::domain::role::RoleId;
     use crate::domain::user::{Email, Provider, Username};
 
     #[test]
@@ -111,7 +151,7 @@ mod tests {
                 Some(Password::new(&format!("{:X>50}", "2")).unwrap()),
             )
             .unwrap(),
-            RoleId::from("user"),
+            Role::new(RoleId::from("user"), "User").unwrap(),
         )
         .unwrap();
         assert_eq!(user.base().id(), "user123");
@@ -130,7 +170,7 @@ mod tests {
                 Some(Password::new(&format!("{:X>50}", "2")).unwrap()),
             )
             .unwrap(),
-            RoleId::from("user"),
+            Role::new(RoleId::from("user"), "User").unwrap(),
         )
         .unwrap();
 

@@ -1,7 +1,7 @@
-mod edit_publication;
 mod publish;
-mod read_publication;
+mod read;
+mod update;
 
-pub use edit_publication::*;
 pub use publish::*;
-pub use read_publication::*;
+pub use read::*;
+pub use update::*;

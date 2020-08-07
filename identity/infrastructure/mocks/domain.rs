@@ -1,6 +1,6 @@
 use common::result::Result;
 
-use crate::domain::role::RoleId;
+use crate::domain::role::{Role, RoleId};
 use crate::domain::user::{
     Email, Identity, Password, PasswordHasher, Provider, User, UserId, Username,
 };
@@ -16,6 +16,6 @@ pub fn user1() -> Result<User> {
             Email::new("username@email.com")?,
             Some(Password::new(&ph.hash("P@asswd!")?)?),
         )?,
-        RoleId::from("user"),
+        Role::new(RoleId::from("user"), "User")?,
     )
 }

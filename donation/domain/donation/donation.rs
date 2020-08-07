@@ -1,7 +1,7 @@
 use common::event::BasicEvent;
 use common::model::AggregateRoot;
 
-use common::domain::user::UserId;
+use identity::domain::user::UserId;
 
 pub type DonationId = String;
 

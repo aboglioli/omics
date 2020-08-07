@@ -5,15 +5,18 @@ use warp::Filter;
 
 use common::event::InMemEventBus;
 use identity::domain::token::TokenService;
-use identity::domain::user::AuthService;
+use identity::domain::user::{AuthenticationService, AuthorizationService, UserService};
 use identity::infrastructure::mocks::{FakePasswordHasher, FakeTokenEncoder};
-use identity::infrastructure::persistence::inmem::{InMemTokenRepository, InMemUserRepository};
+use identity::infrastructure::persistence::inmem::{
+    InMemRoleRepository, InMemTokenRepository, InMemUserRepository,
+};
 
 pub struct Container {
     event_bus: InMemEventBus,
 
-    user_repo: InMemUserRepository,
+    role_repo: InMemRoleRepository,
     token_repo: InMemTokenRepository,
+    user_repo: InMemUserRepository,
 
     password_hasher: FakePasswordHasher,
     token_enc: FakeTokenEncoder,
@@ -23,8 +26,9 @@ impl Container {
     pub fn new() -> Container {
         let event_bus = InMemEventBus::new();
 
-        let user_repo = InMemUserRepository::new();
+        let role_repo = InMemRoleRepository::new();
         let token_repo = InMemTokenRepository::new();
+        let user_repo = InMemUserRepository::new();
 
         let password_hasher = FakePasswordHasher::new();
         let token_enc = FakeTokenEncoder::new();
@@ -32,26 +36,34 @@ impl Container {
         Container {
             event_bus,
 
-            user_repo,
+            role_repo,
             token_repo,
+            user_repo,
 
             password_hasher,
             token_enc,
         }
     }
 
+    // Events
     pub fn event_bus(&self) -> &InMemEventBus {
         &self.event_bus
     }
 
-    pub fn user_repo(&self) -> &InMemUserRepository {
-        &self.user_repo
+    // Repositories
+    pub fn role_repo(&self) -> &InMemRoleRepository {
+        &self.role_repo
     }
 
     pub fn token_repo(&self) -> &InMemTokenRepository {
         &self.token_repo
     }
 
+    pub fn user_repo(&self) -> &InMemUserRepository {
+        &self.user_repo
+    }
+
+    // Tools
     pub fn password_hasher(&self) -> &FakePasswordHasher {
         &self.password_hasher
     }
@@ -60,20 +72,31 @@ impl Container {
         &self.token_enc
     }
 
-    pub fn auth_serv(
+    // Services
+    pub fn token_serv(&self) -> TokenService<'_, InMemTokenRepository, FakeTokenEncoder> {
+        TokenService::new(self.token_repo(), self.token_enc())
+    }
+
+    pub fn authentication_serv(
         &self,
-    ) -> AuthService<
+    ) -> AuthenticationService<
         '_,
         InMemUserRepository,
         FakePasswordHasher,
         InMemTokenRepository,
         FakeTokenEncoder,
     > {
-        AuthService::new(self.user_repo(), self.token_serv(), self.password_hasher())
+        AuthenticationService::new(self.user_repo(), self.password_hasher(), self.token_serv())
     }
 
-    pub fn token_serv(&self) -> TokenService<'_, InMemTokenRepository, FakeTokenEncoder> {
-        TokenService::new(self.token_repo(), self.token_enc())
+    pub fn authorization_serv(
+        &self,
+    ) -> AuthorizationService<'_, InMemUserRepository, InMemTokenRepository, FakeTokenEncoder> {
+        AuthorizationService::new(self.user_repo(), self.token_serv())
+    }
+
+    pub fn user_serv(&self) -> UserService<'_, InMemUserRepository, FakePasswordHasher> {
+        UserService::new(self.user_repo(), self.password_hasher())
     }
 }
 

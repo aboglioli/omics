@@ -6,5 +6,5 @@ use crate::domain::role::{Role, RoleId};
 
 #[async_trait]
 pub trait RoleRepository {
-    async fn get_by_code(&self, code: &RoleId) -> Result<Role>;
+    async fn get_by_code(&self, code: &RoleId) -> Result<Role>; // TODO: rename
 }

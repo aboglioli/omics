@@ -52,7 +52,7 @@ impl Token {
         }
     }
 
-    pub fn token(&self) -> &String {
+    pub fn token(&self) -> &str {
         &self.token
     }
 }

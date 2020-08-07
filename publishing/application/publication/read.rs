@@ -29,7 +29,7 @@ pub struct PageDto {
 }
 
 #[derive(Serialize)]
-pub struct ReadPublicationResponse {
+pub struct ReadResponse {
     id: String,
     name: String,
     synopsis: String,
@@ -41,7 +41,7 @@ pub struct ReadPublicationResponse {
     status: String,
 }
 
-impl From<Publication> for ReadPublicationResponse {
+impl From<Publication> for ReadResponse {
     fn from(publication: Publication) -> Self {
         let stats = publication.statistics();
         let statistics = StatisticsDto {
@@ -74,7 +74,7 @@ impl From<Publication> for ReadPublicationResponse {
             .map(|t| t.name().to_owned())
             .collect();
 
-        ReadPublicationResponse {
+        ReadResponse {
             id: publication.base().id(),
             name: publication.name().value().to_owned(),
             synopsis: publication.synopsis().value().to_owned(),
@@ -88,13 +88,13 @@ impl From<Publication> for ReadPublicationResponse {
     }
 }
 
-pub struct ReadPublication<'a, PRepo, RRepo, IRepo> {
+pub struct Read<'a, PRepo, RRepo, IRepo> {
     publication_repo: &'a PRepo,
     reader_repo: &'a RRepo,
     interaction_repo: &'a IRepo,
 }
 
-impl<'a, PRepo, RRepo, IRepo> ReadPublication<'a, PRepo, RRepo, IRepo>
+impl<'a, PRepo, RRepo, IRepo> Read<'a, PRepo, RRepo, IRepo>
 where
     PRepo: PublicationRepository,
     RRepo: ReaderRepository,
@@ -105,7 +105,7 @@ where
         reader_repo: &'a RRepo,
         interaction_repo: &'a IRepo,
     ) -> Self {
-        ReadPublication {
+        Read {
             publication_repo,
             reader_repo,
             interaction_repo,
@@ -116,13 +116,13 @@ where
         &self,
         reader_id: &ReaderId,
         publication_id: &PublicationId,
-    ) -> Result<ReadPublicationResponse> {
+    ) -> Result<ReadResponse> {
         let publication = self.publication_repo.find_by_id(publication_id).await?;
         let reader = self.reader_repo.find_by_id(reader_id).await?;
 
         let mut read = reader.read(&publication)?;
         self.interaction_repo.save_read(&mut read).await?;
 
-        Ok(ReadPublicationResponse::from(publication))
+        Ok(ReadResponse::from(publication))
     }
 }

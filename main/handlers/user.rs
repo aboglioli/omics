@@ -88,8 +88,8 @@ pub async fn register(
 ) -> Result<impl Reply, Rejection> {
     let uc = Register::new(
         container.event_bus(),
-        container.auth_serv(),
         container.user_repo(),
+        container.user_serv(),
     );
     uc.exec(cmd).await.unwrap();
 
@@ -97,7 +97,7 @@ pub async fn register(
 }
 
 pub async fn login(cmd: LoginCommand, container: Arc<Container>) -> Result<impl Reply, Rejection> {
-    let uc = Login::new(container.auth_serv());
+    let uc = Login::new(container.event_bus(), container.authentication_serv());
     let res = uc.exec(cmd).await.unwrap();
 
     Ok(warp::reply::json(&res))

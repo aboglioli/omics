@@ -1,4 +1,5 @@
-mod auth_service;
+mod authentication_service;
+mod authorization_service;
 mod email;
 mod events;
 mod fullname;
@@ -9,11 +10,13 @@ mod person;
 mod provider;
 mod user;
 mod user_repository;
+mod user_service;
 mod username;
 mod validation;
 
 pub use self::identity::*;
-pub use auth_service::*;
+pub use authentication_service::*;
+pub use authorization_service::*;
 pub use email::*;
 pub use events::*;
 pub use fullname::*;
@@ -23,5 +26,6 @@ pub use person::*;
 pub use provider::*;
 pub use user::*;
 pub use user_repository::*;
+pub use user_service::*;
 pub use username::*;
 pub use validation::*;

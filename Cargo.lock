@@ -149,6 +149,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "common",
+ "identity",
 ]
 
 [[package]]
@@ -172,6 +173,7 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "common",
+ "identity",
 ]
 
 [[package]]
@@ -450,6 +452,7 @@ dependencies = [
  "common",
  "regex",
  "serde",
+ "serde_json",
  "tokio",
  "uuid",
 ]
@@ -856,6 +859,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "common",
+ "identity",
  "serde",
  "slug",
 ]

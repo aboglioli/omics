@@ -1,11 +1,14 @@
-use common::event::{EventPublisher, ToEvent};
+use serde::Deserialize;
+
+use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::domain::user::{Fullname, Person, UserEvent, UserId, UserRepository};
+use crate::domain::user::{Fullname, Person, UserId, UserRepository};
 
+#[derive(Deserialize)]
 pub struct UpdateCommand {
-    pub name: String,
-    pub lastname: String,
+    name: String,
+    lastname: String,
 }
 
 impl UpdateCommand {
@@ -16,6 +19,7 @@ impl UpdateCommand {
 
 pub struct Update<'a, EPub, URepo> {
     event_pub: &'a EPub,
+
     user_repo: &'a URepo,
 }
 
@@ -38,17 +42,10 @@ where
 
         let person = Person::new(Fullname::new(&cmd.name, &cmd.lastname)?)?;
         user.set_person(person)?;
+
         self.user_repo.save(&mut user).await?;
 
-        if let Some(person) = user.person() {
-            let event = UserEvent::Updated {
-                id: user.base().id(),
-                name: person.fullname().name().to_owned(),
-                lastname: person.fullname().lastname().to_owned(),
-            }
-            .to_event()?;
-            self.event_pub.publish(event).await?;
-        }
+        self.event_pub.publish_all(user.base().events()?).await?;
 
         Ok(())
     }

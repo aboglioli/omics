@@ -19,7 +19,7 @@ pub struct PageDto {
 }
 
 #[derive(Deserialize)]
-pub struct EditPublicationCommand {
+pub struct UpdateCommand {
     name: String,
     synopsis: String,
     pages: Vec<PageDto>,
@@ -27,25 +27,25 @@ pub struct EditPublicationCommand {
     tags: Vec<String>,
 }
 
-impl EditPublicationCommand {
+impl UpdateCommand {
     pub fn validate(&self) -> Result<()> {
         Ok(())
     }
 }
 
-pub struct EditPublication<'a, PRepo> {
+pub struct Update<'a, PRepo> {
     publication_repo: &'a PRepo,
 }
 
-impl<'a, PRepo> EditPublication<'a, PRepo>
+impl<'a, PRepo> Update<'a, PRepo>
 where
     PRepo: PublicationRepository,
 {
     pub fn new(publication_repo: &'a PRepo) -> Self {
-        EditPublication { publication_repo }
+        Update { publication_repo }
     }
 
-    pub async fn exec(&self, id: &PublicationId, cmd: EditPublicationCommand) -> Result<()> {
+    pub async fn exec(&self, id: &PublicationId, cmd: UpdateCommand) -> Result<()> {
         cmd.validate()?;
 
         let mut publication = self.publication_repo.find_by_id(id).await?;
