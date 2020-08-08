@@ -10,6 +10,7 @@ path = "lib.rs"
 [dependencies]
 common = { path = "../common" }
 identity = { path = "../identity" }
+shared = { path = "../shared" }
 
 async-trait = "0.1.36"
 chrono = "0.4"

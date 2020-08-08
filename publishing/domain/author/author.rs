@@ -1,4 +1,4 @@
-use common::event::BasicEvent;
+use common::event::Event;
 use common::model::AggregateRoot;
 use common::result::Result;
 
@@ -21,7 +21,7 @@ impl Name {
 }
 
 pub struct Author {
-    base: AggregateRoot<AuthorId, BasicEvent>,
+    base: AggregateRoot<AuthorId, Event>,
     name: Name,
 }
 
@@ -33,7 +33,7 @@ impl Author {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<AuthorId, BasicEvent> {
+    pub fn base(&self) -> &AggregateRoot<AuthorId, Event> {
         &self.base
     }
 

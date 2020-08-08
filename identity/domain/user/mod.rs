@@ -1,7 +1,6 @@
 mod authentication_service;
 mod authorization_service;
 mod email;
-mod events;
 mod fullname;
 mod identity;
 mod password;
@@ -18,7 +17,6 @@ pub use self::identity::*;
 pub use authentication_service::*;
 pub use authorization_service::*;
 pub use email::*;
-pub use events::*;
 pub use fullname::*;
 pub use password::*;
 pub use password_hasher::*;

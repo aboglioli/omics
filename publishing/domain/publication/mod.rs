@@ -1,4 +1,3 @@
-mod events;
 mod name;
 mod page;
 mod publication;
@@ -8,7 +7,6 @@ mod status;
 mod synopsis;
 mod tag;
 
-pub use events::*;
 pub use name::*;
 pub use page::*;
 pub use publication::*;

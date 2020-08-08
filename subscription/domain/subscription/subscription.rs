@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 
-use common::event::BasicEvent;
+use common::event::Event;
 use common::model::{AggregateRoot, StatusHistory};
 use common::result::Result;
 
@@ -11,7 +11,7 @@ use crate::domain::user::UserId;
 pub type SubscriptionId = String;
 
 pub struct Subscription {
-    base: AggregateRoot<SubscriptionId, BasicEvent>,
+    base: AggregateRoot<SubscriptionId, Event>,
     subscribed_at: DateTime<Utc>,
     user_id: UserId,
     plan: SubscriptionPlan,
@@ -31,7 +31,7 @@ impl Subscription {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<SubscriptionId, BasicEvent> {
+    pub fn base(&self) -> &AggregateRoot<SubscriptionId, Event> {
         &self.base
     }
 

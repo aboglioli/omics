@@ -5,15 +5,15 @@ use common::result::Result;
 use crate::domain::publication::PublicationId;
 use crate::domain::reader::ReaderId;
 
-pub struct Read {
+pub struct Reading {
     reader_id: ReaderId,
     publication_id: PublicationId,
     date: DateTime<Utc>,
 }
 
-impl Read {
-    pub fn new(reader_id: ReaderId, publication_id: PublicationId) -> Result<Read> {
-        Ok(Read {
+impl Reading {
+    pub fn new(reader_id: ReaderId, publication_id: PublicationId) -> Result<Reading> {
+        Ok(Reading {
             reader_id,
             publication_id,
             date: Utc::now(),

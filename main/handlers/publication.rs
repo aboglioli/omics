@@ -10,10 +10,10 @@ use crate::handlers::container::{with_container, Container};
 pub fn routes(
     container: &Arc<Container>,
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
-    let get_by_id = warp::get()
+    let view = warp::get()
         .and(warp::path!(PublicationId))
         .and(with_container(container.clone()))
-        .and_then(get_by_id);
+        .and_then(view);
 
     // Administration
     let create = warp::post()
@@ -68,8 +68,7 @@ pub fn routes(
         .and_then(review);
 
     warp::path("publications").and(
-        get_by_id
-            .or(create)
+        view.or(create)
             .or(update)
             .or(delete)
             .or(publish)
@@ -81,10 +80,7 @@ pub fn routes(
     )
 }
 
-pub async fn get_by_id(
-    _id: PublicationId,
-    _container: Arc<Container>,
-) -> Result<impl Reply, Rejection> {
+pub async fn view(_id: PublicationId, _container: Arc<Container>) -> Result<impl Reply, Rejection> {
     Ok(warp::reply::json(&Uninmplemented::new()))
 }
 

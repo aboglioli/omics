@@ -15,33 +15,17 @@ pub struct StatisticsDto {
 }
 
 #[derive(Serialize)]
-pub struct ImageDto {
-    id: String,
-    url: String,
-    size: u32,
-    // frames: Vec<FrameDto>, // TODO: not considering frames right now
-}
-
-#[derive(Serialize)]
-pub struct PageDto {
-    number: u32,
-    images: Vec<ImageDto>,
-}
-
-#[derive(Serialize)]
-pub struct ReadResponse {
+pub struct ViewResponse {
     id: String,
     name: String,
     synopsis: String,
     author_id: String,
     statistics: StatisticsDto,
-    pages: Vec<PageDto>,
     category_id: String,
     tags: Vec<String>,
-    status: String,
 }
 
-impl From<Publication> for ReadResponse {
+impl From<Publication> for ViewResponse {
     fn from(publication: Publication) -> Self {
         let stats = publication.statistics();
         let statistics = StatisticsDto {
@@ -51,50 +35,31 @@ impl From<Publication> for ReadResponse {
             readings: stats.readings(),
         };
 
-        let mut pages = Vec::new();
-        for page in publication.pages().iter() {
-            let mut images = Vec::new();
-            for image in page.images().iter() {
-                images.push(ImageDto {
-                    id: image.id().to_owned(),
-                    url: image.url().to_owned(),
-                    size: image.size(),
-                });
-            }
-
-            pages.push(PageDto {
-                number: *page.number(),
-                images,
-            });
-        }
-
         let tags: Vec<String> = publication
             .tags()
             .iter()
             .map(|t| t.name().to_owned())
             .collect();
 
-        ReadResponse {
+        ViewResponse {
             id: publication.base().id(),
             name: publication.name().value().to_owned(),
             synopsis: publication.synopsis().value().to_owned(),
             author_id: publication.author_id().to_owned(),
             statistics,
-            pages,
             category_id: publication.category_id().to_owned(),
             tags,
-            status: publication.status().current().unwrap().status().to_string(),
         }
     }
 }
 
-pub struct Read<'a, IRepo, PRepo, RRepo> {
+pub struct View<'a, IRepo, PRepo, RRepo> {
     interaction_repo: &'a IRepo,
     publication_repo: &'a PRepo,
     reader_repo: &'a RRepo,
 }
 
-impl<'a, IRepo, PRepo, RRepo> Read<'a, IRepo, PRepo, RRepo>
+impl<'a, IRepo, PRepo, RRepo> View<'a, IRepo, PRepo, RRepo>
 where
     IRepo: InteractionRepository,
     PRepo: PublicationRepository,
@@ -105,7 +70,7 @@ where
         publication_repo: &'a PRepo,
         reader_repo: &'a RRepo,
     ) -> Self {
-        Read {
+        View {
             interaction_repo,
             publication_repo,
             reader_repo,
@@ -116,13 +81,13 @@ where
         &self,
         reader_id: &ReaderId,
         publication_id: &PublicationId,
-    ) -> Result<ReadResponse> {
+    ) -> Result<ViewResponse> {
         let publication = self.publication_repo.find_by_id(publication_id).await?;
         let reader = self.reader_repo.find_by_id(reader_id).await?;
 
-        let mut read = reader.read(&publication)?;
-        self.interaction_repo.save_reading(&mut read).await?;
+        let mut view = reader.view(&publication)?;
+        self.interaction_repo.save_view(&mut view).await?;
 
-        Ok(ReadResponse::from(publication))
+        Ok(ViewResponse::from(publication))
     }
 }

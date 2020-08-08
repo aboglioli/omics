@@ -1,4 +1,4 @@
-use common::event::BasicEvent;
+use common::event::Event;
 use common::model::{AggregateRoot, StatusHistory};
 use common::result::Result;
 
@@ -9,7 +9,7 @@ use crate::domain::publication::{Name, Page, PublicationStatus, Statistics, Syno
 pub type PublicationId = String;
 
 pub struct Publication {
-    base: AggregateRoot<PublicationId, BasicEvent>,
+    base: AggregateRoot<PublicationId, Event>,
     name: Name,
     synopsis: Synopsis,
     author_id: AuthorId,
@@ -43,7 +43,7 @@ impl Publication {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<PublicationId, BasicEvent> {
+    pub fn base(&self) -> &AggregateRoot<PublicationId, Event> {
         &self.base
     }
 

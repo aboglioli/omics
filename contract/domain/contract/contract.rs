@@ -1,5 +1,5 @@
 use common::error::Error;
-use common::event::BasicEvent;
+use common::event::Event;
 use common::model::{AggregateRoot, StatusHistory};
 use common::result::Result;
 
@@ -10,7 +10,7 @@ use crate::domain::summary::Summary;
 pub type ContractId = String;
 
 pub struct Contract {
-    base: AggregateRoot<ContractId, BasicEvent>,
+    base: AggregateRoot<ContractId, Event>,
     publication_id: PublicationId,
     status: StatusHistory<ContractStatus, String>,
     summaries: Vec<Summary>,
@@ -26,7 +26,7 @@ impl Contract {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<ContractId, BasicEvent> {
+    pub fn base(&self) -> &AggregateRoot<ContractId, Event> {
         &self.base
     }
 

@@ -1,4 +1,4 @@
-use common::event::BasicEvent;
+use common::event::Event;
 use common::model::{AggregateRoot, StatusHistory};
 use common::result::Result;
 
@@ -7,7 +7,7 @@ use crate::domain::payment::{Amount, PaymentStatus};
 pub type PaymentId = String;
 
 pub struct Payment {
-    base: AggregateRoot<PaymentId, BasicEvent>,
+    base: AggregateRoot<PaymentId, Event>,
     amount: Amount,
     status: StatusHistory<PaymentStatus, String>,
 }
@@ -21,7 +21,7 @@ impl Payment {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<PaymentId, BasicEvent> {
+    pub fn base(&self) -> &AggregateRoot<PaymentId, Event> {
         &self.base
     }
 
