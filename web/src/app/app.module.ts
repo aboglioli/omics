@@ -1,17 +1,20 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { environment } from '../environments/environment';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 import { HttpClientModule  } from '@angular/common/http';
 
+import { ServiceWorkerModule } from '@angular/service-worker'; // PWA dependencia
+import { ToastrModule } from 'ngx-toastr';
+import { ChartsModule } from 'ng2-charts';
 
-// Angular material
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+// Modulos auxiliares
 import { MaterialModule } from './auxiliar-modules/material.module';
-import { ServiceWorkerModule } from '@angular/service-worker';
-import { environment } from '../environments/environment';
+import { AngularBootstrapModule } from './auxiliar-modules//angular-bootstrap.module';
 
 
 @NgModule({
@@ -23,8 +26,11 @@ import { environment } from '../environments/environment';
     AppRoutingModule,
     BrowserAnimationsModule,
     MaterialModule,
+    AngularBootstrapModule,
     HttpClientModule,
-    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
+    ChartsModule,
+    ToastrModule.forRoot(),
   ],
   providers: [],
   bootstrap: [AppComponent]
