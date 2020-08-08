@@ -1,3 +1,4 @@
+pub mod authorization;
 pub mod common;
 pub mod container;
 pub mod contract;

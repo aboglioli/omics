@@ -1,9 +1,10 @@
 use serde::Deserialize;
 
+use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::domain::user::{Fullname, Person, UserId, UserRepository};
+use crate::domain::user::{Fullname, Person, User, UserId, UserRepository};
 
 #[derive(Deserialize)]
 pub struct UpdateCommand {
@@ -35,7 +36,9 @@ where
         }
     }
 
-    pub async fn exec(&self, user_id: &UserId, cmd: UpdateCommand) -> Result<()> {
+    pub async fn exec(&self, auth_user: &User, user_id: &UserId, cmd: UpdateCommand) -> Result<()> {
+        authorized(auth_user, user_id)?;
+
         cmd.validate()?;
 
         let mut user = self.user_repo.find_by_id(&user_id).await?;
@@ -49,4 +52,14 @@ where
 
         Ok(())
     }
+}
+
+fn authorized(auth_user: &User, user_id: &UserId) -> Result<()> {
+    let guard = &auth_user.base().id() == user_id || auth_user.role().base().id() == "admin";
+
+    if !guard {
+        return Err(Error::new("user", "unauthorized"));
+    }
+
+    Ok(())
 }

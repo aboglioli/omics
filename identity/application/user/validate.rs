@@ -1,6 +1,5 @@
-use common::result::Result;
-
 use common::event::EventPublisher;
+use common::result::Result;
 
 use crate::domain::user::{UserId, UserRepository, ValidationCode};
 

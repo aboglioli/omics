@@ -7,5 +7,4 @@ pub mod result;
 pub mod transaction;
 
 pub use error::Error;
-pub use event::{Event, ToEvent};
 pub use result::Result;

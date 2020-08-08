@@ -7,6 +7,7 @@ use warp::{Filter, Rejection, Reply};
 use identity::application::user::{GetById, Login, LoginCommand, Register, RegisterCommand};
 use identity::domain::user::UserId;
 
+use crate::handlers::authorization;
 use crate::handlers::common::Uninmplemented;
 use crate::handlers::container::{with_container, Container};
 
@@ -20,6 +21,7 @@ pub fn routes(
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     let get_by_id = warp::get()
         .and(warp::path!(UserId))
+        .and(warp::header::<String>("authorization"))
         .and(with_container(container.clone()))
         .and_then(get_by_id);
 
@@ -38,17 +40,20 @@ pub fn routes(
     let update = warp::put()
         .and(warp::path!(UserId))
         .and(warp::body::json())
+        .and(warp::header::<String>("authorization"))
         .and(with_container(container.clone()))
         .and_then(update);
 
     let delete = warp::delete()
         .and(warp::path!(UserId))
+        .and(warp::header::<String>("authorization"))
         .and(with_container(container.clone()))
         .and_then(delete);
 
     let change_password = warp::put()
         .and(warp::path!(UserId / "password"))
         .and(warp::body::json())
+        .and(warp::header::<String>("authorization"))
         .and(with_container(container.clone()))
         .and_then(change_password);
 
@@ -75,9 +80,17 @@ pub fn routes(
     )
 }
 
-pub async fn get_by_id(id: UserId, container: Arc<Container>) -> Result<impl Reply, Rejection> {
+pub async fn get_by_id(
+    id: UserId,
+    authorization_header: String,
+    container: Arc<Container>,
+) -> Result<impl Reply, Rejection> {
+    let token = authorization::extract_token(&authorization_header).unwrap();
+    let authorization_serv = container.authorization_serv();
+    let user = authorization_serv.authorize(&token).await.unwrap();
+
     let uc = GetById::new(container.user_repo());
-    let res = uc.exec(&id).await.unwrap();
+    let res = uc.exec(&user, &id).await.unwrap();
 
     Ok(warp::reply::json(&res))
 }
@@ -106,20 +119,38 @@ pub async fn login(cmd: LoginCommand, container: Arc<Container>) -> Result<impl 
 pub async fn update(
     _id: UserId,
     _cmd: Uninmplemented,
-    _container: Arc<Container>,
+    authorization_header: String,
+    container: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
+    let token = authorization::extract_token(&authorization_header).unwrap();
+    let authorization_serv = container.authorization_serv();
+    let _user = authorization_serv.authorize(&token).await.unwrap();
+
     Ok(warp::reply::json(&Uninmplemented::new()))
 }
 
-pub async fn delete(_id: UserId, _container: Arc<Container>) -> Result<impl Reply, Rejection> {
+pub async fn delete(
+    _id: UserId,
+    authorization_header: String,
+    container: Arc<Container>,
+) -> Result<impl Reply, Rejection> {
+    let token = authorization::extract_token(&authorization_header).unwrap();
+    let authorization_serv = container.authorization_serv();
+    let _user = authorization_serv.authorize(&token).await.unwrap();
+
     Ok(warp::reply::json(&Uninmplemented::new()))
 }
 
 pub async fn change_password(
     _id: UserId,
     _cmd: Uninmplemented,
-    _container: Arc<Container>,
+    authorization_header: String,
+    container: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
+    let token = authorization::extract_token(&authorization_header).unwrap();
+    let authorization_serv = container.authorization_serv();
+    let _user = authorization_serv.authorize(&token).await.unwrap();
+
     Ok(warp::reply::json(&Uninmplemented::new()))
 }
 
