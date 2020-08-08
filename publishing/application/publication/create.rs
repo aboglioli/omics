@@ -20,7 +20,7 @@ pub struct PageDto {
 }
 
 #[derive(Deserialize)]
-pub struct PublishCommand {
+pub struct CreateCommand {
     author_id: AuthorId,
     name: String,
     synopsis: String,
@@ -29,25 +29,25 @@ pub struct PublishCommand {
     tags: Vec<String>,
 }
 
-impl PublishCommand {
+impl CreateCommand {
     pub fn validate(&self) -> Result<()> {
         Ok(())
     }
 }
 
-pub struct Publish<'a, PRepo> {
+pub struct Create<'a, PRepo> {
     publication_repo: &'a PRepo,
 }
 
-impl<'a, PRepo> Publish<'a, PRepo>
+impl<'a, PRepo> Create<'a, PRepo>
 where
     PRepo: PublicationRepository,
 {
     pub fn new(publication_repo: &'a PRepo) -> Self {
-        Publish { publication_repo }
+        Create { publication_repo }
     }
 
-    pub async fn exec(&self, cmd: PublishCommand) -> Result<()> {
+    pub async fn exec(&self, cmd: CreateCommand) -> Result<()> {
         cmd.validate()?;
 
         let name = Name::new(&cmd.name)?;

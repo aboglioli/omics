@@ -1,4 +1,4 @@
-use common::event::BasicEvent;
+use common::event::Event;
 use common::model::AggregateRoot;
 use common::result::Result;
 
@@ -23,7 +23,7 @@ pub type CategoryId = String;
 
 #[derive(Debug, Clone)]
 pub struct Category {
-    base: AggregateRoot<CategoryId, BasicEvent>,
+    base: AggregateRoot<CategoryId, Event>,
     name: Name,
 }
 

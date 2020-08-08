@@ -1,5 +1,5 @@
 [package]
-name = "identity"
+name = "shared"
 version = "0.1.0"
 authors = ["Alan Boglioli <alan.boglioli@gmail.com>"]
 edition = "2018"
@@ -9,11 +9,7 @@ path = "lib.rs"
 
 [dependencies]
 common = { path = "../common" }
-shared = { path = "../shared" }
 
-async-trait = "0.1.36"
-regex = "1"
+chrono = "0.4"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-tokio = { version = "0.2", features = ["full"] }
-uuid = { version = "0.8.1", features = ["serde", "v4"] }

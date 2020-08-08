@@ -1,16 +1,16 @@
 use common::error::Error;
+use common::event::Event;
 use common::result::Result;
 
 use common::model::AggregateRoot;
 
-use crate::domain::interaction::{Like, Read, Review, Stars, View};
+use crate::domain::interaction::{Like, Reading, Review, Stars, View};
 use crate::domain::publication::Publication;
-use crate::domain::reader::ReaderEvent;
 
 pub type ReaderId = String;
 
 pub struct Reader {
-    base: AggregateRoot<ReaderId, ReaderEvent>,
+    base: AggregateRoot<ReaderId, Event>,
     name: String,
     subscribed: bool,
 }
@@ -41,12 +41,12 @@ impl Reader {
         Ok(View::new(self.base.id(), publication.base().id())?)
     }
 
-    pub fn read(&self, publication: &Publication) -> Result<Read> {
+    pub fn read(&self, publication: &Publication) -> Result<Reading> {
         if publication.has_contract() && !self.subscribed {
             return Err(Error::new("reader", "not_subscribed"));
         }
 
-        Ok(Read::new(self.base.id(), publication.base().id())?)
+        Ok(Reading::new(self.base.id(), publication.base().id())?)
     }
 
     pub fn like(&self, publication: &Publication) -> Result<Like> {

@@ -6,7 +6,7 @@ use crate::result::Result;
 
 pub type EventPayload = Vec<u8>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Event {
     topic: String,
     code: String,
@@ -45,14 +45,8 @@ pub trait ToEvent {
     fn to_event(&self) -> Result<Event>;
 }
 
-#[derive(Debug)]
-pub struct BasicEvent {
-    topic: String,
-    code: String,
-}
-
-impl ToEvent for BasicEvent {
+impl ToEvent for Event {
     fn to_event(&self) -> Result<Event> {
-        Ok(Event::new(&self.topic, &self.code, Vec::new()))
+        Ok(self.clone())
     }
 }

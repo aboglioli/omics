@@ -3,18 +3,8 @@ use std::cmp::PartialEq;
 
 use chrono::{DateTime, Utc};
 
-use crate::error::Error;
 use crate::event::{Event, ToEvent};
 use crate::result::Result;
-
-#[derive(Debug)]
-pub struct BasicEvent;
-
-impl ToEvent for BasicEvent {
-    fn to_event(&self) -> Result<Event> {
-        Err(Error::internal("to_event", "not_implemented"))
-    }
-}
 
 #[derive(Debug)]
 pub struct AggregateRoot<ID, E> {

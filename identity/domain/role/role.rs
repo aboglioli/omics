@@ -1,4 +1,4 @@
-use common::event::BasicEvent;
+use common::event::Event;
 use common::model::AggregateRoot;
 use common::result::Result;
 
@@ -8,7 +8,7 @@ pub type RoleId = String;
 
 #[derive(Debug, Clone)]
 pub struct Role {
-    base: AggregateRoot<RoleId, BasicEvent>,
+    base: AggregateRoot<RoleId, Event>,
     name: String,
     permissions: Vec<Permission>,
 }
@@ -22,7 +22,7 @@ impl Role {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<RoleId, BasicEvent> {
+    pub fn base(&self) -> &AggregateRoot<RoleId, Event> {
         &self.base
     }
 

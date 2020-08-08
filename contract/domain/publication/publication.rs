@@ -1,13 +1,13 @@
 use identity::domain::user::UserId;
 
-use common::event::BasicEvent;
+use common::event::Event;
 use common::model::AggregateRoot;
 use common::result::Result;
 
 pub type PublicationId = String;
 
 pub struct Publication {
-    base: AggregateRoot<PublicationId, BasicEvent>,
+    base: AggregateRoot<PublicationId, Event>,
     author_id: UserId,
     name: String,
 }
@@ -21,7 +21,7 @@ impl Publication {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<PublicationId, BasicEvent> {
+    pub fn base(&self) -> &AggregateRoot<PublicationId, Event> {
         &self.base
     }
 

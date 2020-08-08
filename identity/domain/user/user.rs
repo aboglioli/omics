@@ -1,9 +1,10 @@
 use common::error::Error;
 use common::model::AggregateRoot;
 use common::result::Result;
+use shared::domain::event::UserEvent;
 
 use crate::domain::role::Role;
-use crate::domain::user::{Identity, Password, Person, UserEvent, Validation, ValidationCode};
+use crate::domain::user::{Identity, Password, Person, Validation, ValidationCode};
 
 // User
 pub type UserId = String;

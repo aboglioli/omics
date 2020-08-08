@@ -1,5 +1,5 @@
 use common::error::Error;
-use common::event::BasicEvent;
+use common::event::Event;
 use common::model::{AggregateRoot, StatusHistory};
 use common::result::Result;
 
@@ -10,7 +10,7 @@ type SummaryId = String;
 
 #[derive(Debug, Clone)]
 pub struct Summary {
-    base: AggregateRoot<SummaryId, BasicEvent>,
+    base: AggregateRoot<SummaryId, Event>,
     contract_id: ContractId,
     status: StatusHistory<SummaryStatus, ()>,
 }

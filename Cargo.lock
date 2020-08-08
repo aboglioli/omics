@@ -106,6 +106,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0e4cec68f03f32e44924783795810fa50a7035d8c8ebe78580ad7e6c703fba38"
 
 [[package]]
+name = "catalogue"
+version = "0.1.0"
+
+[[package]]
 name = "cfg-if"
 version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -453,6 +457,7 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
+ "shared",
  "tokio",
  "uuid",
 ]
@@ -699,6 +704,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "notification"
+version = "0.1.0"
+
+[[package]]
 name = "num-integer"
 version = "0.1.43"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -861,6 +870,7 @@ dependencies = [
  "common",
  "identity",
  "serde",
+ "shared",
  "slug",
 ]
 
@@ -1139,6 +1149,16 @@ dependencies = [
  "digest",
  "fake-simd",
  "opaque-debug",
+]
+
+[[package]]
+name = "shared"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "common",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

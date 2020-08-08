@@ -1,4 +1,4 @@
-use common::event::BasicEvent;
+use common::event::Event;
 use common::model::AggregateRoot;
 use common::result::Result;
 
@@ -7,7 +7,7 @@ use crate::domain::user::PaymentMethod;
 pub type UserId = String;
 
 pub struct User {
-    base: AggregateRoot<UserId, BasicEvent>,
+    base: AggregateRoot<UserId, Event>,
     name: String,
     payment_methods: Vec<PaymentMethod>,
 }
@@ -21,7 +21,7 @@ impl User {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<UserId, BasicEvent> {
+    pub fn base(&self) -> &AggregateRoot<UserId, Event> {
         &self.base
     }
 
