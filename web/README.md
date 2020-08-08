@@ -1,27 +1,35 @@
 # Web
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.0.0.
+Este proyecto fue generado con [Angular CLI](https://github.com/angular/angular-cli) version 10.0.0.
 
-## Development server
+## Server de desarrollo
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Ejecuta `ng serve` para un dervidor de desarrollo. Navega a `http://localhost:4200/`. La app automáticamente se recargara cuando realices cualquier cambio
 
 ## Code scaffolding
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Ejecuta `ng generate component component-name` para crear un nuevo componente. también puedes usar `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+Ejecutar `ng build` para compilar el proyecto. Los artefactos de compilación serán guardados en el directorio `dist/`. Usa la bandera `--prod` para compilar en producción.
 
-## Running unit tests
+## Ejecutar pruebas unitarias
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Ejecuta `ng test` para ejecutar las pruebas unitarias con [Karma](https://karma-runner.github.io).
 
-## Running end-to-end tests
+## Corrent pruebas end-to-end
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+Ejecutar `ng e2e` para ejecutar pruebas end-to-end con [Protractor](http://www.protractortest.org/).
 
-## Further help
+## Mayor ayuda
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+Para mayor ayuda de Angular CLI usar `ng help` o ir al [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+
+## Librerias principales usadas
+* [Angular Material](https://material.angular.io/).
+* [PWA](https://angular.io/guide/service-worker-intro).
+* [Angular Bootstrap](https://ng-bootstrap.github.io/#/home).
+* [ngx SweetAlert](https://github.com/sweetalert2/ngx-sweetalert2).
+* [ngx-toastr](https://www.npmjs.com/package/ngx-toastr).
+* [ng2-charts](https://valor-software.com/ng2-charts/#/GeneralInfo).
