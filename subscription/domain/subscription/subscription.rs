@@ -15,7 +15,7 @@ pub struct Subscription {
     subscribed_at: DateTime<Utc>,
     user_id: UserId,
     plan: SubscriptionPlan,
-    status: StatusHistory<SubscriptionStatus, String>,
+    status_history: StatusHistory<SubscriptionStatus>,
     payments: Vec<String>,
 }
 
@@ -26,7 +26,7 @@ impl Subscription {
             subscribed_at: Utc::now(),
             user_id,
             plan: SubscriptionPlan::new(plan_id)?,
-            status: StatusHistory::new(SubscriptionStatus::Active),
+            status_history: StatusHistory::new(SubscriptionStatus::Active),
             payments: Vec::new(),
         })
     }
@@ -47,8 +47,8 @@ impl Subscription {
         &self.plan
     }
 
-    pub fn status(&self) -> &StatusHistory<SubscriptionStatus, String> {
-        &self.status
+    pub fn status_history(&self) -> &StatusHistory<SubscriptionStatus> {
+        &self.status_history
     }
 
     pub fn payments(&self) -> &[String] {

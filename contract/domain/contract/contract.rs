@@ -12,7 +12,7 @@ pub type ContractId = String;
 pub struct Contract {
     base: AggregateRoot<ContractId, Event>,
     publication_id: PublicationId,
-    status: StatusHistory<ContractStatus, String>,
+    status_history: StatusHistory<ContractStatus>,
     summaries: Vec<Summary>,
 }
 
@@ -21,7 +21,7 @@ impl Contract {
         Ok(Contract {
             base: AggregateRoot::new(id),
             publication_id,
-            status: StatusHistory::new(ContractStatus::Requested),
+            status_history: StatusHistory::new(ContractStatus::Requested),
             summaries: Vec::new(),
         })
     }
@@ -34,8 +34,8 @@ impl Contract {
         &self.publication_id
     }
 
-    pub fn status(&self) -> &StatusHistory<ContractStatus, String> {
-        &self.status
+    pub fn status_history(&self) -> &StatusHistory<ContractStatus> {
+        &self.status_history
     }
 
     pub fn summaries(&self) -> &[Summary] {
@@ -43,44 +43,44 @@ impl Contract {
     }
 
     pub fn approve(&mut self) -> Result<()> {
-        if self.status().is_current(|s| match s {
+        if self.status_history().is_current(|s| match s {
             ContractStatus::Requested => true,
             _ => false,
         }) {
-            self.status.add_status(ContractStatus::Approved);
+            self.status_history.add_status(ContractStatus::Approved);
             return Ok(());
         }
         Err(Error::new("contract", "cannot_be_approved"))
     }
 
     pub fn reject(&mut self) -> Result<()> {
-        if self.status.is_current(|s| match s {
+        if self.status_history.is_current(|s| match s {
             ContractStatus::Requested => true,
             _ => false,
         }) {
-            self.status.add_status(ContractStatus::Rejected);
+            self.status_history.add_status(ContractStatus::Rejected);
             return Ok(());
         }
         Err(Error::new("contract", "cannto_be_rejected"))
     }
 
     pub fn request(&mut self) -> Result<()> {
-        if self.status.is_current(|s| match s {
+        if self.status_history.is_current(|s| match s {
             ContractStatus::Requested | ContractStatus::Cancelled => true,
             _ => false,
         }) {
-            self.status.add_status(ContractStatus::Requested);
+            self.status_history.add_status(ContractStatus::Requested);
             return Ok(());
         }
         Err(Error::new("contract", "cannot_be_requested"))
     }
 
     pub fn cancel(&mut self) -> Result<()> {
-        if self.status.is_current(|s| match s {
+        if self.status_history.is_current(|s| match s {
             ContractStatus::Requested | ContractStatus::Approved => true,
             _ => false,
         }) {
-            self.status.add_status(ContractStatus::Cancelled);
+            self.status_history.add_status(ContractStatus::Cancelled);
             return Ok(());
         }
         Err(Error::new("contract", "cannot_be_cancelled"))

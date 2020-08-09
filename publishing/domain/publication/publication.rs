@@ -1,15 +1,18 @@
-use common::event::Event;
+use common::error::Error;
 use common::model::{AggregateRoot, StatusHistory};
 use common::result::Result;
+use shared::domain::event::PublicationEvent;
 
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
+use crate::domain::interaction::Stars;
 use crate::domain::publication::{Name, Page, PublicationStatus, Statistics, Synopsis, Tag};
+use crate::domain::reader::Reader;
 
 pub type PublicationId = String;
 
 pub struct Publication {
-    base: AggregateRoot<PublicationId, Event>,
+    base: AggregateRoot<PublicationId, PublicationEvent>,
     name: Name,
     synopsis: Synopsis,
     author_id: AuthorId,
@@ -17,7 +20,7 @@ pub struct Publication {
     pages: Vec<Page>,
     category_id: CategoryId,
     tags: Vec<Tag>,
-    status: StatusHistory<PublicationStatus, String>,
+    status_history: StatusHistory<PublicationStatus>,
     contract: bool,
 }
 
@@ -38,12 +41,12 @@ impl Publication {
             pages: Vec::new(),
             category_id,
             tags: Vec::new(),
-            status: StatusHistory::new(PublicationStatus::Draft),
+            status_history: StatusHistory::new(PublicationStatus::Draft),
             contract: false,
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<PublicationId, Event> {
+    pub fn base(&self) -> &AggregateRoot<PublicationId, PublicationEvent> {
         &self.base
     }
 
@@ -75,8 +78,8 @@ impl Publication {
         &self.tags
     }
 
-    pub fn status(&self) -> &StatusHistory<PublicationStatus, String> {
-        &self.status
+    pub fn status_history(&self) -> &StatusHistory<PublicationStatus> {
+        &self.status_history
     }
 
     pub fn has_contract(&self) -> bool {
@@ -120,6 +123,81 @@ impl Publication {
 
     pub fn remove_contract(&mut self) -> Result<()> {
         self.contract = false;
+        Ok(())
+    }
+
+    pub fn view(&mut self, reader: &Reader) -> Result<()> {
+        self.base.record_event(PublicationEvent::Viewed {
+            reader_id: reader.base().id(),
+            publication_id: reader.base().id(),
+        });
+
+        Ok(())
+    }
+
+    pub fn read(&mut self, reader: &Reader) -> Result<()> {
+        if self.has_contract() && !reader.is_subscribed() {
+            return Err(Error::new("reader", "not_subscribed"));
+        }
+
+        self.base.record_event(PublicationEvent::Read {
+            reader_id: reader.base().id(),
+            publication_id: reader.base().id(),
+        });
+
+        Ok(())
+    }
+
+    pub fn like(&mut self, reader: &Reader) -> Result<()> {
+        if self.has_contract() && !reader.is_subscribed() {
+            return Err(Error::new("reader", "not_subscribed"));
+        }
+
+        self.base.record_event(PublicationEvent::Liked {
+            reader_id: reader.base().id(),
+            publication_id: reader.base().id(),
+        });
+
+        Ok(())
+    }
+
+    pub fn unlike(&mut self, reader: &Reader) -> Result<()> {
+        if self.has_contract() && !reader.is_subscribed() {
+            return Err(Error::new("reader", "not_subscribed"));
+        }
+
+        self.base.record_event(PublicationEvent::Unliked {
+            reader_id: reader.base().id(),
+            publication_id: reader.base().id(),
+        });
+
+        Ok(())
+    }
+
+    pub fn review(&mut self, reader: &Reader, stars: &Stars) -> Result<()> {
+        if self.has_contract() && !reader.is_subscribed() {
+            return Err(Error::new("reader", "not_subscribed"));
+        }
+
+        self.base.record_event(PublicationEvent::Reviewed {
+            reader_id: reader.base().id(),
+            publication_id: reader.base().id(),
+            stars: stars.value(),
+        });
+
+        Ok(())
+    }
+
+    pub fn delete_review(&mut self, reader: &Reader) -> Result<()> {
+        if self.has_contract() && !reader.is_subscribed() {
+            return Err(Error::new("reader", "not_subscribed"));
+        }
+
+        self.base.record_event(PublicationEvent::ReviewDeleted {
+            reader_id: reader.base().id(),
+            publication_id: reader.base().id(),
+        });
+
         Ok(())
     }
 }

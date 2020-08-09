@@ -12,7 +12,7 @@ type SummaryId = String;
 pub struct Summary {
     base: AggregateRoot<SummaryId, Event>,
     contract_id: ContractId,
-    status: StatusHistory<SummaryStatus, ()>,
+    status_history: StatusHistory<SummaryStatus>,
 }
 
 impl Summary {
@@ -20,7 +20,7 @@ impl Summary {
         Ok(Summary {
             base: AggregateRoot::new(id),
             contract_id,
-            status: StatusHistory::new(SummaryStatus::Open),
+            status_history: StatusHistory::new(SummaryStatus::Open),
         })
     }
 
@@ -28,38 +28,38 @@ impl Summary {
         &self.contract_id
     }
 
-    pub fn status(&self) -> &StatusHistory<SummaryStatus, ()> {
-        &self.status
+    pub fn status_history(&self) -> &StatusHistory<SummaryStatus> {
+        &self.status_history
     }
 
     pub fn ready_to_pay(&mut self) -> Result<()> {
-        if self.status.is_current(|s| match s {
+        if self.status_history.is_current(|s| match s {
             SummaryStatus::Open | SummaryStatus::ReadyToPay => true,
             _ => false,
         }) {
-            self.status.add_status(SummaryStatus::ReadyToPay);
+            self.status_history.add_status(SummaryStatus::ReadyToPay);
             return Ok(());
         }
         Err(Error::new("summary", "invalid_status"))
     }
 
     pub fn pay(&mut self) -> Result<()> {
-        if self.status.is_current(|s| match s {
+        if self.status_history.is_current(|s| match s {
             SummaryStatus::ReadyToPay => true,
             _ => false,
         }) {
-            self.status.add_status(SummaryStatus::Paid);
+            self.status_history.add_status(SummaryStatus::Paid);
             return Ok(());
         }
         Err(Error::new("summary", "invalid_status"))
     }
 
     pub fn cancel(&mut self) -> Result<()> {
-        if self.status.is_current(|s| match s {
+        if self.status_history.is_current(|s| match s {
             SummaryStatus::Open | SummaryStatus::ReadyToPay => true,
             _ => false,
         }) {
-            self.status.add_status(SummaryStatus::Cancelled);
+            self.status_history.add_status(SummaryStatus::Cancelled);
             return Ok(());
         }
         Err(Error::new("summary", "invalid_status"))
@@ -76,7 +76,7 @@ mod tests {
         assert!(s_res.is_ok());
 
         let s = s_res.unwrap();
-        assert_eq!(s.status().history().len(), 1);
+        assert_eq!(s.status_history().history().len(), 1);
     }
 
     #[test]
@@ -85,7 +85,7 @@ mod tests {
 
         s.ready_to_pay().unwrap();
         s.pay().unwrap();
-        assert_eq!(s.status().current().unwrap().status(), &SummaryStatus::Paid);
+        assert_eq!(s.status_history().current().status(), &SummaryStatus::Paid);
     }
 
     #[test]

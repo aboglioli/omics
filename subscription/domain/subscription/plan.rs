@@ -26,7 +26,7 @@ impl SubscriptionPlan {
         &self.id
     }
 
-    pub fn status(&self) -> &SubscriptionPlanStatus {
+    pub fn status_history(&self) -> &SubscriptionPlanStatus {
         &self.status
     }
 

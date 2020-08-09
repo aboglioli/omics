@@ -47,6 +47,7 @@ pub enum PublicationEvent {
     Reviewed {
         reader_id: String,
         publication_id: String,
+        stars: u8,
     },
     ReviewDeleted {
         reader_id: String,

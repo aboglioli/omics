@@ -9,7 +9,7 @@ pub type PaymentId = String;
 pub struct Payment {
     base: AggregateRoot<PaymentId, Event>,
     amount: Amount,
-    status: StatusHistory<PaymentStatus, String>,
+    status_history: StatusHistory<PaymentStatus>,
 }
 
 impl Payment {
@@ -17,7 +17,7 @@ impl Payment {
         Ok(Payment {
             base: AggregateRoot::new(id),
             amount,
-            status: StatusHistory::new(PaymentStatus::Pending),
+            status_history: StatusHistory::new(PaymentStatus::Pending),
         })
     }
 
@@ -29,7 +29,7 @@ impl Payment {
         &self.amount
     }
 
-    pub fn status(&self) -> &StatusHistory<PaymentStatus, String> {
-        &self.status
+    pub fn status_history(&self) -> &StatusHistory<PaymentStatus> {
+        &self.status_history
     }
 }

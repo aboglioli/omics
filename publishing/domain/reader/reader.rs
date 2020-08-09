@@ -1,11 +1,6 @@
-use common::error::Error;
 use common::event::Event;
-use common::result::Result;
-
 use common::model::AggregateRoot;
-
-use crate::domain::interaction::{Like, Reading, Review, Stars, View};
-use crate::domain::publication::Publication;
+use common::result::Result;
 
 pub type ReaderId = String;
 
@@ -24,6 +19,10 @@ impl Reader {
         })
     }
 
+    pub fn base(&self) -> &AggregateRoot<ReaderId, Event> {
+        &self.base
+    }
+
     pub fn name(&self) -> &str {
         &self.name
     }
@@ -37,31 +36,8 @@ impl Reader {
         Ok(())
     }
 
-    pub fn view(&self, publication: &Publication) -> Result<View> {
-        Ok(View::new(self.base.id(), publication.base().id())?)
-    }
-
-    pub fn read(&self, publication: &Publication) -> Result<Reading> {
-        if publication.has_contract() && !self.subscribed {
-            return Err(Error::new("reader", "not_subscribed"));
-        }
-
-        Ok(Reading::new(self.base.id(), publication.base().id())?)
-    }
-
-    pub fn like(&self, publication: &Publication) -> Result<Like> {
-        if publication.has_contract() && !self.subscribed {
-            return Err(Error::new("reader", "not_subscribed"));
-        }
-
-        Ok(Like::new(self.base.id(), publication.base().id())?)
-    }
-
-    pub fn review(&self, publication: &Publication, stars: Stars) -> Result<Review> {
-        if publication.has_contract() && !self.subscribed {
-            return Err(Error::new("reader", "not_subscribed"));
-        }
-
-        Ok(Review::new(self.base.id(), publication.base().id(), stars)?)
+    pub fn unsubscribe(&mut self) -> Result<()> {
+        self.subscribed = false;
+        Ok(())
     }
 }

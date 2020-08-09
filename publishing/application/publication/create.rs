@@ -1,9 +1,8 @@
 use serde::Deserialize;
 
+use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::domain::author::AuthorId;
-use crate::domain::category::CategoryId;
 use crate::domain::publication::{
     Image, Name, Page, Publication, PublicationRepository, Synopsis, Tag,
 };
@@ -21,11 +20,11 @@ pub struct PageDto {
 
 #[derive(Deserialize)]
 pub struct CreateCommand {
-    author_id: AuthorId,
+    author_id: String,
     name: String,
     synopsis: String,
     pages: Vec<PageDto>,
-    category_id: CategoryId,
+    category_id: String,
     tags: Vec<String>,
 }
 
@@ -35,16 +34,22 @@ impl CreateCommand {
     }
 }
 
-pub struct Create<'a, PRepo> {
+pub struct Create<'a, EPub, PRepo> {
+    event_pub: &'a EPub,
+
     publication_repo: &'a PRepo,
 }
 
-impl<'a, PRepo> Create<'a, PRepo>
+impl<'a, EPub, PRepo> Create<'a, EPub, PRepo>
 where
+    EPub: EventPublisher,
     PRepo: PublicationRepository,
 {
-    pub fn new(publication_repo: &'a PRepo) -> Self {
-        Create { publication_repo }
+    pub fn new(event_pub: &'a EPub, publication_repo: &'a PRepo) -> Self {
+        Create {
+            event_pub,
+            publication_repo,
+        }
     }
 
     pub async fn exec(&self, cmd: CreateCommand) -> Result<()> {
@@ -76,6 +81,10 @@ where
         publication.set_tags(tags)?;
 
         self.publication_repo.save(&mut publication).await?;
+
+        self.event_pub
+            .publish_all(publication.base().events()?)
+            .await?;
 
         Ok(())
     }
