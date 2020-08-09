@@ -1,8 +1,8 @@
 use serde::Deserialize;
 
+use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::domain::category::CategoryId;
 use crate::domain::publication::{
     Image, Name, Page, PublicationId, PublicationRepository, Synopsis, Tag,
 };
@@ -23,7 +23,7 @@ pub struct UpdateCommand {
     name: String,
     synopsis: String,
     pages: Vec<PageDto>,
-    category_id: CategoryId,
+    category_id: String,
     tags: Vec<String>,
 }
 
@@ -33,16 +33,22 @@ impl UpdateCommand {
     }
 }
 
-pub struct Update<'a, PRepo> {
+pub struct Update<'a, EPub, PRepo> {
+    event_pub: &'a EPub,
+
     publication_repo: &'a PRepo,
 }
 
-impl<'a, PRepo> Update<'a, PRepo>
+impl<'a, EPub, PRepo> Update<'a, EPub, PRepo>
 where
+    EPub: EventPublisher,
     PRepo: PublicationRepository,
 {
-    pub fn new(publication_repo: &'a PRepo) -> Self {
-        Update { publication_repo }
+    pub fn new(event_pub: &'a EPub, publication_repo: &'a PRepo) -> Self {
+        Update {
+            event_pub,
+            publication_repo,
+        }
     }
 
     pub async fn exec(&self, id: &PublicationId, cmd: UpdateCommand) -> Result<()> {
@@ -73,6 +79,10 @@ where
         publication.set_cateogry(cmd.category_id)?;
 
         self.publication_repo.save(&mut publication).await?;
+
+        self.event_pub
+            .publish_all(publication.base().events()?)
+            .await?;
 
         Ok(())
     }

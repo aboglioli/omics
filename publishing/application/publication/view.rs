@@ -1,8 +1,8 @@
 use serde::Serialize;
 
+use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::domain::interaction::InteractionRepository;
 use crate::domain::publication::{Publication, PublicationId, PublicationRepository};
 use crate::domain::reader::{ReaderId, ReaderRepository};
 
@@ -23,10 +23,11 @@ pub struct ViewResponse {
     statistics: StatisticsDto,
     category_id: String,
     tags: Vec<String>,
+    status: Option<String>,
 }
 
-impl From<Publication> for ViewResponse {
-    fn from(publication: Publication) -> Self {
+impl From<&Publication> for ViewResponse {
+    fn from(publication: &Publication) -> Self {
         let stats = publication.statistics();
         let statistics = StatisticsDto {
             likes: stats.likes(),
@@ -49,29 +50,27 @@ impl From<Publication> for ViewResponse {
             statistics,
             category_id: publication.category_id().to_owned(),
             tags,
+            status: None,
         }
     }
 }
 
-pub struct View<'a, IRepo, PRepo, RRepo> {
-    interaction_repo: &'a IRepo,
+pub struct View<'a, EPub, PRepo, RRepo> {
+    event_pub: &'a EPub,
+
     publication_repo: &'a PRepo,
     reader_repo: &'a RRepo,
 }
 
-impl<'a, IRepo, PRepo, RRepo> View<'a, IRepo, PRepo, RRepo>
+impl<'a, EPub, PRepo, RRepo> View<'a, EPub, PRepo, RRepo>
 where
-    IRepo: InteractionRepository,
+    EPub: EventPublisher,
     PRepo: PublicationRepository,
     RRepo: ReaderRepository,
 {
-    pub fn new(
-        interaction_repo: &'a IRepo,
-        publication_repo: &'a PRepo,
-        reader_repo: &'a RRepo,
-    ) -> Self {
+    pub fn new(event_pub: &'a EPub, publication_repo: &'a PRepo, reader_repo: &'a RRepo) -> Self {
         View {
-            interaction_repo,
+            event_pub,
             publication_repo,
             reader_repo,
         }
@@ -82,12 +81,21 @@ where
         reader_id: &ReaderId,
         publication_id: &PublicationId,
     ) -> Result<ViewResponse> {
-        let publication = self.publication_repo.find_by_id(publication_id).await?;
+        let mut publication = self.publication_repo.find_by_id(publication_id).await?;
         let reader = self.reader_repo.find_by_id(reader_id).await?;
 
-        let mut view = reader.view(&publication)?;
-        self.interaction_repo.save_view(&mut view).await?;
+        publication.view(&reader)?;
 
-        Ok(ViewResponse::from(publication))
+        self.event_pub
+            .publish_all(publication.base().events()?)
+            .await?;
+
+        let mut res = ViewResponse::from(&publication);
+
+        if publication.author_id() == reader_id {
+            res.status = Some(publication.status_history().current().status().to_string());
+        }
+
+        Ok(res)
     }
 }
