@@ -3,23 +3,37 @@ use serde::Serialize;
 use common::event::EventPublisher;
 use common::result::Result;
 
+use crate::domain::interaction::{InteractionRepository, Statistics, StatisticsService};
 use crate::domain::publication::{Publication, PublicationId, PublicationRepository};
 use crate::domain::reader::{ReaderId, ReaderRepository};
 
 #[derive(Serialize)]
 pub struct StatisticsDto {
-    likes: u32,
     views: u32,
     unique_views: u32,
     readings: u32,
+    likes: u32,
+    reviews: u32,
+    stars: f32,
+}
+
+impl From<&Statistics> for StatisticsDto {
+    fn from(statistics: &Statistics) -> Self {
+        StatisticsDto {
+            views: statistics.views(),
+            unique_views: statistics.unique_views(),
+            readings: statistics.readings(),
+            likes: statistics.likes(),
+            reviews: statistics.reviews(),
+            stars: statistics.stars(),
+        }
+    }
 }
 
 #[derive(Serialize)]
 pub struct ImageDto {
-    id: String,
     url: String,
     size: u32,
-    // frames: Vec<FrameDto>, // TODO: not considering frames right now
 }
 
 #[derive(Serialize)]
@@ -31,32 +45,23 @@ pub struct PageDto {
 #[derive(Serialize)]
 pub struct ReadResponse {
     id: String,
+    author_id: String,
     name: String,
     synopsis: String,
-    author_id: String,
-    statistics: StatisticsDto,
     pages: Vec<PageDto>,
     category_id: String,
     tags: Vec<String>,
     status: Option<String>,
+    statistics: Option<StatisticsDto>,
 }
 
 impl From<&Publication> for ReadResponse {
     fn from(publication: &Publication) -> Self {
-        let stats = publication.statistics();
-        let statistics = StatisticsDto {
-            likes: stats.likes(),
-            views: stats.views(),
-            unique_views: stats.unique_views(),
-            readings: stats.readings(),
-        };
-
         let mut pages = Vec::new();
         for page in publication.pages().iter() {
             let mut images = Vec::new();
             for image in page.images().iter() {
                 images.push(ImageDto {
-                    id: image.id().to_owned(),
                     url: image.url().to_owned(),
                     size: image.size(),
                 });
@@ -68,44 +73,51 @@ impl From<&Publication> for ReadResponse {
             });
         }
 
-        let tags: Vec<String> = publication
-            .tags()
-            .iter()
-            .map(|t| t.name().to_owned())
-            .collect();
+        let header = publication.header();
+
+        let tags: Vec<String> = header.tags().iter().map(|t| t.name().to_owned()).collect();
 
         ReadResponse {
             id: publication.base().id(),
-            name: publication.name().value().to_owned(),
-            synopsis: publication.synopsis().value().to_owned(),
             author_id: publication.author_id().to_owned(),
-            statistics,
-            pages,
-            category_id: publication.category_id().to_owned(),
+            name: header.name().value().to_owned(),
+            synopsis: header.synopsis().value().to_owned(),
+            category_id: header.category_id().to_owned(),
             tags,
+            pages,
             status: None,
+            statistics: None,
         }
     }
 }
 
-pub struct Read<'a, EPub, PRepo, RRepo> {
+pub struct Read<'a, EPub, PRepo, RRepo, IRepo> {
     event_pub: &'a EPub,
 
     publication_repo: &'a PRepo,
     reader_repo: &'a RRepo,
+
+    statistics_serv: StatisticsService<'a, IRepo>,
 }
 
-impl<'a, EPub, PRepo, RRepo> Read<'a, EPub, PRepo, RRepo>
+impl<'a, EPub, PRepo, RRepo, IRepo> Read<'a, EPub, PRepo, RRepo, IRepo>
 where
     EPub: EventPublisher,
     PRepo: PublicationRepository,
     RRepo: ReaderRepository,
+    IRepo: InteractionRepository,
 {
-    pub fn new(event_pub: &'a EPub, publication_repo: &'a PRepo, reader_repo: &'a RRepo) -> Self {
+    pub fn new(
+        event_pub: &'a EPub,
+        publication_repo: &'a PRepo,
+        reader_repo: &'a RRepo,
+        statistics_serv: StatisticsService<'a, IRepo>,
+    ) -> Self {
         Read {
             event_pub,
             publication_repo,
             reader_repo,
+            statistics_serv,
         }
     }
 
@@ -128,6 +140,12 @@ where
         if publication.author_id() == reader_id {
             res.status = Some(publication.status_history().current().status().to_string());
         }
+
+        let statistics = self
+            .statistics_serv
+            .get_all_statistics(publication_id)
+            .await?;
+        res.statistics = Some(StatisticsDto::from(&statistics));
 
         Ok(res)
     }

@@ -9,12 +9,24 @@ use crate::domain::event::serializer;
 pub enum PublicationEvent {
     Created {
         id: String,
+        author_id: String,
         name: String,
         synopsis: String,
-        author_id: String,
-        pages_count: u32,
         category_id: String,
         tags: Vec<String>,
+        cover: String,
+    },
+    HeaderUpdated {
+        id: String,
+        name: String,
+        synopsis: String,
+        category_id: String,
+        tags: Vec<String>,
+        cover: String,
+    },
+    PagesUpdated {
+        id: String,
+        pages_count: usize,
     },
     Published {
         id: String,
@@ -59,6 +71,8 @@ impl ToString for PublicationEvent {
     fn to_string(&self) -> String {
         match self {
             PublicationEvent::Created { .. } => "created".to_owned(),
+            PublicationEvent::HeaderUpdated { .. } => "header-updated".to_owned(),
+            PublicationEvent::PagesUpdated { .. } => "pages-updated".to_owned(),
             PublicationEvent::Published { .. } => "published".to_owned(),
             PublicationEvent::Approved { .. } => "approved".to_owned(),
             PublicationEvent::Rejected { .. } => "rejected".to_owned(),

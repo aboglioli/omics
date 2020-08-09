@@ -9,5 +9,6 @@ pub trait EventPublisher {
 
     async fn publish(&self, event: Event) -> Result<Self::Output>;
 
+    // TODO: make main function
     async fn publish_all(&self, events: Vec<Event>) -> Result<Self::Output>;
 }

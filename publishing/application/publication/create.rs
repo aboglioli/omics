@@ -3,8 +3,9 @@ use serde::Deserialize;
 use common::event::EventPublisher;
 use common::result::Result;
 
+use crate::domain::author::AuthorId;
 use crate::domain::publication::{
-    Image, Name, Page, Publication, PublicationRepository, Synopsis, Tag,
+    Header, Image, Name, Publication, PublicationRepository, Synopsis, Tag,
 };
 
 #[derive(Deserialize)]
@@ -14,18 +15,12 @@ pub struct ImageDto {
 }
 
 #[derive(Deserialize)]
-pub struct PageDto {
-    images: Vec<ImageDto>,
-}
-
-#[derive(Deserialize)]
 pub struct CreateCommand {
-    author_id: String,
     name: String,
     synopsis: String,
-    pages: Vec<PageDto>,
     category_id: String,
     tags: Vec<String>,
+    cover: ImageDto,
 }
 
 impl CreateCommand {
@@ -52,33 +47,26 @@ where
         }
     }
 
-    pub async fn exec(&self, cmd: CreateCommand) -> Result<()> {
+    pub async fn exec(&self, author_id: &AuthorId, cmd: CreateCommand) -> Result<()> {
         cmd.validate()?;
 
         let name = Name::new(&cmd.name)?;
         let synopsis = Synopsis::new(&cmd.synopsis)?;
 
-        let pages = Vec::new();
-        for (page_n, page) in cmd.pages.iter().enumerate() {
-            let mut images = Vec::new();
-            for (img_id, image) in page.images.iter().enumerate() {
-                images.push(Image::new(img_id.to_string(), &image.url, image.size)?);
-            }
-
-            let mut page = Page::new(page_n as u32)?;
-            page.set_images(images)?;
+        let mut tags = Vec::new();
+        for tag in cmd.tags.iter() {
+            tags.push(Tag::new(tag)?);
         }
-        let tags: Vec<Tag> = cmd.tags.iter().map(|t| Tag::new(t).unwrap()).collect();
+
+        let cover = Image::new(&cmd.cover.url, cmd.cover.size)?;
+
+        let header = Header::new(name, synopsis, cmd.category_id, tags, cover)?;
 
         let mut publication = Publication::new(
             self.publication_repo.next_id().await?,
-            name,
-            synopsis,
-            cmd.author_id,
-            cmd.category_id,
+            author_id.to_owned(),
+            header,
         )?;
-        publication.set_pages(pages)?;
-        publication.set_tags(tags)?;
 
         self.publication_repo.save(&mut publication).await?;
 

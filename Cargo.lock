@@ -870,6 +870,7 @@ dependencies = [
  "common",
  "identity",
  "serde",
+ "serde_json",
  "shared",
  "slug",
 ]

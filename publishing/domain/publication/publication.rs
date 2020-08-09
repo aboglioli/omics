@@ -4,125 +4,104 @@ use common::result::Result;
 use shared::domain::event::PublicationEvent;
 
 use crate::domain::author::AuthorId;
-use crate::domain::category::CategoryId;
 use crate::domain::interaction::Stars;
-use crate::domain::publication::{Name, Page, PublicationStatus, Statistics, Synopsis, Tag};
+use crate::domain::publication::{Header, Page, PublicationStatus};
 use crate::domain::reader::Reader;
 
 pub type PublicationId = String;
 
 pub struct Publication {
     base: AggregateRoot<PublicationId, PublicationEvent>,
-    name: Name,
-    synopsis: Synopsis,
     author_id: AuthorId,
-    statistics: Statistics,
+    header: Header,
+
     pages: Vec<Page>,
-    category_id: CategoryId,
-    tags: Vec<Tag>,
-    status_history: StatusHistory<PublicationStatus>,
     contract: bool,
+
+    status_history: StatusHistory<PublicationStatus>,
 }
 
 impl Publication {
-    pub fn new(
-        id: PublicationId,
-        name: Name,
-        synopsis: Synopsis,
-        author_id: AuthorId,
-        category_id: CategoryId,
-    ) -> Result<Publication> {
-        Ok(Publication {
+    pub fn new(id: PublicationId, author_id: AuthorId, header: Header) -> Result<Publication> {
+        let mut publication = Publication {
             base: AggregateRoot::new(id),
-            name,
-            synopsis,
             author_id,
-            statistics: Statistics::default(),
+            header,
             pages: Vec::new(),
-            category_id,
-            tags: Vec::new(),
-            status_history: StatusHistory::new(PublicationStatus::Draft),
             contract: false,
-        })
+            status_history: StatusHistory::new(PublicationStatus::Draft),
+        };
+
+        publication.base.record_event(PublicationEvent::Created {
+            id: publication.base().id(),
+            author_id: publication.author_id().to_owned(),
+            name: publication.header().name().value().to_owned(),
+            synopsis: publication.header().synopsis().value().to_owned(),
+            category_id: publication.header().category_id().to_owned(),
+            tags: publication
+                .header()
+                .tags()
+                .iter()
+                .map(|t| t.name().to_owned())
+                .collect(),
+            cover: publication.header().cover().url().to_owned(),
+        });
+
+        Ok(publication)
     }
 
     pub fn base(&self) -> &AggregateRoot<PublicationId, PublicationEvent> {
         &self.base
     }
 
-    pub fn name(&self) -> &Name {
-        &self.name
-    }
-
-    pub fn synopsis(&self) -> &Synopsis {
-        &self.synopsis
-    }
-
     pub fn author_id(&self) -> &AuthorId {
         &self.author_id
     }
 
-    pub fn statistics(&self) -> &Statistics {
-        &self.statistics
+    pub fn header(&self) -> &Header {
+        &self.header
     }
 
     pub fn pages(&self) -> &[Page] {
         &self.pages
     }
 
-    pub fn category_id(&self) -> &CategoryId {
-        &self.category_id
-    }
-
-    pub fn tags(&self) -> &[Tag] {
-        &self.tags
+    pub fn has_contract(&self) -> bool {
+        self.contract
     }
 
     pub fn status_history(&self) -> &StatusHistory<PublicationStatus> {
         &self.status_history
     }
 
-    pub fn has_contract(&self) -> bool {
-        self.contract
-    }
+    pub fn set_header(&mut self, header: Header) -> Result<()> {
+        self.header = header;
 
-    pub fn set_name(&mut self, name: Name) -> Result<()> {
-        self.name = name;
-        Ok(())
-    }
+        self.base.record_event(PublicationEvent::HeaderUpdated {
+            id: self.base().id(),
+            name: self.header().name().value().to_owned(),
+            synopsis: self.header().synopsis().value().to_owned(),
+            category_id: self.header().category_id().to_owned(),
+            tags: self
+                .header()
+                .tags()
+                .iter()
+                .map(|t| t.name().to_owned())
+                .collect(),
+            cover: self.header().cover().url().to_owned(),
+        });
 
-    pub fn set_synopsis(&mut self, synopsis: Synopsis) -> Result<()> {
-        self.synopsis = synopsis;
-        Ok(())
-    }
-
-    pub fn set_statistics(&mut self, statistics: Statistics) -> Result<()> {
-        self.statistics = statistics;
         Ok(())
     }
 
     pub fn set_pages(&mut self, pages: Vec<Page>) -> Result<()> {
         self.pages = pages;
-        Ok(())
-    }
 
-    pub fn set_cateogry(&mut self, category_id: CategoryId) -> Result<()> {
-        self.category_id = category_id;
-        Ok(())
-    }
+        self.base.record_event(PublicationEvent::PagesUpdated {
+            id: self.base().id(),
+            pages_count: self.pages().len(),
+        });
 
-    pub fn set_tags(&mut self, tags: Vec<Tag>) -> Result<()> {
-        self.tags = tags;
-        Ok(())
-    }
-
-    pub fn add_contract(&mut self) -> Result<()> {
-        self.contract = true;
-        Ok(())
-    }
-
-    pub fn remove_contract(&mut self) -> Result<()> {
-        self.contract = false;
         Ok(())
     }
 
@@ -198,6 +177,16 @@ impl Publication {
             publication_id: reader.base().id(),
         });
 
+        Ok(())
+    }
+
+    pub fn add_contract(&mut self) -> Result<()> {
+        self.contract = true;
+        Ok(())
+    }
+
+    pub fn remove_contract(&mut self) -> Result<()> {
+        self.contract = false;
         Ok(())
     }
 }

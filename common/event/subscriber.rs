@@ -9,6 +9,6 @@ pub trait EventSubscriber {
 
     async fn subscribe(
         &self,
-        handler: Box<dyn EventHandler<Output = Self::Output> + Sync>,
+        handler: Box<dyn EventHandler<Output = Self::Output> + Sync + Send>, // TODO: use generics.
     ) -> Result<Self::Output>;
 }

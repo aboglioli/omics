@@ -4,7 +4,7 @@ use common::event::EventPublisher;
 use common::result::Result;
 
 use crate::domain::publication::{
-    Image, Name, Page, PublicationId, PublicationRepository, Synopsis, Tag,
+    Header, Image, Name, PublicationId, PublicationRepository, Synopsis, Tag,
 };
 
 #[derive(Deserialize)]
@@ -14,17 +14,12 @@ pub struct ImageDto {
 }
 
 #[derive(Deserialize)]
-pub struct PageDto {
-    images: Vec<ImageDto>,
-}
-
-#[derive(Deserialize)]
 pub struct UpdateCommand {
     name: String,
     synopsis: String,
-    pages: Vec<PageDto>,
     category_id: String,
     tags: Vec<String>,
+    cover: ImageDto,
 }
 
 impl UpdateCommand {
@@ -54,29 +49,21 @@ where
     pub async fn exec(&self, id: &PublicationId, cmd: UpdateCommand) -> Result<()> {
         cmd.validate()?;
 
+        let name = Name::new(&cmd.name)?;
+        let synopsis = Synopsis::new(&cmd.synopsis)?;
+
+        let mut tags = Vec::new();
+        for tag in cmd.tags.iter() {
+            tags.push(Tag::new(tag)?);
+        }
+
+        let cover = Image::new(&cmd.cover.url, cmd.cover.size)?;
+
+        let header = Header::new(name, synopsis, cmd.category_id, tags, cover)?;
+
         let mut publication = self.publication_repo.find_by_id(id).await?;
 
-        let name = Name::new(&cmd.name)?;
-        publication.set_name(name)?;
-        let synopsis = Synopsis::new(&cmd.synopsis)?;
-        publication.set_synopsis(synopsis)?;
-
-        let pages = Vec::new();
-        for (page_n, page) in cmd.pages.iter().enumerate() {
-            let mut images = Vec::new();
-            for (img_id, image) in page.images.iter().enumerate() {
-                images.push(Image::new(img_id.to_string(), &image.url, image.size)?);
-            }
-
-            let mut page = Page::new(page_n as u32)?;
-            page.set_images(images)?;
-        }
-        publication.set_pages(pages)?;
-
-        let tags: Vec<Tag> = cmd.tags.iter().map(|t| Tag::new(t).unwrap()).collect();
-        publication.set_tags(tags)?;
-
-        publication.set_cateogry(cmd.category_id)?;
+        publication.set_header(header)?;
 
         self.publication_repo.save(&mut publication).await?;
 
