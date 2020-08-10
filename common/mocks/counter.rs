@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Mutex;
 
+#[derive(Default)]
 pub struct Counter {
     counts: Mutex<HashMap<String, u32>>,
 }

@@ -1,7 +1,13 @@
-mod edit_publication;
-mod publish;
-mod read_publication;
+mod create;
+mod read;
+mod update;
+mod update_pages;
+mod view;
+mod view_handler;
 
-pub use edit_publication::*;
-pub use publish::*;
-pub use read_publication::*;
+pub use create::*;
+pub use read::*;
+pub use update::*;
+pub use update_pages::*;
+pub use view::*;
+pub use view_handler::*;

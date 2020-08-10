@@ -4,7 +4,7 @@ use crate::event::Event;
 use crate::result::Result;
 
 #[async_trait]
-pub trait EventHandler: Send {
+pub trait EventHandler {
     type Output;
 
     fn topic(&self) -> &str;

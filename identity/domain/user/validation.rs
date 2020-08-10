@@ -1,33 +1,25 @@
 use uuid::Uuid;
 
-use common::result::Result;
-
-pub type ValidationCode = String;
-
-#[derive(Debug, Clone)]
+#[derive(Default, Debug, Clone)]
 pub struct Validation {
-    code: ValidationCode,
-    validated: bool,
+    code: String,
 }
 
 impl Validation {
-    pub fn new() -> Result<Validation> {
+    pub fn new() -> Self {
         let code = Uuid::new_v4();
-        Ok(Validation {
+        Validation {
             code: code.to_string(),
-            validated: false,
-        })
+        }
     }
 
-    pub fn code(&self) -> &ValidationCode {
+    pub fn code(&self) -> &str {
         &self.code
     }
+}
 
-    pub fn validated(&self) -> bool {
-        self.validated
-    }
-
-    pub fn validate(&self, code: &ValidationCode) -> bool {
-        &self.code == code
+impl PartialEq for Validation {
+    fn eq(&self, other: &Self) -> bool {
+        self.code == other.code
     }
 }

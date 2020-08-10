@@ -3,37 +3,38 @@ use common::error::Error;
 use common::result::Result;
 
 pub struct TokenService<'a, TRepo, TEnc> {
-    token_repository: &'a TRepo,
-    token_encoder: &'a TEnc,
+    token_repo: &'a TRepo,
+
+    token_enc: &'a TEnc,
 }
 
 impl<'a, TRepo: TokenRepository, TEnc: TokenEncoder> TokenService<'a, TRepo, TEnc> {
-    pub fn new(token_repository: &'a TRepo, token_encoder: &'a TEnc) -> Self {
+    pub fn new(token_repo: &'a TRepo, token_enc: &'a TEnc) -> Self {
         TokenService {
-            token_encoder,
-            token_repository,
+            token_enc,
+            token_repo,
         }
     }
 
     pub async fn create(&self, data: Data) -> Result<Token> {
         let token_id = TokenId::new();
-        let token = self.token_encoder.encode(&token_id)?;
-        self.token_repository.set(token_id, data).await?;
+        let token = self.token_enc.encode(&token_id)?;
+        self.token_repo.set(token_id, data).await?;
 
         Ok(token)
     }
 
     pub async fn validate(&self, token: &Token) -> Result<Data> {
-        let token_id = self.token_encoder.decode(token)?;
-        if let Some(data) = self.token_repository.get(&token_id).await {
+        let token_id = self.token_enc.decode(token)?;
+        if let Some(data) = self.token_repo.get(&token_id).await {
             return Ok(data);
         }
         Err(Error::new("token", "not_found"))
     }
 
     pub async fn invalidate(&self, token: &Token) -> Result<()> {
-        let token_id = self.token_encoder.decode(token)?;
-        self.token_repository.delete(&token_id).await?;
+        let token_id = self.token_enc.decode(token)?;
+        self.token_repo.delete(&token_id).await?;
         Ok(())
     }
 }

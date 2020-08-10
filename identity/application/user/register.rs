@@ -1,20 +1,20 @@
 use serde::Deserialize;
 
-use common::event::{EventPublisher, ToEvent};
+use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::domain::role::RoleId;
-use crate::domain::token::{TokenEncoder, TokenRepository};
+use crate::domain::role::{Role, RoleId};
+
 use crate::domain::user::{
-    AuthService, Email, Identity, Password, PasswordHasher, Provider, User, UserEvent,
-    UserRepository, Username,
+    Email, Identity, Password, PasswordHasher, Provider, User, UserRepository, UserService,
+    Username,
 };
 
 #[derive(Deserialize)]
 pub struct RegisterCommand {
-    pub username: String,
-    pub email: String,
-    pub password: String,
+    username: String,
+    email: String,
+    password: String,
 }
 
 impl RegisterCommand {
@@ -23,37 +23,37 @@ impl RegisterCommand {
     }
 }
 
-pub struct Register<'a, EPub, URepo, PHasher, TRepo, TEnc> {
+pub struct Register<'a, EPub, URepo, PHasher> {
     event_pub: &'a EPub,
-    auth_serv: AuthService<'a, URepo, PHasher, TRepo, TEnc>,
+
     user_repo: &'a URepo,
+
+    user_serv: UserService<'a, URepo, PHasher>,
 }
 
-impl<'a, EPub, URepo, PHasher, TRepo, TEnc> Register<'a, EPub, URepo, PHasher, TRepo, TEnc>
+impl<'a, EPub, URepo, PHasher> Register<'a, EPub, URepo, PHasher>
 where
     EPub: EventPublisher,
     URepo: UserRepository,
     PHasher: PasswordHasher,
-    TRepo: TokenRepository,
-    TEnc: TokenEncoder,
 {
     pub fn new(
         event_pub: &'a EPub,
-        auth_serv: AuthService<'a, URepo, PHasher, TRepo, TEnc>,
         user_repo: &'a URepo,
+        user_serv: UserService<'a, URepo, PHasher>,
     ) -> Self {
         Register {
             event_pub,
-            auth_serv,
             user_repo,
+            user_serv,
         }
     }
 
     pub async fn exec(&self, cmd: RegisterCommand) -> Result<()> {
         cmd.validate()?;
 
-        self.auth_serv.available(&cmd.username, &cmd.email).await?;
-        let hashed_password = self.auth_serv.generate_password(&cmd.password)?;
+        self.user_serv.available(&cmd.username, &cmd.email).await?;
+        let hashed_password = self.user_serv.generate_password(&cmd.password)?;
 
         let mut user = User::new(
             self.user_repo.next_id().await?,
@@ -63,18 +63,12 @@ where
                 Email::new(&cmd.email)?,
                 Some(Password::new(&hashed_password)?),
             )?,
-            RoleId::from("user"),
+            Role::new(RoleId::new("user")?, "User")?,
         )?;
 
         self.user_repo.save(&mut user).await?;
 
-        let event = UserEvent::Registered {
-            id: user.base().id(),
-            username: user.identity().username().value().to_owned(),
-            email: user.identity().email().value().to_owned(),
-        }
-        .to_event()?;
-        self.event_pub.publish(event).await?;
+        self.event_pub.publish_all(user.base().events()?).await?;
 
         Ok(())
     }

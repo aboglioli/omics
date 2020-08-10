@@ -12,10 +12,16 @@ pub struct InMemUserRepository {
 }
 
 impl InMemUserRepository {
-    pub fn new() -> InMemUserRepository {
+    pub fn new() -> Self {
         InMemUserRepository {
             cache: InMemCache::new(),
         }
+    }
+}
+
+impl Default for InMemUserRepository {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -24,7 +30,7 @@ impl UserRepository for InMemUserRepository {
     async fn next_id(&self) -> Result<UserId> {
         let uuid = Uuid::new_v4();
         let uuid = uuid.to_string();
-        Ok(uuid)
+        UserId::new(&uuid)
     }
 
     async fn find_by_id(&self, id: &UserId) -> Result<User> {
@@ -63,7 +69,7 @@ mod tests {
         let id1 = repo.next_id().await.unwrap();
         let id2 = repo.next_id().await.unwrap();
         let id3 = repo.next_id().await.unwrap();
-        assert!(id1.len() > 10);
+        assert!(id1.value().len() > 10);
         assert_ne!(id1, id2);
         assert_ne!(id2, id3);
     }

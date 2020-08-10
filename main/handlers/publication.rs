@@ -2,72 +2,71 @@ use std::sync::Arc;
 
 use warp::{Filter, Rejection, Reply};
 
-use publishing::domain::publication::PublicationId;
-
 use crate::handlers::common::Uninmplemented;
-use crate::handlers::context::{with_context, Context};
+use crate::handlers::container::{with_container, Container};
 
-pub fn routes(ctx: &Arc<Context>) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
-    let get_by_id = warp::get()
-        .and(warp::path!(PublicationId))
-        .and(with_context(ctx.clone()))
-        .and_then(get_by_id);
+pub fn routes(
+    container: &Arc<Container>,
+) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+    let view = warp::get()
+        .and(warp::path!(String))
+        .and(with_container(container.clone()))
+        .and_then(view);
 
     // Administration
     let create = warp::post()
         .and(warp::path::end())
         .and(warp::body::json())
-        .and(with_context(ctx.clone()))
+        .and(with_container(container.clone()))
         .and_then(create);
 
     let update = warp::put()
-        .and(warp::path!(PublicationId))
+        .and(warp::path!(String))
         .and(warp::body::json())
-        .and(with_context(ctx.clone()))
+        .and(with_container(container.clone()))
         .and_then(update);
 
     let delete = warp::delete()
-        .and(warp::path!(PublicationId))
-        .and(with_context(ctx.clone()))
+        .and(warp::path!(String))
+        .and(with_container(container.clone()))
         .and_then(delete);
 
     let publish = warp::post()
-        .and(warp::path!(PublicationId))
-        .and(with_context(ctx.clone()))
+        .and(warp::path!(String))
+        .and(with_container(container.clone()))
         .and_then(publish);
 
     let approve = warp::post()
-        .and(warp::path!(PublicationId))
+        .and(warp::path!(String))
         .and(warp::body::json())
-        .and(with_context(ctx.clone()))
+        .and(with_container(container.clone()))
         .and_then(approve);
 
     let reject = warp::post()
-        .and(warp::path!(PublicationId))
+        .and(warp::path!(String))
         .and(warp::body::json())
-        .and(with_context(ctx.clone()))
+        .and(with_container(container.clone()))
         .and_then(reject);
 
     // Interactions
     let read = warp::post()
-        .and(warp::path!(PublicationId / "read"))
-        .and(with_context(ctx.clone()))
+        .and(warp::path!(String / "read"))
+        .and(with_container(container.clone()))
         .and_then(read);
 
     let like = warp::post()
-        .and(warp::path!(PublicationId / "like"))
-        .and(with_context(ctx.clone()))
+        .and(warp::path!(String / "like"))
+        .and(with_container(container.clone()))
         .and_then(like);
 
     let review = warp::post()
-        .and(warp::path!(PublicationId / "review"))
+        .and(warp::path!(String / "review"))
         .and(warp::body::json())
-        .and(with_context(ctx.clone()))
+        .and(with_container(container.clone()))
         .and_then(review);
 
     warp::path("publications").and(
-        get_by_id
-            .or(create)
+        view.or(create)
             .or(update)
             .or(delete)
             .or(publish)
@@ -79,58 +78,61 @@ pub fn routes(ctx: &Arc<Context>) -> impl Filter<Extract = impl Reply, Error = R
     )
 }
 
-pub async fn get_by_id(_id: PublicationId, _ctx: Arc<Context>) -> Result<impl Reply, Rejection> {
+pub async fn view(_id: String, _container: Arc<Container>) -> Result<impl Reply, Rejection> {
     Ok(warp::reply::json(&Uninmplemented::new()))
 }
 
-pub async fn create(_cmd: Uninmplemented, _ctx: Arc<Context>) -> Result<impl Reply, Rejection> {
-    Ok(warp::reply::json(&Uninmplemented::new()))
-}
-
-pub async fn update(
-    _id: PublicationId,
+pub async fn create(
     _cmd: Uninmplemented,
-    _ctx: Arc<Context>,
+    _container: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
     Ok(warp::reply::json(&Uninmplemented::new()))
 }
 
-pub async fn delete(_id: PublicationId, _ctx: Arc<Context>) -> Result<impl Reply, Rejection> {
+pub async fn update(
+    _id: String,
+    _cmd: Uninmplemented,
+    _container: Arc<Container>,
+) -> Result<impl Reply, Rejection> {
     Ok(warp::reply::json(&Uninmplemented::new()))
 }
 
-pub async fn publish(_id: PublicationId, _ctx: Arc<Context>) -> Result<impl Reply, Rejection> {
+pub async fn delete(_id: String, _container: Arc<Container>) -> Result<impl Reply, Rejection> {
+    Ok(warp::reply::json(&Uninmplemented::new()))
+}
+
+pub async fn publish(_id: String, _container: Arc<Container>) -> Result<impl Reply, Rejection> {
     Ok(warp::reply::json(&Uninmplemented::new()))
 }
 
 pub async fn approve(
-    _id: PublicationId,
+    _id: String,
     _cmd: Uninmplemented,
-    _ctx: Arc<Context>,
+    _container: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
     Ok(warp::reply::json(&Uninmplemented::new()))
 }
 
 pub async fn reject(
-    _id: PublicationId,
+    _id: String,
     _cmd: Uninmplemented,
-    _ctx: Arc<Context>,
+    _container: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
     Ok(warp::reply::json(&Uninmplemented::new()))
 }
 
-pub async fn read(_id: PublicationId, _ctx: Arc<Context>) -> Result<impl Reply, Rejection> {
+pub async fn read(_id: String, _container: Arc<Container>) -> Result<impl Reply, Rejection> {
     Ok(warp::reply::json(&Uninmplemented::new()))
 }
 
-pub async fn like(_id: PublicationId, _ctx: Arc<Context>) -> Result<impl Reply, Rejection> {
+pub async fn like(_id: String, _container: Arc<Container>) -> Result<impl Reply, Rejection> {
     Ok(warp::reply::json(&Uninmplemented::new()))
 }
 
 pub async fn review(
-    _id: PublicationId,
+    _id: String,
     _cmd: Uninmplemented,
-    _ctx: Arc<Context>,
+    _container: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
     Ok(warp::reply::json(&Uninmplemented::new()))
 }

@@ -1,5 +1,6 @@
+pub mod authorization;
 pub mod common;
-pub mod context;
+pub mod container;
 pub mod contract;
 pub mod donation;
 pub mod publication;
