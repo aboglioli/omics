@@ -1,11 +1,14 @@
+use serde::Deserialize;
+
 use common::result::Result;
 
-use crate::domain::token::{TokenEncoder, TokenRepository};
-use crate::domain::user::{AuthService, PasswordHasher, UserId, UserRepository};
+use crate::application::user::authorization;
+use crate::domain::user::{PasswordHasher, User, UserId, UserRepository, UserService};
 
+#[derive(Deserialize)]
 pub struct ChangePasswordCommand {
-    pub old_password: String,
-    pub new_password: String,
+    old_password: String,
+    new_password: String,
 }
 
 impl ChangePasswordCommand {
@@ -14,24 +17,30 @@ impl ChangePasswordCommand {
     }
 }
 
-pub struct ChangePassword<'a, URepo, PHasher, TRepo, TEnc> {
-    auth_serv: AuthService<'a, URepo, PHasher, TRepo, TEnc>,
+pub struct ChangePassword<'a, URepo, PHasher> {
+    user_serv: UserService<'a, URepo, PHasher>,
 }
 
-impl<'a, URepo, PHasher, TRepo, TEnc> ChangePassword<'a, URepo, PHasher, TRepo, TEnc>
+impl<'a, URepo, PHasher> ChangePassword<'a, URepo, PHasher>
 where
     URepo: UserRepository,
     PHasher: PasswordHasher,
-    TRepo: TokenRepository,
-    TEnc: TokenEncoder,
 {
-    pub fn new(auth_serv: AuthService<'a, URepo, PHasher, TRepo, TEnc>) -> Self {
-        ChangePassword { auth_serv }
+    pub fn new(user_serv: UserService<'a, URepo, PHasher>) -> Self {
+        ChangePassword { user_serv }
     }
 
-    pub async fn exec(&self, user_id: &UserId, cmd: ChangePasswordCommand) -> Result<()> {
+    pub async fn exec(
+        &self,
+        auth_user: &User,
+        user_id: &UserId,
+        cmd: ChangePasswordCommand,
+    ) -> Result<()> {
+        authorization::is_authorized(auth_user, user_id)?;
+
         cmd.validate()?;
-        self.auth_serv
+
+        self.user_serv
             .change_password(user_id, &cmd.old_password, &cmd.new_password)
             .await
     }

@@ -8,7 +8,7 @@ pub struct Synopsis {
 impl Synopsis {
     pub fn new(synopsis: &str) -> Result<Synopsis> {
         if synopsis.len() < 4 {
-            return Err(Error::application());
+            return Err(Error::new("synopsis", "too_short"));
         }
 
         Ok(Synopsis {

@@ -9,15 +9,11 @@ pub struct Email {
 impl Email {
     pub fn new(email: &str) -> Result<Email> {
         if email.len() < 4 {
-            return Err(Error::application()
-                .add_context("email", "too_short")
-                .build());
+            return Err(Error::new("email", "too_short"));
         }
 
         if email.len() > 64 {
-            return Err(Error::application()
-                .add_context("email", "too_long")
-                .build());
+            return Err(Error::new("email", "too_long"));
         }
 
         Ok(Email {

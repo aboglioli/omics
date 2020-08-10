@@ -9,7 +9,7 @@ pub struct Fullname {
 
 impl Fullname {
     pub fn new(name: &str, lastname: &str) -> Result<Fullname> {
-        let mut err = Error::application();
+        let mut err = Error::new("fullname", "invalid");
 
         if name.len() < 4 {
             err.add_context("name", "too_short");
@@ -32,8 +32,8 @@ impl Fullname {
         }
 
         Ok(Fullname {
-            name: String::from(name),
-            lastname: String::from(lastname),
+            name: name.to_owned(),
+            lastname: lastname.to_owned(),
         })
     }
 

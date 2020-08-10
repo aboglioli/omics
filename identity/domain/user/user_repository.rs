@@ -8,10 +8,7 @@ use crate::domain::user::{Email, User, UserId, Username};
 #[async_trait]
 pub trait UserRepository {
     fn err_not_found() -> Error {
-        Error::internal()
-            .set_path("user.repository")
-            .set_code("not_found")
-            .build()
+        Error::internal("user", "not_found")
     }
 
     async fn next_id(&self) -> Result<UserId>;

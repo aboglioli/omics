@@ -11,7 +11,7 @@ pub struct Tag {
 impl Tag {
     pub fn new(name: &str) -> Result<Tag> {
         if name.is_empty() {
-            return Err(Error::application().add_context("name", "empty").build());
+            return Err(Error::new("tag", "empty_name"));
         }
 
         let slug = slugify(name);

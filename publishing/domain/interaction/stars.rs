@@ -8,7 +8,7 @@ pub struct Stars {
 impl Stars {
     pub fn new(stars: u8) -> Result<Stars> {
         if stars > 5 {
-            return Err(Error::pair("stars", "invalid_range"));
+            return Err(Error::new("stars", "invalid_range"));
         }
 
         Ok(Stars { stars })

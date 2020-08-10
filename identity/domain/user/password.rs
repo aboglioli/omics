@@ -9,9 +9,7 @@ pub struct Password {
 impl Password {
     pub fn new(password: &str) -> Result<Password> {
         if password.len() < 50 {
-            return Err(Error::application()
-                .add_context("password", "not_hashed")
-                .build());
+            return Err(Error::new("password", "not_hashed"));
         }
 
         Ok(Password {

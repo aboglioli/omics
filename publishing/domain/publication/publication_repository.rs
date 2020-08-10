@@ -8,10 +8,7 @@ use crate::domain::publication::{Publication, PublicationId};
 #[async_trait]
 pub trait PublicationRepository {
     fn err_not_found() -> Error {
-        Error::internal()
-            .set_path("publication.repository")
-            .set_code("not_found")
-            .build()
+        Error::new("publication", "not_found")
     }
 
     async fn next_id(&self) -> Result<PublicationId>;

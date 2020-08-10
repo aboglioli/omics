@@ -64,8 +64,8 @@ impl Frame {
         })
     }
 
-    pub fn order(&self) -> &u32 {
-        &self.order
+    pub fn order(&self) -> u32 {
+        self.order
     }
 
     pub fn position(&self) -> &Position {
@@ -77,38 +77,28 @@ impl Frame {
     }
 }
 
-pub type ImageId = String;
-
-pub type ImageUrl = String;
-
 #[derive(Debug, Clone)]
 pub struct Image {
-    id: ImageId,
-    url: ImageUrl,
+    url: String,
     size: u32,
     frames: Vec<Frame>,
 }
 
 impl Image {
-    pub fn new(id: ImageId, url: &str, size: u32) -> Result<Image> {
+    pub fn new(url: &str, size: u32) -> Result<Image> {
         Ok(Image {
-            id,
             url: url.to_owned(),
             size,
             frames: Vec::new(),
         })
     }
 
-    pub fn id(&self) -> &ImageId {
-        &self.id
-    }
-
-    pub fn url(&self) -> &ImageUrl {
+    pub fn url(&self) -> &str {
         &self.url
     }
 
-    pub fn size(&self) -> &u32 {
-        &self.size
+    pub fn size(&self) -> u32 {
+        self.size
     }
 
     pub fn frames(&self) -> &[Frame] {
@@ -158,7 +148,7 @@ mod tests {
     #[test]
     fn image() {
         // New image
-        let mut image = Image::new(ImageId::from("image123"), "host.com/image.jpg", 1024).unwrap();
+        let mut image = Image::new("host.com/image.jpg", 1024).unwrap();
         let frames = vec![
             Frame::new(
                 0,
@@ -182,8 +172,8 @@ mod tests {
         image.set_frames(frames).unwrap();
 
         assert_eq!(image.frames().len(), 3);
-        assert_eq!(image.frames()[0].order(), &0);
-        assert_eq!(image.frames()[1].order(), &1);
-        assert_eq!(image.frames()[2].order(), &2);
+        assert_eq!(image.frames()[0].order(), 0);
+        assert_eq!(image.frames()[1].order(), 1);
+        assert_eq!(image.frames()[2].order(), 2);
     }
 }

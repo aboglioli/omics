@@ -2,51 +2,102 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use regex::Regex;
+use tokio::sync::oneshot::{self, Receiver};
 use tokio::sync::Mutex;
 
 use crate::error::Error;
 use crate::event::{Event, EventHandler, EventPublisher, EventSubscriber};
 use crate::result::Result;
 
+#[derive(Default)]
 pub struct InMemEventBus {
-    handlers: Arc<Mutex<Vec<Box<dyn EventHandler<Output = bool> + Sync>>>>,
+    handlers: Arc<Mutex<Vec<Box<dyn EventHandler<Output = bool> + Sync + Send>>>>,
 }
 
 impl InMemEventBus {
     pub fn new() -> Self {
-        Self {
+        InMemEventBus {
             handlers: Arc::new(Mutex::new(Vec::new())),
         }
     }
 }
 
+#[derive(Default)]
+pub struct PublicationResult {
+    published_events: u32,
+    ok_handlers: u32,
+    err_handlers: u32,
+}
+
+impl PublicationResult {
+    pub fn published_events(&self) -> u32 {
+        self.published_events
+    }
+
+    pub fn ok_handlers(&self) -> u32 {
+        self.ok_handlers
+    }
+
+    pub fn err_handlers(&self) -> u32 {
+        self.err_handlers
+    }
+
+    pub fn activated_handlers(&self) -> u32 {
+        self.ok_handlers + self.err_handlers
+    }
+}
+
 #[async_trait]
 impl EventPublisher for InMemEventBus {
-    type Output = bool;
+    type Output = Receiver<PublicationResult>;
 
     async fn publish(&self, event: Event) -> Result<Self::Output> {
-        let mut handlers = self.handlers.lock().await;
-        for handler in handlers.iter_mut() {
-            if let Ok(re) = Regex::new(handler.topic()) {
-                if re.is_match(event.topic()) {
-                    if let Err(err) = handler.handle(&event).await {
-                        return Err(Error::internal().wrap(err).build());
-                    }
-                }
-            } else {
-                println!("invalid regex");
-            }
-        }
-
-        Ok(true)
+        self.publish_all(vec![event]).await
     }
 
     async fn publish_all(&self, events: Vec<Event>) -> Result<Self::Output> {
-        for event in events.into_iter() {
-            self.publish(event).await?;
-        }
+        let handlers = Arc::clone(&self.handlers);
+        let (tx, rx) = oneshot::channel();
+        let mut publication_result = PublicationResult::default();
 
-        Ok(true)
+        tokio::spawn(async move {
+            for event in events.into_iter() {
+                let mut handlers = handlers.lock().await;
+                for handler in handlers.iter_mut() {
+                    match Regex::new(handler.topic()) {
+                        Ok(re) => {
+                            if re.is_match(event.topic()) {
+                                // Execute handler
+                                if let Err(err) = handler.handle(&event).await {
+                                    let err = Error::internal("event_publisher", "handler_error")
+                                        .wrap(err)
+                                        .build();
+                                    println!("{:?}", err);
+
+                                    publication_result.err_handlers += 1;
+                                } else {
+                                    publication_result.ok_handlers += 1;
+                                }
+                            }
+                        }
+                        Err(err) => {
+                            let err = Error::internal("event_publisher", "invalid_topic_regex")
+                                .wrap_raw(err)
+                                .build();
+                            println!("{:?}", err);
+                        }
+                    }
+                }
+
+                publication_result.published_events += 1;
+            }
+
+            if tx.send(publication_result).is_err() {
+                println!("Closed channel");
+            }
+        });
+
+        Ok(rx)
     }
 }
 
@@ -56,7 +107,7 @@ impl EventSubscriber for InMemEventBus {
 
     async fn subscribe(
         &self,
-        handler: Box<dyn EventHandler<Output = Self::Output> + Sync>,
+        handler: Box<dyn EventHandler<Output = Self::Output> + Sync + Send>,
     ) -> Result<Self::Output> {
         let mut handlers = self.handlers.lock().await;
         handlers.push(handler);
@@ -105,7 +156,7 @@ mod tests {
         }
     }
 
-    #[async_trait::async_trait]
+    #[async_trait]
     impl EventHandler for BasicHandler {
         type Output = bool;
 
@@ -116,6 +167,21 @@ mod tests {
         async fn handle(&mut self, event: &Event) -> Result<Self::Output> {
             self.counter.inc(event.topic());
             Ok(true)
+        }
+    }
+
+    struct ErrorHandler;
+
+    #[async_trait]
+    impl EventHandler for ErrorHandler {
+        type Output = bool;
+
+        fn topic(&self) -> &str {
+            "error.*"
+        }
+
+        async fn handle(&mut self, _: &Event) -> Result<Self::Output> {
+            Err(Error::new("error_handler", "error"))
         }
     }
 
@@ -152,7 +218,14 @@ mod tests {
             .unwrap();
 
         let publisher: &mut dyn EventPublisher<Output = _> = &mut eb;
-        assert!(publisher.publish(create_event("evented")).await.is_ok());
+        let res = publisher
+            .publish(create_event("evented"))
+            .await
+            .unwrap()
+            .await
+            .unwrap();
+        assert_eq!(res.published_events(), 1);
+        assert_eq!(res.activated_handlers(), 4);
         assert_eq!(handler.counter().count("evented"), 4);
     }
 
@@ -178,8 +251,27 @@ mod tests {
             .await
             .is_ok());
 
-        assert!(eb.publish(create_event("ent1.created")).await.is_ok());
-        assert!(eb.publish(create_event("ent2.created")).await.is_ok());
+        let res = eb
+            .publish(create_event("ent1.created"))
+            .await
+            .unwrap()
+            .await
+            .unwrap();
+        assert_eq!(res.published_events(), 1);
+        assert_eq!(res.ok_handlers(), 2);
+        assert_eq!(res.err_handlers(), 0);
+        assert_eq!(res.activated_handlers(), 2);
+
+        let res = eb
+            .publish(create_event("ent2.created"))
+            .await
+            .unwrap()
+            .await
+            .unwrap();
+        assert_eq!(res.published_events(), 1);
+        assert_eq!(res.ok_handlers(), 1);
+        assert_eq!(res.err_handlers(), 0);
+        assert_eq!(res.activated_handlers(), 1);
 
         assert_eq!(handler.counter().count("ent1.created"), 2);
         assert_eq!(handler.counter().count("ent1.updated"), 0);
@@ -216,9 +308,32 @@ mod tests {
             .await
             .is_ok());
 
-        assert!(eb.publish(create_event("ent.created")).await.is_ok());
-        assert!(eb.publish(create_event("ent.updated")).await.is_ok());
-        assert!(eb.publish(create_event("ent.deleted")).await.is_ok());
+        let res = eb
+            .publish(create_event("ent.created"))
+            .await
+            .unwrap()
+            .await
+            .unwrap();
+        assert_eq!(res.published_events(), 1);
+        assert_eq!(res.activated_handlers(), 4);
+
+        let res = eb
+            .publish(create_event("ent.updated"))
+            .await
+            .unwrap()
+            .await
+            .unwrap();
+        assert_eq!(res.published_events(), 1);
+        assert_eq!(res.activated_handlers(), 4);
+
+        let res = eb
+            .publish(create_event("ent.deleted"))
+            .await
+            .unwrap()
+            .await
+            .unwrap();
+        assert_eq!(res.published_events(), 1);
+        assert_eq!(res.activated_handlers(), 3);
 
         assert_eq!(handler.counter().count("ent.created"), 4);
         assert_eq!(handler.counter().count("ent.updated"), 4);
@@ -235,7 +350,7 @@ mod tests {
             .await
             .is_ok());
 
-        assert!(eb
+        let res = eb
             .publish_all(vec![
                 create_event("another.created"),
                 create_event("ent.created"),
@@ -244,7 +359,13 @@ mod tests {
                 create_event("another.updated"),
             ])
             .await
-            .is_ok());
+            .unwrap()
+            .await
+            .unwrap();
+        assert_eq!(res.published_events(), 5);
+        assert_eq!(res.ok_handlers(), 4);
+        assert_eq!(res.err_handlers(), 0);
+        assert_eq!(res.activated_handlers(), 4);
 
         assert_eq!(handler.counter().count("ent.created"), 1);
         assert_eq!(handler.counter().count("ent.updated"), 1);
@@ -276,5 +397,50 @@ mod tests {
         assert_eq!(h.counter().count("topic007"), 1);
         assert_eq!(h.counter().count("topic1"), 1);
         assert_eq!(h.counter().count("topic2"), 1);
+    }
+
+    #[tokio::test]
+    async fn errors() {
+        let eb = InMemEventBus::new();
+        eb.subscribe(Box::new(BasicHandler::new("ok")))
+            .await
+            .unwrap();
+        eb.subscribe(Box::new(BasicHandler::new("ok")))
+            .await
+            .unwrap();
+        eb.subscribe(Box::new(BasicHandler::new("error")))
+            .await
+            .unwrap();
+        eb.subscribe(Box::new(ErrorHandler)).await.unwrap();
+
+        let res = eb
+            .publish_all(vec![create_event("ok")])
+            .await
+            .unwrap()
+            .await
+            .unwrap();
+        assert_eq!(res.published_events(), 1);
+        assert_eq!(res.ok_handlers(), 2);
+        assert_eq!(res.err_handlers(), 0);
+
+        let res = eb
+            .publish_all(vec![create_event("error")])
+            .await
+            .unwrap()
+            .await
+            .unwrap();
+        assert_eq!(res.published_events(), 1);
+        assert_eq!(res.ok_handlers(), 1);
+        assert_eq!(res.err_handlers(), 1);
+
+        let res = eb
+            .publish_all(vec![create_event("ok"), create_event("error")])
+            .await
+            .unwrap()
+            .await
+            .unwrap();
+        assert_eq!(res.published_events(), 2);
+        assert_eq!(res.ok_handlers(), 3);
+        assert_eq!(res.err_handlers(), 1);
     }
 }

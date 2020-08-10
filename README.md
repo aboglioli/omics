@@ -37,6 +37,22 @@ docker-compose up
 - Build and run frontend image: `docker-compose up web`
 - Build and run backend image: `docker-compose up server` (test in localhost:3000/api)
 
+**Recreate backend**:
+
+```
+# Delete server container
+docker-compose down
+
+# Recreate server image and run this image as container
+docker-compose up server
+```
+
+Only rebuild server and web images:
+
+```
+docker-compose build
+```
+
 ## Rust
 
 Install rustup: [rustup.rs](https://rustup.rs/). Support for GNU/Linux and Windows (64bit and 32bit: *rustup-init.exe*).

@@ -19,7 +19,7 @@ impl Identity {
     ) -> Result<Identity> {
         let password = match provider {
             Provider::Local => match password {
-                None => return Err(Error::pair("password", "required")),
+                None => return Err(Error::new("password", "required")),
                 password => password,
             },
             _ => None,
@@ -52,7 +52,7 @@ impl Identity {
     pub fn set_password(&mut self, password: Password) -> Result<()> {
         self.password = match self.provider {
             Provider::Local => Some(password),
-            _ => return Err(Error::application()),
+            _ => return Err(Error::new("password", "not_required")),
         };
         Ok(())
     }

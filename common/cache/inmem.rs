@@ -8,6 +8,7 @@ use crate::cache::Cache;
 
 use crate::result::Result;
 
+#[derive(Default)]
 pub struct InMemCache<K, V> {
     data: Mutex<HashMap<K, V>>,
 }
@@ -17,10 +18,6 @@ impl<K, V: Clone> InMemCache<K, V> {
         InMemCache {
             data: Mutex::new(HashMap::new()),
         }
-    }
-
-    pub async fn len(&self) -> usize {
-        self.data.lock().await.len()
     }
 
     pub async fn find<P>(&self, predicate: P) -> Option<V>
@@ -76,7 +73,7 @@ mod tests {
     #[tokio::test]
     async fn initialize() {
         let c: InMemCache<u8, u8> = InMemCache::new();
-        assert_eq!(c.len().await, 0);
+        assert_eq!(c.data.lock().await.len(), 0);
     }
 
     #[tokio::test]

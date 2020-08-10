@@ -11,7 +11,7 @@ pub struct Permission {
 
 impl Permission {
     pub fn new(module: &str, permissions: &str) -> Result<Permission> {
-        let mut err = Error::application();
+        let mut err = Error::new("permission", "invalid");
         if module.is_empty() {
             err.add_context("module", "empty");
         }
@@ -43,7 +43,7 @@ impl Permission {
         let permissions: String = chars.into_iter().collect();
 
         Ok(Permission {
-            module: String::from(module),
+            module: module.to_owned(),
             permissions,
         })
     }

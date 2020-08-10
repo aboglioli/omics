@@ -3,6 +3,9 @@ WEB_DIR = web
 # ----------
 # Server
 # ----------
+check:
+	cargo clippy
+
 fix:
 	cargo fmt
 	cargo fix --allow-dirty
@@ -14,7 +17,7 @@ dependencies:
 	cargo update
 
 test:
-	cargo test
+	cargo test --color always
 
 build: dependencies
 	cargo build --release

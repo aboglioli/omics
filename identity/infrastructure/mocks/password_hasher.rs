@@ -2,10 +2,11 @@ use crate::domain::user::PasswordHasher;
 
 use common::result::Result;
 
+#[derive(Default)]
 pub struct FakePasswordHasher;
 
 impl FakePasswordHasher {
-    pub fn new() -> FakePasswordHasher {
+    pub fn new() -> Self {
         FakePasswordHasher
     }
 }

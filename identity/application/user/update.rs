@@ -1,11 +1,15 @@
-use common::event::{EventPublisher, ToEvent};
+use serde::Deserialize;
+
+use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::domain::user::{Fullname, Person, UserEvent, UserId, UserRepository};
+use crate::application::user::authorization;
+use crate::domain::user::{Fullname, Person, User, UserId, UserRepository};
 
+#[derive(Deserialize)]
 pub struct UpdateCommand {
-    pub name: String,
-    pub lastname: String,
+    name: String,
+    lastname: String,
 }
 
 impl UpdateCommand {
@@ -16,6 +20,7 @@ impl UpdateCommand {
 
 pub struct Update<'a, EPub, URepo> {
     event_pub: &'a EPub,
+
     user_repo: &'a URepo,
 }
 
@@ -31,24 +36,19 @@ where
         }
     }
 
-    pub async fn exec(&self, user_id: &UserId, cmd: UpdateCommand) -> Result<()> {
+    pub async fn exec(&self, auth_user: &User, user_id: &UserId, cmd: UpdateCommand) -> Result<()> {
+        authorization::is_authorized(auth_user, user_id)?;
+
         cmd.validate()?;
 
         let mut user = self.user_repo.find_by_id(&user_id).await?;
 
         let person = Person::new(Fullname::new(&cmd.name, &cmd.lastname)?)?;
         user.set_person(person)?;
+
         self.user_repo.save(&mut user).await?;
 
-        if let Some(person) = user.person() {
-            let event = UserEvent::Updated {
-                id: user.base().id(),
-                name: person.fullname().name().to_owned(),
-                lastname: person.fullname().lastname().to_owned(),
-            }
-            .to_event()?;
-            self.event_pub.publish(event).await?;
-        }
+        self.event_pub.publish_all(user.base().events()?).await?;
 
         Ok(())
     }

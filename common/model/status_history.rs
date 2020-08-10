@@ -1,25 +1,15 @@
 use chrono::{DateTime, Utc};
 
 #[derive(Debug, Clone)]
-pub struct StatusItem<S, M> {
+pub struct StatusItem<S> {
     date: DateTime<Utc>,
-    meta: Option<M>,
     status: S,
 }
 
-impl<S, M> StatusItem<S, M> {
-    pub fn new(status: S) -> Self {
+impl<S> StatusItem<S> {
+    fn new(status: S) -> Self {
         StatusItem {
             date: Utc::now(),
-            meta: None,
-            status,
-        }
-    }
-
-    pub fn new_with_meta(status: S, meta: M) -> Self {
-        StatusItem {
-            date: Utc::now(),
-            meta: Some(meta),
             status,
         }
     }
@@ -28,57 +18,41 @@ impl<S, M> StatusItem<S, M> {
         &self.date
     }
 
-    pub fn meta(&self) -> Option<&M> {
-        self.meta.as_ref()
-    }
-
     pub fn status(&self) -> &S {
         &self.status
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct StatusHistory<S, M> {
-    history: Vec<StatusItem<S, M>>,
+pub struct StatusHistory<S> {
+    history: Vec<StatusItem<S>>,
 }
 
-impl<S, M> StatusHistory<S, M> {
-    pub fn new() -> Self {
+impl<S> StatusHistory<S> {
+    pub fn new(status: S) -> Self {
         StatusHistory {
-            history: Vec::new(),
+            history: vec![StatusItem::new(status)],
         }
-    }
-
-    pub fn init(status: S) -> Self {
-        let mut sh = StatusHistory::new();
-        sh.add_status(status);
-        sh
     }
 
     pub fn add_status(&mut self, status: S) {
         self.history.push(StatusItem::new(status));
     }
 
-    pub fn add_status_with_meta(&mut self, status: S, meta: M) {
-        self.history.push(StatusItem::new_with_meta(status, meta));
-    }
-
-    pub fn history(&self) -> &[StatusItem<S, M>] {
+    pub fn history(&self) -> &[StatusItem<S>] {
         &self.history
     }
 
-    pub fn current(&self) -> Option<&StatusItem<S, M>> {
-        self.history.last()
+    pub fn current(&self) -> &StatusItem<S> {
+        // It's safe because history has at least one status. It's initialized with one status.
+        self.history.last().unwrap()
     }
 
     pub fn is_current<P>(&self, predicate: P) -> bool
     where
         P: Fn(&S) -> bool,
     {
-        if let Some(current) = self.current() {
-            return predicate(current.status());
-        }
-        return false;
+        predicate(self.current().status())
     }
 }
 
@@ -88,58 +62,44 @@ mod tests {
 
     #[derive(Debug, PartialEq)]
     enum Status {
+        Init,
         Open,
         Closed,
     }
 
     #[test]
     fn create() {
-        assert_eq!(StatusHistory::<Status, ()>::new().history().len(), 0);
-        assert!(StatusHistory::<Status, ()>::new().current().is_none());
+        assert_eq!(StatusHistory::new(Status::Init).history().len(), 1);
+        assert_eq!(StatusHistory::new(Status::Init).history().len(), 1);
 
-        let mut sh: StatusHistory<_, ()> = StatusHistory::new();
+        let mut sh = StatusHistory::new(Status::Init);
         sh.add_status(Status::Open);
         sh.add_status(Status::Closed);
         sh.add_status(Status::Open);
+        assert_eq!(sh.history().len(), 4);
+        assert_eq!(sh.current().status(), &Status::Open);
 
-        assert_eq!(sh.history().len(), 3);
-
-        let sh: StatusHistory<_, ()> = StatusHistory::init(Status::Open);
+        let sh = StatusHistory::new(Status::Open);
         assert_eq!(sh.history().len(), 1);
-        assert_eq!(sh.current().unwrap().status(), &Status::Open);
+        assert_eq!(sh.current().status(), &Status::Open);
     }
 
     #[test]
     fn history() {
-        let mut sh: StatusHistory<_, ()> = StatusHistory::new();
+        let mut sh = StatusHistory::new(Status::Init);
         sh.add_status(Status::Open);
         sh.add_status(Status::Closed);
         sh.add_status(Status::Open);
         sh.add_status(Status::Closed);
-
-        assert_eq!(sh.current().unwrap().status(), &Status::Closed);
-    }
-
-    #[test]
-    fn meta() {
-        let mut sh = StatusHistory::new();
-        sh.add_status(Status::Open);
-        sh.add_status_with_meta(Status::Closed, "invalid");
-        sh.add_status_with_meta(Status::Open, "revalid");
-
-        let history = sh.history();
-        assert_eq!(history.len(), 3);
-        assert!(history[0].meta().is_none());
-        assert_eq!(history[1].meta().unwrap(), &"invalid");
-        assert_eq!(history[2].meta().unwrap(), &"revalid");
+        assert_eq!(sh.current().status(), &Status::Closed);
     }
 
     #[test]
     fn compare() {
-        let mut sh = StatusHistory::new();
+        let mut sh = StatusHistory::new(Status::Init);
         sh.add_status(Status::Open);
-        sh.add_status_with_meta(Status::Closed, "invalid");
-        sh.add_status_with_meta(Status::Open, "revalid");
+        sh.add_status(Status::Closed);
+        sh.add_status(Status::Open);
 
         assert!(sh.is_current(|s| match s {
             Status::Open => true,

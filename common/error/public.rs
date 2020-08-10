@@ -1,12 +1,14 @@
 use std::collections::HashMap;
 
+use serde::Serialize;
+
 use crate::error::{Error, ErrorKind};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct PublicError {
-    kind: ErrorKind,
-    code: Option<String>,
-    path: Option<String>,
+    kind: String,
+    path: String,
+    code: String,
     status: Option<i32>,
     message: Option<String>,
     context: HashMap<String, String>,
@@ -33,9 +35,9 @@ impl PublicError {
         };
 
         Some(PublicError {
-            kind: err.kind().clone(),
-            code: err.code().cloned(),
-            path: err.path().cloned(),
+            kind: err.kind().to_string(),
+            code: err.code().to_owned(),
+            path: err.path().to_owned(),
             status: err.status().cloned(),
             message: err.message().cloned(),
             context: err.context().clone(),
@@ -65,27 +67,21 @@ mod tests {
     impl error::Error for StringError {}
 
     fn err() -> Error {
-        Error::application()
-            .set_code("one")
+        Error::new("one", "one")
             .set_message("message")
-            .set_path("my.path")
             .set_status(404)
             .add_context("k1", "v1")
             .add_context("k2", "v2")
             .add_context("k2", "v3")
             .wrap(
-                Error::application()
-                    .set_code("two")
+                Error::new("two", "two")
                     .add_context("prop1", "invalid")
                     .wrap(
-                        Error::internal()
-                            .set_code("three")
+                        Error::internal("three", "three")
                             .wrap(
-                                Error::pair("prop2", "invalid")
-                                    .set_code("four")
+                                Error::new("four", "prop2_invalid")
                                     .wrap(
-                                        Error::internal()
-                                            .set_code("five")
+                                        Error::internal("five", "five")
                                             .wrap_raw(StringError {
                                                 error: "INSERT failed".to_owned(),
                                             })
@@ -105,28 +101,35 @@ mod tests {
         let err = err();
 
         let public_err = PublicError::from(&err, true).unwrap();
-        assert_eq!(public_err.kind, ErrorKind::Application);
-        assert_eq!(public_err.code.unwrap(), "one");
+        assert_eq!(public_err.kind, "application");
+        assert_eq!(public_err.context.len(), 2);
+        assert_eq!(public_err.path, "one");
+        assert_eq!(public_err.code, "one");
 
         let two = public_err.cause.unwrap();
-        assert_eq!(two.kind, ErrorKind::Application);
-        assert_eq!(two.code.unwrap(), "two");
+        assert_eq!(two.kind, "application");
+        assert_eq!(two.context.len(), 1);
+        assert_eq!(two.path, "two");
+        assert_eq!(two.code, "two");
 
         let three = two.cause.unwrap();
-        assert_eq!(three.kind, ErrorKind::Internal);
-        assert_eq!(three.code.unwrap(), "three");
+        assert_eq!(three.kind, "internal");
+        assert_eq!(three.path, "three");
+        assert_eq!(three.code, "three");
 
         let four = three.cause.unwrap();
-        assert_eq!(four.kind, ErrorKind::Application);
-        assert_eq!(four.code.unwrap(), "four");
+        assert_eq!(four.kind, "application");
+        assert_eq!(four.path, "four");
+        assert_eq!(four.code, "prop2_invalid");
 
         let five = four.cause.unwrap();
-        assert_eq!(five.kind, ErrorKind::Internal);
-        assert_eq!(five.code.unwrap(), "five");
+        assert_eq!(five.kind, "internal");
+        assert_eq!(five.path, "five");
+        assert_eq!(five.code, "five");
 
         let six = five.cause.unwrap();
-        assert_eq!(six.kind, ErrorKind::Internal);
-        assert!(six.code.is_none());
+        assert_eq!(six.kind, "internal");
+        assert_eq!(six.code, "raw");
         assert_eq!(six.message.unwrap(), "INSERT failed");
     }
 
@@ -135,12 +138,14 @@ mod tests {
         let err = err();
 
         let public_err = PublicError::from(&err, false).unwrap();
-        assert_eq!(public_err.kind, ErrorKind::Application);
-        assert_eq!(public_err.code.unwrap(), "one");
+        assert_eq!(public_err.kind, "application");
+        assert_eq!(public_err.path, "one");
+        assert_eq!(public_err.code, "one");
 
         let two = public_err.cause.unwrap();
-        assert_eq!(two.kind, ErrorKind::Application);
-        assert_eq!(two.code.unwrap(), "two");
+        assert_eq!(two.kind, "application");
+        assert_eq!(two.path, "two");
+        assert_eq!(two.code, "two");
         assert!(two.cause.is_none());
     }
 }
