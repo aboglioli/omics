@@ -16,10 +16,46 @@ import { ChartsModule } from 'ng2-charts';
 import { MaterialModule } from './auxiliar-modules/material.module';
 import { AngularBootstrapModule } from './auxiliar-modules//angular-bootstrap.module';
 
+// Componentes
+import { HomeComponent } from './pages/home/home.component';
+import { AboutComponent } from './pages/about/about.component';
+import { LoginRegisterComponent } from './components/login-register/login-register.component';
+import { VisorComicComponent } from './pages/visor-comic/visor-comic.component';
+import { FavoritosComponent } from './pages/favoritos/favoritos.component';
+import { PerfilComponent } from './pages/perfil/perfil.component';
+import { SuscripcionComponent } from './components/suscripcion/suscripcion.component';
+import { DonacionComponent } from './components/donacion/donacion.component';
+import { DeskboardGeneralComponent } from './pages/deskboard-general/deskboard-general.component';
+import { DashboardReportesComponent } from './pages/dashboard-reportes/dashboard-reportes.component';
+import { DashboardGestionAdminComponent } from './pages/dashboard-gestion-admin/dashboard-gestion-admin.component';
+import { DashboardGestionContratosPublicacionesComponent } from './pages/dashboard-gestion-contratos-publicaciones/dashboard-gestion-contratos-publicaciones.component';
+import { DashboardReglasNegociosComponent } from './pages/dashboard-reglas-negocios/dashboard-reglas-negocios.component';
+import { CatalogoComponent } from './pages/catalogo/catalogo.component';
+import { RealizarAnalisisComponent } from './components/realizar-analisis/realizar-analisis.component';
+import { ColeccionInfoComponent } from './pages/coleccion-info/coleccion-info.component';
+import { ComicInfoComponent } from './components/comic-info/comic-info.component';
+
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    HomeComponent,
+    AboutComponent,
+    LoginRegisterComponent,
+    VisorComicComponent,
+    FavoritosComponent,
+    PerfilComponent,
+    SuscripcionComponent,
+    DonacionComponent,
+    DeskboardGeneralComponent,
+    DashboardReportesComponent,
+    DashboardGestionAdminComponent,
+    DashboardGestionContratosPublicacionesComponent,
+    DashboardReglasNegociosComponent,
+    CatalogoComponent,
+    RealizarAnalisisComponent,
+    ColeccionInfoComponent,
+    ComicInfoComponent
   ],
   imports: [
     BrowserModule,
