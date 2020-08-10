@@ -2,10 +2,11 @@ use crate::domain::token::{Token, TokenEncoder, TokenId};
 use common::error::Error;
 use common::result::Result;
 
+#[derive(Default)]
 pub struct FakeTokenEncoder;
 
 impl FakeTokenEncoder {
-    pub fn new() -> FakeTokenEncoder {
+    pub fn new() -> Self {
         FakeTokenEncoder
     }
 }

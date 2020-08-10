@@ -5,10 +5,11 @@ use common::result::Result;
 
 use crate::domain::role::{Role, RoleId, RoleRepository};
 
+#[derive(Default)]
 pub struct InMemRoleRepository;
 
 impl InMemRoleRepository {
-    pub fn new() -> InMemRoleRepository {
+    pub fn new() -> Self {
         InMemRoleRepository
     }
 }

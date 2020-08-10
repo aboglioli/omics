@@ -12,13 +12,13 @@ use std::hash::{Hash, Hasher};
 use uuid::Uuid;
 
 // TokenId
-#[derive(Debug, Clone, Eq)]
+#[derive(Default, Debug, Clone, Eq)]
 pub struct TokenId {
     id: String,
 }
 
 impl TokenId {
-    pub fn new() -> TokenId {
+    pub fn new() -> Self {
         let uuid = Uuid::new_v4().to_string();
         TokenId { id: uuid }
     }
@@ -71,13 +71,13 @@ impl PartialEq for Token {
 }
 
 // Data
-#[derive(Debug, Clone)]
+#[derive(Default, Debug, Clone)]
 pub struct Data {
     data: HashMap<String, String>,
 }
 
 impl Data {
-    pub fn new() -> Data {
+    pub fn new() -> Self {
         Data {
             data: HashMap::new(),
         }

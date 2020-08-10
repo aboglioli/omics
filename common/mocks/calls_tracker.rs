@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Mutex;
 
+#[derive(Default)]
 pub struct CallsTracker<T> {
     calls: Mutex<HashMap<String, Vec<T>>>,
 }

@@ -50,9 +50,10 @@ impl User {
             identity,
             person: None,
             role,
-            validation: Some(Validation::new()?),
+            validation: Some(Validation::new()),
         };
 
+        // TODO: should send validation code
         user.base.record_event(UserEvent::Registered {
             id: user.base().id().value().to_owned(),
             username: user.identity().username().value().to_owned(),
@@ -111,14 +112,14 @@ impl User {
         self.role = role;
     }
 
-    pub fn validate(&mut self, code: &ValidationCode) -> Result<()> {
+    pub fn validate(&mut self, val: &Validation) -> Result<()> {
         if self.is_validated() {
             return Err(Error::new("user", "already_validated"));
         }
 
         self.validation = match self.validation.take() {
             Some(validation) => {
-                if validation.validate(code) {
+                if &validation == val {
                     None
                 } else {
                     Some(validation)
@@ -204,7 +205,7 @@ mod tests {
         assert!(!user.is_active());
         assert!(user.validation().is_some());
 
-        let code = user.validation().unwrap().code().clone();
+        let code = user.validation().unwrap().clone();
 
         assert!(user.validate(&code).is_ok());
 

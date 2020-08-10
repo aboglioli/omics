@@ -9,13 +9,14 @@ use crate::error::Error;
 use crate::event::{Event, EventHandler, EventPublisher, EventSubscriber};
 use crate::result::Result;
 
+#[derive(Default)]
 pub struct InMemEventBus {
     handlers: Arc<Mutex<Vec<Box<dyn EventHandler<Output = bool> + Sync + Send>>>>,
 }
 
 impl InMemEventBus {
     pub fn new() -> Self {
-        Self {
+        InMemEventBus {
             handlers: Arc::new(Mutex::new(Vec::new())),
         }
     }
@@ -91,7 +92,7 @@ impl EventPublisher for InMemEventBus {
                 publication_result.published_events += 1;
             }
 
-            if let Err(_) = tx.send(publication_result) {
+            if tx.send(publication_result).is_err() {
                 println!("Closed channel");
             }
         });

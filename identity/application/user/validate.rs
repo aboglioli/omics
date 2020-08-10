@@ -1,7 +1,7 @@
 use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::domain::user::{UserId, UserRepository, ValidationCode};
+use crate::domain::user::{UserId, UserRepository, Validation};
 
 pub struct Validate<'a, URepo, EPub> {
     event_pub: &'a EPub,
@@ -21,10 +21,10 @@ where
         }
     }
 
-    pub async fn exec(&self, user_id: &UserId, validation_code: &ValidationCode) -> Result<()> {
+    pub async fn exec(&self, user_id: &UserId, validation: &Validation) -> Result<()> {
         let mut user = self.user_repo.find_by_id(user_id).await?;
 
-        user.validate(validation_code)?;
+        user.validate(validation)?;
 
         self.user_repo.save(&mut user).await?;
 

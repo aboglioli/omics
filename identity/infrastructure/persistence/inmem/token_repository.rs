@@ -6,12 +6,13 @@ use common::result::Result;
 
 use crate::domain::token::{Data, TokenId, TokenRepository};
 
+#[derive(Default)]
 pub struct InMemTokenRepository {
     cache: InMemCache<TokenId, Data>,
 }
 
 impl InMemTokenRepository {
-    pub fn new() -> InMemTokenRepository {
+    pub fn new() -> Self {
         InMemTokenRepository {
             cache: InMemCache::new(),
         }

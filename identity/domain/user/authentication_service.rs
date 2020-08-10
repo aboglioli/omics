@@ -38,14 +38,23 @@ where
     ) -> Result<(User, Token)> {
         let mut err = Error::new("credentials", "invalid");
 
-        let user = self
+        let mut user_res = self
             .user_repo
             .find_by_username(&Username::new(username_or_email)?)
-            .await
-            .or(self
+            .await;
+
+        if user_res.is_err() {
+            user_res = self
                 .user_repo
                 .find_by_email(&Email::new(username_or_email)?)
-                .await)?;
+                .await;
+        }
+
+        if let Err(err) = user_res {
+            return Err(err);
+        }
+
+        let user = user_res?;
 
         let user_password = match user.identity().password() {
             Some(password) => password.value(),

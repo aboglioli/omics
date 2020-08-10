@@ -12,10 +12,16 @@ pub struct InMemUserRepository {
 }
 
 impl InMemUserRepository {
-    pub fn new() -> InMemUserRepository {
+    pub fn new() -> Self {
         InMemUserRepository {
             cache: InMemCache::new(),
         }
+    }
+}
+
+impl Default for InMemUserRepository {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
