@@ -78,11 +78,11 @@ impl From<&Publication> for ReadResponse {
         let tags: Vec<String> = header.tags().iter().map(|t| t.name().to_owned()).collect();
 
         ReadResponse {
-            id: publication.base().id(),
-            author_id: publication.author_id().to_owned(),
+            id: publication.base().id().value().to_owned(),
+            author_id: publication.author_id().value().to_owned(),
             name: header.name().value().to_owned(),
             synopsis: header.synopsis().value().to_owned(),
-            category_id: header.category_id().to_owned(),
+            category_id: header.category_id().value().to_owned(),
             tags,
             pages,
             status: None,

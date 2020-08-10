@@ -1,10 +1,13 @@
+mod permission;
+mod role_repository;
+pub use permission::*;
+pub use role_repository::*;
+
 use common::event::Event;
-use common::model::AggregateRoot;
+use common::model::{AggregateRoot, StringId};
 use common::result::Result;
 
-use crate::domain::role::Permission;
-
-pub type RoleId = String;
+pub type RoleId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct Role {
@@ -14,7 +17,7 @@ pub struct Role {
 }
 
 impl Role {
-    pub fn new(code: RoleId, name: &str) -> Result<Role> {
+    pub fn new(code: RoleId, name: &str) -> Result<Self> {
         Ok(Role {
             base: AggregateRoot::new(code),
             name: name.to_owned(),
@@ -53,10 +56,10 @@ mod tests {
 
     #[test]
     fn create_role() -> Result<()> {
-        let r = Role::new(RoleId::from("admin"), "Administrator")?;
-        assert_eq!(r.base(), &AggregateRoot::new(RoleId::from("admin")));
+        let r = Role::new(RoleId::new("admin").unwrap(), "Administrator")?;
+        assert_eq!(r.base(), &AggregateRoot::new(RoleId::new("admin").unwrap()));
         assert_eq!(r.name(), "Administrator");
-        assert_eq!(r.base(), &AggregateRoot::new(RoleId::from("admin")));
+        assert_eq!(r.base(), &AggregateRoot::new(RoleId::new("admin").unwrap()));
 
         Ok(())
     }
@@ -66,7 +69,7 @@ mod tests {
         let pmod1 = Permission::new("mod1", "CRUD")?;
         let pmod2 = Permission::new("mod2", "CRD")?;
         let pmod3 = Permission::new("mod3", "R")?;
-        let mut r = Role::new(RoleId::from("user"), "User")?;
+        let mut r = Role::new(RoleId::new("user").unwrap(), "User")?;
         r.add_permissions(pmod1);
         r.add_permissions(pmod2);
         r.add_permissions(pmod3);

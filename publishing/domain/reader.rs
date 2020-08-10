@@ -1,8 +1,11 @@
+mod reader_repository;
+pub use reader_repository::*;
+
 use common::event::Event;
-use common::model::AggregateRoot;
+use common::model::{AggregateRoot, StringId};
 use common::result::Result;
 
-pub type ReaderId = String;
+pub type ReaderId = StringId;
 
 pub struct Reader {
     base: AggregateRoot<ReaderId, Event>,

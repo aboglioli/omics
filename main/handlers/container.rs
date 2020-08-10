@@ -14,6 +14,7 @@ use identity::infrastructure::persistence::inmem::{
 pub struct Container {
     event_bus: InMemEventBus,
 
+    #[allow(dead_code)]
     role_repo: InMemRoleRepository,
     token_repo: InMemTokenRepository,
     user_repo: InMemUserRepository,
@@ -51,6 +52,7 @@ impl Container {
     }
 
     // Repositories
+    #[allow(dead_code)]
     pub fn role_repo(&self) -> &InMemRoleRepository {
         &self.role_repo
     }

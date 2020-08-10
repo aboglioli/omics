@@ -3,6 +3,7 @@ use serde::Deserialize;
 use common::event::EventPublisher;
 use common::result::Result;
 
+use crate::domain::category::CategoryId;
 use crate::domain::publication::{
     Header, Image, Name, PublicationId, PublicationRepository, Synopsis, Tag,
 };
@@ -59,7 +60,9 @@ where
 
         let cover = Image::new(&cmd.cover.url, cmd.cover.size)?;
 
-        let header = Header::new(name, synopsis, cmd.category_id, tags, cover)?;
+        let category_id = CategoryId::new(&cmd.category_id)?;
+
+        let header = Header::new(name, synopsis, category_id, tags, cover)?;
 
         let mut publication = self.publication_repo.find_by_id(id).await?;
 

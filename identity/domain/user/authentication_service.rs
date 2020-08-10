@@ -54,7 +54,7 @@ where
 
         if self.password_hasher.compare(user_password, password) {
             let mut data = Data::new();
-            data.add("user_id", &user.base().id());
+            data.add("user_id", user.base().id().value());
             let token = match self.token_serv.create(data).await {
                 Ok(token) => token,
                 Err(e) => return Err(err.wrap(e).build()),

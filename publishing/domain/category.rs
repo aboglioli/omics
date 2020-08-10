@@ -1,9 +1,11 @@
+mod category_repository;
+pub use category_repository::*;
+
 use common::event::Event;
-use common::model::AggregateRoot;
+use common::model::{AggregateRoot, StringId};
 use common::result::Result;
 
-pub type AuthorId = String;
-
+#[derive(Debug, Clone)]
 pub struct Name {
     name: String,
 }
@@ -20,21 +22,20 @@ impl Name {
     }
 }
 
-pub struct Author {
-    base: AggregateRoot<AuthorId, Event>,
+pub type CategoryId = StringId;
+
+#[derive(Debug, Clone)]
+pub struct Category {
+    base: AggregateRoot<CategoryId, Event>,
     name: Name,
 }
 
-impl Author {
-    pub fn new(id: AuthorId, name: Name) -> Result<Author> {
-        Ok(Author {
+impl Category {
+    pub fn new(id: CategoryId, name: Name) -> Result<Category> {
+        Ok(Category {
             base: AggregateRoot::new(id),
             name,
         })
-    }
-
-    pub fn base(&self) -> &AggregateRoot<AuthorId, Event> {
-        &self.base
     }
 
     pub fn name(&self) -> &Name {

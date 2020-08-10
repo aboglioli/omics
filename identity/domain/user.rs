@@ -1,13 +1,38 @@
+mod authentication_service;
+mod authorization_service;
+mod email;
+mod fullname;
+mod identity;
+mod password;
+mod password_hasher;
+mod person;
+mod provider;
+mod user_repository;
+mod user_service;
+mod username;
+mod validation;
+pub use self::identity::*;
+pub use authentication_service::*;
+pub use authorization_service::*;
+pub use email::*;
+pub use fullname::*;
+pub use password::*;
+pub use password_hasher::*;
+pub use person::*;
+pub use provider::*;
+pub use user_repository::*;
+pub use user_service::*;
+pub use username::*;
+pub use validation::*;
+
 use common::error::Error;
-use common::model::AggregateRoot;
+use common::model::{AggregateRoot, StringId};
 use common::result::Result;
 use shared::domain::event::UserEvent;
 
 use crate::domain::role::Role;
-use crate::domain::user::{Identity, Password, Person, Validation, ValidationCode};
 
-// User
-pub type UserId = String;
+pub type UserId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct User {
@@ -19,7 +44,7 @@ pub struct User {
 }
 
 impl User {
-    pub fn new(id: UserId, identity: Identity, role: Role) -> Result<User> {
+    pub fn new(id: UserId, identity: Identity, role: Role) -> Result<Self> {
         let mut user = User {
             base: AggregateRoot::new(id),
             identity,
@@ -29,7 +54,7 @@ impl User {
         };
 
         user.base.record_event(UserEvent::Registered {
-            id: user.base().id(),
+            id: user.base().id().value().to_owned(),
             username: user.identity().username().value().to_owned(),
             email: user.identity().username().value().to_owned(),
         });
@@ -74,7 +99,7 @@ impl User {
         self.person = Some(person);
 
         self.base.record_event(UserEvent::Updated {
-            id: self.base().id(),
+            id: self.base().id().value().to_owned(),
             name: self.person().unwrap().fullname().name().to_owned(),
             lastname: self.person().unwrap().fullname().lastname().to_owned(),
         });
@@ -107,7 +132,7 @@ impl User {
         }
 
         self.base.record_event(UserEvent::Validated {
-            id: self.base().id(),
+            id: self.base().id().value().to_owned(),
         });
 
         Ok(())
@@ -115,7 +140,7 @@ impl User {
 
     pub fn login(&mut self) -> Result<()> {
         self.base.record_event(UserEvent::LoggedIn {
-            id: self.base().id(),
+            id: self.base().id().value().to_owned(),
         });
 
         Ok(())
@@ -125,7 +150,7 @@ impl User {
         self.identity.set_password(password)?;
         self.base
             .record_event(UserEvent::PasswordRecoveryRequested {
-                id: self.base().id(),
+                id: self.base().id().value().to_owned(),
                 temp_password: temp_password.to_owned(),
                 email: self.identity().email().value().to_owned(),
             });
@@ -144,7 +169,7 @@ mod tests {
     #[test]
     fn create() {
         let user = User::new(
-            UserId::from("user123"),
+            UserId::new("user123").unwrap(),
             Identity::new(
                 Provider::Local,
                 Username::new("user1").unwrap(),
@@ -152,10 +177,10 @@ mod tests {
                 Some(Password::new(&format!("{:X>50}", "2")).unwrap()),
             )
             .unwrap(),
-            Role::new(RoleId::from("user"), "User").unwrap(),
+            Role::new(RoleId::new("user").unwrap(), "User").unwrap(),
         )
         .unwrap();
-        assert_eq!(user.base().id(), "user123");
+        assert_eq!(user.base().id().value(), "user123");
         assert_eq!(user.identity().username().value(), "user1");
         assert_eq!(user.identity().email().value(), "email@user.com");
     }
@@ -163,7 +188,7 @@ mod tests {
     #[test]
     fn validate() {
         let mut user = User::new(
-            UserId::from("user123"),
+            UserId::new("user123").unwrap(),
             Identity::new(
                 Provider::Local,
                 Username::new("user1").unwrap(),
@@ -171,7 +196,7 @@ mod tests {
                 Some(Password::new(&format!("{:X>50}", "2")).unwrap()),
             )
             .unwrap(),
-            Role::new(RoleId::from("user"), "User").unwrap(),
+            Role::new(RoleId::new("user").unwrap(), "User").unwrap(),
         )
         .unwrap();
 

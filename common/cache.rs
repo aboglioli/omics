@@ -1,3 +1,6 @@
+mod inmem;
+pub use inmem::*;
+
 use async_trait::async_trait;
 
 use crate::result::Result;
