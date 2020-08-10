@@ -2,7 +2,7 @@ use common::error::Error;
 use common::result::Result;
 
 use crate::domain::token::{Token, TokenEncoder, TokenRepository, TokenService};
-use crate::domain::user::{User, UserRepository};
+use crate::domain::user::{User, UserId, UserRepository};
 
 pub struct AuthorizationService<'a, URepo, TRepo, TEnc> {
     user_repo: &'a URepo,
@@ -26,7 +26,8 @@ where
     pub async fn authorize(&self, token: &Token) -> Result<User> {
         let data = self.token_serv.validate(token).await?;
         if let Some(user_id) = data.get("user_id") {
-            let user = self.user_repo.find_by_id(user_id).await?;
+            let user_id = UserId::new(user_id)?;
+            let user = self.user_repo.find_by_id(&user_id).await?;
             return Ok(user);
         }
         Err(Error::new("authorization", "unauthorized"))

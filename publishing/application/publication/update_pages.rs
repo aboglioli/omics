@@ -3,9 +3,7 @@ use serde::Deserialize;
 use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::domain::publication::{
-    Image, Name, Page, PublicationId, PublicationRepository, Synopsis, Tag,
-};
+use crate::domain::publication::{Image, Page, PublicationId, PublicationRepository};
 
 #[derive(Deserialize)]
 pub struct ImageDto {

@@ -63,7 +63,7 @@ where
                 Email::new(&cmd.email)?,
                 Some(Password::new(&hashed_password)?),
             )?,
-            Role::new(RoleId::from("user"), "User")?,
+            Role::new(RoleId::new("user")?, "User")?,
         )?;
 
         self.user_repo.save(&mut user).await?;

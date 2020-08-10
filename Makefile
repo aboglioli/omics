@@ -3,6 +3,9 @@ WEB_DIR = web
 # ----------
 # Server
 # ----------
+check:
+	cargo clippy
+
 fix:
 	cargo fmt
 	cargo fix --allow-dirty

@@ -1,8 +1,8 @@
 use serde::Deserialize;
 
-use common::error::Error;
 use common::result::Result;
 
+use crate::application::user::authorization;
 use crate::domain::user::{PasswordHasher, User, UserId, UserRepository, UserService};
 
 #[derive(Deserialize)]
@@ -36,7 +36,7 @@ where
         user_id: &UserId,
         cmd: ChangePasswordCommand,
     ) -> Result<()> {
-        authorized(auth_user, user_id)?;
+        authorization::is_authorized(auth_user, user_id)?;
 
         cmd.validate()?;
 
@@ -44,14 +44,4 @@ where
             .change_password(user_id, &cmd.old_password, &cmd.new_password)
             .await
     }
-}
-
-fn authorized(auth_user: &User, user_id: &UserId) -> Result<()> {
-    let guard = &auth_user.base().id() == user_id || auth_user.role().base().id() == "admin";
-
-    if !guard {
-        return Err(Error::new("user", "unauthorized"));
-    }
-
-    Ok(())
 }

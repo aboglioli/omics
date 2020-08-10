@@ -1,8 +1,8 @@
 use serde::Serialize;
 
-use common::error::Error;
 use common::result::Result;
 
+use crate::application::user::authorization;
 use crate::domain::user::{User, UserId, UserRepository};
 
 #[derive(Serialize)]
@@ -23,21 +23,11 @@ where
     }
 
     pub async fn exec(&self, auth_user: &User, user_id: &UserId) -> Result<GetByIdResponse> {
-        authorized(auth_user, user_id)?;
+        authorization::is_authorized(auth_user, user_id)?;
 
         let user = self.user_repo.find_by_id(user_id).await?;
         Ok(GetByIdResponse {
             username: user.identity().username().value().to_owned(),
         })
     }
-}
-
-fn authorized(auth_user: &User, user_id: &UserId) -> Result<()> {
-    let guard = &auth_user.base().id() == user_id || auth_user.role().base().id() == "admin";
-
-    if !guard {
-        return Err(Error::new("user", "unauthorized"));
-    }
-
-    Ok(())
 }

@@ -1,14 +1,28 @@
+mod header;
+mod name;
+mod page;
+mod publication_repository;
+mod status;
+mod synopsis;
+mod tag;
+pub use header::*;
+pub use name::*;
+pub use page::*;
+pub use publication_repository::*;
+pub use status::*;
+pub use synopsis::*;
+pub use tag::*;
+
 use common::error::Error;
-use common::model::{AggregateRoot, StatusHistory};
+use common::model::{AggregateRoot, StatusHistory, StringId};
 use common::result::Result;
 use shared::domain::event::PublicationEvent;
 
 use crate::domain::author::AuthorId;
 use crate::domain::interaction::Stars;
-use crate::domain::publication::{Header, Page, PublicationStatus};
 use crate::domain::reader::Reader;
 
-pub type PublicationId = String;
+pub type PublicationId = StringId;
 
 pub struct Publication {
     base: AggregateRoot<PublicationId, PublicationEvent>,
@@ -33,11 +47,11 @@ impl Publication {
         };
 
         publication.base.record_event(PublicationEvent::Created {
-            id: publication.base().id(),
-            author_id: publication.author_id().to_owned(),
+            id: publication.base().id().value().to_owned(),
+            author_id: publication.author_id().value().to_owned(),
             name: publication.header().name().value().to_owned(),
             synopsis: publication.header().synopsis().value().to_owned(),
-            category_id: publication.header().category_id().to_owned(),
+            category_id: publication.header().category_id().value().to_owned(),
             tags: publication
                 .header()
                 .tags()
@@ -78,10 +92,10 @@ impl Publication {
         self.header = header;
 
         self.base.record_event(PublicationEvent::HeaderUpdated {
-            id: self.base().id(),
+            id: self.base().id().value().to_owned(),
             name: self.header().name().value().to_owned(),
             synopsis: self.header().synopsis().value().to_owned(),
-            category_id: self.header().category_id().to_owned(),
+            category_id: self.header().category_id().value().to_owned(),
             tags: self
                 .header()
                 .tags()
@@ -98,7 +112,7 @@ impl Publication {
         self.pages = pages;
 
         self.base.record_event(PublicationEvent::PagesUpdated {
-            id: self.base().id(),
+            id: self.base().id().value().to_owned(),
             pages_count: self.pages().len(),
         });
 
@@ -107,8 +121,8 @@ impl Publication {
 
     pub fn view(&mut self, reader: &Reader) -> Result<()> {
         self.base.record_event(PublicationEvent::Viewed {
-            reader_id: reader.base().id(),
-            publication_id: reader.base().id(),
+            reader_id: reader.base().id().value().to_owned(),
+            publication_id: self.base().id().value().to_owned(),
         });
 
         Ok(())
@@ -120,8 +134,8 @@ impl Publication {
         }
 
         self.base.record_event(PublicationEvent::Read {
-            reader_id: reader.base().id(),
-            publication_id: reader.base().id(),
+            reader_id: reader.base().id().value().to_owned(),
+            publication_id: self.base().id().value().to_owned(),
         });
 
         Ok(())
@@ -133,8 +147,8 @@ impl Publication {
         }
 
         self.base.record_event(PublicationEvent::Liked {
-            reader_id: reader.base().id(),
-            publication_id: reader.base().id(),
+            reader_id: reader.base().id().value().to_owned(),
+            publication_id: self.base().id().value().to_owned(),
         });
 
         Ok(())
@@ -146,8 +160,8 @@ impl Publication {
         }
 
         self.base.record_event(PublicationEvent::Unliked {
-            reader_id: reader.base().id(),
-            publication_id: reader.base().id(),
+            reader_id: reader.base().id().value().to_owned(),
+            publication_id: self.base().id().value().to_owned(),
         });
 
         Ok(())
@@ -159,8 +173,8 @@ impl Publication {
         }
 
         self.base.record_event(PublicationEvent::Reviewed {
-            reader_id: reader.base().id(),
-            publication_id: reader.base().id(),
+            reader_id: reader.base().id().value().to_owned(),
+            publication_id: self.base().id().value().to_owned(),
             stars: stars.value(),
         });
 
@@ -173,8 +187,8 @@ impl Publication {
         }
 
         self.base.record_event(PublicationEvent::ReviewDeleted {
-            reader_id: reader.base().id(),
-            publication_id: reader.base().id(),
+            reader_id: reader.base().id().value().to_owned(),
+            publication_id: self.base().id().value().to_owned(),
         });
 
         Ok(())

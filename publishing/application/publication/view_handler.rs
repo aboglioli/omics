@@ -6,6 +6,8 @@ use common::result::Result;
 use shared::domain::event::PublicationEvent;
 
 use crate::domain::interaction::{InteractionRepository, View};
+use crate::domain::publication::PublicationId;
+use crate::domain::reader::ReaderId;
 
 pub struct ViewHandler<'a, IRepo> {
     interaction_repo: &'a IRepo,
@@ -41,7 +43,10 @@ where
             publication_id,
         } = event
         {
-            let mut view = View::new(reader_id, publication_id)?;
+            let mut view = View::new(
+                ReaderId::new(&reader_id)?,
+                PublicationId::new(&publication_id)?,
+            )?;
 
             self.interaction_repo.save_view(&mut view).await?;
 

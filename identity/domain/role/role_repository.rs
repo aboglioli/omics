@@ -6,5 +6,5 @@ use crate::domain::role::{Role, RoleId};
 
 #[async_trait]
 pub trait RoleRepository {
-    async fn find_by_id(&self, code: &RoleId) -> Result<Role>;
+    async fn find_by_id(&self, id: &RoleId) -> Result<Role>;
 }

@@ -6,7 +6,6 @@ mod stars;
 mod statistics;
 mod statistics_service;
 mod view;
-
 pub use interaction_repository::*;
 pub use like::*;
 pub use reading::*;

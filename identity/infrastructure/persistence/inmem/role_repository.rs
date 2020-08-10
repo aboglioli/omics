@@ -15,9 +15,9 @@ impl InMemRoleRepository {
 
 #[async_trait]
 impl RoleRepository for InMemRoleRepository {
-    async fn find_by_id(&self, code: &RoleId) -> Result<Role> {
-        if code == "user" {
-            return Ok(Role::new(code.clone(), "User")?);
+    async fn find_by_id(&self, id: &RoleId) -> Result<Role> {
+        if id.value() == "user" {
+            return Ok(Role::new(id.clone(), "User")?);
         }
         Err(Error::new("role", "not_found"))
     }
@@ -30,7 +30,12 @@ mod tests {
     #[tokio::test]
     async fn get() {
         let repo = InMemRoleRepository::new();
-        repo.find_by_id(&RoleId::from("user")).await.unwrap();
-        assert!(repo.find_by_id(&RoleId::from("another")).await.is_err());
+        repo.find_by_id(&RoleId::new("user").unwrap())
+            .await
+            .unwrap();
+        assert!(repo
+            .find_by_id(&RoleId::new("another").unwrap())
+            .await
+            .is_err());
     }
 }
