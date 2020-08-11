@@ -7,7 +7,7 @@ pub struct Username {
 }
 
 impl Username {
-    pub fn new(username: &str) -> Result<Username> {
+    pub fn new(username: &str) -> Result<Self> {
         if username.len() < 4 {
             return Err(Error::new("username", "too_short"));
         }

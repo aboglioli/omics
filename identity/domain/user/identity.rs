@@ -1,6 +1,7 @@
-use crate::domain::user::{Email, Password, Provider, Username};
 use common::error::Error;
 use common::result::Result;
+
+use crate::domain::user::{Email, Password, Provider, Username};
 
 #[derive(Debug, Clone)]
 pub struct Identity {

@@ -1,6 +1,7 @@
+use slug::slugify;
+
 use common::error::Error;
 use common::result::Result;
-use slug::slugify;
 
 #[derive(Debug, Clone)]
 pub struct Tag {
@@ -9,7 +10,7 @@ pub struct Tag {
 }
 
 impl Tag {
-    pub fn new(name: &str) -> Result<Tag> {
+    pub fn new(name: &str) -> Result<Self> {
         if name.is_empty() {
             return Err(Error::new("tag", "empty_name"));
         }

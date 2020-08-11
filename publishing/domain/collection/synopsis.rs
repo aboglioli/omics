@@ -1,4 +1,3 @@
-use common::error::Error;
 use common::result::Result;
 
 pub struct Synopsis {
@@ -7,10 +6,6 @@ pub struct Synopsis {
 
 impl Synopsis {
     pub fn new(synopsis: &str) -> Result<Self> {
-        if synopsis.len() < 4 {
-            return Err(Error::new("synopsis", "too_short"));
-        }
-
         Ok(Synopsis {
             synopsis: synopsis.to_owned(),
         })

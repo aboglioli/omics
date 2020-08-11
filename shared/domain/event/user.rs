@@ -11,6 +11,7 @@ pub enum UserEvent {
         id: String,
         username: String,
         email: String,
+        validation_code: String,
     },
     LoggedIn {
         id: String,

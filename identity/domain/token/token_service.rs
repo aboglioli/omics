@@ -1,6 +1,7 @@
-use crate::domain::token::{Data, Token, TokenEncoder, TokenId, TokenRepository};
 use common::error::Error;
 use common::result::Result;
+
+use crate::domain::token::{Data, Token, TokenEncoder, TokenId, TokenRepository};
 
 pub struct TokenService<'a, TRepo, TEnc> {
     token_repo: &'a TRepo,

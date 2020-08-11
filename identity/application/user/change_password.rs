@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 use common::result::Result;
 
-use crate::application::user::authorization;
+use crate::application::util;
 use crate::domain::user::{PasswordHasher, User, UserId, UserRepository, UserService};
 
 #[derive(Deserialize)]
@@ -36,7 +36,7 @@ where
         user_id: &UserId,
         cmd: ChangePasswordCommand,
     ) -> Result<()> {
-        authorization::is_authorized(auth_user, user_id)?;
+        util::is_authorized(auth_user, user_id)?;
 
         cmd.validate()?;
 

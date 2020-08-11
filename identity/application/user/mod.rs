@@ -1,4 +1,3 @@
-mod authorization;
 mod change_password;
 mod delete;
 mod get_by_id;
@@ -7,8 +6,6 @@ mod recover_password;
 mod register;
 mod update;
 mod validate;
-
-pub use authorization::*;
 pub use change_password::*;
 pub use delete::*;
 pub use get_by_id::*;

@@ -12,7 +12,7 @@ pub struct Name {
 }
 
 impl Name {
-    pub fn new(name: &str) -> Result<Name> {
+    pub fn new(name: &str) -> Result<Self> {
         Ok(Name {
             name: name.to_owned(),
         })
@@ -29,7 +29,7 @@ pub struct Author {
 }
 
 impl Author {
-    pub fn new(id: AuthorId, name: Name) -> Result<Author> {
+    pub fn new(id: AuthorId, name: Name) -> Result<Self> {
         Ok(Author {
             base: AggregateRoot::new(id),
             name,

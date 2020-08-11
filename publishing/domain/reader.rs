@@ -14,7 +14,7 @@ pub struct Reader {
 }
 
 impl Reader {
-    pub fn new(id: ReaderId, name: &str) -> Result<Reader> {
+    pub fn new(id: ReaderId, name: &str) -> Result<Self> {
         Ok(Reader {
             base: AggregateRoot::new(id),
             name: name.to_owned(),

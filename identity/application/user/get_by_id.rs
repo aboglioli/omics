@@ -2,7 +2,7 @@ use serde::Serialize;
 
 use common::result::Result;
 
-use crate::application::user::authorization;
+use crate::application::util;
 use crate::domain::user::{User, UserId, UserRepository};
 
 #[derive(Serialize)]
@@ -23,7 +23,7 @@ where
     }
 
     pub async fn exec(&self, auth_user: &User, user_id: &UserId) -> Result<GetByIdResponse> {
-        authorization::is_authorized(auth_user, user_id)?;
+        util::is_authorized(auth_user, user_id)?;
 
         let user = self.user_repo.find_by_id(user_id).await?;
         Ok(GetByIdResponse {

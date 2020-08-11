@@ -1,6 +1,6 @@
-use crate::domain::user::PasswordHasher;
-
 use common::result::Result;
+
+use crate::domain::user::PasswordHasher;
 
 #[derive(Default)]
 pub struct FakePasswordHasher;

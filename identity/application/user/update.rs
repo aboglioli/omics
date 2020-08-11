@@ -3,7 +3,7 @@ use serde::Deserialize;
 use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::application::user::authorization;
+use crate::application::util;
 use crate::domain::user::{Fullname, Person, User, UserId, UserRepository};
 
 #[derive(Deserialize)]
@@ -37,7 +37,7 @@ where
     }
 
     pub async fn exec(&self, auth_user: &User, user_id: &UserId, cmd: UpdateCommand) -> Result<()> {
-        authorization::is_authorized(auth_user, user_id)?;
+        util::is_authorized(auth_user, user_id)?;
 
         cmd.validate()?;
 

@@ -4,7 +4,6 @@ mod update;
 mod update_pages;
 mod view;
 mod view_handler;
-
 pub use create::*;
 pub use read::*;
 pub use update::*;

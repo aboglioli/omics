@@ -7,7 +7,7 @@ pub struct Password {
 }
 
 impl Password {
-    pub fn new(password: &str) -> Result<Password> {
+    pub fn new(password: &str) -> Result<Self> {
         if password.len() < 50 {
             return Err(Error::new("password", "not_hashed"));
         }

@@ -1,5 +1,4 @@
-mod inmem;
-pub use inmem::*;
+pub mod inmem;
 
 use async_trait::async_trait;
 

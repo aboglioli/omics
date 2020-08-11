@@ -12,7 +12,7 @@ pub struct View {
 }
 
 impl View {
-    pub fn new(reader_id: ReaderId, publication_id: PublicationId) -> Result<View> {
+    pub fn new(reader_id: ReaderId, publication_id: PublicationId) -> Result<Self> {
         Ok(View {
             reader_id,
             publication_id,

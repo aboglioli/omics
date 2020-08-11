@@ -10,7 +10,7 @@ pub struct Permission {
 }
 
 impl Permission {
-    pub fn new(module: &str, permissions: &str) -> Result<Permission> {
+    pub fn new(module: &str, permissions: &str) -> Result<Self> {
         let mut err = Error::new("permission", "invalid");
         if module.is_empty() {
             err.add_context("module", "empty");

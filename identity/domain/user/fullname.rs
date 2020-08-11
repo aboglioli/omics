@@ -8,7 +8,7 @@ pub struct Fullname {
 }
 
 impl Fullname {
-    pub fn new(name: &str, lastname: &str) -> Result<Fullname> {
+    pub fn new(name: &str, lastname: &str) -> Result<Self> {
         let mut err = Error::new("fullname", "invalid");
 
         if name.len() < 4 {

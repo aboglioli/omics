@@ -1,6 +1,3 @@
-use std::clone::Clone;
-use std::cmp::PartialEq;
-
 use chrono::{DateTime, Utc};
 
 use crate::event::{Event, ToEvent};
