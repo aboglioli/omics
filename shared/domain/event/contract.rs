@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use common::event::{Event, ToEvent};
 use common::result::Result;
 
-use crate::domain::event::serializer;
+use crate::domain::util;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum ContractEvent {
@@ -44,7 +44,7 @@ impl ToString for ContractEvent {
 
 impl ToEvent for ContractEvent {
     fn to_event(&self) -> Result<Event> {
-        let payload = serializer::serialize(&self, "contract")?;
+        let payload = util::serialize(&self, "contract")?;
 
         Ok(Event::new("contract", &self.to_string(), payload))
     }

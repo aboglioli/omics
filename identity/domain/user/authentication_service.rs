@@ -38,23 +38,14 @@ where
     ) -> Result<(User, Token)> {
         let mut err = Error::new("credentials", "invalid");
 
-        let mut user_res = self
-            .user_repo
-            .find_by_username(&Username::new(username_or_email)?)
-            .await;
-
-        if user_res.is_err() {
-            user_res = self
-                .user_repo
-                .find_by_email(&Email::new(username_or_email)?)
-                .await;
-        }
-
-        if let Err(err) = user_res {
-            return Err(err);
-        }
-
-        let user = user_res?;
+        let user = match (
+            Username::new(username_or_email),
+            Email::new(username_or_email),
+        ) {
+            (Ok(username), Err(_)) => self.user_repo.find_by_username(&username).await,
+            (Err(_), Ok(email)) => self.user_repo.find_by_email(&email).await,
+            _ => return Err(err),
+        }?;
 
         let user_password = match user.identity().password() {
             Some(password) => password.value(),
@@ -84,7 +75,7 @@ mod tests {
     use crate::infrastructure::persistence::inmem::*;
 
     #[tokio::test]
-    async fn authenticate() -> Result<()> {
+    async fn authenticate() {
         let user_repo = InMemUserRepository::new();
         let password_hasher = FakePasswordHasher::new();
         let token_enc = FakeTokenEncoder::new();
@@ -93,17 +84,17 @@ mod tests {
 
         let serv = AuthenticationService::new(&user_repo, &password_hasher, token_serv);
 
-        let mut user = mocks::user1()?;
-        user_repo.save(&mut user).await?;
+        let mut user = mocks::user1();
+        user_repo.save(&mut user).await.unwrap();
 
         let (_, token) = serv.authenticate("username", "P@asswd!").await.unwrap();
-        assert!(!token.token().is_empty());
+        assert!(!token.value().is_empty());
 
         let (_, token) = serv
             .authenticate("username@email.com", "P@asswd!")
             .await
             .unwrap();
-        assert!(!token.token().is_empty());
+        assert!(!token.value().is_empty());
 
         assert!(serv.authenticate("user2", "user123").await.is_err());
         assert!(serv.authenticate("user1", "user124").await.is_err());
@@ -115,7 +106,5 @@ mod tests {
             .authenticate("user@email.com", "user124")
             .await
             .is_err());
-
-        Ok(())
     }
 }

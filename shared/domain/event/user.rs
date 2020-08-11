@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use common::event::{Event, ToEvent};
 use common::result::Result;
 
-use crate::domain::event::serializer;
+use crate::domain::util;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum UserEvent {
@@ -15,6 +15,7 @@ pub enum UserEvent {
     },
     LoggedIn {
         id: String,
+        auth_token: String,
     },
     Updated {
         id: String,
@@ -49,7 +50,7 @@ impl ToString for UserEvent {
 
 impl ToEvent for UserEvent {
     fn to_event(&self) -> Result<Event> {
-        let payload = serializer::serialize(&self, "user")?;
+        let payload = util::serialize(&self, "user")?;
 
         Ok(Event::new("user", &self.to_string(), payload))
     }

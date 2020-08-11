@@ -76,7 +76,7 @@ mod tests {
     #[tokio::test]
     async fn find_by_id() {
         let repo = InMemUserRepository::new();
-        let user = mocks::user1().unwrap();
+        let user = mocks::user1();
         let mut changed_user = user.clone();
         changed_user
             .set_person(Person::new(Fullname::new("Name", "Lastname").unwrap()).unwrap())

@@ -48,12 +48,12 @@ where
             .await
         {
             Ok((mut user, token)) => {
-                user.login()?;
+                user.login(&token)?;
 
                 self.event_pub.publish_all(user.base().events()?).await?;
 
                 Ok(LoginResponse {
-                    auth_token: token.token().to_owned(),
+                    auth_token: token.value().to_owned(),
                 })
             }
             Err(e) => Err(e),
