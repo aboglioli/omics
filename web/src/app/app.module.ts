@@ -34,6 +34,7 @@ import { CatalogoComponent } from './pages/catalogo/catalogo.component';
 import { RealizarAnalisisComponent } from './components/realizar-analisis/realizar-analisis.component';
 import { ColeccionInfoComponent } from './pages/coleccion-info/coleccion-info.component';
 import { ComicInfoComponent } from './components/comic-info/comic-info.component';
+import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
 
 
 @NgModule({
@@ -55,7 +56,8 @@ import { ComicInfoComponent } from './components/comic-info/comic-info.component
     CatalogoComponent,
     RealizarAnalisisComponent,
     ColeccionInfoComponent,
-    ComicInfoComponent
+    ComicInfoComponent,
+    NavBarComponent
   ],
   imports: [
     BrowserModule,
