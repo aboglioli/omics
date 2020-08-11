@@ -11,6 +11,7 @@ import { HttpClientModule  } from '@angular/common/http';
 import { ServiceWorkerModule } from '@angular/service-worker'; // PWA dependencia
 import { ToastrModule } from 'ngx-toastr';
 import { ChartsModule } from 'ng2-charts';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 // Modulos auxiliares
 import { MaterialModule } from './auxiliar-modules/material.module';
@@ -36,7 +37,7 @@ import { ColeccionInfoComponent } from './pages/coleccion-info/coleccion-info.co
 import { ComicInfoComponent } from './components/comic-info/comic-info.component';
 import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
 import { LoadingIndicadorComponent } from './shared/loading-indicador/loading-indicador.component';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+// --->
 
 
 @NgModule({
