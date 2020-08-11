@@ -14,7 +14,7 @@ pub struct Review {
 }
 
 impl Review {
-    pub fn new(reader_id: ReaderId, publication_id: PublicationId, stars: Stars) -> Result<Review> {
+    pub fn new(reader_id: ReaderId, publication_id: PublicationId, stars: Stars) -> Result<Self> {
         Ok(Review {
             reader_id,
             publication_id,

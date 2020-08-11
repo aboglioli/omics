@@ -32,18 +32,18 @@ pub struct Publication {
     pages: Vec<Page>,
     contract: bool,
 
-    status_history: StatusHistory<PublicationStatus>,
+    status_history: StatusHistory<Status>,
 }
 
 impl Publication {
-    pub fn new(id: PublicationId, author_id: AuthorId, header: Header) -> Result<Publication> {
+    pub fn new(id: PublicationId, author_id: AuthorId, header: Header) -> Result<Self> {
         let mut publication = Publication {
             base: AggregateRoot::new(id),
             author_id,
             header,
             pages: Vec::new(),
             contract: false,
-            status_history: StatusHistory::new(PublicationStatus::Draft),
+            status_history: StatusHistory::new(Status::Draft),
         };
 
         publication.base.record_event(PublicationEvent::Created {
@@ -84,7 +84,7 @@ impl Publication {
         self.contract
     }
 
-    pub fn status_history(&self) -> &StatusHistory<PublicationStatus> {
+    pub fn status_history(&self) -> &StatusHistory<Status> {
         &self.status_history
     }
 

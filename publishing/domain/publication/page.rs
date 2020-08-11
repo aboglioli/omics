@@ -1,12 +1,10 @@
-use std::cmp::PartialEq;
-
 use common::result::Result;
 
 #[derive(Debug, Clone)]
 pub struct Position(u32, u32);
 
 impl Position {
-    pub fn new(x: u32, y: u32) -> Result<Position> {
+    pub fn new(x: u32, y: u32) -> Result<Self> {
         Ok(Position(x, y))
     }
 
@@ -29,7 +27,7 @@ impl PartialEq for Position {
 pub struct Size(u32, u32);
 
 impl Size {
-    pub fn new(w: u32, h: u32) -> Result<Size> {
+    pub fn new(w: u32, h: u32) -> Result<Self> {
         Ok(Size(w, h))
     }
 
@@ -56,7 +54,7 @@ pub struct Frame {
 }
 
 impl Frame {
-    pub fn new(order: u32, position: Position, size: Size) -> Result<Frame> {
+    pub fn new(order: u32, position: Position, size: Size) -> Result<Self> {
         Ok(Frame {
             order,
             position,
@@ -85,7 +83,7 @@ pub struct Image {
 }
 
 impl Image {
-    pub fn new(url: &str, size: u32) -> Result<Image> {
+    pub fn new(url: &str, size: u32) -> Result<Self> {
         Ok(Image {
             url: url.to_owned(),
             size,
@@ -120,7 +118,7 @@ pub struct Page {
 }
 
 impl Page {
-    pub fn new(number: u32) -> Result<Page> {
+    pub fn new(number: u32) -> Result<Self> {
         Ok(Page {
             number,
             images: Vec::new(),

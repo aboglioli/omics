@@ -5,7 +5,6 @@ pub use token_encoder::*;
 pub use token_repository::*;
 pub use token_service::*;
 
-use std::cmp::PartialEq;
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 

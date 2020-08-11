@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use warp::Filter;
 
-use common::event::InMemEventBus;
+use common::event::inmem::InMemEventBus;
 use identity::domain::token::TokenService;
 use identity::domain::user::{AuthenticationService, AuthorizationService, UserService};
 use identity::infrastructure::mocks::{FakePasswordHasher, FakeTokenEncoder};

@@ -1,8 +1,7 @@
 use async_trait::async_trait;
 use uuid::Uuid;
 
-use common::cache::{Cache, InMemCache};
-
+use common::cache::{inmem::InMemCache, Cache};
 use common::result::Result;
 
 use crate::domain::user::{Email, User, UserId, UserRepository, Username};

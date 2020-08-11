@@ -53,11 +53,11 @@ impl User {
             validation: Some(Validation::new()),
         };
 
-        // TODO: should send validation code
         user.base.record_event(UserEvent::Registered {
             id: user.base().id().value().to_owned(),
             username: user.identity().username().value().to_owned(),
             email: user.identity().username().value().to_owned(),
+            validation_code: user.validation().unwrap().code().to_owned(),
         });
 
         Ok(user)

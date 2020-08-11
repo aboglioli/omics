@@ -12,7 +12,7 @@ pub struct Reading {
 }
 
 impl Reading {
-    pub fn new(reader_id: ReaderId, publication_id: PublicationId) -> Result<Reading> {
+    pub fn new(reader_id: ReaderId, publication_id: PublicationId) -> Result<Self> {
         Ok(Reading {
             reader_id,
             publication_id,

@@ -7,7 +7,7 @@ pub struct Email {
 }
 
 impl Email {
-    pub fn new(email: &str) -> Result<Email> {
+    pub fn new(email: &str) -> Result<Self> {
         if email.len() < 4 {
             return Err(Error::new("email", "too_short"));
         }

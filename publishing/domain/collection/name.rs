@@ -1,4 +1,3 @@
-use common::error::Error;
 use common::result::Result;
 
 pub struct Name {
@@ -7,10 +6,6 @@ pub struct Name {
 
 impl Name {
     pub fn new(name: &str) -> Result<Self> {
-        if name.len() < 4 {
-            return Err(Error::new("name", "too_short"));
-        }
-
         Ok(Name {
             name: name.to_owned(),
         })

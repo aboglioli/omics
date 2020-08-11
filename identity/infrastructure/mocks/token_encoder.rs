@@ -1,6 +1,7 @@
-use crate::domain::token::{Token, TokenEncoder, TokenId};
 use common::error::Error;
 use common::result::Result;
+
+use crate::domain::token::{Token, TokenEncoder, TokenId};
 
 #[derive(Default)]
 pub struct FakeTokenEncoder;

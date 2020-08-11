@@ -1,17 +1,17 @@
-pub enum PublicationStatus {
+pub enum Status {
     Draft,
     WaitingApproval,
     Published,
     Rejected,
 }
 
-impl ToString for PublicationStatus {
+impl ToString for Status {
     fn to_string(&self) -> String {
         match self {
-            PublicationStatus::Draft => "draft".to_owned(),
-            PublicationStatus::WaitingApproval => "waiting-approval".to_owned(),
-            PublicationStatus::Published => "published".to_owned(),
-            PublicationStatus::Rejected => "rejected".to_owned(),
+            Status::Draft => "draft".to_owned(),
+            Status::WaitingApproval => "waiting-approval".to_owned(),
+            Status::Published => "published".to_owned(),
+            Status::Rejected => "rejected".to_owned(),
         }
     }
 }

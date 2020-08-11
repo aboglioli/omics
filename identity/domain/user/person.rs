@@ -8,7 +8,7 @@ pub struct Person {
 }
 
 impl Person {
-    pub fn new(fullname: Fullname) -> Result<Person> {
+    pub fn new(fullname: Fullname) -> Result<Self> {
         Ok(Person { fullname })
     }
 

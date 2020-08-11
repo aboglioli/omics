@@ -12,7 +12,7 @@ pub struct Like {
 }
 
 impl Like {
-    pub fn new(reader_id: ReaderId, publication_id: PublicationId) -> Result<Like> {
+    pub fn new(reader_id: ReaderId, publication_id: PublicationId) -> Result<Self> {
         Ok(Like {
             reader_id,
             publication_id,
