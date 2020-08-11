@@ -35,6 +35,8 @@ import { RealizarAnalisisComponent } from './components/realizar-analisis/realiz
 import { ColeccionInfoComponent } from './pages/coleccion-info/coleccion-info.component';
 import { ComicInfoComponent } from './components/comic-info/comic-info.component';
 import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
+import { LoadingIndicadorComponent } from './shared/loading-indicador/loading-indicador.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 
 @NgModule({
@@ -57,7 +59,8 @@ import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
     RealizarAnalisisComponent,
     ColeccionInfoComponent,
     ComicInfoComponent,
-    NavBarComponent
+    NavBarComponent,
+    LoadingIndicadorComponent
   ],
   imports: [
     BrowserModule,
@@ -69,6 +72,7 @@ import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     ChartsModule,
     ToastrModule.forRoot(),
+    FontAwesomeModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
