@@ -21,3 +21,13 @@ impl Password {
         &self.password
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn invalid() {
+        assert!(Password::new("plain-password").is_err());
+    }
+}

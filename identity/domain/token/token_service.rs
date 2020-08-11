@@ -48,26 +48,24 @@ mod tests {
     use crate::infrastructure::persistence::inmem::InMemTokenRepository;
 
     #[tokio::test]
-    async fn create() -> Result<()> {
-        let enc = FakeTokenEncoder::new();
+    async fn create_validate_invalidate() {
         let repo = InMemTokenRepository::new();
+        let enc = FakeTokenEncoder::new();
         let serv = TokenService::new(&repo, &enc);
 
         let mut data = Data::new();
         data.add("user_id", "u123");
         data.add("user_username", "admin");
 
-        let token = serv.create(data).await?;
-        assert!(!token.token().is_empty());
+        let token = serv.create(data).await.unwrap();
+        assert!(!token.value().is_empty());
 
-        let data = serv.validate(&token).await?;
+        let data = serv.validate(&token).await.unwrap();
         assert_eq!(data.get("user_id"), Some(&"u123".to_owned()));
         assert_eq!(data.get("user_username"), Some(&"admin".to_owned()));
 
         assert!(serv.invalidate(&token).await.is_ok());
 
         assert!(serv.validate(&token).await.is_err());
-
-        Ok(())
     }
 }

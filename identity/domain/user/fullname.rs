@@ -1,3 +1,5 @@
+use regex::Regex;
+
 use common::error::Error;
 use common::result::Result;
 
@@ -11,7 +13,7 @@ impl Fullname {
     pub fn new(name: &str, lastname: &str) -> Result<Self> {
         let mut err = Error::new("fullname", "invalid");
 
-        if name.len() < 4 {
+        if name.len() < 2 {
             err.add_context("name", "too_short");
         }
 
@@ -19,12 +21,26 @@ impl Fullname {
             err.add_context("name", "too_long");
         }
 
-        if lastname.len() < 4 {
+        if lastname.len() < 2 {
             err.add_context("lastname", "too_short");
         }
 
         if lastname.len() > 64 {
             err.add_context("lastname", "too_long");
+        }
+
+        match Regex::new("^[a-zA-Z]+ *[a-zA-Z]+$") {
+            Ok(re) => {
+                if !re.is_match(name) {
+                    err.add_context("name", "invalid_characters");
+                }
+                if !re.is_match(lastname) {
+                    err.add_context("lastname", "invalid_characters");
+                }
+            }
+            Err(_) => {
+                err.add_context("name-lastname", "invalid_regex");
+            }
         }
 
         if err.has_context() {
@@ -43,5 +59,37 @@ impl Fullname {
 
     pub fn lastname(&self) -> &str {
         &self.lastname
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn create() {
+        let fullname = Fullname::new("User", "One").unwrap();
+        assert_eq!(fullname.name(), "User");
+        assert_eq!(fullname.lastname(), "One");
+    }
+
+    #[test]
+    fn valid() {
+        assert!(Fullname::new("User", "One").is_ok());
+        assert!(Fullname::new("User", "On").is_ok());
+        assert!(Fullname::new("Us", "On").is_ok());
+        assert!(Fullname::new("User Valid", "One").is_ok());
+        assert!(Fullname::new("Lee", "Jo").is_ok());
+        assert!(Fullname::new("Alan Daniel", "Boglioli Caffe").is_ok());
+    }
+
+    #[test]
+    fn invalid() {
+        assert!(Fullname::new("U", "O").is_err());
+        assert!(Fullname::new("U", "One").is_err());
+        assert!(Fullname::new("User-Invalid", "One").is_err());
+        assert!(Fullname::new("User", "One_Two").is_err());
+        assert!(Fullname::new("User", "One@Two").is_err());
+        assert!(Fullname::new(" User", "One ").is_err());
     }
 }

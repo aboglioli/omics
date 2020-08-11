@@ -31,6 +31,7 @@ use common::result::Result;
 use shared::domain::event::UserEvent;
 
 use crate::domain::role::Role;
+use crate::domain::token::Token;
 
 pub type UserId = StringId;
 
@@ -139,9 +140,10 @@ impl User {
         Ok(())
     }
 
-    pub fn login(&mut self) -> Result<()> {
+    pub fn login(&mut self, token: &Token) -> Result<()> {
         self.base.record_event(UserEvent::LoggedIn {
             id: self.base().id().value().to_owned(),
+            auth_token: token.value().to_owned(),
         });
 
         Ok(())

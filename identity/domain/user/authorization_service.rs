@@ -33,3 +33,12 @@ where
         Err(Error::new("authorization", "unauthorized"))
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    #[test]
+    fn authenticate() {
+        // TODO: implement
+    }
+}

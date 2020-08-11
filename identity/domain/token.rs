@@ -58,7 +58,7 @@ impl Token {
         }
     }
 
-    pub fn token(&self) -> &str {
+    pub fn value(&self) -> &str {
         &self.token
     }
 }
