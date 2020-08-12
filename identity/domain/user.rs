@@ -141,6 +141,14 @@ impl User {
     }
 
     pub fn login(&mut self, token: &Token) -> Result<()> {
+        if !self.is_validated() {
+            return Err(Error::new("user", "not_validated"));
+        }
+
+        if !self.is_active() {
+            return Err(Error::new("user", "not_active"));
+        }
+
         self.base.record_event(UserEvent::LoggedIn {
             id: self.base().id().value().to_owned(),
             auth_token: token.value().to_owned(),
@@ -157,6 +165,20 @@ impl User {
                 temp_password: temp_password.to_owned(),
                 email: self.identity().email().value().to_owned(),
             });
+
+        Ok(())
+    }
+
+    pub fn delete(&mut self) -> Result<()> {
+        if !self.is_active() {
+            return Err(Error::new("user", "not_active"));
+        }
+
+        self.base.delete();
+
+        self.base.record_event(UserEvent::Deleted {
+            id: self.base().id().value().to_owned(),
+        });
 
         Ok(())
     }
@@ -208,7 +230,6 @@ mod tests {
         assert!(user.validation().is_some());
 
         let code = user.validation().unwrap().clone();
-
         assert!(user.validate(&code).is_ok());
 
         assert!(user.is_validated());
@@ -217,5 +238,29 @@ mod tests {
 
         assert!(user.validate(&code).is_err());
         assert!(user.validation().is_none());
+    }
+
+    #[test]
+    fn delete() {
+        let mut user = User::new(
+            UserId::new("user123").unwrap(),
+            Identity::new(
+                Provider::Local,
+                Username::new("user1").unwrap(),
+                Email::new("email@user.com").unwrap(),
+                Some(Password::new(&format!("{:X>50}", "2")).unwrap()),
+            )
+            .unwrap(),
+            Role::new(RoleId::new("user").unwrap(), "User").unwrap(),
+        )
+        .unwrap();
+
+        assert!(user.delete().is_err());
+
+        let code = user.validation().unwrap().clone();
+        assert!(user.validate(&code).is_ok());
+
+        assert!(user.delete().is_ok());
+        assert!(user.delete().is_err());
     }
 }

@@ -60,7 +60,7 @@ mod tests {
     use super::*;
 
     use crate::domain::user::*;
-    use crate::infrastructure::mocks;
+    use crate::mocks;
 
     #[tokio::test]
     async fn next_id() {
@@ -76,32 +76,27 @@ mod tests {
     #[tokio::test]
     async fn find_by_id() {
         let repo = InMemUserRepository::new();
-        let user = mocks::user1();
-        let mut changed_user = user.clone();
-        changed_user
-            .set_person(Person::new(Fullname::new("Name", "Lastname").unwrap()).unwrap())
+        let mut user = mocks::user1();
+        user.set_person(Person::new(Fullname::new("Name", "Lastname").unwrap()).unwrap())
             .unwrap();
 
-        repo.save(&mut changed_user).await.unwrap();
-        assert!(repo.find_by_id(&changed_user.base().id()).await.is_ok());
-        assert!(user.person().is_none());
+        repo.save(&mut user).await.unwrap();
+        assert!(repo.find_by_id(&user.base().id()).await.is_ok());
+        assert!(user.person().is_some());
 
         let found_user = repo.find_by_id(&user.base().id()).await.unwrap();
         assert_eq!(user.base(), found_user.base());
-        assert_eq!(changed_user.base(), found_user.base());
+        assert_eq!(user.base(), found_user.base());
 
         let changed_user_person = found_user.person().unwrap();
         assert_eq!(changed_user_person.fullname().name(), "Name");
         assert_eq!(changed_user_person.fullname().lastname(), "Lastname");
 
         assert!(repo
-            .find_by_username(&Username::new("username").unwrap())
+            .find_by_username(user.identity().username())
             .await
             .is_ok());
-        assert!(repo
-            .find_by_email(&Email::new("username@email.com").unwrap())
-            .await
-            .is_ok());
+        assert!(repo.find_by_email(user.identity().email()).await.is_ok());
         assert!(repo
             .find_by_username(&Username::new("nonexisting").unwrap())
             .await

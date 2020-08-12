@@ -7,9 +7,9 @@ use warp::{Filter, Rejection, Reply};
 use identity::application::user::{GetById, Login, LoginCommand, Register, RegisterCommand};
 use identity::domain::user::UserId;
 
-use crate::handlers::authorization;
+use crate::authorization;
+use crate::container::{with_container, Container};
 use crate::handlers::common::Uninmplemented;
-use crate::handlers::container::{with_container, Container};
 
 #[derive(Deserialize)]
 pub struct ValidateParams {

@@ -1,3 +1,5 @@
+mod authorization;
+mod container;
 mod handlers;
 mod port;
 
@@ -6,7 +8,7 @@ use std::sync::Arc;
 
 use warp::Filter;
 
-use handlers::container::Container;
+use container::Container;
 use handlers::{contract, donation, publication, subscription, user};
 
 #[tokio::main]

@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use warp::{Filter, Rejection, Reply};
 
+use crate::container::{with_container, Container};
 use crate::handlers::common::Uninmplemented;
-use crate::handlers::container::{with_container, Container};
 
 pub fn routes(
     container: &Arc<Container>,

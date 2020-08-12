@@ -14,7 +14,7 @@ pub struct LoginCommand {
 
 #[derive(Serialize)]
 pub struct LoginResponse {
-    pub auth_token: String,
+    auth_token: String,
 }
 
 pub struct Login<'a, EPub, URepo, PHasher, TRepo, TEnc> {
@@ -58,5 +58,65 @@ where
             }
             Err(e) => Err(e),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use crate::mocks;
+
+    #[tokio::test]
+    async fn not_validated_user() {
+        let c = mocks::container();
+        let uc = Login::new(c.event_pub(), c.authentication_serv());
+
+        let mut user = mocks::user1();
+        c.user_repo().save(&mut user).await.unwrap();
+
+        assert!(uc
+            .exec(LoginCommand {
+                username_or_email: user.identity().username().value().to_owned(),
+                password: "P@asswd!".to_owned(),
+            })
+            .await
+            .is_err());
+    }
+
+    #[tokio::test]
+    async fn validated_user() {
+        let c = mocks::container();
+        let uc = Login::new(c.event_pub(), c.authentication_serv());
+
+        let mut user = mocks::validated_user1();
+        c.user_repo().save(&mut user).await.unwrap();
+
+        let res = uc
+            .exec(LoginCommand {
+                username_or_email: user.identity().username().value().to_owned(),
+                password: "P@asswd!".to_owned(),
+            })
+            .await
+            .unwrap();
+        assert!(!res.auth_token.is_empty());
+        assert_eq!(c.token_repo().cache().len().await, 1);
+        assert_eq!(c.event_pub().events().await.len(), 1);
+
+        assert!(uc
+            .exec(LoginCommand {
+                username_or_email: "non-existing".to_owned(),
+                password: "P@asswd!".to_owned(),
+            })
+            .await
+            .is_err());
+
+        assert!(uc
+            .exec(LoginCommand {
+                username_or_email: user.identity().username().value().to_owned(),
+                password: "invalid".to_owned(),
+            })
+            .await
+            .is_err());
     }
 }
