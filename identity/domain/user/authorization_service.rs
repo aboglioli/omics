@@ -36,9 +36,27 @@ where
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
-    #[test]
-    fn authenticate() {
-        // TODO: implement
+    use crate::domain::token::Data;
+    use crate::mocks;
+
+    #[tokio::test]
+    async fn authorize() {
+        let c = mocks::container();
+
+        let mut user = mocks::validated_user1();
+        c.user_repo().save(&mut user).await.unwrap();
+
+        let mut data = Data::new();
+        data.add("user_id", user.base().id().value());
+        let token = c.token_serv().create(data).await.unwrap();
+
+        let serv = AuthorizationService::new(c.user_repo(), c.token_serv());
+
+        let auth_user = serv.authorize(&token).await.unwrap();
+        assert_eq!(auth_user.base(), user.base());
+
+        assert!(serv.authorize(&Token::new("invalid")).await.is_err());
     }
 }

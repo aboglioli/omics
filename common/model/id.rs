@@ -14,6 +14,10 @@ impl StringId {
             return Err(Error::new("id", "empty"));
         }
 
+        if id.len() < 4 {
+            return Err(Error::new("id", "too_short"));
+        }
+
         Ok(StringId { id: id.to_owned() })
     }
 

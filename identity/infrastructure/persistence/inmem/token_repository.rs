@@ -16,6 +16,10 @@ impl InMemTokenRepository {
             cache: InMemCache::new(),
         }
     }
+
+    pub fn cache(&self) -> &InMemCache<TokenId, Data> {
+        &self.cache
+    }
 }
 
 #[async_trait]

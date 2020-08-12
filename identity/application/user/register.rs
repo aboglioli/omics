@@ -1,4 +1,4 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use common::event::EventPublisher;
 use common::result::Result;
@@ -21,6 +21,11 @@ impl RegisterCommand {
     pub fn validate(&self) -> Result<()> {
         Ok(())
     }
+}
+
+#[derive(Serialize)]
+pub struct RegisterResponse {
+    id: String,
 }
 
 pub struct Register<'a, EPub, URepo, PHasher> {
@@ -49,10 +54,11 @@ where
         }
     }
 
-    pub async fn exec(&self, cmd: RegisterCommand) -> Result<()> {
+    pub async fn exec(&self, cmd: RegisterCommand) -> Result<RegisterResponse> {
         cmd.validate()?;
 
         self.user_serv.available(&cmd.username, &cmd.email).await?;
+
         let hashed_password = self.user_serv.generate_password(&cmd.password)?;
 
         let mut user = User::new(
@@ -70,6 +76,116 @@ where
 
         self.event_pub.publish_all(user.base().events()?).await?;
 
-        Ok(())
+        Ok(RegisterResponse {
+            id: user.base().id().value().to_owned(),
+        })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use crate::domain::user::UserId;
+    use crate::mocks;
+
+    #[tokio::test]
+    async fn new_user() {
+        let c = mocks::container();
+        let uc = Register::new(c.event_pub(), c.user_repo(), c.user_serv());
+
+        let cmd = RegisterCommand {
+            username: "new-user".to_owned(),
+            email: "new@user.com".to_owned(),
+            password: "P@asswd!".to_owned(),
+        };
+
+        let res = uc.exec(cmd).await.unwrap();
+        let saved_user = c
+            .user_repo()
+            .find_by_id(&UserId::new(&res.id).unwrap())
+            .await
+            .unwrap();
+        assert_eq!(res.id, saved_user.base().id().value());
+        assert_eq!(saved_user.identity().username().value(), "new-user");
+        assert_eq!(saved_user.identity().email().value(), "new@user.com");
+        assert_ne!(
+            saved_user.identity().password().unwrap().value(),
+            "P@asswd!"
+        );
+
+        assert_eq!(c.event_pub().events().await.len(), 1);
+    }
+
+    #[tokio::test]
+    async fn invalid_data() {
+        let c = mocks::container();
+        let uc = Register::new(c.event_pub(), c.user_repo(), c.user_serv());
+
+        let mut user = mocks::user1();
+        c.user_repo().save(&mut user).await.unwrap();
+
+        assert!(uc
+            .exec(RegisterCommand {
+                username: "us".to_owned(),
+                email: "new@user.com".to_owned(),
+                password: "P@asswd!".to_owned(),
+            })
+            .await
+            .is_err());
+
+        assert!(uc
+            .exec(RegisterCommand {
+                username: "new-user".to_owned(),
+                email: "invalid-email".to_owned(),
+                password: "P@asswd!".to_owned(),
+            })
+            .await
+            .is_err());
+
+        assert!(uc
+            .exec(RegisterCommand {
+                username: "new-user".to_owned(),
+                email: "new@user.com".to_owned(),
+                password: "1234".to_owned(),
+            })
+            .await
+            .is_err());
+    }
+
+    #[tokio::test]
+    async fn existing_user() {
+        let c = mocks::container();
+        let uc = Register::new(c.event_pub(), c.user_repo(), c.user_serv());
+
+        let mut user = mocks::user1();
+        c.user_repo().save(&mut user).await.unwrap();
+
+        assert!(uc
+            .exec(RegisterCommand {
+                username: user.identity().username().value().to_owned(),
+                email: user.identity().email().value().to_owned(),
+                password: "P@asswd!".to_owned(),
+            })
+            .await
+            .is_err());
+
+        assert!(uc
+            .exec(RegisterCommand {
+                username: "other".to_owned(),
+                email: user.identity().email().value().to_owned(),
+                password: "P@asswd!".to_owned(),
+            })
+            .await
+            .is_err());
+
+        assert!(uc
+            .exec(RegisterCommand {
+                username: user.identity().username().value().to_owned(),
+                email: "other@other.com".to_owned(),
+                password: "P@asswd!".to_owned(),
+            })
+            .await
+            .is_err());
     }
 }

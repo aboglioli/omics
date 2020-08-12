@@ -6,10 +6,10 @@ use warp::Filter;
 use common::event::inmem::InMemEventBus;
 use identity::domain::token::TokenService;
 use identity::domain::user::{AuthenticationService, AuthorizationService, UserService};
-use identity::infrastructure::mocks::{FakePasswordHasher, FakeTokenEncoder};
 use identity::infrastructure::persistence::inmem::{
     InMemRoleRepository, InMemTokenRepository, InMemUserRepository,
 };
+use identity::mocks::{FakePasswordHasher, FakeTokenEncoder};
 
 pub struct Container {
     event_bus: InMemEventBus,

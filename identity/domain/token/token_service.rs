@@ -44,8 +44,8 @@ impl<'a, TRepo: TokenRepository, TEnc: TokenEncoder> TokenService<'a, TRepo, TEn
 mod tests {
     use super::*;
 
-    use crate::infrastructure::mocks::FakeTokenEncoder;
     use crate::infrastructure::persistence::inmem::InMemTokenRepository;
+    use crate::mocks::FakeTokenEncoder;
 
     #[tokio::test]
     async fn create_validate_invalidate() {
