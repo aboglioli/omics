@@ -873,6 +873,8 @@ dependencies = [
  "serde_json",
  "shared",
  "slug",
+ "tokio",
+ "uuid",
 ]
 
 [[package]]

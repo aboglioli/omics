@@ -9,18 +9,12 @@ use crate::domain::publication::{
 };
 
 #[derive(Deserialize)]
-pub struct ImageDto {
-    url: String,
-    size: u32,
-}
-
-#[derive(Deserialize)]
 pub struct CreateCommand {
     name: String,
     synopsis: String,
     category_id: String,
     tags: Vec<String>,
-    cover: ImageDto,
+    cover: String,
 }
 
 impl CreateCommand {
@@ -47,26 +41,28 @@ where
         }
     }
 
-    pub async fn exec(&self, author_id: &AuthorId, cmd: CreateCommand) -> Result<()> {
+    pub async fn exec(&self, author_id: String, cmd: CreateCommand) -> Result<()> {
         cmd.validate()?;
 
-        let name = Name::new(&cmd.name)?;
-        let synopsis = Synopsis::new(&cmd.synopsis)?;
+        // let author = self.user_serv.get_author(&author_id).await?;
+
+        let name = Name::new(cmd.name)?;
+        let synopsis = Synopsis::new(cmd.synopsis)?;
 
         let mut tags = Vec::new();
-        for tag in cmd.tags.iter() {
+        for tag in cmd.tags.into_iter() {
             tags.push(Tag::new(tag)?);
         }
 
-        let cover = Image::new(&cmd.cover.url, cmd.cover.size)?;
+        let cover = Image::new(cmd.cover)?;
 
-        let category_id = CategoryId::new(&cmd.category_id)?;
+        let category_id = CategoryId::new(cmd.category_id)?;
 
         let header = Header::new(name, synopsis, category_id, tags, cover)?;
 
         let mut publication = Publication::new(
             self.publication_repo.next_id().await?,
-            author_id.to_owned(),
+            AuthorId::new(author_id)?,
             header,
         )?;
 

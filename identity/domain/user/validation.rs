@@ -23,3 +23,9 @@ impl PartialEq for Validation {
         self.code == other.code
     }
 }
+
+impl<S: Into<String>> From<S> for Validation {
+    fn from(s: S) -> Self {
+        Validation { code: s.into() }
+    }
+}

@@ -1,6 +1,10 @@
 mod name;
+mod publication;
+mod repository;
 mod synopsis;
 pub use name::*;
+pub use publication::*;
+pub use repository::*;
 pub use synopsis::*;
 
 use common::model::{AggregateRoot, StringId};
@@ -9,10 +13,12 @@ use shared::domain::event::CollectionEvent;
 
 pub type CollectionId = StringId;
 
+#[derive(Debug, Clone)]
 pub struct Collection {
     base: AggregateRoot<CollectionId, CollectionEvent>,
     name: Name,
     synopsis: Synopsis,
+    publications: Vec<Publication>,
 }
 
 impl Collection {
@@ -21,6 +27,7 @@ impl Collection {
             base: AggregateRoot::new(id),
             name,
             synopsis,
+            publications: Vec::new(),
         })
     }
 
@@ -34,5 +41,11 @@ impl Collection {
 
     pub fn synopsis(&self) -> &Synopsis {
         &self.synopsis
+    }
+
+    pub fn set_publications(&mut self, publications: Vec<Publication>) -> Result<()> {
+        self.publications = publications;
+
+        Ok(())
     }
 }

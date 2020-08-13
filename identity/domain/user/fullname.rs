@@ -10,7 +10,10 @@ pub struct Fullname {
 }
 
 impl Fullname {
-    pub fn new(name: &str, lastname: &str) -> Result<Self> {
+    pub fn new<S: Into<String>>(name: S, lastname: S) -> Result<Self> {
+        let name = name.into();
+        let lastname = lastname.into();
+
         let mut err = Error::new("fullname", "invalid");
 
         if name.len() < 2 {
@@ -31,10 +34,10 @@ impl Fullname {
 
         match Regex::new("^[a-zA-Z]+ *[a-zA-Z]+$") {
             Ok(re) => {
-                if !re.is_match(name) {
+                if !re.is_match(&name) {
                     err.add_context("name", "invalid_characters");
                 }
-                if !re.is_match(lastname) {
+                if !re.is_match(&lastname) {
                     err.add_context("lastname", "invalid_characters");
                 }
             }
@@ -47,10 +50,7 @@ impl Fullname {
             return Err(err);
         }
 
-        Ok(Fullname {
-            name: name.to_owned(),
-            lastname: lastname.to_owned(),
-        })
+        Ok(Fullname { name, lastname })
     }
 
     pub fn name(&self) -> &str {
@@ -75,6 +75,7 @@ mod tests {
 
     #[test]
     fn valid() {
+        assert!(Fullname::new(String::from("User"), String::from("One")).is_ok());
         assert!(Fullname::new("User", "One").is_ok());
         assert!(Fullname::new("User", "On").is_ok());
         assert!(Fullname::new("Us", "On").is_ok());

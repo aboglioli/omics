@@ -1,7 +1,13 @@
+mod repository;
+pub use repository::*;
+
 use common::result::Result;
 
-#[derive(Default)]
+use crate::domain::publication::PublicationId;
+
+#[derive(Debug, Clone)]
 pub struct Statistics {
+    publication_id: PublicationId,
     views: u32,
     unique_views: u32,
     readings: u32,
@@ -12,6 +18,7 @@ pub struct Statistics {
 
 impl Statistics {
     pub fn new(
+        publication_id: PublicationId,
         views: u32,
         unique_views: u32,
         readings: u32,
@@ -20,6 +27,7 @@ impl Statistics {
         stars: f32,
     ) -> Result<Statistics> {
         Ok(Statistics {
+            publication_id,
             views,
             unique_views,
             readings,
@@ -27,6 +35,10 @@ impl Statistics {
             reviews,
             stars,
         })
+    }
+
+    pub fn publication_id(&self) -> &PublicationId {
+        &self.publication_id
     }
 
     pub fn views(&self) -> u32 {

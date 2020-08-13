@@ -9,7 +9,9 @@ pub struct Email {
 }
 
 impl Email {
-    pub fn new(email: &str) -> Result<Self> {
+    pub fn new<S: Into<String>>(email: S) -> Result<Self> {
+        let email = email.into();
+
         if email.len() < 5 {
             return Err(Error::new("email", "too_short"));
         }
@@ -20,7 +22,7 @@ impl Email {
 
         match Regex::new(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$") {
             Ok(re) => {
-                if !re.is_match(email) {
+                if !re.is_match(&email) {
                     return Err(Error::new("email", "invalid"));
                 }
             }
@@ -29,9 +31,7 @@ impl Email {
             }
         }
 
-        Ok(Email {
-            email: email.to_owned(),
-        })
+        Ok(Email { email })
     }
 
     pub fn value(&self) -> &str {

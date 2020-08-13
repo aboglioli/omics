@@ -65,9 +65,9 @@ where
             self.user_repo.next_id().await?,
             Identity::new(
                 Provider::Local,
-                Username::new(&cmd.username)?,
-                Email::new(&cmd.email)?,
-                Some(Password::new(&hashed_password)?),
+                Username::new(cmd.username)?,
+                Email::new(cmd.email)?,
+                Some(Password::new(hashed_password)?),
             )?,
             Role::new(RoleId::new("user")?, "User")?,
         )?;

@@ -39,7 +39,7 @@ where
     ) -> Result<(User, Token)> {
         let mut err = Error::new("credentials", "invalid");
 
-        let user = match (
+        let mut user = match (
             Username::new(username_or_email),
             Email::new(username_or_email),
         ) {
@@ -61,6 +61,8 @@ where
                 Ok(token) => token,
                 Err(e) => return Err(err.wrap(e).build()),
             };
+
+            user.login(&token)?;
 
             return Ok((user, token));
         }

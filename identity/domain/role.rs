@@ -1,7 +1,7 @@
 mod permission;
-mod role_repository;
+mod repository;
 pub use permission::*;
-pub use role_repository::*;
+pub use repository::*;
 
 use common::event::Event;
 use common::model::{AggregateRoot, StringId};
@@ -17,10 +17,12 @@ pub struct Role {
 }
 
 impl Role {
-    pub fn new(code: RoleId, name: &str) -> Result<Self> {
+    pub fn new<S: Into<String>>(code: RoleId, name: S) -> Result<Self> {
+        let name = name.into();
+
         Ok(Role {
             base: AggregateRoot::new(code),
-            name: name.to_owned(),
+            name,
             permissions: Vec::new(),
         })
     }

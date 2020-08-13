@@ -47,9 +47,7 @@ where
             .authenticate(&cmd.username_or_email, &cmd.password)
             .await
         {
-            Ok((mut user, token)) => {
-                user.login(&token)?;
-
+            Ok((user, token)) => {
                 self.event_pub.publish_all(user.base().events()?).await?;
 
                 Ok(LoginResponse {

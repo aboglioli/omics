@@ -1,13 +1,14 @@
 use common::result::Result;
 
+#[derive(Debug, Clone)]
 pub struct Synopsis {
     synopsis: String,
 }
 
 impl Synopsis {
-    pub fn new(synopsis: &str) -> Result<Self> {
+    pub fn new<S: Into<String>>(synopsis: S) -> Result<Self> {
         Ok(Synopsis {
-            synopsis: synopsis.to_owned(),
+            synopsis: synopsis.into(),
         })
     }
 

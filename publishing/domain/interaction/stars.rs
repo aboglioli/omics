@@ -1,6 +1,7 @@
 use common::error::Error;
 use common::result::Result;
 
+#[derive(Debug, Clone)]
 pub struct Stars {
     stars: u8,
 }

@@ -5,7 +5,6 @@ use warp::http::StatusCode;
 use warp::{Filter, Rejection, Reply};
 
 use identity::application::user::{GetById, Login, LoginCommand, Register, RegisterCommand};
-use identity::domain::user::UserId;
 
 use crate::authorization;
 use crate::container::{with_container, Container};
@@ -90,8 +89,10 @@ pub async fn get_by_id(
     let user = authorization_serv.authorize(&token).await.unwrap();
 
     let uc = GetById::new(container.user_repo());
-    let id = UserId::new(&id).unwrap();
-    let res = uc.exec(&user, &id).await.unwrap();
+    let res = uc
+        .exec(user.base().id().value().to_owned(), id)
+        .await
+        .unwrap();
 
     Ok(warp::reply::json(&res))
 }
