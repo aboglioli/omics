@@ -1,17 +1,19 @@
-use crate::domain::author::AuthorId;
-use crate::domain::category::CategoryId;
+use crate::domain::author::{Author, AuthorId};
+use crate::domain::category::{Category, CategoryId, Name as CategoryName};
 use crate::domain::content_manager::{ContentManager, ContentManagerId};
-use crate::domain::publication::{Header, Image, Name, Publication, PublicationId, Synopsis, Tag};
+use crate::domain::publication::{
+    Header, Image, Name, Page, Publication, PublicationId, Synopsis, Tag,
+};
 use crate::domain::reader::{Reader, ReaderId};
 
 pub fn publication1() -> Publication {
     Publication::new(
-        PublicationId::new("#pub01").unwrap(),
-        AuthorId::new("#author01").unwrap(),
+        PublicationId::new("#publication01").unwrap(),
+        author1().base().id(),
         Header::new(
-            Name::new("Pub 01").unwrap(),
+            Name::new("Publication 01").unwrap(),
             Synopsis::new("Synopsis...").unwrap(),
-            CategoryId::new("cat_01").unwrap(),
+            category1().base().id(),
             vec![Tag::new("Tag 1").unwrap(), Tag::new("Tag 2").unwrap()],
             Image::new("domain.com/image.jpg").unwrap(),
         )
@@ -22,6 +24,26 @@ pub fn publication1() -> Publication {
 
 pub fn published_publication1() -> Publication {
     let mut publication = publication1();
+
+    let mut page1 = Page::new(0).unwrap();
+    page1
+        .set_images(vec![
+            Image::new("domain.com/img1.jpg").unwrap(),
+            Image::new("domain.com/img2.jpg").unwrap(),
+            Image::new("domain.com/img3.jpg").unwrap(),
+        ])
+        .unwrap();
+
+    let mut page2 = Page::new(1).unwrap();
+    page2
+        .set_images(vec![
+            Image::new("domain.com/img4.jpg").unwrap(),
+            Image::new("domain.com/img5.jpg").unwrap(),
+        ])
+        .unwrap();
+
+    publication.set_pages(vec![page1, page2]).unwrap();
+
     publication.publish().unwrap();
     publication.approve(content_manager1()).unwrap();
     publication
@@ -32,5 +54,33 @@ pub fn content_manager1() -> ContentManager {
 }
 
 pub fn reader1() -> Reader {
-    Reader::new(ReaderId::new("#reader01").unwrap(), "Reader 01").unwrap()
+    Reader::new(ReaderId::new("#reader01").unwrap()).unwrap()
+}
+
+pub fn author1() -> Author {
+    Author::new(AuthorId::new("#author01").unwrap()).unwrap()
+}
+
+pub fn author_as_reader1() -> Reader {
+    Reader::new(ReaderId::new("#author01").unwrap()).unwrap()
+}
+
+pub fn author2() -> Author {
+    Author::new(AuthorId::new("#author02").unwrap()).unwrap()
+}
+
+pub fn category1() -> Category {
+    Category::new(
+        CategoryId::new("#category01").unwrap(),
+        CategoryName::new("Category 01").unwrap(),
+    )
+    .unwrap()
+}
+
+pub fn category2() -> Category {
+    Category::new(
+        CategoryId::new("#category02").unwrap(),
+        CategoryName::new("Category 02").unwrap(),
+    )
+    .unwrap()
 }

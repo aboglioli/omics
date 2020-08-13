@@ -79,3 +79,90 @@ where
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use crate::mocks;
+
+    #[tokio::test]
+    async fn valid() {
+        let c = mocks::container();
+        let uc = UpdatePages::new(c.event_pub(), c.publication_repo());
+
+        let author = mocks::author1();
+        let mut publication = mocks::publication1();
+        c.publication_repo().save(&mut publication).await.unwrap();
+
+        uc.exec(
+            author.base().id().value().to_owned(),
+            publication.base().id().value().to_owned(),
+            UpdatePagesCommand {
+                pages: vec![
+                    PageDto {
+                        images: vec![
+                            "domain.com/image1".to_owned(),
+                            "domain.com/image2".to_owned(),
+                        ],
+                    },
+                    PageDto {
+                        images: vec![
+                            "domain.com/image3".to_owned(),
+                            "domain.com/image4".to_owned(),
+                        ],
+                    },
+                    PageDto {
+                        images: vec!["domain.com/image5".to_owned()],
+                    },
+                ],
+            },
+        )
+        .await
+        .unwrap();
+
+        let publication = c
+            .publication_repo()
+            .find_by_id(&publication.base().id())
+            .await
+            .unwrap();
+        assert_eq!(publication.pages().len(), 3);
+
+        assert_eq!(c.event_pub().events().await.len(), 1);
+    }
+
+    #[tokio::test]
+    async fn invalid() {
+        let c = mocks::container();
+        let uc = UpdatePages::new(c.event_pub(), c.publication_repo());
+
+        let author = mocks::author1();
+
+        assert!(uc
+            .exec(
+                author.base().id().value().to_owned(),
+                "#invalid".to_owned(),
+                UpdatePagesCommand {
+                    pages: vec![
+                        PageDto {
+                            images: vec![
+                                "domain.com/image1".to_owned(),
+                                "domain.com/image2".to_owned()
+                            ],
+                        },
+                        PageDto {
+                            images: vec![
+                                "domain.com/image3".to_owned(),
+                                "domain.com/image4".to_owned()
+                            ],
+                        },
+                        PageDto {
+                            images: vec!["domain.com/image5".to_owned()],
+                        },
+                    ],
+                },
+            )
+            .await
+            .is_err());
+    }
+}

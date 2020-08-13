@@ -7,7 +7,7 @@ use crate::domain::publication::{Publication, PublicationId, PublicationReposito
 use crate::domain::reader::{ReaderId, ReaderRepository};
 use crate::domain::statistics::{Statistics, StatisticsRepository};
 
-#[derive(Serialize)]
+#[derive(Serialize, Default)]
 pub struct StatisticsDto {
     views: u32,
     unique_views: u32,
@@ -134,15 +134,111 @@ where
         let mut res = ReadResponse::from(&publication);
 
         if publication.author_id() == &reader_id {
-            res.status = Some(publication.status_history().current().status().to_string());
+            res.status = Some(
+                publication
+                    .status_history()
+                    .current()
+                    .status()
+                    .to_string()
+                    .to_owned(),
+            );
         }
 
-        let statistics = self
+        let statistics = match self
             .statistics_repo
             .find_by_publication_id(&publication.base().id())
-            .await?;
+            .await
+        {
+            Ok(statistics) => statistics,
+            Err(_) => Statistics::default(publication.base().id()),
+        };
+
         res.statistics = Some(StatisticsDto::from(&statistics));
 
         Ok(res)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use crate::mocks;
+
+    #[tokio::test]
+    async fn valid() {
+        let c = mocks::container();
+        let uc = Read::new(
+            c.event_pub(),
+            c.publication_repo(),
+            c.reader_repo(),
+            c.statistics_repo(),
+        );
+
+        let mut reader = mocks::reader1();
+        c.reader_repo().save(&mut reader).await.unwrap();
+        let mut publication = mocks::published_publication1();
+        c.publication_repo().save(&mut publication).await.unwrap();
+
+        let res = uc
+            .exec(
+                reader.base().id().value().to_owned(),
+                publication.base().id().value().to_owned(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(res.id, publication.base().id().value());
+    }
+
+    #[tokio::test]
+    async fn not_published() {
+        let c = mocks::container();
+        let uc = Read::new(
+            c.event_pub(),
+            c.publication_repo(),
+            c.reader_repo(),
+            c.statistics_repo(),
+        );
+
+        let mut reader = mocks::reader1();
+        c.reader_repo().save(&mut reader).await.unwrap();
+        let mut publication = mocks::publication1();
+        c.publication_repo().save(&mut publication).await.unwrap();
+
+        assert!(uc
+            .exec(
+                reader.base().id().value().to_owned(),
+                publication.base().id().value().to_owned()
+            )
+            .await
+            .is_err());
+    }
+
+    #[tokio::test]
+    async fn invalid_ids() {
+        let c = mocks::container();
+        let uc = Read::new(
+            c.event_pub(),
+            c.publication_repo(),
+            c.reader_repo(),
+            c.statistics_repo(),
+        );
+
+        let mut reader = mocks::reader1();
+        c.reader_repo().save(&mut reader).await.unwrap();
+        let mut publication = mocks::published_publication1();
+        c.publication_repo().save(&mut publication).await.unwrap();
+
+        assert!(uc
+            .exec(reader.base().id().value().to_owned(), "#invalid".to_owned())
+            .await
+            .is_err());
+        assert!(uc
+            .exec(
+                "#invalid".to_owned(),
+                publication.base().id().value().to_owned()
+            )
+            .await
+            .is_err());
     }
 }

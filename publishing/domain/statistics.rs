@@ -1,6 +1,7 @@
 mod repository;
 pub use repository::*;
 
+use common::error::Error;
 use common::result::Result;
 
 use crate::domain::publication::PublicationId;
@@ -26,6 +27,10 @@ impl Statistics {
         reviews: u32,
         stars: f32,
     ) -> Result<Statistics> {
+        if stars < 0.0 {
+            return Err(Error::new("statistics", "stars_not_positive"));
+        }
+
         Ok(Statistics {
             publication_id,
             views,
@@ -35,6 +40,10 @@ impl Statistics {
             reviews,
             stars,
         })
+    }
+
+    pub fn default(publication_id: PublicationId) -> Self {
+        Self::new(publication_id, 0, 0, 0, 0, 0, 0.0).unwrap()
     }
 
     pub fn publication_id(&self) -> &PublicationId {

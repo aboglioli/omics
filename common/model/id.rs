@@ -28,6 +28,12 @@ impl StringId {
     }
 }
 
+impl ToString for StringId {
+    fn to_string(&self) -> String {
+        self.id.to_owned()
+    }
+}
+
 impl PartialEq for StringId {
     fn eq(&self, other: &Self) -> bool {
         self.id == other.id

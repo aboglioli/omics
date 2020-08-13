@@ -261,15 +261,13 @@ impl Publication {
     }
 
     pub fn make_draft(&mut self) -> Result<()> {
-        if matches!(self.status_history().current().status(), Status::Draft) {
-            return Err(Error::new("publication", "is_draft"));
+        if !matches!(self.status_history().current().status(), Status::Draft) {
+            self.status_history.add_status(Status::Draft);
+
+            self.base.record_event(PublicationEvent::ChangedToDraft {
+                id: self.base().id().value().to_owned(),
+            });
         }
-
-        self.status_history.add_status(Status::Draft);
-
-        self.base.record_event(PublicationEvent::ChangedToDraft {
-            id: self.base().id().value().to_owned(),
-        });
 
         Ok(())
     }
@@ -347,10 +345,10 @@ mod tests {
     fn create() {
         let publication = mocks::publication1();
 
-        assert_eq!(publication.base().id().value(), "#pub01");
-        assert_eq!(publication.header().name().value(), "Pub 01");
+        assert_eq!(publication.base().id().value(), "#publication01");
+        assert_eq!(publication.header().name().value(), "Publication 01");
         assert_eq!(publication.header().synopsis().value(), "Synopsis...");
-        assert_eq!(publication.header().category_id().value(), "cat_01");
+        assert_eq!(publication.header().category_id().value(), "#category01");
         assert_eq!(publication.header().tags().len(), 2);
         assert_eq!(publication.base().events().unwrap().len(), 1);
         assert!(matches!(
@@ -364,7 +362,9 @@ mod tests {
         let mut publication = mocks::publication1();
         let cm1 = mocks::content_manager1();
 
-        assert!(publication.make_draft().is_err());
+        assert!(publication.make_draft().is_ok());
+        assert!(publication.make_draft().is_ok());
+
         assert!(publication.approve(cm1.clone()).is_err());
         assert!(publication.reject(cm1.clone()).is_err());
 
@@ -424,7 +424,7 @@ mod tests {
         assert!(publication.add_contract().is_ok());
         assert!(publication.remove_contract().is_ok());
 
-        // 3 first events: Created, ApprovalWaited (publish), Published (approve)
-        assert_eq!(publication.base().events().unwrap().len(), 3 + 6);
+        // 3 first events: Created, PagesUpdated, ApprovalWaited (publish), Published (approve)
+        assert_eq!(publication.base().events().unwrap().len(), 4 + 6);
     }
 }
