@@ -10,7 +10,10 @@ pub struct Permission {
 }
 
 impl Permission {
-    pub fn new(module: &str, permissions: &str) -> Result<Self> {
+    pub fn new<S: Into<String>>(module: S, permissions: S) -> Result<Self> {
+        let module = module.into();
+        let permissions = permissions.into();
+
         let mut err = Error::new("permission", "invalid");
         if module.is_empty() {
             err.add_context("module", "empty");
@@ -43,7 +46,7 @@ impl Permission {
         let permissions: String = chars.into_iter().collect();
 
         Ok(Permission {
-            module: module.to_owned(),
+            module,
             permissions,
         })
     }

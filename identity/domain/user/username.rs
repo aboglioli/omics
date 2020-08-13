@@ -9,7 +9,9 @@ pub struct Username {
 }
 
 impl Username {
-    pub fn new(username: &str) -> Result<Self> {
+    pub fn new<S: Into<String>>(username: S) -> Result<Self> {
+        let username = username.into();
+
         if username.len() < 4 {
             return Err(Error::new("username", "too_short"));
         }
@@ -20,7 +22,7 @@ impl Username {
 
         match Regex::new("^[a-zA-Z0-9]+[a-zA-Z0-9-_.]*[a-zA-Z0-9]+$") {
             Ok(re) => {
-                if !re.is_match(username) {
+                if !re.is_match(&username) {
                     return Err(Error::new("username", "invalid_characters"));
                 }
             }
@@ -29,9 +31,7 @@ impl Username {
             }
         }
 
-        Ok(Username {
-            username: username.to_owned(),
-        })
+        Ok(Username { username })
     }
 
     pub fn value(&self) -> &str {

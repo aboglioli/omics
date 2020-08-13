@@ -1,14 +1,13 @@
 use common::result::Result;
 
+#[derive(Debug, Clone)]
 pub struct Name {
     name: String,
 }
 
 impl Name {
-    pub fn new(name: &str) -> Result<Self> {
-        Ok(Name {
-            name: name.to_owned(),
-        })
+    pub fn new<S: Into<String>>(name: S) -> Result<Self> {
+        Ok(Name { name: name.into() })
     }
 
     pub fn value(&self) -> &str {

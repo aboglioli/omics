@@ -28,10 +28,13 @@ pub enum PublicationEvent {
         id: String,
         pages_count: usize,
     },
-    Published {
+    ChangedToDraft {
         id: String,
     },
-    Approved {
+    ApprovalWaited {
+        id: String,
+    },
+    Published {
         id: String,
     },
     Rejected {
@@ -65,6 +68,12 @@ pub enum PublicationEvent {
         reader_id: String,
         publication_id: String,
     },
+    ContractAdded {
+        id: String,
+    },
+    ContractRemoved {
+        id: String,
+    },
 }
 
 impl ToString for PublicationEvent {
@@ -73,8 +82,9 @@ impl ToString for PublicationEvent {
             PublicationEvent::Created { .. } => "created".to_owned(),
             PublicationEvent::HeaderUpdated { .. } => "header-updated".to_owned(),
             PublicationEvent::PagesUpdated { .. } => "pages-updated".to_owned(),
+            PublicationEvent::ChangedToDraft { .. } => "changed-to-draft".to_owned(),
+            PublicationEvent::ApprovalWaited { .. } => "approval-waited".to_owned(),
             PublicationEvent::Published { .. } => "published".to_owned(),
-            PublicationEvent::Approved { .. } => "approved".to_owned(),
             PublicationEvent::Rejected { .. } => "rejected".to_owned(),
             PublicationEvent::Deleted { .. } => "deleted".to_owned(),
             PublicationEvent::Viewed { .. } => "viewed".to_owned(),
@@ -83,6 +93,8 @@ impl ToString for PublicationEvent {
             PublicationEvent::Unliked { .. } => "unliked".to_owned(),
             PublicationEvent::Reviewed { .. } => "reviewed".to_owned(),
             PublicationEvent::ReviewDeleted { .. } => "review-deleted".to_owned(),
+            PublicationEvent::ContractAdded { .. } => "contract-added".to_owned(),
+            PublicationEvent::ContractRemoved { .. } => "contract-removed".to_owned(),
         }
     }
 }

@@ -3,8 +3,7 @@ use serde::Deserialize;
 use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::application::util;
-use crate::domain::user::{Fullname, Person, User, UserId, UserRepository};
+use crate::domain::user::{Fullname, Person, UserId, UserRepository};
 
 #[derive(Deserialize)]
 pub struct UpdateCommand {
@@ -36,14 +35,13 @@ where
         }
     }
 
-    pub async fn exec(&self, auth_user: &User, user_id: &UserId, cmd: UpdateCommand) -> Result<()> {
-        util::is_authorized(auth_user, user_id)?;
-
+    pub async fn exec(&self, user_id: String, cmd: UpdateCommand) -> Result<()> {
         cmd.validate()?;
 
+        let user_id = UserId::new(user_id)?;
         let mut user = self.user_repo.find_by_id(&user_id).await?;
 
-        let person = Person::new(Fullname::new(&cmd.name, &cmd.lastname)?)?;
+        let person = Person::new(Fullname::new(cmd.name, cmd.lastname)?)?;
         user.set_person(person)?;
 
         self.user_repo.save(&mut user).await?;
@@ -69,8 +67,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                &user,
-                &user.base().id(),
+                user.base().id().value().to_owned(),
                 UpdateCommand {
                     name: "Name".to_owned(),
                     lastname: "Lastname".to_owned(),
@@ -90,8 +87,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                &user,
-                &user.base().id(),
+                user.base().id().value().to_owned(),
                 UpdateCommand {
                     name: "N".to_owned(),
                     lastname: "L".to_owned(),
@@ -111,8 +107,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                &user,
-                &user.base().id(),
+                user.base().id().value().to_owned(),
                 UpdateCommand {
                     name: "Name".to_owned(),
                     lastname: "Lastname".to_owned(),

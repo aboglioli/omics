@@ -1,26 +1,11 @@
-mod category_repository;
-pub use category_repository::*;
+mod name;
+mod repository;
+pub use name::*;
+pub use repository::*;
 
 use common::event::Event;
 use common::model::{AggregateRoot, StringId};
 use common::result::Result;
-
-#[derive(Debug, Clone)]
-pub struct Name {
-    name: String,
-}
-
-impl Name {
-    pub fn new(name: &str) -> Result<Self> {
-        Ok(Name {
-            name: name.to_owned(),
-        })
-    }
-
-    pub fn value(&self) -> &str {
-        &self.name
-    }
-}
 
 pub type CategoryId = StringId;
 
@@ -36,6 +21,10 @@ impl Category {
             base: AggregateRoot::new(id),
             name,
         })
+    }
+
+    pub fn base(&self) -> &AggregateRoot<CategoryId, Event> {
+        &self.base
     }
 
     pub fn name(&self) -> &Name {

@@ -21,10 +21,12 @@ where
         }
     }
 
-    pub async fn exec(&self, user_id: &UserId, validation: &Validation) -> Result<()> {
-        let mut user = self.user_repo.find_by_id(user_id).await?;
+    pub async fn exec(&self, user_id: String, validation_code: String) -> Result<()> {
+        let user_id = UserId::new(user_id)?;
+        let mut user = self.user_repo.find_by_id(&user_id).await?;
 
-        user.validate(validation)?;
+        let validation = Validation::from(validation_code);
+        user.validate(&validation)?;
 
         self.user_repo.save(&mut user).await?;
 
@@ -49,7 +51,10 @@ mod tests {
         c.user_repo().save(&mut user).await.unwrap();
 
         assert!(uc
-            .exec(&user.base().id(), &Validation::new())
+            .exec(
+                user.base().id().value().to_owned(),
+                "invalid-123".to_owned()
+            )
             .await
             .is_err());
     }
@@ -64,7 +69,10 @@ mod tests {
         assert!(!user.is_validated());
 
         assert!(uc
-            .exec(&user.base().id(), user.validation().unwrap())
+            .exec(
+                user.base().id().value().to_owned(),
+                user.validation().unwrap().code().to_owned()
+            )
             .await
             .is_ok());
 
@@ -72,7 +80,10 @@ mod tests {
         assert!(saved_user.is_validated());
 
         assert!(uc
-            .exec(&user.base().id(), user.validation().unwrap())
+            .exec(
+                user.base().id().value().to_owned(),
+                user.validation().unwrap().code().to_owned()
+            )
             .await
             .is_err());
 

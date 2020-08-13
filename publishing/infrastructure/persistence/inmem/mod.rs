@@ -1,0 +1,16 @@
+mod author_repository;
+mod category_repository;
+mod collection_repository;
+mod content_manager_repository;
+mod interaction_repository;
+mod publication_repository;
+mod reader_repository;
+mod statistics_repository;
+pub use author_repository::*;
+pub use category_repository::*;
+pub use collection_repository::*;
+pub use content_manager_repository::*;
+pub use interaction_repository::*;
+pub use publication_repository::*;
+pub use reader_repository::*;
+pub use statistics_repository::*;

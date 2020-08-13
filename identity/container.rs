@@ -64,6 +64,7 @@ where
         &self.user_repo
     }
 
+    // Services
     pub fn password_hasher(&self) -> &PHasher {
         &self.password_hasher
     }

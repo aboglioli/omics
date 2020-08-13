@@ -31,12 +31,13 @@ where
         }
     }
 
-    pub async fn exec(&self, user_id: &UserId) -> Result<()> {
-        let mut user = self.user_repo.find_by_id(user_id).await?;
+    pub async fn exec(&self, user_id: String) -> Result<()> {
+        let user_id = UserId::new(user_id)?;
+        let mut user = self.user_repo.find_by_id(&user_id).await?;
 
         let tmp_password = Uuid::new_v4().to_string();
         let hashed_password = self.user_serv.generate_password(&tmp_password)?;
-        let password = Password::new(&hashed_password)?;
+        let password = Password::new(hashed_password)?;
 
         user.recover_password(password, &tmp_password)?;
 
@@ -60,7 +61,7 @@ mod tests {
         let uc = RecoverPassword::new(c.event_pub(), c.user_repo(), c.user_serv());
 
         let user = mocks::user1();
-        assert!(uc.exec(&user.base().id()).await.is_err())
+        assert!(uc.exec(user.base().id().value().to_owned()).await.is_err())
     }
 
     #[tokio::test]
@@ -72,7 +73,7 @@ mod tests {
         let old_password = user.identity().password().unwrap().value().to_owned();
         c.user_repo().save(&mut user).await.unwrap();
 
-        assert!(uc.exec(&user.base().id()).await.is_ok());
+        assert!(uc.exec(user.base().id().value().to_owned()).await.is_ok());
 
         let user = c.user_repo().find_by_id(&user.base().id()).await.unwrap();
         assert_ne!(user.identity().password().unwrap().value(), old_password);

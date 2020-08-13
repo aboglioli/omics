@@ -5,7 +5,7 @@ use common::event::{Event, EventHandler};
 use common::result::Result;
 use shared::domain::event::PublicationEvent;
 
-use crate::domain::interaction::{InteractionRepository, View};
+use crate::domain::interaction::{Interaction, InteractionRepository, Kind};
 use crate::domain::publication::PublicationId;
 use crate::domain::reader::ReaderId;
 
@@ -43,12 +43,13 @@ where
             publication_id,
         } = event
         {
-            let mut view = View::new(
-                ReaderId::new(&reader_id)?,
-                PublicationId::new(&publication_id)?,
+            let mut view = Interaction::new(
+                ReaderId::new(reader_id)?,
+                PublicationId::new(publication_id)?,
+                Kind::View,
             )?;
 
-            self.interaction_repo.save_view(&mut view).await?;
+            self.interaction_repo.save(&mut view).await?;
 
             return Ok(true);
         }

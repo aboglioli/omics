@@ -28,8 +28,7 @@ impl Default for InMemUserRepository {
 impl UserRepository for InMemUserRepository {
     async fn next_id(&self) -> Result<UserId> {
         let uuid = Uuid::new_v4();
-        let uuid = uuid.to_string();
-        UserId::new(&uuid)
+        UserId::new(&uuid.to_string())
     }
 
     async fn find_by_id(&self, id: &UserId) -> Result<User> {

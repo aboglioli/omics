@@ -1,5 +1,6 @@
 use serde::Deserialize;
 
+use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
 
@@ -9,18 +10,12 @@ use crate::domain::publication::{
 };
 
 #[derive(Deserialize)]
-pub struct ImageDto {
-    url: String,
-    size: u32,
-}
-
-#[derive(Deserialize)]
 pub struct UpdateCommand {
     name: String,
     synopsis: String,
     category_id: String,
     tags: Vec<String>,
-    cover: ImageDto,
+    cover: String,
 }
 
 impl UpdateCommand {
@@ -47,8 +42,20 @@ where
         }
     }
 
-    pub async fn exec(&self, id: &PublicationId, cmd: UpdateCommand) -> Result<()> {
+    pub async fn exec(
+        &self,
+        author_id: String,
+        publication_id: String,
+        cmd: UpdateCommand,
+    ) -> Result<()> {
         cmd.validate()?;
+
+        let publication_id = PublicationId::new(&publication_id)?;
+        let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
+
+        if publication.author_id().value() != author_id {
+            return Err(Error::new("publication", "unauthorized"));
+        }
 
         let name = Name::new(&cmd.name)?;
         let synopsis = Synopsis::new(&cmd.synopsis)?;
@@ -58,13 +65,11 @@ where
             tags.push(Tag::new(tag)?);
         }
 
-        let cover = Image::new(&cmd.cover.url, cmd.cover.size)?;
+        let cover = Image::new(&cmd.cover)?;
 
         let category_id = CategoryId::new(&cmd.category_id)?;
 
         let header = Header::new(name, synopsis, category_id, tags, cover)?;
-
-        let mut publication = self.publication_repo.find_by_id(id).await?;
 
         publication.set_header(header)?;
 

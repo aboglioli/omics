@@ -1,5 +1,5 @@
-mod reader_repository;
-pub use reader_repository::*;
+mod repository;
+pub use repository::*;
 
 use common::event::Event;
 use common::model::{AggregateRoot, StringId};
@@ -7,6 +7,7 @@ use common::result::Result;
 
 pub type ReaderId = StringId;
 
+#[derive(Debug, Clone)]
 pub struct Reader {
     base: AggregateRoot<ReaderId, Event>,
     name: String,
@@ -14,10 +15,10 @@ pub struct Reader {
 }
 
 impl Reader {
-    pub fn new(id: ReaderId, name: &str) -> Result<Self> {
+    pub fn new<S: Into<String>>(id: ReaderId, name: S) -> Result<Self> {
         Ok(Reader {
             base: AggregateRoot::new(id),
-            name: name.to_owned(),
+            name: name.into(),
             subscribed: false,
         })
     }

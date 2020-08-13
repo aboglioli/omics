@@ -1,10 +1,12 @@
 mod create;
+mod delete;
 mod read;
 mod update;
 mod update_pages;
 mod view;
 mod view_handler;
 pub use create::*;
+pub use delete::*;
 pub use read::*;
 pub use update::*;
 pub use update_pages::*;

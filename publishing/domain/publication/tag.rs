@@ -10,16 +10,16 @@ pub struct Tag {
 }
 
 impl Tag {
-    pub fn new(name: &str) -> Result<Self> {
+    pub fn new<S: Into<String>>(name: S) -> Result<Self> {
+        let name = name.into();
+
         if name.is_empty() {
             return Err(Error::new("tag", "empty_name"));
         }
 
-        let slug = slugify(name);
-        Ok(Tag {
-            slug,
-            name: name.to_owned(),
-        })
+        let slug = slugify(&name);
+
+        Ok(Tag { slug, name })
     }
 
     pub fn slug(&self) -> &String {

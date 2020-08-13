@@ -4,6 +4,7 @@ use common::result::Result;
 use crate::domain::category::CategoryId;
 use crate::domain::publication::{Image, Name, Synopsis, Tag};
 
+#[derive(Debug, Clone)]
 pub struct Header {
     name: Name,
     synopsis: Synopsis,

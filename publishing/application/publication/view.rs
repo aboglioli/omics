@@ -3,9 +3,9 @@ use serde::Serialize;
 use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::domain::interaction::{InteractionRepository, Statistics, StatisticsService};
 use crate::domain::publication::{Publication, PublicationId, PublicationRepository};
 use crate::domain::reader::{ReaderId, ReaderRepository};
+use crate::domain::statistics::{Statistics, StatisticsRepository};
 
 #[derive(Serialize)]
 pub struct StatisticsDto {
@@ -61,43 +61,41 @@ impl From<&Publication> for ViewResponse {
     }
 }
 
-pub struct View<'a, EPub, PRepo, RRepo, IRepo> {
+pub struct View<'a, EPub, PRepo, RRepo, SRepo> {
     event_pub: &'a EPub,
 
     publication_repo: &'a PRepo,
     reader_repo: &'a RRepo,
-
-    statistics_serv: StatisticsService<'a, IRepo>,
+    statistics_repo: &'a SRepo,
 }
 
-impl<'a, EPub, PRepo, RRepo, IRepo> View<'a, EPub, PRepo, RRepo, IRepo>
+impl<'a, EPub, PRepo, RRepo, SRepo> View<'a, EPub, PRepo, RRepo, SRepo>
 where
     EPub: EventPublisher,
     PRepo: PublicationRepository,
     RRepo: ReaderRepository,
-    IRepo: InteractionRepository,
+    SRepo: StatisticsRepository,
 {
     pub fn new(
         event_pub: &'a EPub,
         publication_repo: &'a PRepo,
         reader_repo: &'a RRepo,
-        statistics_serv: StatisticsService<'a, IRepo>,
+        statistics_repo: &'a SRepo,
     ) -> Self {
         View {
             event_pub,
             publication_repo,
             reader_repo,
-            statistics_serv,
+            statistics_repo,
         }
     }
 
-    pub async fn exec(
-        &self,
-        reader_id: &ReaderId,
-        publication_id: &PublicationId,
-    ) -> Result<ViewResponse> {
-        let mut publication = self.publication_repo.find_by_id(publication_id).await?;
-        let reader = self.reader_repo.find_by_id(reader_id).await?;
+    pub async fn exec(&self, reader_id: String, publication_id: String) -> Result<ViewResponse> {
+        let publication_id = PublicationId::new(publication_id)?;
+        let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
+
+        let reader_id = ReaderId::new(reader_id)?;
+        let reader = self.reader_repo.find_by_id(&reader_id).await?;
 
         publication.view(&reader)?;
 
@@ -107,13 +105,13 @@ where
 
         let mut res = ViewResponse::from(&publication);
 
-        if publication.author_id() == reader_id {
+        if publication.author_id() == &reader_id {
             res.status = Some(publication.status_history().current().status().to_string());
         }
 
         let statistics = self
-            .statistics_serv
-            .get_all_statistics(publication_id)
+            .statistics_repo
+            .find_by_publication_id(&publication.base().id())
             .await?;
         res.statistics = Some(StatisticsDto::from(&statistics));
 
