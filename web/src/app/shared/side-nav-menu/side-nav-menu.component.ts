@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { faChevronCircleLeft } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-side-nav-menu',
@@ -6,6 +7,10 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./side-nav-menu.component.scss']
 })
 export class SideNavMenuComponent implements OnInit {
+
+  // Font Awseome icons
+  public faBack = faChevronCircleLeft;
+
 
   constructor() { }
 
