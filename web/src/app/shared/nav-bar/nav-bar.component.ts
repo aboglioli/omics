@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -8,12 +8,21 @@ import { faBars } from '@fortawesome/free-solid-svg-icons';
 })
 export class NavBarComponent implements OnInit {
 
+
+  @Output() clickSideNavToggle = new EventEmitter();
+
   // Font Awseome icons
   public faBars = faBars;
 
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  public toggleSideNavMenu(): void {
+
+    this.clickSideNavToggle.emit();
+
   }
 
 }

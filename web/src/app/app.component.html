@@ -1,7 +1,19 @@
-<app-nav-bar></app-nav-bar>
+<mat-drawer-container autosize hasBackdrop="true">
 
-<div class="container">
+  <!-- Sidenav menu -->
+  <mat-drawer #sidenav_main  mode="over">
 
-  <router-outlet></router-outlet>
+    <app-side-nav-menu></app-side-nav-menu>
 
-</div>
+  </mat-drawer>
+
+  <app-nav-bar (clickSideNavToggle)="sidenav_main.toggle()"></app-nav-bar>
+
+  <!-- Body page -->
+  <div class="container">
+
+    <router-outlet></router-outlet>
+
+  </div>
+
+</mat-drawer-container>

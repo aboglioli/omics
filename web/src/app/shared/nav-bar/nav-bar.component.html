@@ -1,7 +1,9 @@
+<!-- Header toolbar -->
 <mat-toolbar color="primary">
 
   <!-- Burguer menu -->
-  <button mat-icon-button class="button-no-borders">
+  <button mat-icon-button class="button-no-borders"
+          (click)="toggleSideNavMenu()">
       <fa-icon [icon]="faBars" size="2x"></fa-icon>
   </button>
 
@@ -11,9 +13,9 @@
   </div>
 
   <!-- User menu buttons -->
-  <span>
-    Menu
-  </span>
+  <button mat-stroked-button class="button-white-borders">
+    Ingresar / Registrarse
+  </button>
 
 
 </mat-toolbar>
