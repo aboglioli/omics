@@ -6,7 +6,7 @@ use crate::container::Container;
 use crate::infrastructure::persistence::inmem::{
     InMemAuthorRepository, InMemCategoryRepository, InMemCollectionRepository,
     InMemContentManagerRepository, InMemInteractionRepository, InMemPublicationRepository,
-    InMemReaderRepository, InMemStatisticsRepository,
+    InMemReaderRepository,
 };
 
 pub fn container() -> Container<
@@ -18,7 +18,6 @@ pub fn container() -> Container<
     InMemInteractionRepository,
     InMemPublicationRepository,
     InMemReaderRepository,
-    InMemStatisticsRepository,
 > {
     Container::new(
         Arc::new(FakeEventPublisher::new()),
@@ -29,6 +28,5 @@ pub fn container() -> Container<
         InMemInteractionRepository::new(),
         InMemPublicationRepository::new(),
         InMemReaderRepository::new(),
-        InMemStatisticsRepository::new(),
     )
 }

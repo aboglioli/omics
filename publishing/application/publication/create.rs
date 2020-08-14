@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::domain::author::AuthorId;
+use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::category::{CategoryId, CategoryRepository};
 use crate::domain::publication::{
     Header, Image, Name, Publication, PublicationRepository, Synopsis, Tag,
@@ -19,7 +19,7 @@ pub struct CreateCommand {
 }
 
 impl CreateCommand {
-    pub fn validate(&self) -> Result<()> {
+    fn validate(&self) -> Result<()> {
         Ok(())
     }
 }
@@ -29,22 +29,30 @@ pub struct CreateResponse {
     id: String,
 }
 
-pub struct Create<'a, EPub, CRepo, PRepo> {
+pub struct Create<'a, EPub, ARepo, CRepo, PRepo> {
     event_pub: &'a EPub,
 
+    author_repo: &'a ARepo,
     category_repo: &'a CRepo,
     publication_repo: &'a PRepo,
 }
 
-impl<'a, EPub, CRepo, PRepo> Create<'a, EPub, CRepo, PRepo>
+impl<'a, EPub, ARepo, CRepo, PRepo> Create<'a, EPub, ARepo, CRepo, PRepo>
 where
     EPub: EventPublisher,
+    ARepo: AuthorRepository,
     CRepo: CategoryRepository,
     PRepo: PublicationRepository,
 {
-    pub fn new(event_pub: &'a EPub, category_repo: &'a CRepo, publication_repo: &'a PRepo) -> Self {
+    pub fn new(
+        event_pub: &'a EPub,
+        author_repo: &'a ARepo,
+        category_repo: &'a CRepo,
+        publication_repo: &'a PRepo,
+    ) -> Self {
         Create {
             event_pub,
+            author_repo,
             category_repo,
             publication_repo,
         }
@@ -68,11 +76,11 @@ where
 
         let header = Header::new(name, synopsis, category_id, tags, cover)?;
 
-        let mut publication = Publication::new(
-            self.publication_repo.next_id().await?,
-            AuthorId::new(author_id)?,
-            header,
-        )?;
+        let author_id = AuthorId::new(author_id)?;
+        self.author_repo.find_by_id(&author_id).await?;
+
+        let mut publication =
+            Publication::new(self.publication_repo.next_id().await?, author_id, header)?;
 
         self.publication_repo.save(&mut publication).await?;
 
@@ -96,9 +104,15 @@ mod tests {
     #[tokio::test]
     async fn valid() {
         let c = mocks::container();
-        let uc = Create::new(c.event_pub(), c.category_repo(), c.publication_repo());
+        let uc = Create::new(
+            c.event_pub(),
+            c.author_repo(),
+            c.category_repo(),
+            c.publication_repo(),
+        );
 
-        let author = mocks::author1();
+        let mut author = mocks::author1();
+        c.author_repo().save(&mut author).await.unwrap();
         let mut category = mocks::category1();
         c.category_repo().save(&mut category).await.unwrap();
 
@@ -132,9 +146,15 @@ mod tests {
     #[tokio::test]
     async fn invalid_data() {
         let c = mocks::container();
-        let uc = Create::new(c.event_pub(), c.category_repo(), c.publication_repo());
+        let uc = Create::new(
+            c.event_pub(),
+            c.author_repo(),
+            c.category_repo(),
+            c.publication_repo(),
+        );
 
-        let author = mocks::author1();
+        let mut author = mocks::author1();
+        c.author_repo().save(&mut author).await.unwrap();
         let mut category = mocks::category1();
         c.category_repo().save(&mut category).await.unwrap();
 
@@ -170,9 +190,15 @@ mod tests {
     #[tokio::test]
     async fn not_existing_category() {
         let c = mocks::container();
-        let uc = Create::new(c.event_pub(), c.category_repo(), c.publication_repo());
+        let uc = Create::new(
+            c.event_pub(),
+            c.author_repo(),
+            c.category_repo(),
+            c.publication_repo(),
+        );
 
-        let author = mocks::author1();
+        let mut author = mocks::author1();
+        c.author_repo().save(&mut author).await.unwrap();
         let category = mocks::category1();
 
         assert!(uc

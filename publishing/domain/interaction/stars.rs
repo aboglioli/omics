@@ -1,7 +1,7 @@
 use common::error::Error;
 use common::result::Result;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Stars {
     stars: u8,
 }
