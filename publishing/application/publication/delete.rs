@@ -22,7 +22,7 @@ where
         }
     }
 
-    async fn exec(&self, author_id: String, publication_id: String) -> Result<()> {
+    pub async fn exec(&self, author_id: String, publication_id: String) -> Result<()> {
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 

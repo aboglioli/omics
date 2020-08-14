@@ -1,5 +1,6 @@
 use crate::domain::author::{Author, AuthorId};
 use crate::domain::category::{Category, CategoryId, Name as CategoryName};
+use crate::domain::collection::{Collection, CollectionId};
 use crate::domain::content_manager::{ContentManager, ContentManagerId};
 use crate::domain::publication::{
     Header, Image, Name, Page, Publication, PublicationId, Synopsis, Tag,
@@ -47,6 +48,22 @@ pub fn published_publication1() -> Publication {
     publication.publish().unwrap();
     publication.approve(content_manager1()).unwrap();
     publication
+}
+
+pub fn empty_collection1() -> Collection {
+    Collection::new(
+        CollectionId::new("#collection01").unwrap(),
+        author1().base().id(),
+        Header::new(
+            Name::new("Collection 01").unwrap(),
+            Synopsis::new("Synopsis...").unwrap(),
+            category1().base().id(),
+            vec![Tag::new("Tag 1").unwrap(), Tag::new("Tag 2").unwrap()],
+            Image::new("domain.com/image.jpg").unwrap(),
+        )
+        .unwrap(),
+    )
+    .unwrap()
 }
 
 pub fn content_manager1() -> ContentManager {

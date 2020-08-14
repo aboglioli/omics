@@ -1,0 +1,46 @@
+use common::result::Result;
+use common::event::EventPublisher;
+
+use crate::domain::publication::{PublicationId, PublicationRepository};
+use crate::domain::collection::{CollectionId, CollectionRepository};
+
+pub struct AddPublication<'a, EPub, CRepo, PRepo> {
+    event_pub: &'a EPub,
+
+    collection_repo: &'a CRepo,
+    publication_repo: &'a PRepo,
+}
+
+impl<'a, EPub, CRepo, PRepo> AddPublication<'a, EPub, CRepo, PRepo>
+where EPub: EventPublisher,
+      CRepo: CollectionRepository,
+      PRepo: PublicationRepository,
+{
+    pub fn new(
+        event_pub: &'a EPub,
+        collection_repo: &'a CRepo,
+        publication_repo: &'a PRepo,
+    ) -> Self {
+        AddPublication {
+            event_pub,
+            collection_repo,
+            publication_repo,
+        }
+    }
+
+    pub async fn exec(&self, collection_id: String, publication_id: String) -> Result<()> {
+        let collection_id = CollectionId::new(collection_id)?;
+        let mut collection = self.collection_repo.find_by_id(&collection_id).await?;
+
+        let publication_id = PublicationId::new(publication_id)?;
+        let publication = self.publication_repo.find_by_id(&publication_id).await?;
+
+        collection.add_item(&publication)?;
+
+        self.collection_repo.save(&mut collection).await?;
+
+        self.event_pub.publish_all(collection.base().event()?).await?;
+
+        Ok(())
+    }
+}

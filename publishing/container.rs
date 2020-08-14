@@ -6,12 +6,11 @@ use crate::domain::author::AuthorRepository;
 use crate::domain::category::CategoryRepository;
 use crate::domain::collection::CollectionRepository;
 use crate::domain::content_manager::ContentManagerRepository;
-use crate::domain::interaction::InteractionRepository;
-use crate::domain::publication::PublicationRepository;
+use crate::domain::interaction::{InteractionRepository, InteractionService};
+use crate::domain::publication::{PublicationRepository, StatisticsService};
 use crate::domain::reader::ReaderRepository;
-use crate::domain::statistics::StatisticsRepository;
 
-pub struct Container<EPub, ARepo, CatRepo, CollRepo, CMRepo, IRepo, PRepo, RRepo, SRepo> {
+pub struct Container<EPub, ARepo, CatRepo, CollRepo, CMRepo, IRepo, PRepo, RRepo> {
     event_pub: Arc<EPub>,
 
     author_repo: ARepo,
@@ -21,11 +20,10 @@ pub struct Container<EPub, ARepo, CatRepo, CollRepo, CMRepo, IRepo, PRepo, RRepo
     interaction_repo: IRepo,
     publication_repo: PRepo,
     reader_repo: RRepo,
-    statistics_repo: SRepo,
 }
 
-impl<EPub, ARepo, CatRepo, CollRepo, CMRepo, IRepo, PRepo, RRepo, SRepo>
-    Container<EPub, ARepo, CatRepo, CollRepo, CMRepo, IRepo, PRepo, RRepo, SRepo>
+impl<EPub, ARepo, CatRepo, CollRepo, CMRepo, IRepo, PRepo, RRepo>
+    Container<EPub, ARepo, CatRepo, CollRepo, CMRepo, IRepo, PRepo, RRepo>
 where
     EPub: EventPublisher,
     ARepo: AuthorRepository,
@@ -35,7 +33,6 @@ where
     IRepo: InteractionRepository,
     PRepo: PublicationRepository,
     RRepo: ReaderRepository,
-    SRepo: StatisticsRepository,
 {
     pub fn new(
         event_pub: Arc<EPub>,
@@ -46,7 +43,6 @@ where
         interaction_repo: IRepo,
         publication_repo: PRepo,
         reader_repo: RRepo,
-        statistics_repo: SRepo,
     ) -> Self {
         Container {
             event_pub,
@@ -57,7 +53,6 @@ where
             interaction_repo,
             publication_repo,
             reader_repo,
-            statistics_repo,
         }
     }
 
@@ -93,7 +88,12 @@ where
         &self.reader_repo
     }
 
-    pub fn statistics_repo(&self) -> &SRepo {
-        &self.statistics_repo
+    // Service
+    pub fn statistics_serv(&self) -> StatisticsService<'_, IRepo> {
+        StatisticsService::new(self.interaction_repo())
+    }
+
+    pub fn interaction_serv(&self) -> InteractionService<'_, IRepo> {
+        InteractionService::new(self.interaction_repo())
     }
 }

@@ -5,4 +5,3 @@ pub mod content_manager;
 pub mod interaction;
 pub mod publication;
 pub mod reader;
-pub mod statistics;
