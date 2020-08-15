@@ -22,11 +22,11 @@ impl Tag {
         Ok(Tag { slug, name })
     }
 
-    pub fn slug(&self) -> &String {
+    pub fn slug(&self) -> &str {
         &self.slug
     }
 
-    pub fn name(&self) -> &String {
+    pub fn name(&self) -> &str {
         &self.name
     }
 }
