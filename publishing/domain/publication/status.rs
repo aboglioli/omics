@@ -1,11 +1,11 @@
-use crate::domain::content_manager::ContentManager;
+use crate::domain::content_manager::ContentManagerId;
 
 #[derive(Debug, Clone)]
 pub enum Status {
     Draft,
     WaitingApproval,
-    Published { admin: ContentManager },
-    Rejected { admin: ContentManager },
+    Published { admin_id: ContentManagerId },
+    Rejected { admin_id: ContentManagerId },
 }
 
 impl ToString for Status {
