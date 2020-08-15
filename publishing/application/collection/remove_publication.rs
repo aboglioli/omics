@@ -2,30 +2,23 @@ use common::event::EventPublisher;
 use common::result::Result;
 
 use crate::domain::collection::{CollectionId, CollectionRepository};
-use crate::domain::publication::{PublicationId, PublicationRepository};
+use crate::domain::publication::PublicationId;
 
-pub struct AddPublication<'a, EPub, CRepo, PRepo> {
+pub struct RemovePublication<'a, EPub, CRepo> {
     event_pub: &'a EPub,
 
     collection_repo: &'a CRepo,
-    publication_repo: &'a PRepo,
 }
 
-impl<'a, EPub, CRepo, PRepo> AddPublication<'a, EPub, CRepo, PRepo>
+impl<'a, EPub, CRepo> RemovePublication<'a, EPub, CRepo>
 where
     EPub: EventPublisher,
     CRepo: CollectionRepository,
-    PRepo: PublicationRepository,
 {
-    pub fn new(
-        event_pub: &'a EPub,
-        collection_repo: &'a CRepo,
-        publication_repo: &'a PRepo,
-    ) -> Self {
-        AddPublication {
+    pub fn new(event_pub: &'a EPub, collection_repo: &'a CRepo) -> Self {
+        RemovePublication {
             event_pub,
             collection_repo,
-            publication_repo,
         }
     }
 
@@ -34,9 +27,8 @@ where
         let mut collection = self.collection_repo.find_by_id(&collection_id).await?;
 
         let publication_id = PublicationId::new(publication_id)?;
-        let publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        collection.add_item(&publication)?;
+        collection.remove_item(&publication_id)?;
 
         self.collection_repo.save(&mut collection).await?;
 

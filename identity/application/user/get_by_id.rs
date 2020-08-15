@@ -1,29 +1,7 @@
-use serde::Serialize;
-
 use common::result::Result;
 
-use crate::domain::user::{User, UserId, UserRepository};
-
-#[derive(Serialize)]
-pub struct GetByIdResponse {
-    id: String,
-    username: String,
-    email: Option<String>,
-    name: Option<String>,
-    lastname: Option<String>,
-}
-
-impl From<&User> for GetByIdResponse {
-    fn from(user: &User) -> GetByIdResponse {
-        GetByIdResponse {
-            id: user.base().id().value().to_owned(),
-            username: user.identity().username().value().to_owned(),
-            email: None,
-            name: user.person().map(|p| p.fullname().name().to_owned()),
-            lastname: user.person().map(|p| p.fullname().lastname().to_owned()),
-        }
-    }
-}
+use crate::application::dtos::UserDto;
+use crate::domain::user::{UserId, UserRepository};
 
 pub struct GetById<'a, URepo> {
     user_repo: &'a URepo,
@@ -37,17 +15,11 @@ where
         GetById { user_repo }
     }
 
-    pub async fn exec(&self, viewer_id: String, user_id: String) -> Result<GetByIdResponse> {
+    pub async fn exec(&self, viewer_id: String, user_id: String) -> Result<UserDto> {
         let user_id = UserId::new(user_id)?;
         let user = self.user_repo.find_by_id(&user_id).await?;
 
-        let mut res = GetByIdResponse::from(&user);
-
-        if viewer_id == user_id.value() {
-            res.email = Some(user.identity().email().value().to_owned());
-        }
-
-        Ok(res)
+        Ok(UserDto::new(&user, viewer_id == user_id.value()))
     }
 }
 
