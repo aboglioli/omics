@@ -320,7 +320,7 @@ impl Publication {
         Ok(())
     }
 
-    pub fn approve(&mut self, content_manager: ContentManager) -> Result<()> {
+    pub fn approve(&mut self, content_manager: &ContentManager) -> Result<()> {
         if !matches!(
             self.status_history().current().status(),
             Status::WaitingApproval
@@ -329,7 +329,7 @@ impl Publication {
         }
 
         self.status_history.add_status(Status::Published {
-            admin: content_manager,
+            admin_id: content_manager.base().id(),
         });
 
         self.base.record_event(PublicationEvent::Published {
@@ -339,7 +339,7 @@ impl Publication {
         Ok(())
     }
 
-    pub fn reject(&mut self, content_manager: ContentManager) -> Result<()> {
+    pub fn reject(&mut self, content_manager: &ContentManager) -> Result<()> {
         if !matches!(
             self.status_history().current().status(),
             Status::WaitingApproval
@@ -348,7 +348,7 @@ impl Publication {
         }
 
         self.status_history.add_status(Status::Rejected {
-            admin: content_manager,
+            admin_id: content_manager.base().id(),
         });
 
         self.base.record_event(PublicationEvent::Rejected {
@@ -399,8 +399,8 @@ mod tests {
         assert!(publication.make_draft().is_ok());
         assert!(publication.make_draft().is_ok());
 
-        assert!(publication.approve(cm1.clone()).is_err());
-        assert!(publication.reject(cm1.clone()).is_err());
+        assert!(publication.approve(&cm1).is_err());
+        assert!(publication.reject(&cm1).is_err());
 
         assert!(publication.publish().is_ok());
         assert!(matches!(
@@ -408,7 +408,7 @@ mod tests {
             Status::WaitingApproval
         ));
 
-        assert!(publication.approve(cm1.clone()).is_ok());
+        assert!(publication.approve(&cm1).is_ok());
         assert!(
             matches!(publication.status_history().current().status(), Status::Published { .. })
         );
@@ -421,7 +421,7 @@ mod tests {
         ));
         assert!(publication.publish().is_ok());
 
-        assert!(publication.reject(cm1.clone()).is_ok());
+        assert!(publication.reject(&cm1).is_ok());
         assert!(matches!(publication.status_history().current().status(), Status::Rejected { .. }));
         assert!(publication.publish().is_err());
 

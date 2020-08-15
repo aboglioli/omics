@@ -46,7 +46,7 @@ pub fn published_publication1() -> Publication {
     publication.set_pages(vec![page1, page2]).unwrap();
 
     publication.publish().unwrap();
-    publication.approve(content_manager1()).unwrap();
+    publication.approve(&content_manager1()).unwrap();
     publication
 }
 
