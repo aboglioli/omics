@@ -85,10 +85,10 @@ pub async fn get_by_id(
     container: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
     let token = authorization::extract_token(&authorization_header).unwrap();
-    let authorization_serv = container.authorization_serv();
+    let authorization_serv = container.identity.authorization_serv();
     let user = authorization_serv.authorize(&token).await.unwrap();
 
-    let uc = GetById::new(container.user_repo());
+    let uc = GetById::new(container.identity.user_repo());
     let res = uc
         .exec(user.base().id().value().to_owned(), id)
         .await
@@ -102,9 +102,9 @@ pub async fn register(
     container: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
     let uc = Register::new(
-        container.event_bus(),
-        container.user_repo(),
-        container.user_serv(),
+        container.identity.event_pub(),
+        container.identity.user_repo(),
+        container.identity.user_serv(),
     );
     uc.exec(cmd).await.unwrap();
 
@@ -112,7 +112,10 @@ pub async fn register(
 }
 
 pub async fn login(cmd: LoginCommand, container: Arc<Container>) -> Result<impl Reply, Rejection> {
-    let uc = Login::new(container.event_bus(), container.authentication_serv());
+    let uc = Login::new(
+        container.identity.event_pub(),
+        container.identity.authentication_serv(),
+    );
     let res = uc.exec(cmd).await.unwrap();
 
     Ok(warp::reply::json(&res))
@@ -125,7 +128,7 @@ pub async fn update(
     container: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
     let token = authorization::extract_token(&authorization_header).unwrap();
-    let authorization_serv = container.authorization_serv();
+    let authorization_serv = container.identity.authorization_serv();
     let _user = authorization_serv.authorize(&token).await.unwrap();
 
     Ok(warp::reply::json(&Uninmplemented::new()))
@@ -137,7 +140,7 @@ pub async fn delete(
     container: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
     let token = authorization::extract_token(&authorization_header).unwrap();
-    let authorization_serv = container.authorization_serv();
+    let authorization_serv = container.identity.authorization_serv();
     let _user = authorization_serv.authorize(&token).await.unwrap();
 
     Ok(warp::reply::json(&Uninmplemented::new()))
@@ -150,7 +153,7 @@ pub async fn change_password(
     container: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
     let token = authorization::extract_token(&authorization_header).unwrap();
-    let authorization_serv = container.authorization_serv();
+    let authorization_serv = container.identity.authorization_serv();
     let _user = authorization_serv.authorize(&token).await.unwrap();
 
     Ok(warp::reply::json(&Uninmplemented::new()))
