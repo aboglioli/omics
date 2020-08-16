@@ -65,7 +65,6 @@ mod tests {
         let mut author = mocks::author1();
         c.author_repo().save(&mut author).await.unwrap();
         let mut publication = mocks::publication1();
-        publication.publish().unwrap();
         c.publication_repo().save(&mut publication).await.unwrap();
 
         uc.exec(
@@ -82,7 +81,7 @@ mod tests {
             .unwrap();
         assert_eq!(
             publication.status_history().current().status().to_string(),
-            "published"
+            "waiting-approval"
         );
 
         if let Status::Published { admin_id } = publication.status_history().current().status() {
