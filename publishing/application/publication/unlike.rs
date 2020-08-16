@@ -1,4 +1,3 @@
-
 use common::event::EventPublisher;
 use common::result::Result;
 
