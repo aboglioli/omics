@@ -76,7 +76,7 @@ where
 
         Ok(PublicationDto::new(
             &publication,
-            AuthorDto::new(&author),
+            AuthorDto::new(&author, None),
             CategoryDto::new(&category),
             true,
             is_reader_author,

@@ -34,15 +34,17 @@ pub struct AuthorDto {
     pub username: String,
     pub name: String,
     pub lastname: String,
+    pub publications: Option<Vec<PublicationDto>>,
 }
 
 impl AuthorDto {
-    pub fn new(author: &Author) -> Self {
+    pub fn new(author: &Author, publications: Option<Vec<PublicationDto>>) -> Self {
         AuthorDto {
             id: author.base().id().value().to_owned(),
             username: author.username().to_owned(),
             name: author.name().to_owned(),
             lastname: author.lastname().to_owned(),
+            publications,
         }
     }
 }

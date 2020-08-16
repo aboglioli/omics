@@ -71,7 +71,7 @@ where
 
             publications.push(PublicationDto::new(
                 &publication,
-                AuthorDto::new(&author),
+                AuthorDto::new(&author, None),
                 CategoryDto::new(&category),
                 false,
                 false,
@@ -80,7 +80,7 @@ where
 
         Ok(CollectionDto::new(
             &collection,
-            AuthorDto::new(&author),
+            AuthorDto::new(&author, None),
             CategoryDto::new(&category),
             publications,
         ))
