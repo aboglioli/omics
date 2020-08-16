@@ -5,7 +5,6 @@ use common::result::Result;
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};
 use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::category::{CategoryId, CategoryRepository};
-use crate::domain::collection::CollectionRepository;
 use crate::domain::publication::{PublicationRepository, Status};
 
 #[derive(Deserialize)]
