@@ -1,17 +1,42 @@
 
 <!-- Header -->
-<div mat-dialog-title class="image-box">
-  <img src="assets/images/omics-logo-sin-subtitulo.png" alt="omics-logo">
+<div mat-dialog-title >
+
+  <!-- Volver -->
+  <div class="button-top-menu">
+    <button mat-icon-button mat-dialog-close (click)="closeMatDialog()">
+      <fa-icon [icon]="faClose" size="2x"></fa-icon>
+    </button>
+  </div>
+
+  <!--image -->
+  <div class="image-box">
+    <img src="assets/images/omics-logo-sin-subtitulo.png" alt="omics-logo">
+  </div>
 </div>
 
 <!-- Body -->
 <mat-dialog-content class="mat-typography body">
 
-  <p>Pruba</p>
+  <mat-tab-group color="primary">
+
+    <!-- LOGUEARSE -->
+    <mat-tab label="LOGIN">
+      Content 1
+    </mat-tab>
+
+    <!-- REGISTRARSE -->
+    <mat-tab label="SIGN UP">
+      Content 2
+    </mat-tab>
+
+  </mat-tab-group>
 
 </mat-dialog-content>
 
 <!-- Bottom Action -->
 <mat-dialog-actions align="end">
+
+
 
 </mat-dialog-actions>

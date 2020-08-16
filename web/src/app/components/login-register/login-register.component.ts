@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { FormGroup, FormBuilder } from '@angular/forms';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-login-register',
@@ -7,9 +10,22 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LoginRegisterComponent implements OnInit {
 
-  constructor() { }
+  // Font Awseome icons
+  public faClose = faTimesCircle;
+
+  constructor( private dialogRef: MatDialogRef<LoginRegisterComponent> ) {
+
+    dialogRef.disableClose = true;
+
+  }
 
   ngOnInit(): void {
+  }
+
+  public closeMatDialog(): void {
+
+
+
   }
 
 }

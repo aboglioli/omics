@@ -1,12 +1,34 @@
 @import "../../../scss/vars";
 
-div.image-box {
+.mat-dialog-title {
 
-  width: 160px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 
-  img {
+  div.button-top-menu {
+
+    display: flex;
+    justify-content: flex-end;
     width: 100%;
-    height: 100%;
+
+    button {
+      margin: 0px;
+    }
+
+
+  }
+
+  div.image-box {
+
+    width: 160px;
+
+    img {
+      width: 100%;
+      height: 100%;
+    }
+
   }
 
 }
@@ -17,5 +39,23 @@ div.image-box {
   min-width: 20em;
   min-height: 20em;
   background-color: white;
+
+}
+
+button {
+
+  color: white;
+  height: 75%;
+  margin: 0em 0.5em;
+
+  &:focus {
+    outline: none;
+  }
+
+  fa-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
 }
