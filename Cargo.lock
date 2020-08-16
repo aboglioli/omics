@@ -151,9 +151,11 @@ name = "contract"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "chrono",
  "common",
  "identity",
+ "serde",
+ "tokio",
+ "uuid",
 ]
 
 [[package]]

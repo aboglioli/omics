@@ -1,0 +1,73 @@
+mod repository;
+mod status;
+pub use repository::*;
+pub use status::*;
+
+use common::error::Error;
+use common::event::Event;
+use common::model::{AggregateRoot, StatusHistory, StringId};
+use common::result::Result;
+
+use crate::domain::admin::Admin;
+use crate::domain::publication::PublicationId;
+
+pub type ContractId = StringId;
+
+#[derive(Debug, Clone)]
+pub struct Contract {
+    base: AggregateRoot<ContractId, Event>,
+    publication_id: PublicationId,
+    status_history: StatusHistory<Status>,
+}
+
+impl Contract {
+    pub fn new(id: ContractId, publication_id: PublicationId) -> Result<Self> {
+        Ok(Contract {
+            base: AggregateRoot::new(id),
+            publication_id,
+            status_history: StatusHistory::new(Status::Requested),
+        })
+    }
+
+    pub fn base(&self) -> &AggregateRoot<ContractId, Event> {
+        &self.base
+    }
+
+    pub fn publication_id(&self) -> &PublicationId {
+        &self.publication_id
+    }
+
+    pub fn status_history(&self) -> &StatusHistory<Status> {
+        &self.status_history
+    }
+
+    pub fn approve(&mut self, admin: &Admin) -> Result<()> {
+        if !matches!(self.status_history().current().status(), Status::Requested) {
+            return Err(Error::new("contract", "not_requested"));
+        }
+
+        self.status_history.add_status(Status::Approved {
+            admin_id: admin.base().id(),
+        });
+
+        Ok(())
+    }
+
+    pub fn reject(&mut self, admin: &Admin) -> Result<()> {
+        if !matches!(self.status_history().current().status(), Status::Requested) {
+            return Err(Error::new("contract", "not_requested"));
+        }
+
+        self.status_history.add_status(Status::Rejected {
+            admin_id: admin.base().id(),
+        });
+
+        Ok(())
+    }
+
+    pub fn cancel(&mut self) -> Result<()> {
+        self.status_history.add_status(Status::Cancelled);
+
+        Ok(())
+    }
+}
