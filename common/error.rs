@@ -25,7 +25,7 @@ pub struct Error {
     kind: ErrorKind,
     path: String,
     code: String,
-    status: Option<i32>,
+    status: Option<u32>,
     message: Option<String>,
     context: HashMap<String, String>,
     cause: Option<Box<Error>>,
@@ -68,8 +68,8 @@ impl Error {
         &self.path
     }
 
-    pub fn status(&self) -> Option<&i32> {
-        self.status.as_ref()
+    pub fn status(&self) -> Option<u32> {
+        self.status.clone()
     }
 
     pub fn message(&self) -> Option<&String> {
@@ -101,7 +101,7 @@ impl Error {
         self
     }
 
-    pub fn set_status(&mut self, status: i32) -> &mut Error {
+    pub fn set_status(&mut self, status: u32) -> &mut Error {
         self.status = Some(status);
         self
     }
@@ -179,7 +179,7 @@ mod tests {
         assert_eq!(err.code(), "code");
         assert_eq!(err.message().unwrap(), "message");
         assert_eq!(err.path(), "my.path");
-        assert_eq!(err.status().unwrap(), &404);
+        assert_eq!(err.status().unwrap(), 404);
         assert_eq!(err.context().len(), 2);
         assert_eq!(err.context().get("k1").unwrap(), "v1");
         assert_eq!(err.context().get("k2").unwrap(), "v3");

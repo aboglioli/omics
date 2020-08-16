@@ -4,11 +4,14 @@ use serde::Deserialize;
 use warp::http::StatusCode;
 use warp::{Filter, Rejection, Reply};
 
-use identity::application::user::{GetById, Login, LoginCommand, Register, RegisterCommand};
+use identity::application::user::{
+    GetById, Login, LoginCommand, Register, RegisterCommand, Update, UpdateCommand, Validate,
+};
 
 use crate::authorization;
 use crate::container::{with_container, Container};
 use crate::handlers::common::Uninmplemented;
+use crate::response;
 
 #[derive(Deserialize)]
 pub struct ValidateParams {
@@ -61,9 +64,8 @@ pub fn routes(
         .and(with_container(container.clone()))
         .and_then(recover_password);
 
-    let validate = warp::post()
-        .and(warp::path!(String))
-        .and(warp::query::<ValidateParams>())
+    let validate = warp::get()
+        .and(warp::path!(String / "validate" / String))
         .and(with_container(container.clone()))
         .and_then(validate);
 
@@ -89,12 +91,9 @@ pub async fn get_by_id(
     let user = authorization_serv.authorize(&token).await.unwrap();
 
     let uc = GetById::new(container.identity.user_repo());
-    let res = uc
-        .exec(user.base().id().value().to_owned(), id)
-        .await
-        .unwrap();
+    let res = uc.exec(user.base().id().value().to_owned(), id).await;
 
-    Ok(warp::reply::json(&res))
+    response::check(res, None)
 }
 
 pub async fn register(
@@ -106,9 +105,9 @@ pub async fn register(
         container.identity.user_repo(),
         container.identity.user_serv(),
     );
-    uc.exec(cmd).await.unwrap();
+    let res = uc.exec(cmd).await;
 
-    Ok(StatusCode::CREATED)
+    response::check(res, Some(StatusCode::CREATED))
 }
 
 pub async fn login(cmd: LoginCommand, container: Arc<Container>) -> Result<impl Reply, Rejection> {
@@ -116,22 +115,25 @@ pub async fn login(cmd: LoginCommand, container: Arc<Container>) -> Result<impl 
         container.identity.event_pub(),
         container.identity.authentication_serv(),
     );
-    let res = uc.exec(cmd).await.unwrap();
+    let res = uc.exec(cmd).await;
 
-    Ok(warp::reply::json(&res))
+    response::check(res, None)
 }
 
 pub async fn update(
-    _id: String,
-    _cmd: Uninmplemented,
+    id: String,
+    cmd: UpdateCommand,
     authorization_header: String,
-    container: Arc<Container>,
+    c: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
     let token = authorization::extract_token(&authorization_header).unwrap();
-    let authorization_serv = container.identity.authorization_serv();
+    let authorization_serv = c.identity.authorization_serv();
     let _user = authorization_serv.authorize(&token).await.unwrap();
+    let uc = Update::new(c.identity.event_pub(), c.identity.user_repo());
 
-    Ok(warp::reply::json(&Uninmplemented::new()))
+    let res = uc.exec(id, cmd).await;
+
+    response::check(res, None)
 }
 
 pub async fn delete(
@@ -167,9 +169,12 @@ pub async fn recover_password(
 }
 
 pub async fn validate(
-    _id: String,
-    _params: ValidateParams,
-    _container: Arc<Container>,
+    id: String,
+    code: String,
+    c: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
-    Ok(warp::reply::json(&Uninmplemented::new()))
+    let uc = Validate::new(c.identity.event_pub(), c.identity.user_repo());
+    let res = uc.exec(id, code).await;
+
+    response::check(res, None)
 }

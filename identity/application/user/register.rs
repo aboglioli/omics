@@ -26,6 +26,7 @@ impl RegisterCommand {
 #[derive(Serialize)]
 pub struct RegisterResponse {
     id: String,
+    validation_code: String, // TODO: remove, only for testing
 }
 
 pub struct Register<'a, EPub, URepo, PHasher> {
@@ -78,6 +79,7 @@ where
 
         Ok(RegisterResponse {
             id: user.base().id().value().to_owned(),
+            validation_code: user.validation().unwrap().code().to_owned(),
         })
     }
 }

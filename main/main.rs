@@ -2,6 +2,7 @@ mod authorization;
 mod container;
 mod handlers;
 mod port;
+mod response;
 
 use std::error::Error;
 use std::sync::Arc;
