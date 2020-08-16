@@ -4,12 +4,14 @@
   <!-- Burguer menu -->
   <button mat-icon-button class="button-no-borders"
           (click)="toggleSideNavMenu()">
-      <fa-icon [icon]="faBars" size="2x"></fa-icon>
+      <fa-icon [icon]="faBars" size="3x"></fa-icon>
   </button>
 
   <!-- Title -->
   <div class="image-box">
+    <button mat-button (click)="goToPage('home')">
     <img src="assets/images/omics-logo-sin-subtitulo.png" alt="omics-logo">
+  </button>
   </div>
 
   <!-- User menu buttons -->

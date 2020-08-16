@@ -41,4 +41,12 @@ mat-toolbar {
 
   }
 
+  button {
+
+    &:focus {
+      outline: none;
+    }
+
+  }
+
 }

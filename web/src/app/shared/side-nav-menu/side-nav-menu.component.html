@@ -2,10 +2,12 @@
 
   <div class="header">
 
-    <button mat-icon-button>
+    <!-- Volver -->
+    <button mat-icon-button (click)="closeSideNavMenu()">
       <fa-icon [icon]="faBack" size="2x"></fa-icon>
     </button>
 
+    <!-- Menu cabecera -->
     <button mat-stroked-button class="button-white-borders">
       ¡Comienza a ser parte de Omics!
     </button>
@@ -13,7 +15,26 @@
   </div>
 
   <div class="body">
-    Body
+
+    <!-- Lista menu opciones -->
+    <button mat-stroked-button class="button-white-borders"
+            [ngClass]="{'active': ( activePathSelected === 'catalogue' ) }"
+            (click)="goToPage('catalogue')">
+      Biblioteca
+    </button>
+
+    <button mat-stroked-button class="button-white-borders"
+            [ngClass]="{'active': ( activePathSelected === 'authors' ) }"
+            (click)="goToPage('authors')">
+      Autores
+    </button>
+
+    <button mat-stroked-button class="button-white-borders"
+            [ngClass]="{'active': ( activePathSelected === 'about' ) }"
+            (click)="goToPage('about')">
+      Sobre Omics
+    </button>
+
   </div>
 
 </div>

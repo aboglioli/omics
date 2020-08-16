@@ -1,5 +1,6 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-nav-bar',
@@ -14,7 +15,7 @@ export class NavBarComponent implements OnInit {
   // Font Awseome icons
   public faBars = faBars;
 
-  constructor() { }
+  constructor(  private router: Router ) { }
 
   ngOnInit(): void {
   }
@@ -24,5 +25,12 @@ export class NavBarComponent implements OnInit {
     this.clickSideNavToggle.emit();
 
   }
+
+  public goToPage( pagePath: string ): void {
+
+    this.router.navigate( ['/', pagePath] );
+
+  }
+
 
 }

@@ -38,6 +38,7 @@ import { ComicInfoComponent } from './components/comic-info/comic-info.component
 import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
 import { LoadingIndicadorComponent } from './shared/loading-indicador/loading-indicador.component';
 import { SideNavMenuComponent } from './shared/side-nav-menu/side-nav-menu.component';
+import { AutoresComponent } from './pages/autores/autores.component';
 // --->
 
 
@@ -63,7 +64,8 @@ import { SideNavMenuComponent } from './shared/side-nav-menu/side-nav-menu.compo
     ComicInfoComponent,
     NavBarComponent,
     LoadingIndicadorComponent,
-    SideNavMenuComponent
+    SideNavMenuComponent,
+    AutoresComponent
   ],
   imports: [
     BrowserModule,
