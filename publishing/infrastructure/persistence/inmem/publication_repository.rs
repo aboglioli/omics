@@ -6,7 +6,8 @@ use common::error::Error;
 use common::result::Result;
 
 use crate::domain::author::AuthorId;
-use crate::domain::publication::{Publication, PublicationId, PublicationRepository};
+use crate::domain::category::CategoryId;
+use crate::domain::publication::{Publication, PublicationId, PublicationRepository, Status};
 
 pub struct InMemPublicationRepository {
     cache: InMemCache<PublicationId, Publication>,
@@ -44,6 +45,29 @@ impl PublicationRepository for InMemPublicationRepository {
         Ok(self
             .cache
             .filter(|&(_, publication)| publication.author_id() == author_id)
+            .await)
+    }
+
+    async fn find_by_category_id(&self, category_id: &CategoryId) -> Result<Vec<Publication>> {
+        Ok(self
+            .cache
+            .filter(|&(_, publication)| publication.header().category_id() == category_id)
+            .await)
+    }
+
+    async fn find_by_status(&self, status: &Status) -> Result<Vec<Publication>> {
+        Ok(self
+            .cache
+            .filter(|&(_, publication)| {
+                publication.status_history().current().status().to_string() == status.to_string()
+            })
+            .await)
+    }
+
+    async fn search(&self, text: &str) -> Result<Vec<Publication>> {
+        Ok(self
+            .cache
+            .filter(|&(_, publication)| publication.header().name().value().contains(text))
             .await)
     }
 

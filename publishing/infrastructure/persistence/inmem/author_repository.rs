@@ -39,6 +39,17 @@ impl AuthorRepository for InMemAuthorRepository {
             .ok_or(Error::new("author", "not_found"))
     }
 
+    async fn search(&self, text: &str) -> Result<Vec<Author>> {
+        Ok(self
+            .cache
+            .filter(|&(_, author)| {
+                author.username().contains(text)
+                    || author.name().contains(text)
+                    || author.lastname().contains(text)
+            })
+            .await)
+    }
+
     async fn save(&self, author: &mut Author) -> Result<()> {
         self.cache.set(author.base().id(), author.clone()).await
     }
