@@ -3,11 +3,15 @@
   <!-- Sidenav menu -->
   <mat-drawer #sidenav_main  mode="over">
 
-    <app-side-nav-menu (clickSideNavToggle)="sidenav_main.toggle()"></app-side-nav-menu>
+    <app-side-nav-menu  (clickSideNavToggle)="sidenav_main.toggle()"
+                        (clickRegisterLoginDialog)="header_menu.openLoginRegisterDialog()">
+    </app-side-nav-menu>
 
   </mat-drawer>
 
-  <app-nav-bar (clickSideNavToggle)="sidenav_main.toggle()"></app-nav-bar>
+  <app-nav-bar  #header_menu
+                (clickSideNavToggle)="sidenav_main.toggle()">
+  </app-nav-bar>
 
   <!-- Body page -->
   <div class="container">

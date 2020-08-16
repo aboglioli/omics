@@ -1,6 +1,8 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { LoginRegisterComponent } from '../../components/login-register/login-register.component';
 
 @Component({
   selector: 'app-nav-bar',
@@ -15,7 +17,8 @@ export class NavBarComponent implements OnInit {
   // Font Awseome icons
   public faBars = faBars;
 
-  constructor(  private router: Router ) { }
+  constructor(  private router: Router,
+                public dialog: MatDialog ) { }
 
   ngOnInit(): void {
   }
@@ -29,6 +32,12 @@ export class NavBarComponent implements OnInit {
   public goToPage( pagePath: string ): void {
 
     this.router.navigate( ['/', pagePath] );
+
+  }
+
+  public openLoginRegisterDialog(): void {
+
+    const dialogRef = this.dialog.open(LoginRegisterComponent);
 
   }
 

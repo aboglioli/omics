@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 export class SideNavMenuComponent implements OnInit, OnDestroy {
 
   @Output() clickSideNavToggle = new EventEmitter();
+  @Output() clickRegisterLoginDialog = new EventEmitter();
 
   // Font Awseome icons
   public faBack = faChevronCircleLeft;
@@ -55,6 +56,13 @@ export class SideNavMenuComponent implements OnInit, OnDestroy {
     this.activePathSelected = pagePath;
 
     this.closeSideNavMenu();
+
+  }
+
+  public openRegisterLoginDialog(): void {
+
+    this.closeSideNavMenu();
+    this.clickRegisterLoginDialog.emit();
 
   }
 
