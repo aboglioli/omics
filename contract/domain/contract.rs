@@ -9,22 +9,22 @@ use common::model::{AggregateRoot, StatusHistory, StringId};
 use common::result::Result;
 
 use crate::domain::admin::Admin;
-use crate::domain::publication::PublicationId;
+use crate::domain::publication::Publication;
 
 pub type ContractId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct Contract {
     base: AggregateRoot<ContractId, Event>,
-    publication_id: PublicationId,
+    publication: Publication,
     status_history: StatusHistory<Status>,
 }
 
 impl Contract {
-    pub fn new(id: ContractId, publication_id: PublicationId) -> Result<Self> {
+    pub fn new(id: ContractId, publication: Publication) -> Result<Self> {
         Ok(Contract {
             base: AggregateRoot::new(id),
-            publication_id,
+            publication,
             status_history: StatusHistory::new(Status::Requested),
         })
     }
@@ -33,8 +33,8 @@ impl Contract {
         &self.base
     }
 
-    pub fn publication_id(&self) -> &PublicationId {
-        &self.publication_id
+    pub fn publication(&self) -> &Publication {
+        &self.publication
     }
 
     pub fn status_history(&self) -> &StatusHistory<Status> {
