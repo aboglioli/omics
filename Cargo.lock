@@ -17,9 +17,9 @@ checksum = "4d25d88fd6b8041580a654f9d0c581a047baee2b3efee13275f2fc392fc75034"
 
 [[package]]
 name = "async-trait"
-version = "0.1.36"
+version = "0.1.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a265e3abeffdce30b2e26b7a11b222fe37c6067404001b434101457d0385eb92"
+checksum = "caae68055714ff28740f310927e04f2eba76ff580b16fb18ed90073ee71646f7"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -117,9 +117,9 @@ checksum = "4785bdd1c96b2a846b2bd7cc02e86b6b3dbf14e7e53446c4f54c92a361040822"
 
 [[package]]
 name = "chrono"
-version = "0.4.13"
+version = "0.4.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c74d84029116787153e02106bf53e66828452a4b325cc8652b788b5967c0a0b6"
+checksum = "942f72db697d8767c22d46a598e01f2d3b475501ea43d0db4f16d90259182d0b"
 dependencies = [
  "num-integer",
  "num-traits",
@@ -147,18 +147,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "contract"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "common",
- "identity",
- "serde",
- "tokio",
- "uuid",
-]
-
-[[package]]
 name = "deunicode"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -171,15 +159,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f3d0c8c8752312f9713efd397ff63acb9f85585afbf179282e720e7704954dd5"
 dependencies = [
  "generic-array",
-]
-
-[[package]]
-name = "donation"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "common",
- "identity",
 ]
 
 [[package]]
@@ -554,11 +533,10 @@ name = "main"
 version = "0.1.0"
 dependencies = [
  "common",
- "contract",
  "identity",
+ "payment",
  "publishing",
  "serde",
- "subscription",
  "tokio",
  "warp",
 ]
@@ -755,8 +733,10 @@ name = "payment"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "chrono",
  "common",
+ "serde",
+ "tokio",
+ "uuid",
 ]
 
 [[package]]
@@ -1207,15 +1187,6 @@ dependencies = [
  "libc",
  "redox_syscall",
  "winapi 0.3.9",
-]
-
-[[package]]
-name = "subscription"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "chrono",
- "common",
 ]
 
 [[package]]

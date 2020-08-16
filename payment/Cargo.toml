@@ -11,4 +11,6 @@ path = "lib.rs"
 common = { path = "../common" }
 
 async-trait = "0.1.36"
-chrono = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "0.2", features = ["full"] }
+uuid = { version = "0.8.1", features = ["serde", "v4"] }
