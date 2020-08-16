@@ -3,9 +3,9 @@ use std::sync::Arc;
 use warp::{Filter, Rejection, Reply};
 
 use publishing::application::publication::{
-    AddReview, AddReviewCommand, Approve, Create, CreateCommand, Delete, GetById, Like, Publish,
-    Read, Reject, Reviews, Search, SearchCommand, Unlike, Update, UpdateCommand, UpdatePages,
-    UpdatePagesCommand,
+    AddReview, AddReviewCommand, Approve, Create, CreateCommand, Delete, DeleteReview, GetById,
+    Like, Publish, Read, Reject, Reviews, Search, SearchCommand, Unlike, Update, UpdateCommand,
+    UpdatePages, UpdatePagesCommand,
 };
 
 use crate::authorization::with_auth;
@@ -23,7 +23,7 @@ pub fn routes(
         .and_then(get_by_id);
 
     // GET /publications
-    let _search = warp::get()
+    let search = warp::get()
         .and(warp::path::end())
         .and(warp::query::<SearchCommand>())
         .and(with_container(container.clone()))
@@ -46,7 +46,7 @@ pub fn routes(
         .and_then(update);
 
     // PUT /publications/:id/pages
-    let _update_pages = warp::put()
+    let update_pages = warp::put()
         .and(warp::path!(String / "pages"))
         .and(warp::body::json())
         .and(with_auth(container.clone()))
@@ -96,7 +96,7 @@ pub fn routes(
         .and_then(like);
 
     // POST /publications/:id/unlike
-    let _unlike = warp::post()
+    let unlike = warp::post()
         .and(warp::path!(String / "unlike"))
         .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
@@ -110,8 +110,15 @@ pub fn routes(
         .and(with_container(container.clone()))
         .and_then(review);
 
-    // GET /publications/:id/reviesws
-    let _reviews = warp::get()
+    // DELETE /publications/:id/review
+    let delete_review = warp::delete()
+        .and(warp::path!(String / "review"))
+        .and(with_auth(container.clone()))
+        .and(with_container(container.clone()))
+        .and_then(delete_review);
+
+    // GET /publications/:id/reviews
+    let reviews = warp::get()
         .and(warp::path!(String / "reviews"))
         .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
@@ -119,15 +126,20 @@ pub fn routes(
 
     warp::path("publications").and(
         get_by_id
+            .or(search)
             .or(create)
             .or(update)
+            .or(update_pages)
             .or(delete)
             .or(publish)
             .or(approve)
             .or(reject)
             .or(read)
             .or(like)
-            .or(review),
+            .or(unlike)
+            .or(review)
+            .or(reviews)
+            .or(delete_review),
     )
 }
 
@@ -313,6 +325,22 @@ pub async fn review(
         c.publishing.interaction_serv(),
     );
     let res = uc.exec(user_id, id, cmd).await;
+
+    response::map(res, None)
+}
+
+pub async fn delete_review(
+    id: String,
+    user_id: String,
+    c: Arc<Container>,
+) -> Result<impl Reply, Rejection> {
+    let uc = DeleteReview::new(
+        c.publishing.event_pub(),
+        c.publishing.publication_repo(),
+        c.publishing.reader_repo(),
+        c.publishing.interaction_serv(),
+    );
+    let res = uc.exec(user_id, id).await;
 
     response::map(res, None)
 }
