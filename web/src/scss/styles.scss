@@ -25,6 +25,10 @@ body {
 
   //#endregion
 
+  .mat-dialog-container {
+    background-color: $omics-background-menu;
+    box-shadow: 0px 0px 15px 2px $omics-neon-pink;
+  }
 
 }
 
