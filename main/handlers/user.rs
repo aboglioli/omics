@@ -8,7 +8,7 @@ use identity::application::user::{
     Register, RegisterCommand, Update, UpdateCommand, Validate,
 };
 
-use crate::authorization;
+use crate::authorization::with_auth;
 use crate::container::{with_container, Container};
 use crate::response;
 
@@ -18,7 +18,7 @@ pub fn routes(
     // GET /users/:id
     let get_by_id = warp::get()
         .and(warp::path!(String))
-        .and(warp::header::<String>("authorization"))
+        .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(get_by_id);
 
@@ -40,14 +40,14 @@ pub fn routes(
     let update = warp::put()
         .and(warp::path!(String))
         .and(warp::body::json())
-        .and(warp::header::<String>("authorization"))
+        .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(update);
 
     // DELETE /users/:id
     let delete = warp::delete()
         .and(warp::path!(String))
-        .and(warp::header::<String>("authorization"))
+        .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(delete);
 
@@ -55,7 +55,7 @@ pub fn routes(
     let change_password = warp::put()
         .and(warp::path!(String / "change-password"))
         .and(warp::body::json())
-        .and(warp::header::<String>("authorization"))
+        .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(change_password);
 
@@ -85,17 +85,13 @@ pub fn routes(
 
 pub async fn get_by_id(
     id: String,
-    authorization_header: String,
+    user_id: String,
     c: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
-    let user_id = authorization::with_user(&authorization_header, &c)
-        .await
-        .unwrap();
-
     let uc = GetById::new(c.identity.user_repo());
     let res = uc.exec(user_id, id).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }
 
 pub async fn register(cmd: RegisterCommand, c: Arc<Container>) -> Result<impl Reply, Rejection> {
@@ -106,61 +102,49 @@ pub async fn register(cmd: RegisterCommand, c: Arc<Container>) -> Result<impl Re
     );
     let res = uc.exec(cmd).await;
 
-    response::check(res, Some(StatusCode::CREATED))
+    response::map(res, Some(StatusCode::CREATED))
 }
 
 pub async fn login(cmd: LoginCommand, c: Arc<Container>) -> Result<impl Reply, Rejection> {
     let uc = Login::new(c.identity.event_pub(), c.identity.authentication_serv());
     let res = uc.exec(cmd).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }
 
 pub async fn update(
     id: String,
     cmd: UpdateCommand,
-    authorization_header: String,
+    _user_id: String,
     c: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
-    let _user_id = authorization::with_user(&authorization_header, &c)
-        .await
-        .unwrap();
-
     let uc = Update::new(c.identity.event_pub(), c.identity.user_repo());
     let res = uc.exec(id, cmd).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }
 
 pub async fn delete(
     id: String,
-    authorization_header: String,
+    _user_id: String,
     c: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
-    let _user_id = authorization::with_user(&authorization_header, &c)
-        .await
-        .unwrap();
-
     let uc = Delete::new(c.identity.event_pub(), c.identity.user_repo());
     let res = uc.exec(id).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }
 
 pub async fn change_password(
     id: String,
     cmd: ChangePasswordCommand,
-    authorization_header: String,
+    _user_id: String,
     c: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
-    let _user_id = authorization::with_user(&authorization_header, &c)
-        .await
-        .unwrap();
-
     let uc = ChangePassword::new(c.identity.user_serv());
     let res = uc.exec(id, cmd).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }
 
 pub async fn recover_password(id: String, c: Arc<Container>) -> Result<impl Reply, Rejection> {
@@ -171,7 +155,7 @@ pub async fn recover_password(id: String, c: Arc<Container>) -> Result<impl Repl
     );
     let res = uc.exec(id).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }
 
 pub async fn validate(
@@ -182,5 +166,5 @@ pub async fn validate(
     let uc = Validate::new(c.identity.event_pub(), c.identity.user_repo());
     let res = uc.exec(id, code).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }

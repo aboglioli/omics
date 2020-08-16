@@ -32,11 +32,11 @@ pub struct Error {
 }
 
 impl Error {
-    pub fn new(path: &str, code: &str) -> Error {
+    pub fn new<S: Into<String>>(path: S, code: S) -> Error {
         Error {
             kind: ErrorKind::Application,
-            path: path.to_owned(),
-            code: code.to_owned(),
+            path: path.into(),
+            code: code.into(),
             status: None,
             message: None,
             context: HashMap::new(),
@@ -44,11 +44,11 @@ impl Error {
         }
     }
 
-    pub fn internal(path: &str, code: &str) -> Error {
+    pub fn internal<S: Into<String>>(path: S, code: S) -> Error {
         Error {
             kind: ErrorKind::Internal,
-            path: path.to_owned(),
-            code: code.to_owned(),
+            path: path.into(),
+            code: code.into(),
             status: None,
             message: None,
             context: HashMap::new(),
@@ -91,13 +91,13 @@ impl Error {
         }
     }
 
-    pub fn set_path(&mut self, path: &str) -> &mut Error {
-        self.path = path.to_owned();
+    pub fn set_path<S: Into<String>>(&mut self, path: S) -> &mut Error {
+        self.path = path.into();
         self
     }
 
-    pub fn set_code(&mut self, code: &str) -> &mut Error {
-        self.code = code.to_owned();
+    pub fn set_code<S: Into<String>>(&mut self, code: S) -> &mut Error {
+        self.code = code.into();
         self
     }
 
@@ -106,13 +106,13 @@ impl Error {
         self
     }
 
-    pub fn set_message(&mut self, message: &str) -> &mut Error {
-        self.message = Some(message.to_owned());
+    pub fn set_message<S: Into<String>>(&mut self, message: S) -> &mut Error {
+        self.message = Some(message.into());
         self
     }
 
-    pub fn add_context(&mut self, k: &str, v: &str) -> &mut Error {
-        self.context.insert(k.to_owned(), v.to_owned());
+    pub fn add_context<S: Into<String>>(&mut self, k: S, v: S) -> &mut Error {
+        self.context.insert(k.into(), v.into());
         self
     }
 

@@ -8,7 +8,7 @@ use publishing::application::publication::{
     UpdatePagesCommand,
 };
 
-use crate::authorization;
+use crate::authorization::with_auth;
 use crate::container::{with_container, Container};
 use crate::response;
 
@@ -18,7 +18,7 @@ pub fn routes(
     // GET /publications/:id
     let get_by_id = warp::get()
         .and(warp::path!(String))
-        .and(warp::header::<String>("authorization"))
+        .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(get_by_id);
 
@@ -33,7 +33,7 @@ pub fn routes(
     let create = warp::post()
         .and(warp::path::end())
         .and(warp::body::json())
-        .and(warp::header::<String>("authorization"))
+        .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(create);
 
@@ -41,7 +41,7 @@ pub fn routes(
     let update = warp::put()
         .and(warp::path!(String))
         .and(warp::body::json())
-        .and(warp::header::<String>("authorization"))
+        .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(update);
 
@@ -49,56 +49,56 @@ pub fn routes(
     let _update_pages = warp::put()
         .and(warp::path!(String / "pages"))
         .and(warp::body::json())
-        .and(warp::header::<String>("authorization"))
+        .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(update_pages);
 
     // DELETE /publications/:id
     let delete = warp::delete()
         .and(warp::path!(String))
-        .and(warp::header::<String>("authorization"))
+        .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(delete);
 
     // POST /publications/:id/publish
     let publish = warp::post()
         .and(warp::path!(String / "publish"))
-        .and(warp::header::<String>("authorization"))
+        .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(publish);
 
     // POST /publications/:id/approve
     let approve = warp::post()
         .and(warp::path!(String / "approve"))
-        .and(warp::header::<String>("authorization"))
+        .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(approve);
 
     // POST /publications/:id/reject
     let reject = warp::post()
         .and(warp::path!(String / "reject"))
-        .and(warp::header::<String>("authorization"))
+        .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(reject);
 
     // POST /publications/:id/read
     let read = warp::post()
         .and(warp::path!(String / "read"))
-        .and(warp::header::<String>("authorization"))
+        .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(read);
 
     // POST /publications/:id/like
     let like = warp::post()
         .and(warp::path!(String / "like"))
-        .and(warp::header::<String>("authorization"))
+        .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(like);
 
     // POST /publications/:id/unlike
     let _unlike = warp::post()
         .and(warp::path!(String / "unlike"))
-        .and(warp::header::<String>("authorization"))
+        .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(unlike);
 
@@ -106,14 +106,14 @@ pub fn routes(
     let review = warp::post()
         .and(warp::path!(String / "review"))
         .and(warp::body::json())
-        .and(warp::header::<String>("authorization"))
+        .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(review);
 
     // GET /publications/:id/reviesws
     let _reviews = warp::get()
         .and(warp::path!(String / "reviews"))
-        .and(warp::header::<String>("authorization"))
+        .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(reviews);
 
@@ -133,13 +133,9 @@ pub fn routes(
 
 pub async fn get_by_id(
     id: String,
-    authorization_header: String,
+    user_id: String,
     c: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
-    let user_id = authorization::with_user(&authorization_header, &c)
-        .await
-        .unwrap();
-
     let uc = GetById::new(
         c.publishing.event_pub(),
         c.publishing.author_repo(),
@@ -150,7 +146,7 @@ pub async fn get_by_id(
     );
     let res = uc.exec(user_id, id).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }
 
 pub async fn search(cmd: SearchCommand, c: Arc<Container>) -> Result<impl Reply, Rejection> {
@@ -161,18 +157,14 @@ pub async fn search(cmd: SearchCommand, c: Arc<Container>) -> Result<impl Reply,
     );
     let res = uc.exec(cmd).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }
 
 pub async fn create(
     cmd: CreateCommand,
-    authorization_header: String,
+    user_id: String,
     c: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
-    let user_id = authorization::with_user(&authorization_header, &c)
-        .await
-        .unwrap();
-
     let uc = Create::new(
         c.publishing.event_pub(),
         c.publishing.author_repo(),
@@ -181,19 +173,15 @@ pub async fn create(
     );
     let res = uc.exec(user_id, cmd).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }
 
 pub async fn update(
     id: String,
     cmd: UpdateCommand,
-    authorization_header: String,
+    user_id: String,
     c: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
-    let user_id = authorization::with_user(&authorization_header, &c)
-        .await
-        .unwrap();
-
     let uc = Update::new(
         c.publishing.event_pub(),
         c.publishing.category_repo(),
@@ -201,49 +189,37 @@ pub async fn update(
     );
     let res = uc.exec(user_id, id, cmd).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }
 
 pub async fn update_pages(
     id: String,
     cmd: UpdatePagesCommand,
-    authorization_header: String,
+    user_id: String,
     c: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
-    let user_id = authorization::with_user(&authorization_header, &c)
-        .await
-        .unwrap();
-
     let uc = UpdatePages::new(c.publishing.event_pub(), c.publishing.publication_repo());
     let res = uc.exec(user_id, id, cmd).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }
 
 pub async fn delete(
     id: String,
-    authorization_header: String,
+    user_id: String,
     c: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
-    let user_id = authorization::with_user(&authorization_header, &c)
-        .await
-        .unwrap();
-
     let uc = Delete::new(c.publishing.event_pub(), c.publishing.publication_repo());
     let res = uc.exec(user_id, id).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }
 
 pub async fn publish(
     id: String,
-    authorization_header: String,
+    user_id: String,
     c: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
-    let user_id = authorization::with_user(&authorization_header, &c)
-        .await
-        .unwrap();
-
     let uc = Publish::new(
         c.publishing.event_pub(),
         c.publishing.author_repo(),
@@ -251,18 +227,14 @@ pub async fn publish(
     );
     let res = uc.exec(user_id, id).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }
 
 pub async fn approve(
     id: String,
-    authorization_header: String,
+    user_id: String,
     c: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
-    let user_id = authorization::with_user(&authorization_header, &c)
-        .await
-        .unwrap();
-
     let uc = Approve::new(
         c.publishing.event_pub(),
         c.publishing.content_manager_repo(),
@@ -270,18 +242,14 @@ pub async fn approve(
     );
     let res = uc.exec(user_id, id).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }
 
 pub async fn reject(
     id: String,
-    authorization_header: String,
+    user_id: String,
     c: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
-    let user_id = authorization::with_user(&authorization_header, &c)
-        .await
-        .unwrap();
-
     let uc = Reject::new(
         c.publishing.event_pub(),
         c.publishing.content_manager_repo(),
@@ -289,18 +257,10 @@ pub async fn reject(
     );
     let res = uc.exec(user_id, id).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }
 
-pub async fn read(
-    id: String,
-    authorization_header: String,
-    c: Arc<Container>,
-) -> Result<impl Reply, Rejection> {
-    let user_id = authorization::with_user(&authorization_header, &c)
-        .await
-        .unwrap();
-
+pub async fn read(id: String, user_id: String, c: Arc<Container>) -> Result<impl Reply, Rejection> {
     let uc = Read::new(
         c.publishing.event_pub(),
         c.publishing.publication_repo(),
@@ -309,18 +269,10 @@ pub async fn read(
     );
     let res = uc.exec(user_id, id).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }
 
-pub async fn like(
-    id: String,
-    authorization_header: String,
-    c: Arc<Container>,
-) -> Result<impl Reply, Rejection> {
-    let user_id = authorization::with_user(&authorization_header, &c)
-        .await
-        .unwrap();
-
+pub async fn like(id: String, user_id: String, c: Arc<Container>) -> Result<impl Reply, Rejection> {
     let uc = Like::new(
         c.publishing.event_pub(),
         c.publishing.publication_repo(),
@@ -329,18 +281,14 @@ pub async fn like(
     );
     let res = uc.exec(user_id, id).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }
 
 pub async fn unlike(
     id: String,
-    authorization_header: String,
+    user_id: String,
     c: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
-    let user_id = authorization::with_user(&authorization_header, &c)
-        .await
-        .unwrap();
-
     let uc = Unlike::new(
         c.publishing.event_pub(),
         c.publishing.publication_repo(),
@@ -349,19 +297,15 @@ pub async fn unlike(
     );
     let res = uc.exec(user_id, id).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }
 
 pub async fn review(
     id: String,
     cmd: AddReviewCommand,
-    authorization_header: String,
+    user_id: String,
     c: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
-    let user_id = authorization::with_user(&authorization_header, &c)
-        .await
-        .unwrap();
-
     let uc = AddReview::new(
         c.publishing.event_pub(),
         c.publishing.publication_repo(),
@@ -370,20 +314,16 @@ pub async fn review(
     );
     let res = uc.exec(user_id, id, cmd).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }
 
 pub async fn reviews(
     id: String,
-    authorization_header: String,
+    _user_id: String,
     c: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
-    let _user_id = authorization::with_user(&authorization_header, &c)
-        .await
-        .unwrap();
-
     let uc = Reviews::new(c.publishing.interaction_repo());
     let res = uc.exec(id).await;
 
-    response::check(res, None)
+    response::map(res, None)
 }

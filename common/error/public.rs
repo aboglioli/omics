@@ -46,6 +46,8 @@ impl PublicError {
     }
 }
 
+impl warp::reject::Reject for PublicError {}
+
 #[cfg(test)]
 mod tests {
     use super::*;

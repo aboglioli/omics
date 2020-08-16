@@ -5,14 +5,14 @@ use warp::{Rejection, Reply};
 use common::error::public::PublicError;
 use common::result::Result as CustomResult;
 
-pub fn check<T: Serialize>(
+pub fn map<T: Serialize>(
     res: CustomResult<T>,
-    status: Option<StatusCode>,
+    ok_status: Option<StatusCode>,
 ) -> Result<impl Reply, Rejection> {
     match res {
         Ok(value) => Ok(warp::reply::with_status(
             warp::reply::json(&value),
-            if let Some(status) = status {
+            if let Some(status) = ok_status {
                 status
             } else {
                 StatusCode::OK
@@ -29,7 +29,10 @@ pub fn check<T: Serialize>(
                 }
                 None => StatusCode::BAD_REQUEST,
             };
-            let err = PublicError::from(&err, false).unwrap(); // TODO: safe
+
+            // Safe
+            let err = PublicError::from(&err, false).unwrap();
+
             let json = warp::reply::json(&err);
             Ok(warp::reply::with_status(json, status))
         }
