@@ -31,15 +31,18 @@ impl StatisticsDto {
 #[derive(Serialize)]
 pub struct AuthorDto {
     pub id: String,
-    // username: String,
-    // name: String,
-    // lastname: String,
+    pub username: String,
+    pub name: String,
+    pub lastname: String,
 }
 
 impl AuthorDto {
     pub fn new(author: &Author) -> Self {
         AuthorDto {
             id: author.base().id().value().to_owned(),
+            username: author.username().to_owned(),
+            name: author.name().to_owned(),
+            lastname: author.lastname().to_owned(),
         }
     }
 }
@@ -170,6 +173,21 @@ impl CollectionDto {
                 .map(|tag| tag.name().to_owned())
                 .collect(),
             publications,
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct CatalogueDto {
+    pub publications: Vec<PublicationDto>,
+    pub authors: Vec<AuthorDto>,
+}
+
+impl CatalogueDto {
+    pub fn new(publications: Vec<PublicationDto>, authors: Vec<AuthorDto>) -> Self {
+        CatalogueDto {
+            publications,
+            authors,
         }
     }
 }

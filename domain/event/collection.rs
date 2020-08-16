@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use common::event::{Event, ToEvent};
 use common::result::Result;
 
-use crate::domain::util;
+use crate::util;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum CollectionEvent {

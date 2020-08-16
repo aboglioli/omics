@@ -28,7 +28,7 @@ pub use validation::*;
 use common::error::Error;
 use common::model::{AggregateRoot, StringId};
 use common::result::Result;
-use shared::domain::event::UserEvent;
+use domain::event::UserEvent;
 
 use crate::domain::role::Role;
 use crate::domain::token::Token;

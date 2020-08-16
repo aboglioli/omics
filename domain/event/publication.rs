@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use common::event::{Event, ToEvent};
 use common::result::Result;
 
-use crate::domain::util;
+use crate::util;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum PublicationEvent {
@@ -70,6 +70,15 @@ pub enum PublicationEvent {
         reader_id: String,
         publication_id: String,
     },
+    StatisticsUpdated {
+        id: String,
+        views: u32,
+        unique_views: u32,
+        readings: u32,
+        likes: u32,
+        reviews: u32,
+        stars: f32,
+    },
     ContractAdded {
         id: String,
     },
@@ -95,6 +104,7 @@ impl ToString for PublicationEvent {
             PublicationEvent::Unliked { .. } => "unliked".to_owned(),
             PublicationEvent::Reviewed { .. } => "reviewed".to_owned(),
             PublicationEvent::ReviewDeleted { .. } => "review-deleted".to_owned(),
+            PublicationEvent::StatisticsUpdated { .. } => "statistics-updated".to_owned(),
             PublicationEvent::ContractAdded { .. } => "contract-added".to_owned(),
             PublicationEvent::ContractRemoved { .. } => "contract-removed".to_owned(),
         }

@@ -1,32 +1,33 @@
-mod repository;
-pub use repository::*;
-
-use common::event::Event;
-use common::model::{AggregateRoot, StringId};
 use common::result::Result;
-
-pub type AuthorId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct Author {
-    base: AggregateRoot<AuthorId, Event>,
+    id: String,
     username: String,
     name: String,
     lastname: String,
+    publications: usize,
 }
 
 impl Author {
-    pub fn new<S: Into<String>>(id: AuthorId, username: S, name: S, lastname: S) -> Result<Self> {
+    pub fn new<S: Into<String>>(
+        id: S,
+        username: S,
+        name: S,
+        lastname: S,
+        publications: usize,
+    ) -> Result<Self> {
         Ok(Author {
-            base: AggregateRoot::new(id),
+            id: id.into(),
             username: username.into(),
             name: name.into(),
             lastname: lastname.into(),
+            publications,
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<AuthorId, Event> {
-        &self.base
+    pub fn id(&self) -> &str {
+        &self.id
     }
 
     pub fn username(&self) -> &str {
@@ -39,5 +40,9 @@ impl Author {
 
     pub fn lastname(&self) -> &str {
         &self.lastname
+    }
+
+    pub fn publications(&self) -> usize {
+        self.publications
     }
 }

@@ -50,7 +50,7 @@ pub fn routes(
         .and_then(delete);
 
     let change_password = warp::put()
-        .and(warp::path!(String / "password"))
+        .and(warp::path!(String / "change-password"))
         .and(warp::body::json())
         .and(warp::header::<String>("authorization"))
         .and(with_container(container.clone()))

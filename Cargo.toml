@@ -2,10 +2,11 @@
 members = [
   "catalogue",
   "common",
+  "domain",
   "identity",
+  "infrastructure",
   "main",
   "notification",
   "payment",
   "publishing",
-  "shared",
 ]

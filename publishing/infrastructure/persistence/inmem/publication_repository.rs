@@ -5,6 +5,7 @@ use common::cache::{inmem::InMemCache, Cache};
 use common::error::Error;
 use common::result::Result;
 
+use crate::domain::author::AuthorId;
 use crate::domain::publication::{Publication, PublicationId, PublicationRepository};
 
 pub struct InMemPublicationRepository {
@@ -37,6 +38,13 @@ impl PublicationRepository for InMemPublicationRepository {
             .get(id)
             .await
             .ok_or(Error::new("publication", "not_found"))
+    }
+
+    async fn find_by_author_id(&self, author_id: &AuthorId) -> Result<Vec<Publication>> {
+        Ok(self
+            .cache
+            .filter(|&(_, publication)| publication.author_id() == author_id)
+            .await)
     }
 
     async fn save(&self, publication: &mut Publication) -> Result<()> {

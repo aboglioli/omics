@@ -24,7 +24,7 @@ pub use tag::*;
 use common::error::Error;
 use common::model::{AggregateRoot, StatusHistory, StringId};
 use common::result::Result;
-use shared::domain::event::PublicationEvent;
+use domain::event::PublicationEvent;
 
 use crate::domain::author::AuthorId;
 use crate::domain::content_manager::ContentManager;
