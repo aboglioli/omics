@@ -157,6 +157,16 @@ impl Publication {
             unique,
         });
 
+        self.base.record_event(PublicationEvent::StatisticsUpdated {
+            id: self.base().id().value().to_owned(),
+            views: self.statistics().views(),
+            unique_views: self.statistics().unique_views(),
+            readings: self.statistics().readings(),
+            likes: self.statistics().likes(),
+            reviews: self.statistics().reviews(),
+            stars: self.statistics().stars(),
+        });
+
         Ok(View::new(reader.base().id(), self.base().id(), unique)?)
     }
 
@@ -174,6 +184,16 @@ impl Publication {
         self.base.record_event(PublicationEvent::Read {
             reader_id: reader.base().id().value().to_owned(),
             publication_id: self.base().id().value().to_owned(),
+        });
+
+        self.base.record_event(PublicationEvent::StatisticsUpdated {
+            id: self.base().id().value().to_owned(),
+            views: self.statistics().views(),
+            unique_views: self.statistics().unique_views(),
+            readings: self.statistics().readings(),
+            likes: self.statistics().likes(),
+            reviews: self.statistics().reviews(),
+            stars: self.statistics().stars(),
         });
 
         Ok(Reading::new(reader.base().id(), self.base().id())?)
@@ -195,6 +215,16 @@ impl Publication {
             publication_id: self.base().id().value().to_owned(),
         });
 
+        self.base.record_event(PublicationEvent::StatisticsUpdated {
+            id: self.base().id().value().to_owned(),
+            views: self.statistics().views(),
+            unique_views: self.statistics().unique_views(),
+            readings: self.statistics().readings(),
+            likes: self.statistics().likes(),
+            reviews: self.statistics().reviews(),
+            stars: self.statistics().stars(),
+        });
+
         Ok(Like::new(reader.base().id(), self.base().id())?)
     }
 
@@ -212,6 +242,16 @@ impl Publication {
         self.base.record_event(PublicationEvent::Unliked {
             reader_id: reader.base().id().value().to_owned(),
             publication_id: self.base().id().value().to_owned(),
+        });
+
+        self.base.record_event(PublicationEvent::StatisticsUpdated {
+            id: self.base().id().value().to_owned(),
+            views: self.statistics().views(),
+            unique_views: self.statistics().unique_views(),
+            readings: self.statistics().readings(),
+            likes: self.statistics().likes(),
+            reviews: self.statistics().reviews(),
+            stars: self.statistics().stars(),
         });
 
         Ok(())
@@ -233,6 +273,16 @@ impl Publication {
             publication_id: self.base().id().value().to_owned(),
             stars: stars.value(),
             comment: comment.value().to_owned(),
+        });
+
+        self.base.record_event(PublicationEvent::StatisticsUpdated {
+            id: self.base().id().value().to_owned(),
+            views: self.statistics().views(),
+            unique_views: self.statistics().unique_views(),
+            readings: self.statistics().readings(),
+            likes: self.statistics().likes(),
+            reviews: self.statistics().reviews(),
+            stars: self.statistics().stars(),
         });
 
         Ok(Review::new(
@@ -257,6 +307,16 @@ impl Publication {
         self.base.record_event(PublicationEvent::ReviewDeleted {
             reader_id: reader.base().id().value().to_owned(),
             publication_id: self.base().id().value().to_owned(),
+        });
+
+        self.base.record_event(PublicationEvent::StatisticsUpdated {
+            id: self.base().id().value().to_owned(),
+            views: self.statistics().views(),
+            unique_views: self.statistics().unique_views(),
+            readings: self.statistics().readings(),
+            likes: self.statistics().likes(),
+            reviews: self.statistics().reviews(),
+            stars: self.statistics().stars(),
         });
 
         Ok(())

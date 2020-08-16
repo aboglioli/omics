@@ -61,8 +61,7 @@ where
             CollectionEvent::PublicationRemoved { id, .. } => {
                 let collection = self.collection_serv.get_by_id(&id).await?;
                 catalogue.add_collection(collection);
-            }
-            _ => return Ok(false),
+            } // _ => return Ok(false),
         }
 
         self.catalogue_repo.save(&mut catalogue).await?;

@@ -50,17 +50,6 @@ where
             PublicationEvent::Deleted { id } => {
                 catalogue.remove_publication(&id);
             }
-            PublicationEvent::ChangedToDraft { id } => {
-                catalogue.remove_publication(&id);
-            }
-            PublicationEvent::HeaderUpdated { id, .. } => {
-                let publication = self.publication_serv.get_by_id(&id).await?;
-                catalogue.add_publication(publication);
-            }
-            PublicationEvent::PagesUpdated { id, .. } => {
-                let publication = self.publication_serv.get_by_id(&id).await?;
-                catalogue.add_publication(publication);
-            }
             PublicationEvent::StatisticsUpdated { id, .. } => {
                 let publication = self.publication_serv.get_by_id(&id).await?;
                 catalogue.add_publication(publication);
