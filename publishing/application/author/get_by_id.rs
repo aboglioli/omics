@@ -43,13 +43,13 @@ where
                 .await?;
             publication_dtos.push(PublicationDto::new(
                 &publication,
-                AuthorDto::new(&author, None),
+                AuthorDto::new(&author),
                 CategoryDto::new(&category),
                 false,
                 false,
             ));
         }
 
-        Ok(AuthorDto::new(&author, Some(publication_dtos)))
+        Ok(AuthorDto::new(&author).publications(publication_dtos))
     }
 }

@@ -99,7 +99,7 @@ where
 
             publication_dtos.push(PublicationDto::new(
                 &publication,
-                AuthorDto::new(&author, None),
+                AuthorDto::new(&author),
                 CategoryDto::new(&category),
                 false,
                 false,

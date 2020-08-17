@@ -2,11 +2,9 @@ use common::result::Result;
 
 use crate::domain::publication::Image;
 
-pub type PageNumber = u32;
-
 #[derive(Debug, Clone)]
 pub struct Page {
-    number: PageNumber,
+    number: u32,
     images: Vec<Image>,
 }
 
@@ -18,8 +16,8 @@ impl Page {
         })
     }
 
-    pub fn number(&self) -> &PageNumber {
-        &self.number
+    pub fn number(&self) -> u32 {
+        self.number
     }
 
     pub fn images(&self) -> &[Image] {
