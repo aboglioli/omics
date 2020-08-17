@@ -60,7 +60,7 @@ pub fn routes(
         .and_then(change_password);
 
     // POST /users/:id/recover-password
-    let recover_password = warp::post()
+    let recover_password = warp::get()
         .and(warp::path!(String / "recover-password"))
         .and(with_container(container.clone()))
         .and_then(recover_password);
@@ -147,13 +147,13 @@ pub async fn change_password(
     response::map(res, None)
 }
 
-pub async fn recover_password(id: String, c: Arc<Container>) -> Result<impl Reply, Rejection> {
+pub async fn recover_password(email: String, c: Arc<Container>) -> Result<impl Reply, Rejection> {
     let uc = RecoverPassword::new(
         c.identity.event_pub(),
         c.identity.user_repo(),
         c.identity.user_serv(),
     );
-    let res = uc.exec(id).await;
+    let res = uc.exec(email).await;
 
     response::map(res, None)
 }

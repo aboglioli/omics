@@ -42,6 +42,12 @@ import { SideNavMenuComponent } from './shared/side-nav-menu/side-nav-menu.compo
 import { AutoresComponent } from './pages/autores/autores.component';
 // --->
 
+// Development
+import { DevelopmentComponent } from './pages/development/development.component';
+
+// Domain
+import { DomainModule } from './domain/module';
+
 
 @NgModule({
   declarations: [
@@ -66,7 +72,9 @@ import { AutoresComponent } from './pages/autores/autores.component';
     NavBarComponent,
     LoadingIndicadorComponent,
     SideNavMenuComponent,
-    AutoresComponent
+    AutoresComponent,
+
+    DevelopmentComponent,
   ],
   imports: [
     BrowserModule,
@@ -81,6 +89,9 @@ import { AutoresComponent } from './pages/autores/autores.component';
     ChartsModule,
     ToastrModule.forRoot(),
     FontAwesomeModule,
+
+    // Custom modules
+    DomainModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
