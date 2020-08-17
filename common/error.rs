@@ -160,6 +160,8 @@ impl cmp::PartialEq for Error {
     }
 }
 
+impl warp::reject::Reject for Error {}
+
 #[cfg(test)]
 mod tests {
     use std::error;

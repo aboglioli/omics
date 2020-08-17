@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use warp::{Filter, Rejection};
 
-use common::error::{public::PublicError, Error};
+use common::error::Error;
 use common::result::Result;
 use identity::domain::token::Token;
 
@@ -46,8 +46,8 @@ pub fn with_auth(c: Arc<Container>) -> impl Filter<Extract = (String,), Error = 
                 match with_user(authorization_header, &c).await {
                     Ok(user_id) => Ok(user_id),
                     Err(err) => {
-                        let pub_err = PublicError::from(&err, false).unwrap();
-                        Err(warp::reject::custom(pub_err))
+                        // let pub_err = PublicError::from(&err, false).unwrap();
+                        Err(warp::reject::custom(err))
                     }
                 }
             },

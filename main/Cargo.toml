@@ -20,6 +20,7 @@ identity = { path = "../identity" }
 publishing = { path = "../publishing" }
 payment = { path = "../payment" }
 
+async-trait = "0.1.36"
 serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "0.2", features = ["full"] }
 warp = "0.2"

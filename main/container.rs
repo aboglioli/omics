@@ -16,6 +16,8 @@ use publishing::infrastructure::persistence::inmem::{
     InMemReaderRepository,
 };
 
+use crate::infrastructure::translator::AuthorTranslator;
+
 pub struct Container {
     pub identity: IdentityContainer<
         InMemEventBus,
@@ -75,6 +77,10 @@ impl Container {
                 reader_repo,
             ),
         }
+    }
+
+    pub fn author_translator(&self) -> AuthorTranslator<'_, InMemUserRepository> {
+        AuthorTranslator::new(self.identity.user_repo())
     }
 }
 

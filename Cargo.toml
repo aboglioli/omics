@@ -4,7 +4,6 @@ members = [
   "common",
   "domain",
   "identity",
-  "infrastructure",
   "main",
   "notification",
   "payment",

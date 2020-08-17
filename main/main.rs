@@ -1,6 +1,7 @@
 mod authorization;
 mod container;
 mod handlers;
+mod infrastructure;
 mod port;
 mod response;
 
@@ -26,7 +27,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
             .or(publication::routes(&container))
             .or(contract::routes(&container))
             .or(subscription::routes(&container))
-            .or(donation::routes(&container)),
+            .or(donation::routes(&container))
+            .recover(response::handle_rejection),
     );
 
     // Server

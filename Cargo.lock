@@ -541,10 +541,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "infrastructure"
-version = "0.1.0"
-
-[[package]]
 name = "input_buffer"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -635,6 +631,7 @@ dependencies = [
 name = "main"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "common",
  "identity",
  "payment",
