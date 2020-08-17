@@ -33,3 +33,4 @@ Para mayor ayuda de Angular CLI usar `ng help` o ir al [Angular CLI README](http
 * [ngx SweetAlert](https://github.com/sweetalert2/ngx-sweetalert2).
 * [ngx-toastr](https://www.npmjs.com/package/ngx-toastr).
 * [ng2-charts](https://valor-software.com/ng2-charts/#/GeneralInfo).
+* [FontAwesome](https://www.npmjs.com/package/@fortawesome/angular-fontawesome).

@@ -1,0 +1,24 @@
+<!-- Header toolbar -->
+<mat-toolbar color="primary">
+
+  <!-- Burguer menu -->
+  <button mat-icon-button class="button-no-borders"
+          (click)="toggleSideNavMenu()">
+      <fa-icon [icon]="faBars" size="3x"></fa-icon>
+  </button>
+
+  <!-- Title -->
+  <div class="image-box">
+    <button mat-button (click)="goToPage('home')">
+    <img src="assets/images/omics-logo-sin-subtitulo.png" alt="omics-logo">
+  </button>
+  </div>
+
+  <!-- User menu buttons -->
+  <button mat-stroked-button class="button-white-borders"
+          (click)="openLoginRegisterDialog()">
+    Ingresar / Registrarse
+  </button>
+
+
+</mat-toolbar>

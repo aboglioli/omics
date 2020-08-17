@@ -1,0 +1,15 @@
+@import "../scss/vars";
+
+mat-drawer-container {
+
+  background-color: $omics-background-flat;
+  height: 100vh;
+
+  mat-drawer {
+
+    min-width: 100px;
+    background-color: $omics-background-menu;
+
+  }
+
+}

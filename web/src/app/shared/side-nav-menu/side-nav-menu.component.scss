@@ -1,0 +1,77 @@
+@import "../../../scss/vars";
+
+div.menu-box {
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .header {
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    flex: 1;
+
+    background-color: $omics-background-flat;
+
+    button {
+
+
+      color: white;
+      height: 75%;
+      margin: 0em 0.5em;
+
+    }
+
+  }
+
+  .body {
+
+    display: flex;
+    flex-direction: column;
+    flex: 10;
+
+    margin: 0.25em 0.25em;
+
+    button {
+
+      height: 50px;
+      margin: 0.5em 1em;
+
+      &.active {
+
+        background-color: $omics-background-button;
+
+      }
+
+
+
+    }
+
+  }
+
+
+}
+
+// Generales
+button.button-white-borders {
+
+  color: white;
+  border-color: white;
+
+}
+
+button {
+
+  fa-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}

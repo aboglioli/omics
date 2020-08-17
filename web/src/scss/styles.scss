@@ -1,10 +1,38 @@
 
 // Imports de librerias
 @import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+@import "./vars";
+@import '~bootstrap/scss/bootstrap'; /* Importing Bootstrap SCSS file. */
 
 // Estilos generales
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body {
+  height: 100%;
+}
 
-/* Importing Bootstrap SCSS file. */
-@import '~bootstrap/scss/bootstrap';
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue",sans-serif;
+
+  //#region Estilos por defecto
+  background-color: $omics-background-flat;
+  color: white;
+
+  // Botón deshabilitado general
+  .mat-button-disabled {
+    color: white !important;
+    background-color: #acacac !important
+  }
+
+  //#endregion
+
+  .mat-dialog-container {
+    background-color: $omics-background-menu;
+    box-shadow: 0px 0px 15px 2px $omics-neon-pink;
+
+    overflow: hidden;
+    padding: 4px;
+
+  }
+
+}
+

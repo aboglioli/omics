@@ -14,7 +14,7 @@ pub struct LoginCommand {
 
 #[derive(Serialize)]
 pub struct LoginResponse {
-    pub auth_token: String,
+    auth_token: String,
 }
 
 pub struct Login<'a, EPub, URepo, PHasher, TRepo, TEnc> {

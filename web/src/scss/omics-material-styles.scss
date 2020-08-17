@@ -1,0 +1,104 @@
+/*
+
+  * Este archivo se usa para poder tener un estilo personalizado basado en angular-material.
+  * Se uso la guía oficial: https://material.angular.io/guide/theming
+  * IMPORTANTE: Debe hacerse en un archivo scss
+
+*/
+
+@import "~@angular/material/theming"; // Desbloquea algunas funciones para crear el nuevo tema
+@include mat-core();
+
+//#region Definición de paletas de colores (que no esta en _theming.scss)
+
+$mat-omics-blue: (
+  50: #e3f2fd,
+  100: #bbdefb,
+  200: #90caf9,
+  300: #64b5f6,
+  400: #42a5f5,
+  500: #134260,
+  600: #1e88e5,
+  700: #1976d2,
+  800: #1565c0,
+  900: #0d47a1,
+  A100: #82b1ff,
+  A200: #59ADFF,
+  A400: #2979ff,
+  A700: #2962ff,
+  contrast: (
+    50: $dark-primary-text,
+    100: $dark-primary-text,
+    200: $dark-primary-text,
+    300: $dark-primary-text,
+    400: $dark-primary-text,
+    500: $light-primary-text,
+    600: $light-primary-text,
+    700: $light-primary-text,
+    800: $light-primary-text,
+    900: $light-primary-text,
+    A100: $dark-primary-text,
+    A200: $light-primary-text,
+    A400: $light-primary-text,
+    A700: $light-primary-text,
+  )
+);
+
+
+$mat-omics-green: (
+  50: #e8f5e9,
+  100: #c8e6c9,
+  200: #a5d6a7,
+  300: #81c784,
+  400: #66bb6a,
+  500: #4caf50,
+  600: #43a047,
+  700: #388e3c,
+  800: #2e7d32,
+  900: #1b5e20,
+  A100: #b9f6ca,
+  A200: #69f0ae,
+  A400: #00e676,
+  A700: #00c853,
+  contrast: (
+    50: $dark-primary-text,
+    100: $dark-primary-text,
+    200: $dark-primary-text,
+    300: $dark-primary-text,
+    400: $dark-primary-text,
+    500: $dark-primary-text,
+    600: $light-primary-text,
+    700: $light-primary-text,
+    800: $light-primary-text,
+    900: $light-primary-text,
+    A100: $dark-primary-text,
+    A200: $dark-primary-text,
+    A400: $light-primary-text,
+    A700: $dark-primary-text,
+  )
+);
+
+//#endregion
+
+// Variables utilizadas para la paleta de colores (las variables como $mat-indigo y $mat-pink son sacados de la libreria de angular material en _theming.scss
+$omic-theme-primary : mat-palette($mat-omics-blue);
+$omic-theme-accent  : mat-palette($mat-green, A200, A100, A400);
+$omic-theme-warn    :    mat-palette($mat-red); // La paleta de colores para warn es opcional
+
+
+// Paletas de color para componentes específicos
+$omics-theme-buttons:   mat-light-theme((
+  color: (
+    primary: mat-palette($mat-omics-blue, A200, A100, A400),
+    accent: mat-palette($mat-omics-green, A400, A100, A600),
+    warn: mat-palette($mat-red),
+  )
+));
+
+// Se inyecta en el nucleo del estilo que se desea suplantar
+$omic-theme: mat-light-theme( $omic-theme-primary, $omic-theme-accent, $omic-theme-warn );
+
+@include angular-material-theme($omic-theme);
+
+// Para componentes de angular material específicos
+@include mat-button-theme($omics-theme-buttons);

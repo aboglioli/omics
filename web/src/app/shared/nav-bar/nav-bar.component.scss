@@ -1,0 +1,52 @@
+mat-toolbar {
+
+  display: flex;
+  justify-content: space-between;
+
+  span.spacer {
+
+    flex: 1 1 auto;
+
+  }
+
+  div.image-box {
+
+    width: 160px;
+
+    img {
+      width: 100%;
+      height: 100%;
+    }
+
+  }
+
+  button.button-no-borders {
+
+    &:focus {
+      outline: none;
+    }
+
+    fa-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+
+  }
+
+  button.button-white-borders {
+
+    border-color: white;
+
+  }
+
+  button {
+
+    &:focus {
+      outline: none;
+    }
+
+  }
+
+}
