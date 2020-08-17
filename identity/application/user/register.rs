@@ -12,9 +12,9 @@ use crate::domain::user::{
 
 #[derive(Deserialize)]
 pub struct RegisterCommand {
-    username: String,
-    email: String,
-    password: String,
+    pub username: String,
+    pub email: String,
+    pub password: String,
 }
 
 impl RegisterCommand {
@@ -25,8 +25,8 @@ impl RegisterCommand {
 
 #[derive(Serialize)]
 pub struct RegisterResponse {
-    id: String,
-    validation_code: String, // TODO: remove, only for testing
+    pub id: String,
+    pub validation_code: String, // TODO: remove, only for testing
 }
 
 pub struct Register<'a, EPub, URepo, PHasher> {

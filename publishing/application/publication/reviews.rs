@@ -2,31 +2,31 @@ use serde::Serialize;
 
 use common::result::Result;
 
+use crate::application::dtos::{ReaderDto, ReviewDto};
 use crate::domain::interaction::InteractionRepository;
 use crate::domain::publication::PublicationId;
-
-#[derive(Serialize)]
-pub struct ReviewDto {
-    reader_id: String,
-    stars: u8,
-    comment: String,
-}
+use crate::domain::reader::ReaderRepository;
 
 #[derive(Serialize)]
 pub struct ReviewsResponse {
-    reviews: Vec<ReviewDto>,
+    pub reviews: Vec<ReviewDto>,
 }
 
-pub struct Reviews<'a, IRepo> {
+pub struct Reviews<'a, IRepo, RRepo> {
     interaction_repo: &'a IRepo,
+    reader_repo: &'a RRepo,
 }
 
-impl<'a, IRepo> Reviews<'a, IRepo>
+impl<'a, IRepo, RRepo> Reviews<'a, IRepo, RRepo>
 where
     IRepo: InteractionRepository,
+    RRepo: ReaderRepository,
 {
-    pub fn new(interaction_repo: &'a IRepo) -> Self {
-        Reviews { interaction_repo }
+    pub fn new(interaction_repo: &'a IRepo, reader_repo: &'a RRepo) -> Self {
+        Reviews {
+            interaction_repo,
+            reader_repo,
+        }
     }
 
     pub async fn exec(&self, publication_id: String) -> Result<ReviewsResponse> {
@@ -36,12 +36,12 @@ where
             .await?;
 
         let mut review_dtos = Vec::new();
-        for review in reviews {
-            review_dtos.push(ReviewDto {
-                reader_id: review.base().reader_id().value().to_owned(),
-                stars: review.stars().value(),
-                comment: review.comment().value().to_owned(),
-            });
+        for review in reviews.iter() {
+            let reader = self
+                .reader_repo
+                .find_by_id(review.base().reader_id())
+                .await?;
+            review_dtos.push(ReviewDto::new(review, ReaderDto::new(&reader)));
         }
 
         Ok(ReviewsResponse {

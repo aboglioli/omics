@@ -358,7 +358,7 @@ pub async fn reviews(
     _user_id: String,
     c: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
-    let uc = Reviews::new(c.publishing.interaction_repo());
+    let uc = Reviews::new(c.publishing.interaction_repo(), c.publishing.reader_repo());
     let res = uc.exec(id).await;
 
     response::map(res, None)

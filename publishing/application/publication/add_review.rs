@@ -9,8 +9,8 @@ use crate::domain::reader::{ReaderId, ReaderRepository};
 
 #[derive(Deserialize)]
 pub struct AddReviewCommand {
-    stars: u8,
-    comment: String,
+    pub stars: u8,
+    pub comment: String,
 }
 
 pub struct AddReview<'a, EPub, PRepo, RRepo, IRepo> {

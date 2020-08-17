@@ -10,11 +10,11 @@ use crate::domain::publication::{Header, Image, Name, Synopsis, Tag};
 
 #[derive(Deserialize)]
 pub struct UpdateCommand {
-    name: String,
-    synopsis: String,
-    category_id: String,
-    tags: Vec<String>,
-    cover: String,
+    pub name: String,
+    pub synopsis: String,
+    pub category_id: String,
+    pub tags: Vec<String>,
+    pub cover: String,
 }
 
 impl UpdateCommand {

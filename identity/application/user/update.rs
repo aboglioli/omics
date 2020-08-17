@@ -7,8 +7,8 @@ use crate::domain::user::{Fullname, Person, UserId, UserRepository};
 
 #[derive(Deserialize)]
 pub struct UpdateCommand {
-    name: String,
-    lastname: String,
+    pub name: String,
+    pub lastname: String,
 }
 
 impl UpdateCommand {

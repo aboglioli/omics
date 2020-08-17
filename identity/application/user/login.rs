@@ -8,13 +8,13 @@ use crate::domain::user::{AuthenticationService, PasswordHasher, UserRepository}
 
 #[derive(Deserialize)]
 pub struct LoginCommand {
-    username_or_email: String,
-    password: String,
+    pub username_or_email: String,
+    pub password: String,
 }
 
 #[derive(Serialize)]
 pub struct LoginResponse {
-    auth_token: String,
+    pub auth_token: String,
 }
 
 pub struct Login<'a, EPub, URepo, PHasher, TRepo, TEnc> {

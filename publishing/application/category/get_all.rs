@@ -7,7 +7,7 @@ use crate::domain::category::CategoryRepository;
 
 #[derive(Serialize)]
 pub struct GetAllResponse {
-    categories: Vec<CategoryDto>,
+    pub categories: Vec<CategoryDto>,
 }
 
 pub struct GetAll<'a, CRepo> {

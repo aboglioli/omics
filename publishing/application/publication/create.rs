@@ -11,11 +11,11 @@ use crate::domain::publication::{
 
 #[derive(Deserialize)]
 pub struct CreateCommand {
-    name: String,
-    synopsis: String,
-    category_id: String,
-    tags: Vec<String>,
-    cover: String,
+    pub name: String,
+    pub synopsis: String,
+    pub category_id: String,
+    pub tags: Vec<String>,
+    pub cover: String,
 }
 
 impl CreateCommand {
@@ -26,7 +26,7 @@ impl CreateCommand {
 
 #[derive(Serialize)]
 pub struct CreateResponse {
-    id: String,
+    pub id: String,
 }
 
 pub struct Create<'a, EPub, ARepo, CRepo, PRepo> {

@@ -9,12 +9,12 @@ use crate::domain::publication::PublicationRepository;
 
 #[derive(Deserialize)]
 pub struct SearchCommand {
-    name: String,
+    pub name: String,
 }
 
 #[derive(Serialize)]
 pub struct SearchResponse {
-    authors: Vec<AuthorDto>,
+    pub authors: Vec<AuthorDto>,
 }
 
 pub struct Search<'a, ARepo, CRepo, PRepo> {

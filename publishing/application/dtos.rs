@@ -3,7 +3,9 @@ use serde::Serialize;
 use crate::domain::author::Author;
 use crate::domain::category::Category;
 use crate::domain::collection::Collection;
+use crate::domain::interaction::Review;
 use crate::domain::publication::{Page, Publication, Statistics};
+use crate::domain::reader::Reader;
 
 #[derive(Serialize)]
 pub struct StatisticsDto {
@@ -198,6 +200,44 @@ impl CollectionDto {
                 .map(|tag| tag.name().to_owned())
                 .collect(),
             publications,
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct ReviewDto {
+    pub reader: ReaderDto,
+    pub publication_id: String,
+    pub stars: u8,
+    pub comment: String,
+}
+
+impl ReviewDto {
+    pub fn new(review: &Review, reader: ReaderDto) -> Self {
+        ReviewDto {
+            reader,
+            publication_id: review.base().publication_id().value().to_owned(),
+            stars: review.stars().value(),
+            comment: review.comment().value().to_owned(),
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct ReaderDto {
+    pub id: String,
+    pub username: String,
+    pub name: String,
+    pub lastname: String,
+}
+
+impl ReaderDto {
+    pub fn new(reader: &Reader) -> Self {
+        ReaderDto {
+            id: reader.base().id().value().to_owned(),
+            username: reader.username().to_owned(),
+            name: reader.name().to_owned(),
+            lastname: reader.lastname().to_owned(),
         }
     }
 }
