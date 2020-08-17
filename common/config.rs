@@ -1,8 +1,8 @@
 use std::env;
 
 pub struct Config {
-    pub port: u16,
-    pub env: String,
+    port: u16,
+    env: String,
 }
 
 impl Config {
@@ -17,5 +17,13 @@ impl Config {
             },
             env: env::var("ENV").unwrap_or("development".to_owned()),
         }
+    }
+
+    pub fn port(&self) -> u16 {
+        self.port
+    }
+
+    pub fn env(&self) -> &str {
+        &self.env
     }
 }

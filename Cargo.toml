@@ -2,7 +2,7 @@
 members = [
   "catalogue",
   "common",
-  "domain",
+  "shared",
   "identity",
   "main",
   "notification",

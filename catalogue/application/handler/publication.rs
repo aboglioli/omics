@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use common::error::Error;
 use common::event::{Event, EventHandler};
 use common::result::Result;
-use domain::event::PublicationEvent;
+use shared::event::PublicationEvent;
 
 use crate::domain::catalogue::{CatalogueRepository, PublicationService};
 

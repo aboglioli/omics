@@ -9,7 +9,7 @@ path = "lib.rs"
 
 [dependencies]
 common = { path = "../common" }
-domain = { path = "../domain" }
+shared = { path = "../shared" }
 publishing = { path = "../publishing" }
 
 async-trait = "0.1.36"

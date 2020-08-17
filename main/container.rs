@@ -79,7 +79,7 @@ impl Container {
         }
     }
 
-    pub fn author_translator(&self) -> AuthorTranslator<'_, InMemUserRepository> {
+    pub fn publishing_author_translator(&self) -> AuthorTranslator<'_, InMemUserRepository> {
         AuthorTranslator::new(self.identity.user_repo())
     }
 }

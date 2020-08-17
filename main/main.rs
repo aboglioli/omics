@@ -1,5 +1,4 @@
 mod authorization;
-mod config;
 mod container;
 mod development;
 mod handlers;
@@ -11,7 +10,8 @@ use std::sync::Arc;
 
 use warp::Filter;
 
-use config::Config;
+use common::config::Config;
+
 use container::Container;
 use handlers::{author, category, collection, contract, donation, publication, subscription, user};
 
@@ -22,7 +22,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // Dependencies
     let container = Arc::new(Container::new());
 
-    if config.env == "development" {
+    if config.env() == "development" {
         println!("# Populate...");
         if let Err(err) = development::populate(&container).await {
             println!("{:?}", err);
@@ -49,8 +49,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     );
 
     // Server
-    println!("Listening on {}", config.port);
-    warp::serve(routes).run(([0, 0, 0, 0], config.port)).await;
+    println!("Listening on {}", config.port());
+    warp::serve(routes).run(([0, 0, 0, 0], config.port())).await;
 
     Ok(())
 }
