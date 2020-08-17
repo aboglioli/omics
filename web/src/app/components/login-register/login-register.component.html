@@ -18,16 +18,168 @@
 <!-- Body -->
 <mat-dialog-content class="mat-typography body">
 
-  <mat-tab-group color="primary">
+  <mat-tab-group color="primary" (selectedTabChange)="changeLoginShow($event.index)">
 
     <!-- LOGUEARSE -->
     <mat-tab label="LOGIN">
-      Content 1
+
+      <form autocomplete="off" [formGroup]="formLogin">
+
+        <!-- Correo -->
+        <div class="form-group row">
+          <div class="col">
+
+
+            <div class="top-field">
+
+              <small class="form-text text-top">
+                Correo
+              </small>
+
+              <!-- mensaje de error -->
+              <small  *ngIf="correoLoginNovalido"
+                      class="form-text text-danger">
+                Ingrese un correo válido
+              </small>
+
+            </div>
+
+            <input class="form-control"
+                   type="email"
+                   placeholder="Correo electrónico"
+                   formControlName="correo"
+                   [class.is-invalid]="correoLoginNovalido">
+
+
+          </div>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="form-group row">
+          <div class="col">
+
+            <div class="top-field">
+
+              <small class="form-text text-top">
+                Contraseña
+              </small>
+
+              <!-- mensaje de error -->
+              <small  *ngIf="passwordLoginNoValido"
+                      class="form-text text-danger">
+                  Contraseña no válida
+              </small>
+
+            </div>
+
+            <input  class="form-control"
+                    type="password"
+                    placeholder="Contraseña"
+                    formControlName="password"
+                    [class.is-invalid]="passwordLoginNoValido">
+
+
+          </div>
+        </div>
+
+      </form>
+
     </mat-tab>
 
     <!-- REGISTRARSE -->
     <mat-tab label="SIGN UP">
-      Content 2
+      <form autocomplete="off" [formGroup]="formSignUp">
+
+        <!-- Correo -->
+        <div class="form-group row">
+          <div class="col">
+
+            <div class="top-field">
+              <small class="form-text text-top">
+                Correo
+              </small>
+              <!-- mensaje de error -->
+              <small  *ngIf="correoSignUpNovalido"
+                      class="form-text text-danger">
+                      Ingrese un correo válido
+              </small>
+            </div>
+
+
+            <input class="form-control"
+                   type="email"
+                   placeholder="Correo electrónico"
+                   formControlName="correo"
+                   [class.is-invalid]="correoSignUpNovalido">
+
+
+          </div>
+        </div>
+
+        <!-- Nombre Usuario -->
+        <div class="form-group row">
+          <div class="col">
+
+            <div class="top-field">
+
+              <small class="form-text text-top">
+                Usuario
+              </small>
+
+              <!-- mensaje de error -->
+              <small  *ngIf="usuarioNoValido"
+                      class="form-text text-danger">
+                  Ingrese un usuario válido
+              </small>
+
+            </div>
+
+            <input class="form-control"
+                   type="text"
+                   placeholder="Nombre de Usuario"
+                   formControlName="usuario"
+                   [class.is-invalid]="usuarioNoValido">
+
+
+
+          </div>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="form-group row">
+          <div class="col">
+
+            <small class="form-text text-top">
+              Contraseña
+            </small>
+
+            <input  class="form-control"
+                    type="password"
+                    placeholder="Contraseña"
+                    formControlName="password1"
+                    [class.is-invalid]="password1SignUpNoValido">
+
+          </div>
+        </div>
+
+        <!-- Repetir contraseña-->
+        <div class="form-group row">
+          <div class="col">
+
+            <small class="form-text text-top">
+              Repetir Contraseña
+            </small>
+
+            <input  class="form-control"
+                    type="password"
+                    placeholder="Repita Contraseña"
+                    formControlName="password2"
+                    [class.is-invalid]="password2SignUpNoValido">
+
+          </div>
+        </div>
+
+      </form>
     </mat-tab>
 
   </mat-tab-group>
@@ -35,8 +187,11 @@
 </mat-dialog-content>
 
 <!-- Bottom Action -->
-<mat-dialog-actions align="end">
+<mat-dialog-actions align="center">
 
-
+  <button mat-icon-button  (click)="submitForm()">
+    <fa-icon *ngIf="isLoginOptionShow"  [icon]="faSubmit" size="3x"></fa-icon>
+    <fa-icon *ngIf="!isLoginOptionShow" [icon]="faSignUp" size="3x"></fa-icon>
+  </button>
 
 </mat-dialog-actions>
