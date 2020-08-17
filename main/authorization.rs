@@ -54,6 +54,7 @@ pub fn with_auth(c: Arc<Container>) -> impl Filter<Extract = (String,), Error = 
         )
 }
 
+#[allow(dead_code)]
 pub fn with_optional_auth(
     c: Arc<Container>,
     optional: bool,

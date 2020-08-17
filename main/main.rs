@@ -11,7 +11,7 @@ use std::sync::Arc;
 use warp::Filter;
 
 use container::Container;
-use handlers::{contract, donation, publication, subscription, user};
+use handlers::{author, category, collection, contract, donation, publication, subscription, user};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -25,6 +25,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
         health
             .or(user::routes(&container))
             .or(publication::routes(&container))
+            .or(collection::routes(&container))
+            .or(author::routes(&container))
+            .or(category::routes(&container))
             .or(contract::routes(&container))
             .or(subscription::routes(&container))
             .or(donation::routes(&container))
