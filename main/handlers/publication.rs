@@ -26,6 +26,7 @@ pub fn routes(
     let search = warp::get()
         .and(warp::path::end())
         .and(warp::query::<SearchCommand>())
+        .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(search);
 
@@ -163,13 +164,18 @@ pub async fn get_by_id(
     response::map(res, None)
 }
 
-pub async fn search(cmd: SearchCommand, c: Arc<Container>) -> Result<impl Reply, Rejection> {
+pub async fn search(
+    cmd: SearchCommand,
+    user_id: String,
+    c: Arc<Container>,
+) -> Result<impl Reply, Rejection> {
     let uc = Search::new(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
+        c.publishing.content_manager_repo(),
         c.publishing.publication_repo(),
     );
-    let res = uc.exec(cmd).await;
+    let res = uc.exec(user_id, cmd).await;
 
     response::map(res, None)
 }

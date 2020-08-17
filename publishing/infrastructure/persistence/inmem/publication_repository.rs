@@ -7,7 +7,7 @@ use common::result::Result;
 
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
-use crate::domain::publication::{Publication, PublicationId, PublicationRepository, Status};
+use crate::domain::publication::{Publication, PublicationId, PublicationRepository};
 use crate::mocks;
 
 pub struct InMemPublicationRepository {
@@ -67,11 +67,11 @@ impl PublicationRepository for InMemPublicationRepository {
             .await)
     }
 
-    async fn find_by_status(&self, status: &Status) -> Result<Vec<Publication>> {
+    async fn find_by_status(&self, status: &str) -> Result<Vec<Publication>> {
         Ok(self
             .cache
             .filter(|&(_, publication)| {
-                publication.status_history().current().status().to_string() == status.to_string()
+                publication.status_history().current().status().to_string() == status
             })
             .await)
     }

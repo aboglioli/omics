@@ -54,6 +54,24 @@ pub fn with_auth(c: Arc<Container>) -> impl Filter<Extract = (String,), Error = 
         )
 }
 
+pub fn with_optional_auth(
+    c: Arc<Container>,
+    optional: bool,
+) -> impl Filter<Extract = (Option<String>,), Error = Rejection> + Clone {
+    warp::header::<String>("authorization")
+        .and(with_container(c.clone()))
+        .and(warp::any().map(move || optional))
+        .and_then(
+            |authorization_header: String, c: Arc<Container>, optional: bool| async move {
+                match with_user(authorization_header, &c).await {
+                    Ok(user_id) => Ok(Some(user_id)),
+                    Err(_) if optional => Ok(None),
+                    Err(err) => Err(warp::reject::custom(err)),
+                }
+            },
+        )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
