@@ -9,6 +9,7 @@ use crate::infrastructure::persistence::inmem::{
     InMemReaderRepository,
 };
 
+#[allow(dead_code)]
 pub fn container() -> Container<
     FakeEventPublisher,
     InMemAuthorRepository,

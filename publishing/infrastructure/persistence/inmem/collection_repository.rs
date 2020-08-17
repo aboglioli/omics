@@ -8,6 +8,7 @@ use common::result::Result;
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
 use crate::domain::collection::{Collection, CollectionId, CollectionRepository};
+use crate::mocks;
 
 pub struct InMemCollectionRepository {
     cache: InMemCache<CollectionId, Collection>,
@@ -18,6 +19,14 @@ impl InMemCollectionRepository {
         InMemCollectionRepository {
             cache: InMemCache::new(),
         }
+    }
+
+    pub async fn populated() -> Self {
+        let repo = Self::new();
+
+        repo.save(&mut mocks::empty_collection1()).await.unwrap();
+
+        repo
     }
 }
 

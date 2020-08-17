@@ -17,7 +17,10 @@ fn extract_token<S: Into<String>>(authorization: S) -> Result<Token> {
         }
     }
 
-    Err(Error::new("authorization", "invalid_header"))
+    Err(Error::new("authorization", "invalid_header")
+        .set_status(401)
+        .set_message("Authorization header is not present")
+        .build())
 }
 
 async fn with_user<S: Into<String>>(authorization_header: S, c: &Container) -> Result<String> {
@@ -31,7 +34,7 @@ async fn with_user<S: Into<String>>(authorization_header: S, c: &Container) -> R
 
     Err(Error::new("authorization", "unauthorized")
         .set_status(401)
-        .set_message("Authorization header is not present")
+        .set_message("User is not logged in")
         .build())
 }
 
