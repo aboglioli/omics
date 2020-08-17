@@ -17,7 +17,7 @@ import { PublicationService } from './services/publication';
   ],
   providers: [
     AuthorService,
-    AuthorService,
+    AuthService,
     CategoryService,
     CollectionService,
     ConfigService,
