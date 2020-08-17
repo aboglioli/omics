@@ -3,7 +3,9 @@ use serde::Serialize;
 use crate::domain::author::Author;
 use crate::domain::category::Category;
 use crate::domain::collection::Collection;
+use crate::domain::interaction::Review;
 use crate::domain::publication::{Page, Publication, Statistics};
+use crate::domain::reader::Reader;
 
 #[derive(Serialize)]
 pub struct StatisticsDto {
@@ -31,16 +33,40 @@ impl StatisticsDto {
 #[derive(Serialize)]
 pub struct AuthorDto {
     pub id: String,
-    // username: String,
-    // name: String,
-    // lastname: String,
+    pub username: String,
+    pub name: String,
+    pub lastname: String,
+    pub publications: Option<Vec<PublicationDto>>,
+    pub publication_count: Option<usize>,
+    pub collection_count: Option<usize>,
 }
 
 impl AuthorDto {
     pub fn new(author: &Author) -> Self {
         AuthorDto {
             id: author.base().id().value().to_owned(),
+            username: author.username().to_owned(),
+            name: author.name().to_owned(),
+            lastname: author.lastname().to_owned(),
+            publications: None,
+            publication_count: None,
+            collection_count: None,
         }
+    }
+
+    pub fn publications(mut self, publications: Vec<PublicationDto>) -> Self {
+        self.publications = Some(publications);
+        self
+    }
+
+    pub fn publication_count(mut self, count: usize) -> Self {
+        self.publication_count = Some(count);
+        self
+    }
+
+    pub fn collection_count(mut self, count: usize) -> Self {
+        self.collection_count = Some(count);
+        self
     }
 }
 
@@ -48,6 +74,7 @@ impl AuthorDto {
 pub struct CategoryDto {
     pub id: String,
     pub name: String,
+    pub publications: Option<Vec<PublicationDto>>,
 }
 
 impl CategoryDto {
@@ -55,7 +82,13 @@ impl CategoryDto {
         CategoryDto {
             id: category.base().id().value().to_owned(),
             name: category.name().value().to_owned(),
+            publications: None,
         }
+    }
+
+    pub fn publications(mut self, publications: Vec<PublicationDto>) -> Self {
+        self.publications = Some(publications);
+        self
     }
 }
 
@@ -72,22 +105,19 @@ pub struct PageDto {
 
 impl PageDto {
     pub fn new(pages: &[Page]) -> Vec<Self> {
-        let mut pages_dto = Vec::new();
-        for page in pages.iter() {
-            let mut images = Vec::new();
-            for image in page.images().iter() {
-                images.push(ImageDto {
-                    url: image.url().to_owned(),
-                });
-            }
-
-            pages_dto.push(PageDto {
-                number: *page.number(),
-                images,
-            });
-        }
-
-        pages_dto
+        pages
+            .iter()
+            .map(|page| PageDto {
+                number: page.number(),
+                images: page
+                    .images()
+                    .iter()
+                    .map(|image| ImageDto {
+                        url: image.url().to_owned(),
+                    })
+                    .collect(),
+            })
+            .collect()
     }
 }
 
@@ -170,6 +200,44 @@ impl CollectionDto {
                 .map(|tag| tag.name().to_owned())
                 .collect(),
             publications,
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct ReviewDto {
+    pub reader: ReaderDto,
+    pub publication_id: String,
+    pub stars: u8,
+    pub comment: String,
+}
+
+impl ReviewDto {
+    pub fn new(review: &Review, reader: ReaderDto) -> Self {
+        ReviewDto {
+            reader,
+            publication_id: review.base().publication_id().value().to_owned(),
+            stars: review.stars().value(),
+            comment: review.comment().value().to_owned(),
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct ReaderDto {
+    pub id: String,
+    pub username: String,
+    pub name: String,
+    pub lastname: String,
+}
+
+impl ReaderDto {
+    pub fn new(reader: &Reader) -> Self {
+        ReaderDto {
+            id: reader.base().id().value().to_owned(),
+            username: reader.username().to_owned(),
+            name: reader.name().to_owned(),
+            lastname: reader.lastname().to_owned(),
         }
     }
 }

@@ -22,7 +22,11 @@ impl TokenId {
         TokenId { id: uuid }
     }
 
-    pub fn id(&self) -> &String {
+    pub fn build<S: Into<String>>(id: S) -> Self {
+        TokenId { id: id.into() }
+    }
+
+    pub fn id(&self) -> &str {
         &self.id
     }
 }

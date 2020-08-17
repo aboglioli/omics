@@ -2,13 +2,10 @@
 members = [
   "catalogue",
   "common",
-  "contract",
-  "donation",
+  "shared",
   "identity",
   "main",
   "notification",
   "payment",
   "publishing",
-  "shared",
-  "subscription",
 ]

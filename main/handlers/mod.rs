@@ -1,3 +1,6 @@
+pub mod author;
+pub mod category;
+pub mod collection;
 pub mod common;
 pub mod contract;
 pub mod donation;

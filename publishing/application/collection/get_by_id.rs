@@ -10,13 +10,13 @@ use crate::domain::publication::PublicationRepository;
 
 #[derive(Serialize)]
 pub struct GetByIdResponse {
-    id: String,
-    author: AuthorDto,
-    name: String,
-    synopsis: String,
-    category: CategoryDto,
-    tags: Vec<String>,
-    publications: Vec<PublicationDto>,
+    pub id: String,
+    pub author: AuthorDto,
+    pub name: String,
+    pub synopsis: String,
+    pub category: CategoryDto,
+    pub tags: Vec<String>,
+    pub publications: Vec<PublicationDto>,
 }
 
 pub struct GetById<'a, ARepo, CatRepo, CollRepo, PRepo> {

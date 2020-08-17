@@ -6,6 +6,7 @@ use common::error::Error;
 use common::result::Result;
 
 use crate::domain::reader::{Reader, ReaderId, ReaderRepository};
+use crate::mocks;
 
 pub struct InMemReaderRepository {
     cache: InMemCache<ReaderId, Reader>,
@@ -16,6 +17,15 @@ impl InMemReaderRepository {
         InMemReaderRepository {
             cache: InMemCache::new(),
         }
+    }
+
+    pub async fn reader() -> Self {
+        let repo = Self::new();
+
+        repo.save(&mut mocks::reader1()).await.unwrap();
+        repo.save(&mut mocks::author_as_reader1()).await.unwrap();
+
+        repo
     }
 }
 

@@ -4,6 +4,7 @@ use common::result::Result;
 use crate::domain::content_manager::{ContentManagerId, ContentManagerRepository};
 use crate::domain::publication::{PublicationId, PublicationRepository};
 
+// TODO: add comment
 pub struct Approve<'a, EPub, CMRepo, PRepo> {
     event_pub: &'a EPub,
 

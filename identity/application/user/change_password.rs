@@ -6,8 +6,8 @@ use crate::domain::user::{PasswordHasher, UserId, UserRepository, UserService};
 
 #[derive(Deserialize)]
 pub struct ChangePasswordCommand {
-    old_password: String,
-    new_password: String,
+    pub old_password: String,
+    pub new_password: String,
 }
 
 impl ChangePasswordCommand {
@@ -17,7 +17,7 @@ impl ChangePasswordCommand {
 }
 
 pub struct ChangePassword<'a, URepo, PHasher> {
-    user_serv: UserService<'a, URepo, PHasher>,
+    user_serv: &'a UserService<URepo, PHasher>,
 }
 
 impl<'a, URepo, PHasher> ChangePassword<'a, URepo, PHasher>
@@ -25,7 +25,7 @@ where
     URepo: UserRepository,
     PHasher: PasswordHasher,
 {
-    pub fn new(user_serv: UserService<'a, URepo, PHasher>) -> Self {
+    pub fn new(user_serv: &'a UserService<URepo, PHasher>) -> Self {
         ChangePassword { user_serv }
     }
 

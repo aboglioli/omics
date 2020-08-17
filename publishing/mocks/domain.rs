@@ -71,19 +71,43 @@ pub fn content_manager1() -> ContentManager {
 }
 
 pub fn reader1() -> Reader {
-    Reader::new(ReaderId::new("#reader01").unwrap()).unwrap()
+    Reader::new(
+        ReaderId::new("#reader01").unwrap(),
+        "reader-01",
+        "Name 01",
+        "Lastname 01",
+    )
+    .unwrap()
 }
 
 pub fn author1() -> Author {
-    Author::new(AuthorId::new("#author01").unwrap()).unwrap()
+    Author::new(
+        AuthorId::new("#author01").unwrap(),
+        "author-01",
+        "Name 01",
+        "Lastname 01",
+    )
+    .unwrap()
 }
 
 pub fn author_as_reader1() -> Reader {
-    Reader::new(ReaderId::new("#author01").unwrap()).unwrap()
+    Reader::new(
+        ReaderId::new("#author01").unwrap(),
+        "author-01",
+        "Name 01",
+        "Lastname 01",
+    )
+    .unwrap()
 }
 
 pub fn author2() -> Author {
-    Author::new(AuthorId::new("#author02").unwrap()).unwrap()
+    Author::new(
+        AuthorId::new("#author02").unwrap(),
+        "author-02",
+        "Name 02",
+        "Lastname 02",
+    )
+    .unwrap()
 }
 
 pub fn category1() -> Category {

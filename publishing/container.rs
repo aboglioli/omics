@@ -13,13 +13,16 @@ use crate::domain::reader::ReaderRepository;
 pub struct Container<EPub, ARepo, CatRepo, CollRepo, CMRepo, IRepo, PRepo, RRepo> {
     event_pub: Arc<EPub>,
 
-    author_repo: ARepo,
-    category_repo: CatRepo,
-    collection_repo: CollRepo,
-    content_manager_repo: CMRepo,
-    interaction_repo: IRepo,
-    publication_repo: PRepo,
-    reader_repo: RRepo,
+    author_repo: Arc<ARepo>,
+    category_repo: Arc<CatRepo>,
+    collection_repo: Arc<CollRepo>,
+    content_manager_repo: Arc<CMRepo>,
+    interaction_repo: Arc<IRepo>,
+    publication_repo: Arc<PRepo>,
+    reader_repo: Arc<RRepo>,
+
+    statistics_serv: Arc<StatisticsService<IRepo>>,
+    interaction_serv: Arc<InteractionService<IRepo>>,
 }
 
 impl<EPub, ARepo, CatRepo, CollRepo, CMRepo, IRepo, PRepo, RRepo>
@@ -36,16 +39,20 @@ where
 {
     pub fn new(
         event_pub: Arc<EPub>,
-        author_repo: ARepo,
-        category_repo: CatRepo,
-        collection_repo: CollRepo,
-        content_manager_repo: CMRepo,
-        interaction_repo: IRepo,
-        publication_repo: PRepo,
-        reader_repo: RRepo,
+        author_repo: Arc<ARepo>,
+        category_repo: Arc<CatRepo>,
+        collection_repo: Arc<CollRepo>,
+        content_manager_repo: Arc<CMRepo>,
+        interaction_repo: Arc<IRepo>,
+        publication_repo: Arc<PRepo>,
+        reader_repo: Arc<RRepo>,
     ) -> Self {
+        let statistics_serv = Arc::new(StatisticsService::new(Arc::clone(&interaction_repo)));
+        let interaction_serv = Arc::new(InteractionService::new(Arc::clone(&interaction_repo)));
+
         Container {
             event_pub,
+
             author_repo,
             category_repo,
             collection_repo,
@@ -53,6 +60,9 @@ where
             interaction_repo,
             publication_repo,
             reader_repo,
+
+            statistics_serv,
+            interaction_serv,
         }
     }
 
@@ -89,11 +99,11 @@ where
     }
 
     // Service
-    pub fn statistics_serv(&self) -> StatisticsService<'_, IRepo> {
-        StatisticsService::new(self.interaction_repo())
+    pub fn statistics_serv(&self) -> &StatisticsService<IRepo> {
+        &self.statistics_serv
     }
 
-    pub fn interaction_serv(&self) -> InteractionService<'_, IRepo> {
-        InteractionService::new(self.interaction_repo())
+    pub fn interaction_serv(&self) -> &InteractionService<IRepo> {
+        &self.interaction_serv
     }
 }

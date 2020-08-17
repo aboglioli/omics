@@ -12,9 +12,9 @@ use crate::domain::user::{
 
 #[derive(Deserialize)]
 pub struct RegisterCommand {
-    username: String,
-    email: String,
-    password: String,
+    pub username: String,
+    pub email: String,
+    pub password: String,
 }
 
 impl RegisterCommand {
@@ -25,7 +25,8 @@ impl RegisterCommand {
 
 #[derive(Serialize)]
 pub struct RegisterResponse {
-    id: String,
+    pub id: String,
+    pub validation_code: String, // TODO: remove, only for testing
 }
 
 pub struct Register<'a, EPub, URepo, PHasher> {
@@ -33,7 +34,7 @@ pub struct Register<'a, EPub, URepo, PHasher> {
 
     user_repo: &'a URepo,
 
-    user_serv: UserService<'a, URepo, PHasher>,
+    user_serv: &'a UserService<URepo, PHasher>,
 }
 
 impl<'a, EPub, URepo, PHasher> Register<'a, EPub, URepo, PHasher>
@@ -45,7 +46,7 @@ where
     pub fn new(
         event_pub: &'a EPub,
         user_repo: &'a URepo,
-        user_serv: UserService<'a, URepo, PHasher>,
+        user_serv: &'a UserService<URepo, PHasher>,
     ) -> Self {
         Register {
             event_pub,
@@ -78,6 +79,7 @@ where
 
         Ok(RegisterResponse {
             id: user.base().id().value().to_owned(),
+            validation_code: user.validation().unwrap().code().to_owned(),
         })
     }
 }

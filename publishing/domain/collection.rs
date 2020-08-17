@@ -6,7 +6,7 @@ pub use repository::*;
 use common::error::Error;
 use common::model::{AggregateRoot, StringId};
 use common::result::Result;
-use shared::domain::event::CollectionEvent;
+use shared::event::CollectionEvent;
 
 use crate::domain::author::AuthorId;
 use crate::domain::publication::{Header, Publication, PublicationId};

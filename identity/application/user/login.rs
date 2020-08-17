@@ -8,8 +8,8 @@ use crate::domain::user::{AuthenticationService, PasswordHasher, UserRepository}
 
 #[derive(Deserialize)]
 pub struct LoginCommand {
-    username_or_email: String,
-    password: String,
+    pub username_or_email: String,
+    pub password: String,
 }
 
 #[derive(Serialize)]
@@ -20,7 +20,7 @@ pub struct LoginResponse {
 pub struct Login<'a, EPub, URepo, PHasher, TRepo, TEnc> {
     event_pub: &'a EPub,
 
-    authentication_serv: AuthenticationService<'a, URepo, PHasher, TRepo, TEnc>,
+    authentication_serv: &'a AuthenticationService<URepo, PHasher, TRepo, TEnc>,
 }
 
 impl<'a, EPub, URepo, PHasher, TRepo, TEnc> Login<'a, EPub, URepo, PHasher, TRepo, TEnc>
@@ -33,7 +33,7 @@ where
 {
     pub fn new(
         event_pub: &'a EPub,
-        authentication_serv: AuthenticationService<'a, URepo, PHasher, TRepo, TEnc>,
+        authentication_serv: &'a AuthenticationService<URepo, PHasher, TRepo, TEnc>,
     ) -> Self {
         Login {
             event_pub,

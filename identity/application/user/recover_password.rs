@@ -10,7 +10,7 @@ pub struct RecoverPassword<'a, EPub, URepo, PHasher> {
 
     user_repo: &'a URepo,
 
-    user_serv: UserService<'a, URepo, PHasher>,
+    user_serv: &'a UserService<URepo, PHasher>,
 }
 
 impl<'a, EPub, URepo, PHasher> RecoverPassword<'a, EPub, URepo, PHasher>
@@ -22,7 +22,7 @@ where
     pub fn new(
         event_pub: &'a EPub,
         user_repo: &'a URepo,
-        user_serv: UserService<'a, URepo, PHasher>,
+        user_serv: &'a UserService<URepo, PHasher>,
     ) -> Self {
         RecoverPassword {
             user_repo,

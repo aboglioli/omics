@@ -9,8 +9,8 @@ use crate::domain::reader::{ReaderId, ReaderRepository};
 
 #[derive(Deserialize)]
 pub struct AddReviewCommand {
-    stars: u8,
-    comment: String,
+    pub stars: u8,
+    pub comment: String,
 }
 
 pub struct AddReview<'a, EPub, PRepo, RRepo, IRepo> {
@@ -19,7 +19,7 @@ pub struct AddReview<'a, EPub, PRepo, RRepo, IRepo> {
     publication_repo: &'a PRepo,
     reader_repo: &'a RRepo,
 
-    interaction_serv: InteractionService<'a, IRepo>,
+    interaction_serv: &'a InteractionService<IRepo>,
 }
 
 impl<'a, EPub, PRepo, RRepo, IRepo> AddReview<'a, EPub, PRepo, RRepo, IRepo>
@@ -33,7 +33,7 @@ where
         event_pub: &'a EPub,
         publication_repo: &'a PRepo,
         reader_repo: &'a RRepo,
-        interaction_serv: InteractionService<'a, IRepo>,
+        interaction_serv: &'a InteractionService<IRepo>,
     ) -> Self {
         AddReview {
             event_pub,

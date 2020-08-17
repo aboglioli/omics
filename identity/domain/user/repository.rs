@@ -1,16 +1,11 @@
 use async_trait::async_trait;
 
-use common::error::Error;
 use common::result::Result;
 
 use crate::domain::user::{Email, User, UserId, Username};
 
 #[async_trait]
 pub trait UserRepository {
-    fn err_not_found() -> Error {
-        Error::internal("user", "not_found")
-    }
-
     async fn next_id(&self) -> Result<UserId>;
 
     async fn find_by_id(&self, id: &UserId) -> Result<User>;

@@ -10,19 +10,37 @@ pub type ReaderId = StringId;
 #[derive(Debug, Clone)]
 pub struct Reader {
     base: AggregateRoot<ReaderId, Event>,
+    username: String,
+    name: String,
+    lastname: String,
     subscribed: bool,
 }
 
 impl Reader {
-    pub fn new(id: ReaderId) -> Result<Self> {
+    pub fn new<S: Into<String>>(id: ReaderId, username: S, name: S, lastname: S) -> Result<Self> {
         Ok(Reader {
             base: AggregateRoot::new(id),
+            username: username.into(),
+            name: name.into(),
+            lastname: lastname.into(),
             subscribed: false,
         })
     }
 
     pub fn base(&self) -> &AggregateRoot<ReaderId, Event> {
         &self.base
+    }
+
+    pub fn username(&self) -> &str {
+        &self.username
+    }
+
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn lastname(&self) -> &str {
+        &self.lastname
     }
 
     pub fn is_subscribed(&self) -> bool {

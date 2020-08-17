@@ -2,9 +2,11 @@ use async_trait::async_trait;
 use uuid::Uuid;
 
 use common::cache::{inmem::InMemCache, Cache};
+use common::error::Error;
 use common::result::Result;
 
 use crate::domain::user::{Email, User, UserId, UserRepository, Username};
+use crate::mocks;
 
 pub struct InMemUserRepository {
     cache: InMemCache<UserId, User>,
@@ -15,6 +17,17 @@ impl InMemUserRepository {
         InMemUserRepository {
             cache: InMemCache::new(),
         }
+    }
+
+    pub async fn populated() -> Self {
+        let repo = Self::new();
+        repo.save(&mut mocks::user1()).await.unwrap();
+        repo.save(&mut mocks::user2()).await.unwrap();
+        repo.save(&mut mocks::validated_user1()).await.unwrap();
+        repo.save(&mut mocks::validated_user2()).await.unwrap();
+        repo.save(&mut mocks::admin1()).await.unwrap();
+
+        repo
     }
 }
 
@@ -32,21 +45,24 @@ impl UserRepository for InMemUserRepository {
     }
 
     async fn find_by_id(&self, id: &UserId) -> Result<User> {
-        self.cache.get(id).await.ok_or_else(Self::err_not_found)
+        self.cache
+            .get(id)
+            .await
+            .ok_or(Error::new("user", "not_found"))
     }
 
     async fn find_by_username(&self, username: &Username) -> Result<User> {
         self.cache
             .find(|(_, user)| user.identity().username().value() == username.value())
             .await
-            .ok_or_else(Self::err_not_found)
+            .ok_or(Error::new("user", "not_found"))
     }
 
     async fn find_by_email(&self, email: &Email) -> Result<User> {
         self.cache
             .find(|(_, user)| user.identity().email().value() == email.value())
             .await
-            .ok_or_else(Self::err_not_found)
+            .ok_or(Error::new("user", "not_found"))
     }
 
     async fn save(&self, user: &mut User) -> Result<()> {

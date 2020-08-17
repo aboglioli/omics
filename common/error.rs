@@ -25,18 +25,18 @@ pub struct Error {
     kind: ErrorKind,
     path: String,
     code: String,
-    status: Option<i32>,
+    status: Option<u32>,
     message: Option<String>,
     context: HashMap<String, String>,
     cause: Option<Box<Error>>,
 }
 
 impl Error {
-    pub fn new(path: &str, code: &str) -> Error {
+    pub fn new<S: Into<String>>(path: S, code: S) -> Error {
         Error {
             kind: ErrorKind::Application,
-            path: path.to_owned(),
-            code: code.to_owned(),
+            path: path.into(),
+            code: code.into(),
             status: None,
             message: None,
             context: HashMap::new(),
@@ -44,11 +44,11 @@ impl Error {
         }
     }
 
-    pub fn internal(path: &str, code: &str) -> Error {
+    pub fn internal<S: Into<String>>(path: S, code: S) -> Error {
         Error {
             kind: ErrorKind::Internal,
-            path: path.to_owned(),
-            code: code.to_owned(),
+            path: path.into(),
+            code: code.into(),
             status: None,
             message: None,
             context: HashMap::new(),
@@ -68,8 +68,8 @@ impl Error {
         &self.path
     }
 
-    pub fn status(&self) -> Option<&i32> {
-        self.status.as_ref()
+    pub fn status(&self) -> Option<u32> {
+        self.status.clone()
     }
 
     pub fn message(&self) -> Option<&String> {
@@ -91,28 +91,28 @@ impl Error {
         }
     }
 
-    pub fn set_path(&mut self, path: &str) -> &mut Error {
-        self.path = path.to_owned();
+    pub fn set_path<S: Into<String>>(&mut self, path: S) -> &mut Error {
+        self.path = path.into();
         self
     }
 
-    pub fn set_code(&mut self, code: &str) -> &mut Error {
-        self.code = code.to_owned();
+    pub fn set_code<S: Into<String>>(&mut self, code: S) -> &mut Error {
+        self.code = code.into();
         self
     }
 
-    pub fn set_status(&mut self, status: i32) -> &mut Error {
+    pub fn set_status(&mut self, status: u32) -> &mut Error {
         self.status = Some(status);
         self
     }
 
-    pub fn set_message(&mut self, message: &str) -> &mut Error {
-        self.message = Some(message.to_owned());
+    pub fn set_message<S: Into<String>>(&mut self, message: S) -> &mut Error {
+        self.message = Some(message.into());
         self
     }
 
-    pub fn add_context(&mut self, k: &str, v: &str) -> &mut Error {
-        self.context.insert(k.to_owned(), v.to_owned());
+    pub fn add_context<S: Into<String>>(&mut self, k: S, v: S) -> &mut Error {
+        self.context.insert(k.into(), v.into());
         self
     }
 
@@ -160,6 +160,8 @@ impl cmp::PartialEq for Error {
     }
 }
 
+impl warp::reject::Reject for Error {}
+
 #[cfg(test)]
 mod tests {
     use std::error;
@@ -179,7 +181,7 @@ mod tests {
         assert_eq!(err.code(), "code");
         assert_eq!(err.message().unwrap(), "message");
         assert_eq!(err.path(), "my.path");
-        assert_eq!(err.status().unwrap(), &404);
+        assert_eq!(err.status().unwrap(), 404);
         assert_eq!(err.context().len(), 2);
         assert_eq!(err.context().get("k1").unwrap(), "v1");
         assert_eq!(err.context().get("k2").unwrap(), "v3");

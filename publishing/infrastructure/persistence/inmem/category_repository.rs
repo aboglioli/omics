@@ -6,6 +6,7 @@ use common::error::Error;
 use common::result::Result;
 
 use crate::domain::category::{Category, CategoryId, CategoryRepository};
+use crate::mocks;
 
 pub struct InMemCategoryRepository {
     cache: InMemCache<CategoryId, Category>,
@@ -16,6 +17,15 @@ impl InMemCategoryRepository {
         InMemCategoryRepository {
             cache: InMemCache::new(),
         }
+    }
+
+    pub async fn populated() -> Self {
+        let repo = Self::new();
+
+        repo.save(&mut mocks::category1()).await.unwrap();
+        repo.save(&mut mocks::category2()).await.unwrap();
+
+        repo
     }
 }
 

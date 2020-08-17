@@ -6,6 +6,7 @@ use common::error::Error;
 use common::result::Result;
 
 use crate::domain::author::{Author, AuthorId, AuthorRepository};
+use crate::mocks;
 
 pub struct InMemAuthorRepository {
     cache: InMemCache<AuthorId, Author>,
@@ -16,6 +17,15 @@ impl InMemAuthorRepository {
         InMemAuthorRepository {
             cache: InMemCache::new(),
         }
+    }
+
+    pub async fn populated() -> Self {
+        let repo = Self::new();
+
+        repo.save(&mut mocks::author1()).await.unwrap();
+        repo.save(&mut mocks::author2()).await.unwrap();
+
+        repo
     }
 }
 
@@ -37,6 +47,17 @@ impl AuthorRepository for InMemAuthorRepository {
             .get(id)
             .await
             .ok_or(Error::new("author", "not_found"))
+    }
+
+    async fn search(&self, text: &str) -> Result<Vec<Author>> {
+        Ok(self
+            .cache
+            .filter(|&(_, author)| {
+                author.username().contains(text)
+                    || author.name().contains(text)
+                    || author.lastname().contains(text)
+            })
+            .await)
     }
 
     async fn save(&self, author: &mut Author) -> Result<()> {

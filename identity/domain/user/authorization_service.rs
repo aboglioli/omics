@@ -1,22 +1,24 @@
+use std::sync::Arc;
+
 use common::error::Error;
 use common::result::Result;
 
 use crate::domain::token::{Token, TokenEncoder, TokenRepository, TokenService};
 use crate::domain::user::{User, UserId, UserRepository};
 
-pub struct AuthorizationService<'a, URepo, TRepo, TEnc> {
-    user_repo: &'a URepo,
+pub struct AuthorizationService<URepo, TRepo, TEnc> {
+    user_repo: Arc<URepo>,
 
-    token_serv: TokenService<'a, TRepo, TEnc>,
+    token_serv: Arc<TokenService<TRepo, TEnc>>,
 }
 
-impl<'a, URepo, TRepo, TEnc> AuthorizationService<'a, URepo, TRepo, TEnc>
+impl<URepo, TRepo, TEnc> AuthorizationService<URepo, TRepo, TEnc>
 where
     URepo: UserRepository,
     TRepo: TokenRepository,
     TEnc: TokenEncoder,
 {
-    pub fn new(user_repo: &'a URepo, token_serv: TokenService<'a, TRepo, TEnc>) -> Self {
+    pub fn new(user_repo: Arc<URepo>, token_serv: Arc<TokenService<TRepo, TEnc>>) -> Self {
         AuthorizationService {
             user_repo,
             token_serv,
@@ -52,7 +54,7 @@ mod tests {
         data.add("user_id", user.base().id().value());
         let token = c.token_serv().create(data).await.unwrap();
 
-        let serv = AuthorizationService::new(c.user_repo(), c.token_serv());
+        let serv = c.authorization_serv();
 
         let auth_user = serv.authorize(&token).await.unwrap();
         assert_eq!(auth_user.base(), user.base());
