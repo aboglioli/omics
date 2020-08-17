@@ -18,10 +18,10 @@ pub fn container() -> Container<
 > {
     Container::new(
         Arc::new(FakeEventPublisher::new()),
-        InMemRoleRepository::new(),
-        InMemTokenRepository::new(),
-        InMemUserRepository::new(),
-        FakePasswordHasher::new(),
-        FakeTokenEncoder::new(),
+        Arc::new(InMemRoleRepository::new()),
+        Arc::new(InMemTokenRepository::new()),
+        Arc::new(InMemUserRepository::new()),
+        Arc::new(FakePasswordHasher::new()),
+        Arc::new(FakeTokenEncoder::new()),
     )
 }

@@ -1,21 +1,23 @@
+use std::sync::Arc;
+
 use async_trait::async_trait;
 
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
 use publishing::domain::author::{Author, AuthorId, AuthorRepository};
 
-pub struct AuthorTranslator<'a, URepo> {
-    user_repo: &'a URepo,
+pub struct AuthorTranslator<URepo> {
+    user_repo: Arc<URepo>,
 }
 
-impl<'a, URepo> AuthorTranslator<'a, URepo> {
-    pub fn new(user_repo: &'a URepo) -> Self {
+impl<URepo> AuthorTranslator<URepo> {
+    pub fn new(user_repo: Arc<URepo>) -> Self {
         AuthorTranslator { user_repo }
     }
 }
 
 #[async_trait]
-impl<'a, URepo> AuthorRepository for AuthorTranslator<'a, URepo>
+impl<URepo> AuthorRepository for AuthorTranslator<URepo>
 where
     URepo: UserRepository + Sync + Send,
 {

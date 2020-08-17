@@ -1,1 +1,1 @@
-pub mod translator;
+pub mod publishing;

@@ -1,16 +1,18 @@
+use std::sync::Arc;
+
 use common::error::Error;
 use common::result::Result;
 
 use crate::domain::token::{Data, Token, TokenEncoder, TokenId, TokenRepository};
 
-pub struct TokenService<'a, TRepo, TEnc> {
-    token_repo: &'a TRepo,
+pub struct TokenService<TRepo, TEnc> {
+    token_repo: Arc<TRepo>,
 
-    token_enc: &'a TEnc,
+    token_enc: Arc<TEnc>,
 }
 
-impl<'a, TRepo: TokenRepository, TEnc: TokenEncoder> TokenService<'a, TRepo, TEnc> {
-    pub fn new(token_repo: &'a TRepo, token_enc: &'a TEnc) -> Self {
+impl<TRepo: TokenRepository, TEnc: TokenEncoder> TokenService<TRepo, TEnc> {
+    pub fn new(token_repo: Arc<TRepo>, token_enc: Arc<TEnc>) -> Self {
         TokenService {
             token_enc,
             token_repo,
@@ -44,14 +46,12 @@ impl<'a, TRepo: TokenRepository, TEnc: TokenEncoder> TokenService<'a, TRepo, TEn
 mod tests {
     use super::*;
 
-    use crate::infrastructure::persistence::inmem::InMemTokenRepository;
-    use crate::mocks::FakeTokenEncoder;
+    use crate::mocks;
 
     #[tokio::test]
     async fn create_validate_invalidate() {
-        let repo = InMemTokenRepository::new();
-        let enc = FakeTokenEncoder::new();
-        let serv = TokenService::new(&repo, &enc);
+        let c = mocks::container();
+        let serv = c.token_serv();
 
         let mut data = Data::new();
         data.add("user_id", "u123");

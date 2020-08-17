@@ -1,19 +1,21 @@
+use std::sync::Arc;
+
 use common::error::Error;
 use common::result::Result;
 
 use crate::domain::token::{Data, Token, TokenEncoder, TokenRepository, TokenService};
 use crate::domain::user::{Email, PasswordHasher, User, UserRepository, Username};
 
-pub struct AuthenticationService<'a, URepo, PHasher, TRepo, TEnc> {
-    user_repo: &'a URepo,
+pub struct AuthenticationService<URepo, PHasher, TRepo, TEnc> {
+    user_repo: Arc<URepo>,
 
-    password_hasher: &'a PHasher,
+    password_hasher: Arc<PHasher>,
 
-    token_serv: TokenService<'a, TRepo, TEnc>,
+    token_serv: Arc<TokenService<TRepo, TEnc>>,
 }
 
 /// AutenticationService authenticate any user, validated or not.
-impl<'a, URepo, PHasher, TRepo, TEnc> AuthenticationService<'a, URepo, PHasher, TRepo, TEnc>
+impl<URepo, PHasher, TRepo, TEnc> AuthenticationService<URepo, PHasher, TRepo, TEnc>
 where
     URepo: UserRepository,
     PHasher: PasswordHasher,
@@ -21,9 +23,9 @@ where
     TEnc: TokenEncoder,
 {
     pub fn new(
-        user_repo: &'a URepo,
-        password_hasher: &'a PHasher,
-        token_serv: TokenService<'a, TRepo, TEnc>,
+        user_repo: Arc<URepo>,
+        password_hasher: Arc<PHasher>,
+        token_serv: Arc<TokenService<TRepo, TEnc>>,
     ) -> Self {
         AuthenticationService {
             user_repo,
@@ -79,7 +81,7 @@ mod tests {
     #[tokio::test]
     async fn authenticate() {
         let c = mocks::container();
-        let serv = AuthenticationService::new(c.user_repo(), c.password_hasher(), c.token_serv());
+        let serv = c.authentication_serv();
 
         let mut user = mocks::validated_user1();
         c.user_repo().save(&mut user).await.unwrap();

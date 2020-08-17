@@ -149,11 +149,9 @@ pub async fn get_by_id(
     user_id: String,
     c: Arc<Container>,
 ) -> Result<impl Reply, Rejection> {
-    let author_trans = c.publishing_author_translator();
     let uc = GetById::new(
         c.publishing.event_pub(),
-        &author_trans,
-        // c.publishing.author_repo(),
+        c.publishing.author_repo(),
         c.publishing.category_repo(),
         c.publishing.publication_repo(),
         c.publishing.reader_repo(),

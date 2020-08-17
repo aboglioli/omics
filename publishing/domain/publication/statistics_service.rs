@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use chrono::{DateTime, Utc};
 
 use common::result::Result;
@@ -6,15 +8,15 @@ use crate::domain::interaction::{InteractionRepository, Like, Reading, Review, V
 use crate::domain::publication::{PublicationId, Statistics};
 use crate::domain::reader::ReaderId;
 
-pub struct StatisticsService<'a, IRepo> {
-    interaction_repo: &'a IRepo,
+pub struct StatisticsService<IRepo> {
+    interaction_repo: Arc<IRepo>,
 }
 
-impl<'a, IRepo> StatisticsService<'a, IRepo>
+impl<IRepo> StatisticsService<IRepo>
 where
     IRepo: InteractionRepository,
 {
-    pub fn new(interaction_repo: &'a IRepo) -> Self {
+    pub fn new(interaction_repo: Arc<IRepo>) -> Self {
         StatisticsService { interaction_repo }
     }
 

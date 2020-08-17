@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use common::error::Error;
 use common::result::Result;
 
@@ -7,15 +9,15 @@ use crate::domain::interaction::{
 use crate::domain::publication::Publication;
 use crate::domain::reader::Reader;
 
-pub struct InteractionService<'a, IRepo> {
-    interaction_repo: &'a IRepo,
+pub struct InteractionService<IRepo> {
+    interaction_repo: Arc<IRepo>,
 }
 
-impl<'a, IRepo> InteractionService<'a, IRepo>
+impl<IRepo> InteractionService<IRepo>
 where
     IRepo: InteractionRepository,
 {
-    pub fn new(interaction_repo: &'a IRepo) -> Self {
+    pub fn new(interaction_repo: Arc<IRepo>) -> Self {
         InteractionService { interaction_repo }
     }
 
