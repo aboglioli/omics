@@ -3,8 +3,8 @@ use std::sync::Arc;
 use warp::{Filter, Rejection, Reply};
 
 use publishing::application::collection::{
-    AddPublication, Create, CreateCommand, Delete, GetById, RemovePublication, Update,
-    UpdateCommand,
+    AddPublication, Create, CreateCommand, Delete, GetById, RemovePublication, Search,
+    SearchCommand, Update, UpdateCommand,
 };
 
 use crate::authorization::with_auth;
@@ -20,6 +20,14 @@ pub fn routes(
         .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(get_by_id);
+
+    // GET /collections
+    let search = warp::get()
+        .and(warp::path::end())
+        .and(warp::query::<SearchCommand>())
+        .and(with_auth(container.clone()))
+        .and(with_container(container.clone()))
+        .and_then(search);
 
     // POST /collections
     let create = warp::post()
@@ -52,7 +60,7 @@ pub fn routes(
         .and_then(add_publication);
 
     // POST /collections/:id/publication/:publication_id
-    let remove_publication = warp::post()
+    let remove_publication = warp::delete()
         .and(warp::path!(String / "publication" / String))
         .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
@@ -60,6 +68,7 @@ pub fn routes(
 
     warp::path("collections").and(
         get_by_id
+            .or(search)
             .or(create)
             .or(update)
             .or(delete)
@@ -80,6 +89,22 @@ pub async fn get_by_id(
         c.publishing.publication_repo(),
     );
     let res = uc.exec(id).await;
+
+    response::map(res, None)
+}
+
+pub async fn search(
+    cmd: SearchCommand,
+    user_id: String,
+    c: Arc<Container>,
+) -> Result<impl Reply, Rejection> {
+    let uc = Search::new(
+        c.publishing.author_repo(),
+        c.publishing.category_repo(),
+        c.publishing.collection_repo(),
+        c.publishing.publication_repo(),
+    );
+    let res = uc.exec(user_id, cmd).await;
 
     response::map(res, None)
 }
