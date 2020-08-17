@@ -1,6 +1,7 @@
+use slug::slugify;
+
 use common::error::Error;
 use common::result::Result;
-use slug::slugify;
 
 #[derive(Debug, Clone)]
 pub struct Tag {
@@ -9,23 +10,23 @@ pub struct Tag {
 }
 
 impl Tag {
-    pub fn new(name: &str) -> Result<Tag> {
+    pub fn new<S: Into<String>>(name: S) -> Result<Self> {
+        let name = name.into();
+
         if name.is_empty() {
             return Err(Error::new("tag", "empty_name"));
         }
 
-        let slug = slugify(name);
-        Ok(Tag {
-            slug,
-            name: name.to_owned(),
-        })
+        let slug = slugify(&name);
+
+        Ok(Tag { slug, name })
     }
 
-    pub fn slug(&self) -> &String {
+    pub fn slug(&self) -> &str {
         &self.slug
     }
 
-    pub fn name(&self) -> &String {
+    pub fn name(&self) -> &str {
         &self.name
     }
 }

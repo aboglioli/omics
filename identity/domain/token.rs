@@ -1,11 +1,10 @@
-mod token_encoder;
-mod token_repository;
-mod token_service;
-pub use token_encoder::*;
-pub use token_repository::*;
-pub use token_service::*;
+mod encoder;
+mod repository;
+mod service;
+pub use encoder::*;
+pub use repository::*;
+pub use service::*;
 
-use std::cmp::PartialEq;
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 
@@ -23,7 +22,11 @@ impl TokenId {
         TokenId { id: uuid }
     }
 
-    pub fn id(&self) -> &String {
+    pub fn build<S: Into<String>>(id: S) -> Self {
+        TokenId { id: id.into() }
+    }
+
+    pub fn id(&self) -> &str {
         &self.id
     }
 }
@@ -40,9 +43,9 @@ impl Hash for TokenId {
     }
 }
 
-impl From<&str> for TokenId {
-    fn from(s: &str) -> TokenId {
-        TokenId { id: s.to_owned() }
+impl<S: Into<String>> From<S> for TokenId {
+    fn from(s: S) -> TokenId {
+        TokenId { id: s.into() }
     }
 }
 
@@ -53,13 +56,13 @@ pub struct Token {
 }
 
 impl Token {
-    pub fn new(token: &str) -> Token {
+    pub fn new<S: Into<String>>(token: S) -> Token {
         Token {
-            token: token.to_owned(),
+            token: token.into(),
         }
     }
 
-    pub fn token(&self) -> &str {
+    pub fn value(&self) -> &str {
         &self.token
     }
 }

@@ -7,17 +7,27 @@ pub struct Password {
 }
 
 impl Password {
-    pub fn new(password: &str) -> Result<Password> {
+    pub fn new<S: Into<String>>(password: S) -> Result<Self> {
+        let password = password.into();
+
         if password.len() < 50 {
             return Err(Error::new("password", "not_hashed"));
         }
 
-        Ok(Password {
-            password: password.to_owned(),
-        })
+        Ok(Password { password })
     }
 
     pub fn value(&self) -> &str {
         &self.password
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn invalid() {
+        assert!(Password::new("plain-password").is_err());
     }
 }

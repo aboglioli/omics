@@ -1,6 +1,3 @@
-use std::clone::Clone;
-use std::cmp::PartialEq;
-
 use chrono::{DateTime, Utc};
 
 use crate::event::{Event, ToEvent};
@@ -39,7 +36,7 @@ impl<ID: Clone, E: ToEvent> AggregateRoot<ID, E> {
     }
 
     pub fn deleted_at(&self) -> Option<&DateTime<Utc>> {
-        self.updated_at.as_ref()
+        self.deleted_at.as_ref()
     }
 
     pub fn update(&mut self) {
@@ -47,7 +44,7 @@ impl<ID: Clone, E: ToEvent> AggregateRoot<ID, E> {
     }
 
     pub fn delete(&mut self) {
-        self.updated_at = Some(Utc::now());
+        self.deleted_at = Some(Utc::now());
     }
 
     pub fn record_event(&mut self, event: E) {
@@ -141,18 +138,17 @@ mod tests {
     fn properties() {
         let mut e = AggRoot::new(AggRootID::from("AR_022"));
         assert_eq!(e.base().id(), "AR_022");
-        assert_ne!(e.base().created_at(), &Utc::now());
         assert!(e.base().created_at() < &Utc::now());
         assert!(e.base().updated_at().is_none());
         assert!(e.base().deleted_at().is_none());
 
         e.base_mut().update();
         assert!(e.base().updated_at().is_some());
-        assert_ne!(e.base().updated_at().unwrap(), &Utc::now());
+        assert!(e.base().updated_at().unwrap() < &Utc::now());
 
         e.base_mut().delete();
         assert!(e.base().deleted_at().is_some());
-        assert_ne!(e.base().deleted_at().unwrap(), &Utc::now());
+        assert!(e.base().deleted_at().unwrap() < &Utc::now());
     }
 
     #[test]

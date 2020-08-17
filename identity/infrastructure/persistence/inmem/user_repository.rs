@@ -1,11 +1,12 @@
 use async_trait::async_trait;
 use uuid::Uuid;
 
-use common::cache::{Cache, InMemCache};
-
+use common::cache::{inmem::InMemCache, Cache};
+use common::error::Error;
 use common::result::Result;
 
 use crate::domain::user::{Email, User, UserId, UserRepository, Username};
+use crate::mocks;
 
 pub struct InMemUserRepository {
     cache: InMemCache<UserId, User>,
@@ -16,6 +17,17 @@ impl InMemUserRepository {
         InMemUserRepository {
             cache: InMemCache::new(),
         }
+    }
+
+    pub async fn populated() -> Self {
+        let repo = Self::new();
+        repo.save(&mut mocks::user1()).await.unwrap();
+        repo.save(&mut mocks::user2()).await.unwrap();
+        repo.save(&mut mocks::validated_user1()).await.unwrap();
+        repo.save(&mut mocks::validated_user2()).await.unwrap();
+        repo.save(&mut mocks::admin1()).await.unwrap();
+
+        repo
     }
 }
 
@@ -29,26 +41,28 @@ impl Default for InMemUserRepository {
 impl UserRepository for InMemUserRepository {
     async fn next_id(&self) -> Result<UserId> {
         let uuid = Uuid::new_v4();
-        let uuid = uuid.to_string();
-        UserId::new(&uuid)
+        UserId::new(&uuid.to_string())
     }
 
     async fn find_by_id(&self, id: &UserId) -> Result<User> {
-        self.cache.get(id).await.ok_or_else(Self::err_not_found)
+        self.cache
+            .get(id)
+            .await
+            .ok_or(Error::new("user", "not_found"))
     }
 
     async fn find_by_username(&self, username: &Username) -> Result<User> {
         self.cache
             .find(|(_, user)| user.identity().username().value() == username.value())
             .await
-            .ok_or_else(Self::err_not_found)
+            .ok_or(Error::new("user", "not_found"))
     }
 
     async fn find_by_email(&self, email: &Email) -> Result<User> {
         self.cache
             .find(|(_, user)| user.identity().email().value() == email.value())
             .await
-            .ok_or_else(Self::err_not_found)
+            .ok_or(Error::new("user", "not_found"))
     }
 
     async fn save(&self, user: &mut User) -> Result<()> {
@@ -61,7 +75,7 @@ mod tests {
     use super::*;
 
     use crate::domain::user::*;
-    use crate::infrastructure::mocks;
+    use crate::mocks;
 
     #[tokio::test]
     async fn next_id() {
@@ -77,32 +91,27 @@ mod tests {
     #[tokio::test]
     async fn find_by_id() {
         let repo = InMemUserRepository::new();
-        let user = mocks::user1().unwrap();
-        let mut changed_user = user.clone();
-        changed_user
-            .set_person(Person::new(Fullname::new("Name", "Lastname").unwrap()).unwrap())
+        let mut user = mocks::user1();
+        user.set_person(Person::new(Fullname::new("Name", "Lastname").unwrap()).unwrap())
             .unwrap();
 
-        repo.save(&mut changed_user).await.unwrap();
-        assert!(repo.find_by_id(&changed_user.base().id()).await.is_ok());
-        assert!(user.person().is_none());
+        repo.save(&mut user).await.unwrap();
+        assert!(repo.find_by_id(&user.base().id()).await.is_ok());
+        assert!(user.person().is_some());
 
         let found_user = repo.find_by_id(&user.base().id()).await.unwrap();
         assert_eq!(user.base(), found_user.base());
-        assert_eq!(changed_user.base(), found_user.base());
+        assert_eq!(user.base(), found_user.base());
 
         let changed_user_person = found_user.person().unwrap();
         assert_eq!(changed_user_person.fullname().name(), "Name");
         assert_eq!(changed_user_person.fullname().lastname(), "Lastname");
 
         assert!(repo
-            .find_by_username(&Username::new("username").unwrap())
+            .find_by_username(user.identity().username())
             .await
             .is_ok());
-        assert!(repo
-            .find_by_email(&Email::new("username@email.com").unwrap())
-            .await
-            .is_ok());
+        assert!(repo.find_by_email(user.identity().email()).await.is_ok());
         assert!(repo
             .find_by_username(&Username::new("nonexisting").unwrap())
             .await

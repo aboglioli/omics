@@ -1,2 +1,2 @@
-pub mod mocks;
 pub mod persistence;
+pub mod service;

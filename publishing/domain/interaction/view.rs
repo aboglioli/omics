@@ -1,34 +1,28 @@
-use chrono::{DateTime, Utc};
-
 use common::result::Result;
 
+use crate::domain::interaction::Base;
 use crate::domain::publication::PublicationId;
 use crate::domain::reader::ReaderId;
 
+#[derive(Debug, Clone)]
 pub struct View {
-    reader_id: ReaderId,
-    publication_id: PublicationId,
-    date: DateTime<Utc>,
+    base: Base,
+    unique: bool,
 }
 
 impl View {
-    pub fn new(reader_id: ReaderId, publication_id: PublicationId) -> Result<View> {
+    pub fn new(reader_id: ReaderId, publication_id: PublicationId, unique: bool) -> Result<Self> {
         Ok(View {
-            reader_id,
-            publication_id,
-            date: Utc::now(),
+            base: Base::new(reader_id, publication_id)?,
+            unique,
         })
     }
 
-    pub fn reader_id(&self) -> &ReaderId {
-        &self.reader_id
+    pub fn base(&self) -> &Base {
+        &self.base
     }
 
-    pub fn publication_id(&self) -> &PublicationId {
-        &self.publication_id
-    }
-
-    pub fn date(&self) -> &DateTime<Utc> {
-        &self.date
+    pub fn is_unique(&self) -> bool {
+        self.unique
     }
 }

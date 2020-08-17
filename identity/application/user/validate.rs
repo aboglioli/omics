@@ -21,15 +21,72 @@ where
         }
     }
 
-    pub async fn exec(&self, user_id: &UserId, validation: &Validation) -> Result<()> {
-        let mut user = self.user_repo.find_by_id(user_id).await?;
+    pub async fn exec(&self, user_id: String, validation_code: String) -> Result<()> {
+        let user_id = UserId::new(user_id)?;
+        let mut user = self.user_repo.find_by_id(&user_id).await?;
 
-        user.validate(validation)?;
+        let validation = Validation::from(validation_code);
+        user.validate(&validation)?;
 
         self.user_repo.save(&mut user).await?;
 
         self.event_pub.publish_all(user.base().events()?).await?;
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use crate::mocks;
+
+    #[tokio::test]
+    async fn invalid_code() {
+        let c = mocks::container();
+        let uc = Validate::new(c.event_pub(), c.user_repo());
+
+        let mut user = mocks::user1();
+        c.user_repo().save(&mut user).await.unwrap();
+
+        assert!(uc
+            .exec(
+                user.base().id().value().to_owned(),
+                "invalid-123".to_owned()
+            )
+            .await
+            .is_err());
+    }
+
+    #[tokio::test]
+    async fn valid_code() {
+        let c = mocks::container();
+        let uc = Validate::new(c.event_pub(), c.user_repo());
+
+        let mut user = mocks::user1();
+        c.user_repo().save(&mut user).await.unwrap();
+        assert!(!user.is_validated());
+
+        assert!(uc
+            .exec(
+                user.base().id().value().to_owned(),
+                user.validation().unwrap().code().to_owned()
+            )
+            .await
+            .is_ok());
+
+        let saved_user = c.user_repo().find_by_id(&user.base().id()).await.unwrap();
+        assert!(saved_user.is_validated());
+
+        assert!(uc
+            .exec(
+                user.base().id().value().to_owned(),
+                user.validation().unwrap().code().to_owned()
+            )
+            .await
+            .is_err());
+
+        assert_eq!(c.event_pub().events().await.len(), 1);
     }
 }

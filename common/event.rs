@@ -1,9 +1,8 @@
 mod handler;
-mod inmem;
+pub mod inmem;
 mod publisher;
 mod subscriber;
 pub use handler::*;
-pub use inmem::*;
 pub use publisher::*;
 pub use subscriber::*;
 

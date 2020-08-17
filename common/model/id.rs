@@ -9,16 +9,28 @@ pub struct StringId {
 }
 
 impl StringId {
-    pub fn new(id: &str) -> Result<Self> {
+    pub fn new<S: Into<String>>(id: S) -> Result<Self> {
+        let id = id.into();
+
         if id.is_empty() {
             return Err(Error::new("id", "empty"));
         }
 
-        Ok(StringId { id: id.to_owned() })
+        if id.len() < 4 {
+            return Err(Error::new("id", "too_short"));
+        }
+
+        Ok(StringId { id })
     }
 
     pub fn value(&self) -> &str {
         &self.id
+    }
+}
+
+impl ToString for StringId {
+    fn to_string(&self) -> String {
+        self.id.to_owned()
     }
 }
 
@@ -31,5 +43,19 @@ impl PartialEq for StringId {
 impl Hash for StringId {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.id.hash(state);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn crete() {
+        let id = StringId::new("#id01").unwrap();
+        assert_eq!(id.value(), "#id01");
+
+        assert!(StringId::new(String::from("#id01")).is_ok());
+        assert!(StringId::new("#id").is_err());
     }
 }

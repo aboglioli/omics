@@ -7,8 +7,8 @@ mod password;
 mod password_hasher;
 mod person;
 mod provider;
-mod user_repository;
-mod user_service;
+mod repository;
+mod service;
 mod username;
 mod validation;
 pub use self::identity::*;
@@ -20,17 +20,18 @@ pub use password::*;
 pub use password_hasher::*;
 pub use person::*;
 pub use provider::*;
-pub use user_repository::*;
-pub use user_service::*;
+pub use repository::*;
+pub use service::*;
 pub use username::*;
 pub use validation::*;
 
 use common::error::Error;
 use common::model::{AggregateRoot, StringId};
 use common::result::Result;
-use shared::domain::event::UserEvent;
+use shared::event::UserEvent;
 
 use crate::domain::role::Role;
+use crate::domain::token::Token;
 
 pub type UserId = StringId;
 
@@ -53,11 +54,11 @@ impl User {
             validation: Some(Validation::new()),
         };
 
-        // TODO: should send validation code
         user.base.record_event(UserEvent::Registered {
             id: user.base().id().value().to_owned(),
             username: user.identity().username().value().to_owned(),
             email: user.identity().username().value().to_owned(),
+            validation_code: user.validation().unwrap().code().to_owned(),
         });
 
         Ok(user)
@@ -139,9 +140,18 @@ impl User {
         Ok(())
     }
 
-    pub fn login(&mut self) -> Result<()> {
+    pub fn login(&mut self, token: &Token) -> Result<()> {
+        if !self.is_validated() {
+            return Err(Error::new("user", "not_validated"));
+        }
+
+        if !self.is_active() {
+            return Err(Error::new("user", "not_active"));
+        }
+
         self.base.record_event(UserEvent::LoggedIn {
             id: self.base().id().value().to_owned(),
+            auth_token: token.value().to_owned(),
         });
 
         Ok(())
@@ -155,6 +165,20 @@ impl User {
                 temp_password: temp_password.to_owned(),
                 email: self.identity().email().value().to_owned(),
             });
+
+        Ok(())
+    }
+
+    pub fn delete(&mut self) -> Result<()> {
+        if !self.is_active() {
+            return Err(Error::new("user", "not_active"));
+        }
+
+        self.base.delete();
+
+        self.base.record_event(UserEvent::Deleted {
+            id: self.base().id().value().to_owned(),
+        });
 
         Ok(())
     }
@@ -206,7 +230,6 @@ mod tests {
         assert!(user.validation().is_some());
 
         let code = user.validation().unwrap().clone();
-
         assert!(user.validate(&code).is_ok());
 
         assert!(user.is_validated());
@@ -215,5 +238,29 @@ mod tests {
 
         assert!(user.validate(&code).is_err());
         assert!(user.validation().is_none());
+    }
+
+    #[test]
+    fn delete() {
+        let mut user = User::new(
+            UserId::new("user123").unwrap(),
+            Identity::new(
+                Provider::Local,
+                Username::new("user1").unwrap(),
+                Email::new("email@user.com").unwrap(),
+                Some(Password::new(&format!("{:X>50}", "2")).unwrap()),
+            )
+            .unwrap(),
+            Role::new(RoleId::new("user").unwrap(), "User").unwrap(),
+        )
+        .unwrap();
+
+        assert!(user.delete().is_err());
+
+        let code = user.validation().unwrap().clone();
+        assert!(user.validate(&code).is_ok());
+
+        assert!(user.delete().is_ok());
+        assert!(user.delete().is_err());
     }
 }

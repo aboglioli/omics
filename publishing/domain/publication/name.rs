@@ -1,19 +1,20 @@
 use common::error::Error;
 use common::result::Result;
 
+#[derive(Debug, Clone)]
 pub struct Name {
     name: String,
 }
 
 impl Name {
-    pub fn new(name: &str) -> Result<Name> {
+    pub fn new<S: Into<String>>(name: S) -> Result<Self> {
+        let name = name.into();
+
         if name.len() < 4 {
             return Err(Error::new("name", "too_short"));
         }
 
-        Ok(Name {
-            name: name.to_owned(),
-        })
+        Ok(Name { name })
     }
 
     pub fn value(&self) -> &str {

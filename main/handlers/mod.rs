@@ -1,6 +1,7 @@
-pub mod authorization;
+pub mod author;
+pub mod category;
+pub mod collection;
 pub mod common;
-pub mod container;
 pub mod contract;
 pub mod donation;
 pub mod publication;

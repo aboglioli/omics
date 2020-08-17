@@ -44,6 +44,10 @@ impl<K, V: Clone> InMemCache<K, V> {
             .map(|(_, v)| v.clone())
             .collect()
     }
+
+    pub async fn len(&self) -> usize {
+        self.data.lock().await.len()
+    }
 }
 
 #[async_trait]

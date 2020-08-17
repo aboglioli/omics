@@ -1,7 +1,6 @@
 use async_trait::async_trait;
 
-use common::cache::{Cache, InMemCache};
-
+use common::cache::{inmem::InMemCache, Cache};
 use common::result::Result;
 
 use crate::domain::token::{Data, TokenId, TokenRepository};
@@ -16,6 +15,10 @@ impl InMemTokenRepository {
         InMemTokenRepository {
             cache: InMemCache::new(),
         }
+    }
+
+    pub fn cache(&self) -> &InMemCache<TokenId, Data> {
+        &self.cache
     }
 }
 
