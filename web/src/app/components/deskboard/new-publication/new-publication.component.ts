@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../domain/services/auth';
 
 @Component({
   selector: 'app-new-publication',
@@ -9,10 +10,14 @@ import { Router } from '@angular/router';
 export class NewPublicationComponent implements OnInit {
 
   constructor(
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
+
+    this.authService.authStart();
+
   }
 
   public backToDeskboard(): void {

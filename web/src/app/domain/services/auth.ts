@@ -1,6 +1,7 @@
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthService {
@@ -10,7 +11,9 @@ export class AuthService {
   public accessUser = new Subject<boolean>();
   public accessUser$ = this.accessUser.asObservable();
 
-  constructor() {
+  constructor(
+    private router: Router,
+  ) {
 
     const authToken = localStorage.getItem('auth_token');
     if (authToken) {
@@ -49,6 +52,17 @@ export class AuthService {
 
   public isLoggedIn(): boolean {
     return !!this.authToken;
+  }
+
+  public authStart(): void {
+
+    // Saber si el usuario esta o no logueado para rediriguir
+    if ( !this.isLoggedIn() ) {
+
+      this.router.navigate(['/home']);
+
+    }
+
   }
 
 }
