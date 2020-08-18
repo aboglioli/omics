@@ -66,7 +66,7 @@ pub async fn populate(c: &Container) -> Result<()> {
             Some(Password::new(hashed_password.clone())?),
         )?,
         Some(Person::new(Fullname::new("TheFirst", "User")?)?),
-        content_manager_role.clone(),
+        user_role.clone(),
         None,
     );
     c.identity.user_repo().save(&mut admin).await?;

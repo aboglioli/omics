@@ -29,7 +29,7 @@ impl ContentManagerRepository for ContentManagerTranslator {
     async fn find_by_id(&self, id: &ContentManagerId) -> Result<ContentManager> {
         let user = self.user_repo.find_by_id(&UserId::new(id.value())?).await?;
 
-        if !user.role().is("admin") || !user.role().is("content-manager") {
+        if !user.role().is("admin") && !user.role().is("content-manager") {
             return Err(Error::new("user", "unauthorized"));
         }
 

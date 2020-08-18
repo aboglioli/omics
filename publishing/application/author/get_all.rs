@@ -36,20 +36,24 @@ impl<'a> GetAll<'a> {
 
         let mut author_dtos = Vec::new();
         for author in authors.iter() {
+            let publication_count = self.publication_repo
+                .find_by_author_id(&author.base().id())
+                .await?
+                .len();
+
+            let collection_count = self.collection_repo
+                .find_by_author_id(&author.base().id())
+                .await?
+                .len();
+
+            if publication_count == 0 && collection_count == 0 {
+                continue;
+            }
+
             author_dtos.push(
                 AuthorDto::new(author)
-                    .publication_count(
-                        self.publication_repo
-                            .find_by_author_id(&author.base().id())
-                            .await?
-                            .len(),
-                    )
-                    .collection_count(
-                        self.collection_repo
-                            .find_by_author_id(&author.base().id())
-                            .await?
-                            .len(),
-                    ),
+                    .publication_count(publication_count)
+                    .collection_count(collection_count),
             )
         }
 

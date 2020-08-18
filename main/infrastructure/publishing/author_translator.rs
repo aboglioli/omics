@@ -40,16 +40,6 @@ impl AuthorRepository for AuthorTranslator {
         for user in users {
             let author_id = AuthorId::new(user.base().id().value())?;
 
-            if self
-                .publication_repo
-                .find_by_author_id(&author_id)
-                .await?
-                .len()
-                == 0
-            {
-                continue;
-            }
-
             authors.push(Author::new(
                 author_id,
                 user.identity().username().value(),
@@ -67,16 +57,6 @@ impl AuthorRepository for AuthorTranslator {
 
         if user.person().is_none() {
             return Err(Error::new("author", "does_not_have_a_name"));
-        }
-
-        if self
-            .publication_repo
-            .find_by_author_id(&author_id)
-            .await?
-            .len()
-            == 0
-        {
-            return Err(Error::new("author", "not_found"));
         }
 
         Ok(Author::new(
