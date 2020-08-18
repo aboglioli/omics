@@ -10,6 +10,7 @@ use crate::domain::collection::{Collection, CollectionId};
 pub trait CollectionRepository: Sync + Send {
     async fn next_id(&self) -> Result<CollectionId>;
 
+    async fn find_all(&self) -> Result<Vec<Collection>>;
     async fn find_by_id(&self, id: &CollectionId) -> Result<Collection>;
     async fn find_by_author_id(&self, author_id: &AuthorId) -> Result<Vec<Collection>>;
     async fn find_by_category_id(&self, category_id: &CategoryId) -> Result<Vec<Collection>>;

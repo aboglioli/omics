@@ -1,4 +1,4 @@
+mod get_all;
 mod get_by_id;
-mod search;
+pub use get_all::*;
 pub use get_by_id::*;
-pub use search::*;

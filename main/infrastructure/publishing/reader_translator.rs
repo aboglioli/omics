@@ -6,21 +6,18 @@ use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
 use publishing::domain::reader::{Reader, ReaderId, ReaderRepository};
 
-pub struct ReaderTranslator<URepo> {
-    user_repo: Arc<URepo>,
+pub struct ReaderTranslator {
+    user_repo: Arc<dyn UserRepository>,
 }
 
-impl<URepo> ReaderTranslator<URepo> {
-    pub fn new(user_repo: Arc<URepo>) -> Self {
+impl ReaderTranslator {
+    pub fn new(user_repo: Arc<dyn UserRepository>) -> Self {
         ReaderTranslator { user_repo }
     }
 }
 
 #[async_trait]
-impl<URepo> ReaderRepository for ReaderTranslator<URepo>
-where
-    URepo: UserRepository + Sync + Send,
-{
+impl ReaderRepository for ReaderTranslator {
     async fn next_id(&self) -> Result<ReaderId> {
         let user_id = self.user_repo.next_id().await?;
         Ok(ReaderId::new(user_id.value())?)

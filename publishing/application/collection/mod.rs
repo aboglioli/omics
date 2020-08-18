@@ -1,14 +1,14 @@
 mod add_publication;
 mod create;
 mod delete;
+mod get_all;
 mod get_by_id;
 mod remove_publication;
-mod search;
 mod update;
 pub use add_publication::*;
 pub use create::*;
 pub use delete::*;
+pub use get_all::*;
 pub use get_by_id::*;
 pub use remove_publication::*;
-pub use search::*;
 pub use update::*;

@@ -7,11 +7,13 @@ use catalogue::container::Container as CatalogueContainer;
 use catalogue::infrastructure::persistence::inmem::InMemCatalogueRepository;
 use common::event::inmem::InMemEventBus;
 use identity::container::Container as IdentityContainer;
+use identity::domain::user::UserRepository;
 use identity::infrastructure::persistence::inmem::{
     InMemRoleRepository, InMemTokenRepository, InMemUserRepository,
 };
 use identity::infrastructure::service::{BcryptHasher, JWTEncoder};
 use publishing::container::Container as PublishingContainer;
+use publishing::domain::publication::PublicationRepository;
 use publishing::infrastructure::persistence::inmem::{
     InMemAuthorRepository, InMemCategoryRepository, InMemCollectionRepository,
     InMemContentManagerRepository, InMemInteractionRepository, InMemPublicationRepository,
@@ -43,15 +45,23 @@ impl Container {
         let token_enc = Arc::new(JWTEncoder::new());
 
         let _author_repo = Arc::new(InMemAuthorRepository::new());
-        let author_repo = Arc::new(AuthorTranslator::new(Arc::clone(&user_repo)));
         let category_repo = Arc::new(InMemCategoryRepository::new());
         let collection_repo = Arc::new(InMemCollectionRepository::new());
         let _content_manager_repo = Arc::new(InMemContentManagerRepository::new());
-        let content_manager_repo = Arc::new(ContentManagerTranslator::new(Arc::clone(&user_repo)));
         let interaction_repo = Arc::new(InMemInteractionRepository::new());
         let publication_repo = Arc::new(InMemPublicationRepository::new());
         let _reader_repo = Arc::new(InMemReaderRepository::new());
-        let reader_repo = Arc::new(ReaderTranslator::new(Arc::clone(&user_repo)));
+
+        let reader_repo = Arc::new(ReaderTranslator::new(
+            Arc::clone(&user_repo) as Arc<dyn UserRepository>
+        ));
+        let author_repo = Arc::new(AuthorTranslator::new(
+            Arc::clone(&publication_repo) as Arc<dyn PublicationRepository>,
+            Arc::clone(&user_repo) as Arc<dyn UserRepository>,
+        ));
+        let content_manager_repo = Arc::new(ContentManagerTranslator::new(
+            Arc::clone(&user_repo) as Arc<dyn UserRepository>
+        ));
 
         let catalogue_repo = Arc::new(InMemCatalogueRepository::new());
 

@@ -1,9 +1,15 @@
+use serde::Deserialize;
 use uuid::Uuid;
 
 use common::event::EventPublisher;
 use common::result::Result;
 
 use crate::domain::user::{Email, Password, UserRepository, UserService};
+
+#[derive(Deserialize)]
+pub struct RecoverPasswordCommand {
+    pub email: String,
+}
 
 pub struct RecoverPassword<'a> {
     event_pub: &'a dyn EventPublisher,
@@ -26,8 +32,8 @@ impl<'a> RecoverPassword<'a> {
         }
     }
 
-    pub async fn exec(&self, email: String) -> Result<()> {
-        let email = Email::new(email)?;
+    pub async fn exec(&self, cmd: RecoverPasswordCommand) -> Result<()> {
+        let email = Email::new(cmd.email)?;
         let mut user = self.user_repo.find_by_email(&email).await?;
 
         let tmp_password = Uuid::new_v4().to_string();
@@ -56,7 +62,12 @@ mod tests {
         let uc = RecoverPassword::new(c.event_pub(), c.user_repo(), c.user_serv());
 
         let user = mocks::user1();
-        assert!(uc.exec(user.base().id().value().to_owned()).await.is_err())
+        assert!(uc
+            .exec(RecoverPasswordCommand {
+                email: user.identity().email().value().to_owned(),
+            })
+            .await
+            .is_err())
     }
 
     #[tokio::test]
@@ -69,7 +80,9 @@ mod tests {
         c.user_repo().save(&mut user).await.unwrap();
 
         assert!(uc
-            .exec(user.identity().email().value().to_owned())
+            .exec(RecoverPasswordCommand {
+                email: user.identity().email().value().to_owned(),
+            })
             .await
             .is_ok());
 

@@ -43,6 +43,10 @@ impl CollectionRepository for InMemCollectionRepository {
         CollectionId::new(id.to_string())
     }
 
+    async fn find_all(&self) -> Result<Vec<Collection>> {
+        Ok(self.cache.all().await)
+    }
+
     async fn find_by_id(&self, id: &CollectionId) -> Result<Collection> {
         self.cache
             .get(id)

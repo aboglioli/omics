@@ -42,6 +42,10 @@ impl AuthorRepository for InMemAuthorRepository {
         AuthorId::new(id.to_string())
     }
 
+    async fn find_all(&self) -> Result<Vec<Author>> {
+        Ok(self.cache.all().await)
+    }
+
     async fn find_by_id(&self, id: &AuthorId) -> Result<Author> {
         self.cache
             .get(id)
