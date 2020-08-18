@@ -13,7 +13,9 @@ use warp::Filter;
 use common::config::Config;
 
 use container::Container;
-use handlers::{author, category, collection, contract, donation, publication, subscription, user};
+use handlers::{
+    author, catalogue, category, collection, contract, donation, publication, subscription, user,
+};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -23,11 +25,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let container = Arc::new(Container::new());
 
     if config.env() == "development" {
-        println!("# Populate...");
-        if let Err(err) = development::populate(&container).await {
+        if let Err(err) = development::run(&container).await {
             println!("{:?}", err);
-        } else {
-            println!("OK")
         }
     }
 
@@ -37,6 +36,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // Routes
     let routes = warp::path("api").and(
         health
+            .or(development::routes(&container))
+            .or(catalogue::routes(&container))
             .or(user::routes(&container))
             .or(publication::routes(&container))
             .or(collection::routes(&container))

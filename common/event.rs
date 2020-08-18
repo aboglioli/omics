@@ -12,18 +12,16 @@ use chrono::{DateTime, Utc};
 
 use crate::result::Result;
 
-pub type EventPayload = Vec<u8>;
-
 #[derive(Debug, Clone)]
 pub struct Event {
     topic: String,
     code: String,
     timestamp: DateTime<Utc>,
-    payload: EventPayload,
+    payload: Vec<u8>,
 }
 
 impl Event {
-    pub fn new(topic: &str, code: &str, payload: EventPayload) -> Self {
+    pub fn new(topic: &str, code: &str, payload: Vec<u8>) -> Self {
         Event {
             topic: topic.to_owned(),
             code: code.to_owned(),
@@ -44,7 +42,7 @@ impl Event {
         &self.timestamp
     }
 
-    pub fn payload(&self) -> &EventPayload {
+    pub fn payload(&self) -> &[u8] {
         &self.payload
     }
 }

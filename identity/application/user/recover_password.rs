@@ -73,7 +73,10 @@ mod tests {
         let old_password = user.identity().password().unwrap().value().to_owned();
         c.user_repo().save(&mut user).await.unwrap();
 
-        assert!(uc.exec(user.base().id().value().to_owned()).await.is_ok());
+        assert!(uc
+            .exec(user.identity().email().value().to_owned())
+            .await
+            .is_ok());
 
         let user = c.user_repo().find_by_id(&user.base().id()).await.unwrap();
         assert_ne!(user.identity().password().unwrap().value(), old_password);

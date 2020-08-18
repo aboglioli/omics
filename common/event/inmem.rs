@@ -92,9 +92,7 @@ impl EventPublisher for InMemEventBus {
                 publication_result.published_events += 1;
             }
 
-            if tx.send(publication_result).is_err() {
-                println!("Closed channel");
-            }
+            if tx.send(publication_result).is_err() {}
         });
 
         Ok(rx)

@@ -3,6 +3,8 @@ use std::sync::Arc;
 
 use warp::Filter;
 
+use catalogue::container::Container as CatalogueContainer;
+use catalogue::infrastructure::persistence::inmem::InMemCatalogueRepository;
 use common::event::inmem::InMemEventBus;
 use identity::container::Container as IdentityContainer;
 use identity::infrastructure::persistence::inmem::{
@@ -21,6 +23,7 @@ use crate::infrastructure::publishing::{
 };
 
 pub struct Container {
+    pub event_bus: Arc<InMemEventBus>,
     pub identity: IdentityContainer<
         InMemEventBus,
         InMemRoleRepository,
@@ -39,6 +42,7 @@ pub struct Container {
         InMemPublicationRepository,
         ReaderTranslator<InMemUserRepository>,
     >,
+    pub catalogue: CatalogueContainer<InMemEventBus, InMemCatalogueRepository>,
 }
 
 impl Container {
@@ -62,7 +66,10 @@ impl Container {
         let _reader_repo = Arc::new(InMemReaderRepository::new());
         let reader_repo = Arc::new(ReaderTranslator::new(Arc::clone(&user_repo)));
 
+        let catalogue_repo = Arc::new(InMemCatalogueRepository::new());
+
         Container {
+            event_bus: Arc::clone(&event_bus),
             identity: IdentityContainer::new(
                 Arc::clone(&event_bus),
                 role_repo,
@@ -81,7 +88,12 @@ impl Container {
                 publication_repo,
                 reader_repo,
             ),
+            catalogue: CatalogueContainer::new(Arc::clone(&event_bus), catalogue_repo),
         }
+    }
+
+    pub fn event_bus(&self) -> &InMemEventBus {
+        &self.event_bus
     }
 }
 

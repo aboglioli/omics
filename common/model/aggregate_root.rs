@@ -172,7 +172,7 @@ mod tests {
         let events = ag.base().events().unwrap();
         assert_eq!(events.len(), 3);
         assert_eq!(events[0].topic(), "agg_root.created");
-        assert_eq!(events[0].payload(), &"agg_root.created".as_bytes().to_vec());
+        assert_eq!(events[0].payload(), "agg_root.created".as_bytes());
         assert_eq!(events[1].topic(), "agg_root.updated");
         assert_eq!(events[2].topic(), "agg_root.deleted");
     }
