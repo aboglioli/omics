@@ -32,13 +32,15 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private authServ: AuthService) {  }
 
   public intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    req = req.clone({
-      setHeaders: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${this.authServ.getToken()}`,
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-    });
+    if (this.authServ.isLoggedIn()) {
+      req = req.clone({
+        setHeaders: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${this.authServ.getToken()}`,
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+      });
+    }
 
     return next.handle(req);
   }

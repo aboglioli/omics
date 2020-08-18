@@ -5,6 +5,9 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { ValidadoresCustomService } from '../../services/validadores-custom.service';
 import { Router } from '@angular/router';
 
+import { IdentityService, IRegisterCommand, ILoginCommand  } from '../../domain/services/identity';
+import { AuthService  } from '../../domain/services/auth';
+
 @Component({
   selector: 'app-login-register',
   templateUrl: './login-register.component.html',
@@ -28,7 +31,9 @@ export class LoginRegisterComponent implements OnInit {
   constructor(  private dialogRef: MatDialogRef<LoginRegisterComponent>,
                 private fb: FormBuilder,
                 private validadoresCustom: ValidadoresCustomService,
-                private router: Router ) {
+                private router: Router,
+                private identityServ: IdentityService,
+                private authServ: AuthService) {
 
     dialogRef.disableClose = true;
 
@@ -126,12 +131,21 @@ export class LoginRegisterComponent implements OnInit {
 
     } else {
 
-      console.log('TEST > Usuario Registrado');
+      const cmd: IRegisterCommand = {
+        email: this.formSignUp.get('correo').value,
+        username: this.formSignUp.get('usuario').value,
+        password: this.formSignUp.get('password1').value,
+      };
+      this.identityServ.register(cmd).subscribe(res => {
+        console.log(res);
+      });
 
-      localStorage.setItem('tokenJWT', 'adminToken'); // Uso temporal por ahora
-      this.router.navigate(['/home']);
+      // console.log('TEST > Usuario Registrado');
+      //
+      // localStorage.setItem('tokenJWT', 'adminToken'); // Uso temporal por ahora
+      // this.router.navigate(['/home']);
 
-      this.closeMatDialog();
+      // this.closeMatDialog();
 
     }
 
