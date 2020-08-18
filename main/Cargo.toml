@@ -22,6 +22,8 @@ payment = { path = "../payment" }
 publishing = { path = "../publishing" }
 
 async-trait = "0.1.36"
+env_logger = "0.7.1"
+log = "0.4.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tokio = { version = "0.2", features = ["full"] }

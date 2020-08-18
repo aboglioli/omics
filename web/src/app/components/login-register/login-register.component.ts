@@ -5,6 +5,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { ValidadoresCustomService } from '../../services/validadores-custom.service';
 import { Router } from '@angular/router';
 import { IdentityService, IRegisterCommand, IRegisterResponse } from '../../domain/services/identity';
+import { AuthService  } from '../../domain/services/auth';
 
 @Component({
   selector: 'app-login-register',
@@ -30,7 +31,8 @@ export class LoginRegisterComponent implements OnInit {
                 private fb: FormBuilder,
                 private validadoresCustom: ValidadoresCustomService,
                 private router: Router,
-                private identifyService: IdentityService ) {
+                private identityServ: IdentityService,
+                private authServ: AuthService) {
 
     dialogRef.disableClose = true;
 
@@ -136,7 +138,7 @@ export class LoginRegisterComponent implements OnInit {
         password: this.formSignUp.get('password1').value
 
       };
-      this.identifyService.register( registerCommand ).subscribe(
+      this.identityServ.register( registerCommand ).subscribe(
 
         (result: IRegisterResponse) => {
 
