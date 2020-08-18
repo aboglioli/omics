@@ -5,23 +5,18 @@ use crate::domain::content_manager::{ContentManagerId, ContentManagerRepository}
 use crate::domain::publication::{PublicationId, PublicationRepository};
 
 // TODO: add comment
-pub struct Approve<'a, EPub, CMRepo, PRepo> {
-    event_pub: &'a EPub,
+pub struct Approve<'a> {
+    event_pub: &'a dyn EventPublisher,
 
-    content_manager_repo: &'a CMRepo,
-    publication_repo: &'a PRepo,
+    content_manager_repo: &'a dyn ContentManagerRepository,
+    publication_repo: &'a dyn PublicationRepository,
 }
 
-impl<'a, EPub, CMRepo, PRepo> Approve<'a, EPub, CMRepo, PRepo>
-where
-    EPub: EventPublisher,
-    CMRepo: ContentManagerRepository,
-    PRepo: PublicationRepository,
-{
+impl<'a> Approve<'a> {
     pub fn new(
-        event_pub: &'a EPub,
-        content_manager_repo: &'a CMRepo,
-        publication_repo: &'a PRepo,
+        event_pub: &'a dyn EventPublisher,
+        content_manager_repo: &'a dyn ContentManagerRepository,
+        publication_repo: &'a dyn PublicationRepository,
     ) -> Self {
         Approve {
             event_pub,

@@ -6,8 +6,7 @@ use common::result::Result;
 use crate::domain::role::{Role, RoleId};
 
 use crate::domain::user::{
-    Email, Identity, Password, PasswordHasher, Provider, User, UserRepository, UserService,
-    Username,
+    Email, Identity, Password, Provider, User, UserRepository, UserService, Username,
 };
 
 #[derive(Deserialize)]
@@ -29,24 +28,19 @@ pub struct RegisterResponse {
     pub validation_code: String, // TODO: remove, only for testing
 }
 
-pub struct Register<'a, EPub, URepo, PHasher> {
-    event_pub: &'a EPub,
+pub struct Register<'a> {
+    event_pub: &'a dyn EventPublisher,
 
-    user_repo: &'a URepo,
+    user_repo: &'a dyn UserRepository,
 
-    user_serv: &'a UserService<URepo, PHasher>,
+    user_serv: &'a UserService,
 }
 
-impl<'a, EPub, URepo, PHasher> Register<'a, EPub, URepo, PHasher>
-where
-    EPub: EventPublisher,
-    URepo: UserRepository,
-    PHasher: PasswordHasher,
-{
+impl<'a> Register<'a> {
     pub fn new(
-        event_pub: &'a EPub,
-        user_repo: &'a URepo,
-        user_serv: &'a UserService<URepo, PHasher>,
+        event_pub: &'a dyn EventPublisher,
+        user_repo: &'a dyn UserRepository,
+        user_serv: &'a UserService,
     ) -> Self {
         Register {
             event_pub,

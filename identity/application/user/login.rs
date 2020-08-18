@@ -3,8 +3,7 @@ use serde::{Deserialize, Serialize};
 use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::domain::token::{TokenEncoder, TokenRepository};
-use crate::domain::user::{AuthenticationService, PasswordHasher, UserRepository};
+use crate::domain::user::AuthenticationService;
 
 #[derive(Deserialize)]
 pub struct LoginCommand {
@@ -18,23 +17,16 @@ pub struct LoginResponse {
     auth_token: String,
 }
 
-pub struct Login<'a, EPub, URepo, PHasher, TRepo, TEnc> {
-    event_pub: &'a EPub,
+pub struct Login<'a> {
+    event_pub: &'a dyn EventPublisher,
 
-    authentication_serv: &'a AuthenticationService<URepo, PHasher, TRepo, TEnc>,
+    authentication_serv: &'a AuthenticationService,
 }
 
-impl<'a, EPub, URepo, PHasher, TRepo, TEnc> Login<'a, EPub, URepo, PHasher, TRepo, TEnc>
-where
-    EPub: EventPublisher,
-    URepo: UserRepository,
-    PHasher: PasswordHasher,
-    TRepo: TokenRepository,
-    TEnc: TokenEncoder,
-{
+impl<'a> Login<'a> {
     pub fn new(
-        event_pub: &'a EPub,
-        authentication_serv: &'a AuthenticationService<URepo, PHasher, TRepo, TEnc>,
+        event_pub: &'a dyn EventPublisher,
+        authentication_serv: &'a AuthenticationService,
     ) -> Self {
         Login {
             event_pub,
@@ -100,7 +92,6 @@ mod tests {
             .await
             .unwrap();
         assert!(!res.auth_token.is_empty());
-        assert_eq!(c.token_repo().cache().len().await, 1);
         assert_eq!(c.event_pub().events().await.len(), 1);
 
         assert!(uc

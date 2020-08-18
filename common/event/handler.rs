@@ -5,9 +5,7 @@ use crate::result::Result;
 
 #[async_trait]
 pub trait EventHandler {
-    type Output;
-
     fn topic(&self) -> &str;
 
-    async fn handle(&mut self, event: &Event) -> Result<Self::Output>;
+    async fn handle(&mut self, event: &Event) -> Result<bool>;
 }

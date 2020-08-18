@@ -26,25 +26,9 @@ use crate::infrastructure::publishing::{
 pub struct Container {
     pub event_bus: Arc<InMemEventBus>,
     pub event_repo: Arc<EventRepository>,
-    pub identity: IdentityContainer<
-        InMemEventBus,
-        InMemRoleRepository,
-        InMemTokenRepository,
-        InMemUserRepository,
-        BcryptHasher,
-        JWTEncoder,
-    >,
-    pub publishing: PublishingContainer<
-        InMemEventBus,
-        AuthorTranslator<InMemUserRepository>,
-        InMemCategoryRepository,
-        InMemCollectionRepository,
-        ContentManagerTranslator<InMemUserRepository>,
-        InMemInteractionRepository,
-        InMemPublicationRepository,
-        ReaderTranslator<InMemUserRepository>,
-    >,
-    pub catalogue: CatalogueContainer<InMemEventBus, InMemCatalogueRepository>,
+    pub identity: IdentityContainer<InMemEventBus>,
+    pub publishing: PublishingContainer<InMemEventBus>,
+    pub catalogue: CatalogueContainer<InMemEventBus>,
 }
 
 impl Container {

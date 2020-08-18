@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 use common::result::Result;
 
-use crate::domain::user::{PasswordHasher, UserId, UserRepository, UserService};
+use crate::domain::user::{UserId, UserService};
 
 #[derive(Deserialize)]
 pub struct ChangePasswordCommand {
@@ -16,16 +16,12 @@ impl ChangePasswordCommand {
     }
 }
 
-pub struct ChangePassword<'a, URepo, PHasher> {
-    user_serv: &'a UserService<URepo, PHasher>,
+pub struct ChangePassword<'a> {
+    user_serv: &'a UserService,
 }
 
-impl<'a, URepo, PHasher> ChangePassword<'a, URepo, PHasher>
-where
-    URepo: UserRepository,
-    PHasher: PasswordHasher,
-{
-    pub fn new(user_serv: &'a UserService<URepo, PHasher>) -> Self {
+impl<'a> ChangePassword<'a> {
+    pub fn new(user_serv: &'a UserService) -> Self {
         ChangePassword { user_serv }
     }
 

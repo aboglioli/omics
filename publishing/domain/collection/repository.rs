@@ -7,7 +7,7 @@ use crate::domain::category::CategoryId;
 use crate::domain::collection::{Collection, CollectionId};
 
 #[async_trait]
-pub trait CollectionRepository {
+pub trait CollectionRepository: Sync + Send {
     async fn next_id(&self) -> Result<CollectionId>;
 
     async fn find_by_id(&self, id: &CollectionId) -> Result<Collection>;

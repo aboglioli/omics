@@ -28,13 +28,11 @@ where
     CRepo: CatalogueRepository + Sync + Send,
     CServ: CollectionService + Sync + Send,
 {
-    type Output = bool;
-
     fn topic(&self) -> &str {
         "collection"
     }
 
-    async fn handle(&mut self, event: &Event) -> Result<Self::Output> {
+    async fn handle(&mut self, event: &Event) -> Result<bool> {
         let event = match serde_json::from_slice(event.payload()) {
             Ok(event) => event,
             Err(err) => return Err(Error::new("handler", "deserialize").wrap_raw(err).build()),

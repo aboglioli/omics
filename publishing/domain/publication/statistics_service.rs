@@ -8,15 +8,12 @@ use crate::domain::interaction::{InteractionRepository, Like, Reading, Review, V
 use crate::domain::publication::{PublicationId, Statistics};
 use crate::domain::reader::ReaderId;
 
-pub struct StatisticsService<IRepo> {
-    interaction_repo: Arc<IRepo>,
+pub struct StatisticsService {
+    interaction_repo: Arc<dyn InteractionRepository>,
 }
 
-impl<IRepo> StatisticsService<IRepo>
-where
-    IRepo: InteractionRepository,
-{
-    pub fn new(interaction_repo: Arc<IRepo>) -> Self {
+impl StatisticsService {
+    pub fn new(interaction_repo: Arc<dyn InteractionRepository>) -> Self {
         StatisticsService { interaction_repo }
     }
 

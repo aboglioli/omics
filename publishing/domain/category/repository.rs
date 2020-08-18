@@ -5,7 +5,7 @@ use common::result::Result;
 use crate::domain::category::{Category, CategoryId};
 
 #[async_trait]
-pub trait CategoryRepository {
+pub trait CategoryRepository: Sync + Send {
     async fn next_id(&self) -> Result<CategoryId>;
 
     async fn find_by_id(&self, id: &CategoryId) -> Result<Category>;

@@ -10,42 +10,31 @@ use crate::domain::interaction::{InteractionRepository, InteractionService};
 use crate::domain::publication::{PublicationRepository, StatisticsService};
 use crate::domain::reader::ReaderRepository;
 
-pub struct Container<EPub, ARepo, CatRepo, CollRepo, CMRepo, IRepo, PRepo, RRepo> {
+pub struct Container<EPub> {
     event_pub: Arc<EPub>,
 
-    author_repo: Arc<ARepo>,
-    category_repo: Arc<CatRepo>,
-    collection_repo: Arc<CollRepo>,
-    content_manager_repo: Arc<CMRepo>,
-    interaction_repo: Arc<IRepo>,
-    publication_repo: Arc<PRepo>,
-    reader_repo: Arc<RRepo>,
+    author_repo: Arc<dyn AuthorRepository>,
+    category_repo: Arc<dyn CategoryRepository>,
+    collection_repo: Arc<dyn CollectionRepository>,
+    content_manager_repo: Arc<dyn ContentManagerRepository>,
+    interaction_repo: Arc<dyn InteractionRepository>,
+    publication_repo: Arc<dyn PublicationRepository>,
+    reader_repo: Arc<dyn ReaderRepository>,
 
-    statistics_serv: Arc<StatisticsService<IRepo>>,
-    interaction_serv: Arc<InteractionService<IRepo>>,
+    statistics_serv: Arc<StatisticsService>,
+    interaction_serv: Arc<InteractionService>,
 }
 
-impl<EPub, ARepo, CatRepo, CollRepo, CMRepo, IRepo, PRepo, RRepo>
-    Container<EPub, ARepo, CatRepo, CollRepo, CMRepo, IRepo, PRepo, RRepo>
-where
-    EPub: EventPublisher,
-    ARepo: AuthorRepository,
-    CatRepo: CategoryRepository,
-    CollRepo: CollectionRepository,
-    CMRepo: ContentManagerRepository,
-    IRepo: InteractionRepository,
-    PRepo: PublicationRepository,
-    RRepo: ReaderRepository,
-{
+impl<EPub: EventPublisher> Container<EPub> {
     pub fn new(
         event_pub: Arc<EPub>,
-        author_repo: Arc<ARepo>,
-        category_repo: Arc<CatRepo>,
-        collection_repo: Arc<CollRepo>,
-        content_manager_repo: Arc<CMRepo>,
-        interaction_repo: Arc<IRepo>,
-        publication_repo: Arc<PRepo>,
-        reader_repo: Arc<RRepo>,
+        author_repo: Arc<dyn AuthorRepository>,
+        category_repo: Arc<dyn CategoryRepository>,
+        collection_repo: Arc<dyn CollectionRepository>,
+        content_manager_repo: Arc<dyn ContentManagerRepository>,
+        interaction_repo: Arc<dyn InteractionRepository>,
+        publication_repo: Arc<dyn PublicationRepository>,
+        reader_repo: Arc<dyn ReaderRepository>,
     ) -> Self {
         let statistics_serv = Arc::new(StatisticsService::new(Arc::clone(&interaction_repo)));
         let interaction_serv = Arc::new(InteractionService::new(Arc::clone(&interaction_repo)));
@@ -70,40 +59,40 @@ where
         &self.event_pub
     }
 
-    pub fn author_repo(&self) -> &ARepo {
-        &self.author_repo
+    pub fn author_repo(&self) -> &dyn AuthorRepository {
+        self.author_repo.as_ref()
     }
 
-    pub fn category_repo(&self) -> &CatRepo {
-        &self.category_repo
+    pub fn category_repo(&self) -> &dyn CategoryRepository {
+        self.category_repo.as_ref()
     }
 
-    pub fn collection_repo(&self) -> &CollRepo {
-        &self.collection_repo
+    pub fn collection_repo(&self) -> &dyn CollectionRepository {
+        self.collection_repo.as_ref()
     }
 
-    pub fn content_manager_repo(&self) -> &CMRepo {
-        &self.content_manager_repo
+    pub fn content_manager_repo(&self) -> &dyn ContentManagerRepository {
+        self.content_manager_repo.as_ref()
     }
 
-    pub fn interaction_repo(&self) -> &IRepo {
-        &self.interaction_repo
+    pub fn interaction_repo(&self) -> &dyn InteractionRepository {
+        self.interaction_repo.as_ref()
     }
 
-    pub fn publication_repo(&self) -> &PRepo {
-        &self.publication_repo
+    pub fn publication_repo(&self) -> &dyn PublicationRepository {
+        self.publication_repo.as_ref()
     }
 
-    pub fn reader_repo(&self) -> &RRepo {
-        &self.reader_repo
+    pub fn reader_repo(&self) -> &dyn ReaderRepository {
+        self.reader_repo.as_ref()
     }
 
     // Service
-    pub fn statistics_serv(&self) -> &StatisticsService<IRepo> {
+    pub fn statistics_serv(&self) -> &StatisticsService {
         &self.statistics_serv
     }
 
-    pub fn interaction_serv(&self) -> &InteractionService<IRepo> {
+    pub fn interaction_serv(&self) -> &InteractionService {
         &self.interaction_serv
     }
 }

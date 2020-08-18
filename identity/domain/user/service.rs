@@ -5,18 +5,17 @@ use common::result::Result;
 
 use crate::domain::user::{Email, Password, PasswordHasher, UserId, UserRepository, Username};
 
-pub struct UserService<URepo, PHasher> {
-    user_repo: Arc<URepo>,
+pub struct UserService {
+    user_repo: Arc<dyn UserRepository + Sync + Send>,
 
-    password_hasher: Arc<PHasher>,
+    password_hasher: Arc<dyn PasswordHasher + Sync + Send>,
 }
 
-impl<URepo, PHasher> UserService<URepo, PHasher>
-where
-    URepo: UserRepository,
-    PHasher: PasswordHasher,
-{
-    pub fn new(user_repo: Arc<URepo>, password_hasher: Arc<PHasher>) -> Self {
+impl UserService {
+    pub fn new(
+        user_repo: Arc<dyn UserRepository + Sync + Send>,
+        password_hasher: Arc<dyn PasswordHasher + Sync + Send>,
+    ) -> Self {
         UserService {
             user_repo,
             password_hasher,

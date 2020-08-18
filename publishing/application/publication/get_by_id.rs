@@ -4,38 +4,29 @@ use common::result::Result;
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};
 use crate::domain::author::AuthorRepository;
 use crate::domain::category::CategoryRepository;
-use crate::domain::interaction::{InteractionRepository, InteractionService};
+use crate::domain::interaction::InteractionService;
 use crate::domain::publication::{PublicationId, PublicationRepository};
 use crate::domain::reader::{ReaderId, ReaderRepository};
 
-pub struct GetById<'a, EPub, ARepo, CRepo, PRepo, RRepo, IRepo> {
-    event_pub: &'a EPub,
+pub struct GetById<'a> {
+    event_pub: &'a dyn EventPublisher,
 
-    author_repo: &'a ARepo,
-    category_repo: &'a CRepo,
-    publication_repo: &'a PRepo,
-    reader_repo: &'a RRepo,
+    author_repo: &'a dyn AuthorRepository,
+    category_repo: &'a dyn CategoryRepository,
+    publication_repo: &'a dyn PublicationRepository,
+    reader_repo: &'a dyn ReaderRepository,
 
-    interaction_serv: &'a InteractionService<IRepo>,
+    interaction_serv: &'a InteractionService,
 }
 
-impl<'a, EPub, ARepo, CRepo, PRepo, RRepo, IRepo>
-    GetById<'a, EPub, ARepo, CRepo, PRepo, RRepo, IRepo>
-where
-    EPub: EventPublisher,
-    ARepo: AuthorRepository,
-    CRepo: CategoryRepository,
-    PRepo: PublicationRepository,
-    RRepo: ReaderRepository,
-    IRepo: InteractionRepository,
-{
+impl<'a> GetById<'a> {
     pub fn new(
-        event_pub: &'a EPub,
-        author_repo: &'a ARepo,
-        category_repo: &'a CRepo,
-        publication_repo: &'a PRepo,
-        reader_repo: &'a RRepo,
-        interaction_serv: &'a InteractionService<IRepo>,
+        event_pub: &'a dyn EventPublisher,
+        author_repo: &'a dyn AuthorRepository,
+        category_repo: &'a dyn CategoryRepository,
+        publication_repo: &'a dyn PublicationRepository,
+        reader_repo: &'a dyn ReaderRepository,
+        interaction_serv: &'a InteractionService,
     ) -> Self {
         GetById {
             event_pub,

@@ -3,7 +3,7 @@ use serde::Deserialize;
 use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::domain::interaction::{Comment, InteractionRepository, InteractionService, Stars};
+use crate::domain::interaction::{Comment, InteractionService, Stars};
 use crate::domain::publication::{PublicationId, PublicationRepository};
 use crate::domain::reader::{ReaderId, ReaderRepository};
 
@@ -13,27 +13,21 @@ pub struct AddReviewCommand {
     pub comment: String,
 }
 
-pub struct AddReview<'a, EPub, PRepo, RRepo, IRepo> {
-    event_pub: &'a EPub,
+pub struct AddReview<'a> {
+    event_pub: &'a dyn EventPublisher,
 
-    publication_repo: &'a PRepo,
-    reader_repo: &'a RRepo,
+    publication_repo: &'a dyn PublicationRepository,
+    reader_repo: &'a dyn ReaderRepository,
 
-    interaction_serv: &'a InteractionService<IRepo>,
+    interaction_serv: &'a InteractionService,
 }
 
-impl<'a, EPub, PRepo, RRepo, IRepo> AddReview<'a, EPub, PRepo, RRepo, IRepo>
-where
-    EPub: EventPublisher,
-    PRepo: PublicationRepository,
-    RRepo: ReaderRepository,
-    IRepo: InteractionRepository,
-{
+impl<'a> AddReview<'a> {
     pub fn new(
-        event_pub: &'a EPub,
-        publication_repo: &'a PRepo,
-        reader_repo: &'a RRepo,
-        interaction_serv: &'a InteractionService<IRepo>,
+        event_pub: &'a dyn EventPublisher,
+        publication_repo: &'a dyn PublicationRepository,
+        reader_repo: &'a dyn ReaderRepository,
+        interaction_serv: &'a InteractionService,
     ) -> Self {
         AddReview {
             event_pub,

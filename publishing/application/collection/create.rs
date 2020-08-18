@@ -28,26 +28,20 @@ pub struct CreateResponse {
     id: String,
 }
 
-pub struct Create<'a, EPub, ARepo, CatRepo, CollRepo> {
-    event_pub: &'a EPub,
+pub struct Create<'a> {
+    event_pub: &'a dyn EventPublisher,
 
-    author_repo: &'a ARepo,
-    category_repo: &'a CatRepo,
-    collection_repo: &'a CollRepo,
+    author_repo: &'a dyn AuthorRepository,
+    category_repo: &'a dyn CategoryRepository,
+    collection_repo: &'a dyn CollectionRepository,
 }
 
-impl<'a, EPub, ARepo, CatRepo, CollRepo> Create<'a, EPub, ARepo, CatRepo, CollRepo>
-where
-    EPub: EventPublisher,
-    ARepo: AuthorRepository,
-    CatRepo: CategoryRepository,
-    CollRepo: CollectionRepository,
-{
+impl<'a> Create<'a> {
     pub fn new(
-        event_pub: &'a EPub,
-        author_repo: &'a ARepo,
-        category_repo: &'a CatRepo,
-        collection_repo: &'a CollRepo,
+        event_pub: &'a dyn EventPublisher,
+        author_repo: &'a dyn AuthorRepository,
+        category_repo: &'a dyn CategoryRepository,
+        collection_repo: &'a dyn CollectionRepository,
     ) -> Self {
         Create {
             event_pub,

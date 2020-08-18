@@ -17,7 +17,7 @@ pub fn routes(
     container: &Arc<Container>,
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     // GET /users
-    let _get_all = warp::get()
+    let get_all = warp::get()
         .and(warp::path::end())
         .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
@@ -88,7 +88,8 @@ pub fn routes(
         .and_then(change_role);
 
     warp::path("users").and(
-        get_by_id
+        get_all
+            .or(get_by_id)
             .or(register)
             .or(login)
             .or(update)

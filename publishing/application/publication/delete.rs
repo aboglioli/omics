@@ -4,18 +4,17 @@ use common::result::Result;
 
 use crate::domain::publication::{PublicationId, PublicationRepository};
 
-pub struct Delete<'a, EPub, PRepo> {
-    event_pub: &'a EPub,
+pub struct Delete<'a> {
+    event_pub: &'a dyn EventPublisher,
 
-    publication_repo: &'a PRepo,
+    publication_repo: &'a dyn PublicationRepository,
 }
 
-impl<'a, EPub, PRepo> Delete<'a, EPub, PRepo>
-where
-    EPub: EventPublisher,
-    PRepo: PublicationRepository,
-{
-    pub fn new(event_pub: &'a EPub, publication_repo: &'a PRepo) -> Self {
+impl<'a> Delete<'a> {
+    pub fn new(
+        event_pub: &'a dyn EventPublisher,
+        publication_repo: &'a dyn PublicationRepository,
+    ) -> Self {
         Delete {
             event_pub,
             publication_repo,

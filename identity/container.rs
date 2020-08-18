@@ -8,38 +8,32 @@ use crate::domain::user::{
     AuthenticationService, AuthorizationService, PasswordHasher, UserRepository, UserService,
 };
 
-pub struct Container<EPub, RRepo, TRepo, URepo, PHasher, TEnc> {
+pub struct Container<EPub> {
     event_pub: Arc<EPub>,
 
-    role_repo: Arc<RRepo>,
-    token_repo: Arc<TRepo>,
-    user_repo: Arc<URepo>,
+    role_repo: Arc<dyn RoleRepository + Sync + Send>,
+    token_repo: Arc<dyn TokenRepository + Sync + Send>,
+    user_repo: Arc<dyn UserRepository + Sync + Send>,
 
-    password_hasher: Arc<PHasher>,
-    token_enc: Arc<TEnc>,
+    password_hasher: Arc<dyn PasswordHasher + Sync + Send>,
+    token_enc: Arc<dyn TokenEncoder + Sync + Send>,
 
-    token_serv: Arc<TokenService<TRepo, TEnc>>,
-    user_serv: Arc<UserService<URepo, PHasher>>,
-    authentication_serv: Arc<AuthenticationService<URepo, PHasher, TRepo, TEnc>>,
-    authorization_serv: Arc<AuthorizationService<URepo, TRepo, TEnc>>,
+    token_serv: Arc<TokenService>,
+    user_serv: Arc<UserService>,
+    authentication_serv: Arc<AuthenticationService>,
+    authorization_serv: Arc<AuthorizationService>,
 }
 
-impl<EPub, RRepo, TRepo, URepo, PHasher, TEnc> Container<EPub, RRepo, TRepo, URepo, PHasher, TEnc>
-where
-    EPub: EventPublisher,
-    RRepo: RoleRepository,
-    TRepo: TokenRepository,
-    URepo: UserRepository,
-    PHasher: PasswordHasher,
-    TEnc: TokenEncoder,
-{
+impl<EPub: EventPublisher> Container<EPub> {
     pub fn new(
         event_pub: Arc<EPub>,
-        role_repo: Arc<RRepo>,
-        token_repo: Arc<TRepo>,
-        user_repo: Arc<URepo>,
-        password_hasher: Arc<PHasher>,
-        token_enc: Arc<TEnc>,
+
+        role_repo: Arc<dyn RoleRepository + Sync + Send>,
+        token_repo: Arc<dyn TokenRepository + Sync + Send>,
+        user_repo: Arc<dyn UserRepository + Sync + Send>,
+
+        password_hasher: Arc<dyn PasswordHasher + Sync + Send>,
+        token_enc: Arc<dyn TokenEncoder + Sync + Send>,
     ) -> Self {
         let token_serv = Arc::new(TokenService::new(
             Arc::clone(&token_repo),
@@ -80,40 +74,40 @@ where
         &self.event_pub
     }
 
-    pub fn role_repo(&self) -> &RRepo {
-        &self.role_repo
+    pub fn role_repo(&self) -> &dyn RoleRepository {
+        self.role_repo.as_ref()
     }
 
-    pub fn token_repo(&self) -> &TRepo {
-        &self.token_repo
+    pub fn token_repo(&self) -> &dyn TokenRepository {
+        self.token_repo.as_ref()
     }
 
-    pub fn user_repo(&self) -> &URepo {
-        &self.user_repo
+    pub fn user_repo(&self) -> &dyn UserRepository {
+        self.user_repo.as_ref()
     }
 
     // Services
-    pub fn password_hasher(&self) -> &PHasher {
-        &self.password_hasher
+    pub fn password_hasher(&self) -> &dyn PasswordHasher {
+        self.password_hasher.as_ref()
     }
 
-    pub fn token_enc(&self) -> &TEnc {
-        &self.token_enc
+    pub fn token_enc(&self) -> &dyn TokenEncoder {
+        self.token_enc.as_ref()
     }
 
-    pub fn token_serv(&self) -> &TokenService<TRepo, TEnc> {
+    pub fn token_serv(&self) -> &TokenService {
         &self.token_serv
     }
 
-    pub fn user_serv(&self) -> &UserService<URepo, PHasher> {
+    pub fn user_serv(&self) -> &UserService {
         &self.user_serv
     }
 
-    pub fn authentication_serv(&self) -> &AuthenticationService<URepo, PHasher, TRepo, TEnc> {
+    pub fn authentication_serv(&self) -> &AuthenticationService {
         &self.authentication_serv
     }
 
-    pub fn authorization_serv(&self) -> &AuthorizationService<URepo, TRepo, TEnc> {
+    pub fn authorization_serv(&self) -> &AuthorizationService {
         &self.authorization_serv
     }
 }

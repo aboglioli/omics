@@ -5,7 +5,7 @@ use common::result::Result;
 use crate::domain::user::{Email, User, UserId, Username};
 
 #[async_trait]
-pub trait UserRepository {
+pub trait UserRepository: Sync + Send {
     async fn next_id(&self) -> Result<UserId>;
 
     async fn find_all(&self) -> Result<Vec<User>>;

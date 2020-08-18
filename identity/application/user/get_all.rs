@@ -11,15 +11,12 @@ pub struct GetAllResponse {
     pub users: Vec<UserDto>,
 }
 
-pub struct GetAll<'a, URepo> {
-    user_repo: &'a URepo,
+pub struct GetAll<'a> {
+    user_repo: &'a dyn UserRepository,
 }
 
-impl<'a, URepo> GetAll<'a, URepo>
-where
-    URepo: UserRepository,
-{
-    pub fn new(user_repo: &'a URepo) -> Self {
+impl<'a> GetAll<'a> {
+    pub fn new(user_repo: &'a dyn UserRepository) -> Self {
         GetAll { user_repo }
     }
 

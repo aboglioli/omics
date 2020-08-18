@@ -21,25 +21,19 @@ pub struct SearchResponse {
     collections: Vec<CollectionDto>,
 }
 
-pub struct Search<'a, ARepo, CatRepo, CollRepo, PRepo> {
-    author_repo: &'a ARepo,
-    category_repo: &'a CatRepo,
-    collection_repo: &'a CollRepo,
-    publication_repo: &'a PRepo,
+pub struct Search<'a> {
+    author_repo: &'a dyn AuthorRepository,
+    category_repo: &'a dyn CategoryRepository,
+    collection_repo: &'a dyn CollectionRepository,
+    publication_repo: &'a dyn PublicationRepository,
 }
 
-impl<'a, ARepo, CatRepo, CollRepo, PRepo> Search<'a, ARepo, CatRepo, CollRepo, PRepo>
-where
-    ARepo: AuthorRepository,
-    CatRepo: CategoryRepository,
-    CollRepo: CollectionRepository,
-    PRepo: PublicationRepository,
-{
+impl<'a> Search<'a> {
     pub fn new(
-        author_repo: &'a ARepo,
-        category_repo: &'a CatRepo,
-        collection_repo: &'a CollRepo,
-        publication_repo: &'a PRepo,
+        author_repo: &'a dyn AuthorRepository,
+        category_repo: &'a dyn CategoryRepository,
+        collection_repo: &'a dyn CollectionRepository,
+        publication_repo: &'a dyn PublicationRepository,
     ) -> Self {
         Search {
             author_repo,

@@ -5,27 +5,21 @@ use crate::domain::interaction::{InteractionRepository, InteractionService};
 use crate::domain::publication::{PublicationId, PublicationRepository};
 use crate::domain::reader::{ReaderId, ReaderRepository};
 
-pub struct DeleteReview<'a, EPub, PRepo, RRepo, IRepo> {
-    event_pub: &'a EPub,
+pub struct DeleteReview<'a> {
+    event_pub: &'a dyn EventPublisher,
 
-    publication_repo: &'a PRepo,
-    reader_repo: &'a RRepo,
+    publication_repo: &'a dyn PublicationRepository,
+    reader_repo: &'a dyn ReaderRepository,
 
-    interaction_serv: &'a InteractionService<IRepo>,
+    interaction_serv: &'a InteractionService,
 }
 
-impl<'a, EPub, PRepo, RRepo, IRepo> DeleteReview<'a, EPub, PRepo, RRepo, IRepo>
-where
-    EPub: EventPublisher,
-    PRepo: PublicationRepository,
-    RRepo: ReaderRepository,
-    IRepo: InteractionRepository,
-{
+impl<'a> DeleteReview<'a> {
     pub fn new(
-        event_pub: &'a EPub,
-        publication_repo: &'a PRepo,
-        reader_repo: &'a RRepo,
-        interaction_serv: &'a InteractionService<IRepo>,
+        event_pub: &'a dyn EventPublisher,
+        publication_repo: &'a dyn PublicationRepository,
+        reader_repo: &'a dyn ReaderRepository,
+        interaction_serv: &'a InteractionService,
     ) -> Self {
         DeleteReview {
             event_pub,
