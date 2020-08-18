@@ -16,6 +16,8 @@ pub fn routes(
     warp::path("development").and(development)
 }
 
-pub async fn development(_c: Arc<Container>) -> Result<impl Reply, Rejection> {
+pub async fn development(c: Arc<Container>) -> Result<impl Reply, Rejection> {
+    let _events = c.event_repo().events().await;
+
     Ok(warp::reply::html("<b>Ok</b>"))
 }

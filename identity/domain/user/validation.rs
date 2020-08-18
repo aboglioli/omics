@@ -1,5 +1,7 @@
 use uuid::Uuid;
 
+use common::config::Config;
+
 #[derive(Default, Debug, Clone)]
 pub struct Validation {
     code: String,
@@ -7,10 +9,15 @@ pub struct Validation {
 
 impl Validation {
     pub fn new() -> Self {
-        let code = Uuid::new_v4();
-        Validation {
-            code: code.to_string(),
-        }
+        let config = Config::get();
+
+        let code = if config.env() == "development" {
+            "magic".to_owned()
+        } else {
+            Uuid::new_v4().to_string()
+        };
+
+        Validation { code }
     }
 
     pub fn code(&self) -> &str {
