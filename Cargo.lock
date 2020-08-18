@@ -154,6 +154,7 @@ dependencies = [
  "serde",
  "serde_json",
  "shared",
+ "tokio",
 ]
 
 [[package]]
@@ -622,11 +623,13 @@ name = "main"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "catalogue",
  "common",
  "identity",
  "payment",
  "publishing",
  "serde",
+ "serde_json",
  "tokio",
  "warp",
 ]

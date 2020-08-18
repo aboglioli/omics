@@ -1,4 +1,5 @@
 pub mod author;
+pub mod catalogue;
 pub mod category;
 pub mod collection;
 pub mod common;
