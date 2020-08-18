@@ -22,8 +22,7 @@ export class CatalogoComponent implements OnInit {
     this.obrasService.getListaObras().subscribe( obras => {
 
       this.listaObras = obras;
-      console.log('test > ', obras);
-
+      // console.log('test > ', obras);
 
     } );
 
