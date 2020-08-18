@@ -15,26 +15,72 @@
 
   </div>
 
+  <!-- Lista menu opciones -->
   <div class="body">
 
-    <!-- Lista menu opciones -->
-    <button mat-stroked-button class="button-white-borders"
-            [ngClass]="{'active': ( activePathSelected === 'catalogue' ) }"
-            (click)="goToPage('catalogue')">
-      Biblioteca
-    </button>
+    <!-- Admin Options -->
+    <div class="menu-admin dir-column">
 
-    <button mat-stroked-button class="button-white-borders"
-            [ngClass]="{'active': ( activePathSelected === 'authors' ) }"
-            (click)="goToPage('authors')">
-      Autores
-    </button>
+      <button mat-stroked-button class="button-white-borders admin-button"
+              [ngClass]="{'active': ( activePathSelected === 'dashboard-reportes' ) }"
+              (click)="goToPage('dashboard-reportes')">
+              Reportes
+      </button>
 
-    <button mat-stroked-button class="button-white-borders"
-            [ngClass]="{'active': ( activePathSelected === 'about' ) }"
-            (click)="goToPage('about')">
-      Sobre Omics
-    </button>
+      <button mat-stroked-button class="button-white-borders admin-button"
+              [ngClass]="{'active': ( activePathSelected === 'dashboard-publicaciones-contratos' ) }"
+              (click)="goToPage('dashboard-publicaciones-contratos')">
+              Gestionar Publicaciones y Contratos
+      </button>
+
+      <button mat-stroked-button class="button-white-borders admin-button"
+              [ngClass]="{'active': ( activePathSelected === 'dashboard-reglas-negocio' ) }"
+              (click)="goToPage('dashboard-reglas-negocio')">
+              Gestionar Reglas de Negocio
+      </button>
+
+      <button mat-stroked-button class="button-white-borders admin-button"
+              [ngClass]="{'active': ( activePathSelected === 'dashboard-general' ) }"
+              (click)="goToPage('dashboard-general')">
+              Gestionar Categorías, Estados y Etiquetas
+      </button>
+
+    </div>
+
+    <!-- User Options -->
+    <div class="menu-user dir-column">
+
+      <button mat-stroked-button class="button-white-borders user-button"
+              [ngClass]="{'active': ( activePathSelected === 'favorites' ) }"
+              (click)="goToPage('favorites')">
+        Favoritos
+      </button>
+
+      <button mat-stroked-button class="button-white-borders user-button"
+              [ngClass]="{'active': ( activePathSelected === 'catalogue' ) }"
+              (click)="goToPage('catalogue')">
+        Biblioteca
+      </button>
+
+      <button mat-stroked-button class="button-white-borders user-button"
+              [ngClass]="{'active': ( activePathSelected === 'deskboard' ) }"
+              (click)="goToPage('deskboard')">
+        Deskboard
+      </button>
+
+      <button mat-stroked-button class="button-white-borders user-button"
+              [ngClass]="{'active': ( activePathSelected === 'authors' ) }"
+              (click)="goToPage('authors')">
+        Autores
+      </button>
+
+      <button mat-stroked-button class="button-white-borders user-button"
+              [ngClass]="{'active': ( activePathSelected === 'about' ) }"
+              (click)="goToPage('about')">
+        Sobre Omics
+      </button>
+
+    </div>
 
   </div>
 
