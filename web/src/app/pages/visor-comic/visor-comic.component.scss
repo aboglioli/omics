@@ -1,0 +1,44 @@
+@import "src/scss/vars";
+
+div.page {
+
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  height: calc(100vh - 4.6em);
+
+  background-color: rgba(0, 0, 0, 0.25);
+
+  div.body-page {
+
+    height: 90%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex: 15;
+
+    img {
+
+      width: auto;
+      height: 100%;
+
+    }
+
+  }
+
+  div.footer-page {
+
+    flex: 1;
+    background-color: $omics-background-menu;
+
+    color: white;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0.25em 0.25em;
+
+  }
+
+
+}

@@ -31,7 +31,6 @@ export class SideNavMenuComponent implements OnInit, OnDestroy {
 
       if ( event instanceof NavigationStart ) {
         this.activePathSelected = event.url.substr(1);
-        // console.log('TEST >', this.activePathSelected);
       }
 
     });

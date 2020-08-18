@@ -48,6 +48,8 @@ import { DevelopmentComponent } from './pages/development/development.component'
 // Domain
 import { DomainModule } from './domain/module';
 import { UnderConstructionComponent } from './shared/under-construction/under-construction.component';
+import { DeskboardMisComicsComponent } from './components/deskboard/deskboard-mis-comics/deskboard-mis-comics.component';
+import { NewPublicationComponent } from './components/deskboard/new-publication/new-publication.component';
 
 
 @NgModule({
@@ -78,6 +80,10 @@ import { UnderConstructionComponent } from './shared/under-construction/under-co
     DevelopmentComponent,
 
     UnderConstructionComponent,
+
+    DeskboardMisComicsComponent,
+
+    NewPublicationComponent,
   ],
   imports: [
     BrowserModule,
