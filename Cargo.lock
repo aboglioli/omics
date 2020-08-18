@@ -205,10 +205,17 @@ name = "common"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "bcrypt",
  "chrono",
+ "env_logger",
+ "jsonwebtoken",
+ "log 0.4.11",
  "regex",
  "serde",
+ "serde_json",
+ "slug",
  "tokio",
+ "uuid",
  "warp",
 ]
 

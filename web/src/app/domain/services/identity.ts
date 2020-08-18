@@ -22,6 +22,7 @@ export interface ILoginCommand {
 }
 
 export interface ILoginResponse {
+  user_id: string;
   auth_token: string;
 }
 
@@ -48,15 +49,15 @@ export class IdentityService {
   }
 
   public register(cmd: IRegisterCommand): Observable<IRegisterResponse> {
-    return this.http.post<IRegisterResponse>(this.baseUrl, cmd);
+    return this.http.post<IRegisterResponse>(`${this.baseUrl}/register`, cmd);
   }
 
   public login(cmd: ILoginCommand): Observable<ILoginResponse> {
-    return this.http.post<ILoginResponse>(this.baseUrl, cmd);
+    return this.http.post<ILoginResponse>(`${this.baseUrl}/login`, cmd);
   }
 
-  public update(cmd: IUpdateCommand): Observable<any> {
-    return this.http.put(this.baseUrl, cmd);
+  public update(id: string, cmd: IUpdateCommand): Observable<any> {
+    return this.http.put(`${this.baseUrl}/${id}`, cmd);
   }
 
   public delete(id: string): Observable<any> {

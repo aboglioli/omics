@@ -14,6 +14,7 @@ pub struct LoginCommand {
 
 #[derive(Serialize)]
 pub struct LoginResponse {
+    user_id: String,
     auth_token: String,
 }
 
@@ -51,6 +52,7 @@ where
                 self.event_pub.publish_all(user.base().events()?).await?;
 
                 Ok(LoginResponse {
+                    user_id: user.base().id().value().to_owned(),
                     auth_token: token.value().to_owned(),
                 })
             }
