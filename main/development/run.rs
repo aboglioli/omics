@@ -31,13 +31,15 @@ pub async fn populate(c: &Container) -> Result<()> {
         .await?;
     c.identity.role_repo().save(&mut user_role).await?;
 
+    let hashed_password = c.identity.password_hasher().hash("P@asswd!")?;
+
     let mut admin = User::build(
         AggregateRoot::new(UserId::new("admin-1")?),
         Identity::new(
             Provider::Local,
             Username::new("admin")?,
             Email::new("admin@omics.com")?,
-            Some(Password::new("P@asswd!")?),
+            Some(Password::new(hashed_password.clone())?),
         )?,
         Some(Person::new(Fullname::new("Admin", "Superpowers")?)?),
         admin_role.clone(),
@@ -49,7 +51,7 @@ pub async fn populate(c: &Container) -> Result<()> {
             Provider::Local,
             Username::new("content-manager")?,
             Email::new("content-manager@omics.com")?,
-            Some(Password::new("P@asswd!")?),
+            Some(Password::new(hashed_password.clone())?),
         )?,
         Some(Person::new(Fullname::new("Content", "Manager")?)?),
         content_manager_role.clone(),
@@ -61,7 +63,7 @@ pub async fn populate(c: &Container) -> Result<()> {
             Provider::Local,
             Username::new("user")?,
             Email::new("user@omics.com")?,
-            Some(Password::new("P@asswd!")?),
+            Some(Password::new(hashed_password.clone())?),
         )?,
         Some(Person::new(Fullname::new("TheFirst", "User")?)?),
         content_manager_role.clone(),
