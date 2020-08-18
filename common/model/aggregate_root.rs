@@ -23,6 +23,21 @@ impl<ID: Clone, E: ToEvent> AggregateRoot<ID, E> {
         }
     }
 
+    pub fn build(
+        id: ID,
+        created_at: DateTime<Utc>,
+        updated_at: Option<DateTime<Utc>>,
+        deleted_at: Option<DateTime<Utc>>,
+    ) -> Self {
+        AggregateRoot {
+            id,
+            created_at,
+            updated_at,
+            deleted_at,
+            events: Vec::new(),
+        }
+    }
+
     pub fn id(&self) -> ID {
         self.id.clone()
     }

@@ -64,6 +64,22 @@ impl User {
         Ok(user)
     }
 
+    pub fn build(
+        base: AggregateRoot<UserId, UserEvent>,
+        identity: Identity,
+        person: Option<Person>,
+        role: Role,
+        validation: Option<Validation>,
+    ) -> Self {
+        User {
+            base,
+            identity,
+            person,
+            role,
+            validation,
+        }
+    }
+
     pub fn base(&self) -> &AggregateRoot<UserId, UserEvent> {
         &self.base
     }
@@ -109,8 +125,14 @@ impl User {
         Ok(())
     }
 
-    pub fn set_role(&mut self, role: Role) {
+    pub fn change_role(&mut self, role: Role, admin: &User) -> Result<()> {
+        if !admin.role().is("admin") {
+            return Err(Error::new("user", "is_not_an_admin"));
+        }
+
         self.role = role;
+
+        Ok(())
     }
 
     pub fn validate(&mut self, val: &Validation) -> Result<()> {

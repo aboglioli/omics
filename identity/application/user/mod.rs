@@ -1,5 +1,7 @@
 mod change_password;
+mod change_role;
 mod delete;
+mod get_all;
 mod get_by_id;
 mod login;
 mod recover_password;
@@ -7,7 +9,9 @@ mod register;
 mod update;
 mod validate;
 pub use change_password::*;
+pub use change_role::*;
 pub use delete::*;
+pub use get_all::*;
 pub use get_by_id::*;
 pub use login::*;
 pub use recover_password::*;

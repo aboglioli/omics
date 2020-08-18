@@ -31,7 +31,11 @@ impl Role {
         &self.base
     }
 
-    pub fn name(&self) -> &String {
+    pub fn is(&self, role_id: &str) -> bool {
+        self.base().id().value() == role_id
+    }
+
+    pub fn name(&self) -> &str {
         &self.name
     }
 

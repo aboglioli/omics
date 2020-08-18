@@ -1,5 +1,6 @@
 use serde::Serialize;
 
+use crate::domain::role::Role;
 use crate::domain::user::User;
 
 #[derive(Serialize)]
@@ -9,6 +10,8 @@ pub struct UserDto {
     pub email: Option<String>,
     pub name: Option<String>,
     pub lastname: Option<String>,
+    pub validated: bool,
+    pub role: String,
 }
 
 impl UserDto {
@@ -23,6 +26,23 @@ impl UserDto {
             },
             name: user.person().map(|p| p.fullname().name().to_owned()),
             lastname: user.person().map(|p| p.fullname().lastname().to_owned()),
+            validated: user.is_validated(),
+            role: user.role().base().id().value().to_owned(),
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct RoleDto {
+    pub id: String,
+    pub name: String,
+}
+
+impl RoleDto {
+    pub fn new(role: &Role) -> Self {
+        RoleDto {
+            id: role.base().id().value().to_owned(),
+            name: role.name().to_owned(),
         }
     }
 }
