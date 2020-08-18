@@ -9,7 +9,7 @@ mod response;
 use std::error::Error;
 use std::sync::Arc;
 
-use warp::http::header::{HeaderMap, HeaderValue};
+
 use warp::Filter;
 
 use common::config::Config;
@@ -47,9 +47,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
             "access-control-allow-origin",
             "access-control-request-method",
             "access-control-request-headers",
+            "authorization",
         ])
         .allow_methods(vec!["GET", "POST", "DELETE", "PUT", "OPTIONS"]);
-        // .allow_credentials(true);
+    // .allow_credentials(true);
 
     // let mut headers = HeaderMap::new();
     // headers.insert("Access-Control-Allow-Origin", HeaderValue::from_static("*"));

@@ -54,6 +54,10 @@ impl UserService {
         old_password: &str,
         new_password: &str,
     ) -> Result<()> {
+        if old_password == new_password {
+            return Err(Error::new("passwords", "are_the_same"));
+        }
+
         let mut user = self.user_repo.find_by_id(user_id).await?;
 
         let user_password = match user.identity().password() {
