@@ -89,6 +89,8 @@ where
             matches!(publication.status_history().current().status(), Status::Published { .. })
         });
 
+        // TODO: dedup
+
         let mut publication_dtos = Vec::new();
         for publication in publications {
             let author = self.author_repo.find_by_id(publication.author_id()).await?;
