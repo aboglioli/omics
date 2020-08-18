@@ -47,6 +47,7 @@ import { DevelopmentComponent } from './pages/development/development.component'
 
 // Domain
 import { DomainModule } from './domain/module';
+import { UnderConstructionComponent } from './shared/under-construction/under-construction.component';
 
 
 @NgModule({
@@ -75,6 +76,8 @@ import { DomainModule } from './domain/module';
     AutoresComponent,
 
     DevelopmentComponent,
+
+    UnderConstructionComponent,
   ],
   imports: [
     BrowserModule,

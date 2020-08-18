@@ -4,8 +4,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ValidadoresCustomService } from '../../services/validadores-custom.service';
 import { Router } from '@angular/router';
-
-import { IdentityService, IRegisterCommand, ILoginCommand  } from '../../domain/services/identity';
+import { IdentityService, IRegisterCommand, IRegisterResponse } from '../../domain/services/identity';
 import { AuthService  } from '../../domain/services/auth';
 
 @Component({
@@ -100,7 +99,6 @@ export class LoginRegisterComponent implements OnInit {
 
       console.log('TEST > Usuario login correcto');
 
-      localStorage.setItem('tokenJWT', 'adminToken'); // Uso temporal por ahora
       this.router.navigate(['/home']);
 
       this.closeMatDialog();
@@ -131,21 +129,30 @@ export class LoginRegisterComponent implements OnInit {
 
     } else {
 
-      const cmd: IRegisterCommand = {
-        email: this.formSignUp.get('correo').value,
+      console.log('TEST > Usuario Registrado');
+
+      const registerCommand: IRegisterCommand = {
+
         username: this.formSignUp.get('usuario').value,
-        password: this.formSignUp.get('password1').value,
+        email: this.formSignUp.get('correo').value,
+        password: this.formSignUp.get('password1').value
+
       };
-      this.identityServ.register(cmd).subscribe(res => {
-        console.log(res);
-      });
+      this.identityServ.register( registerCommand ).subscribe(
 
-      // console.log('TEST > Usuario Registrado');
-      //
-      // localStorage.setItem('tokenJWT', 'adminToken'); // Uso temporal por ahora
-      // this.router.navigate(['/home']);
+        (result: IRegisterResponse) => {
 
-      // this.closeMatDialog();
+          console.log('TEST > ', result);
+
+          this.router.navigate(['/home']);
+          this.closeMatDialog();
+        },
+        (error: any ) => {
+
+          console.error( 'ERROR !!!', error );
+
+        }
+      );
 
     }
 
