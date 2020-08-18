@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 use common::result::Result;
 
@@ -7,37 +7,32 @@ use crate::domain::author::AuthorRepository;
 use crate::domain::collection::CollectionRepository;
 use crate::domain::publication::PublicationRepository;
 
-#[derive(Deserialize)]
-pub struct SearchCommand {
-    pub name: String,
-}
-
 #[derive(Serialize)]
-pub struct SearchResponse {
+pub struct GetAllResponse {
     pub authors: Vec<AuthorDto>,
 }
 
-pub struct Search<'a> {
+pub struct GetAll<'a> {
     author_repo: &'a dyn AuthorRepository,
     collection_repo: &'a dyn CollectionRepository,
     publication_repo: &'a dyn PublicationRepository,
 }
 
-impl<'a> Search<'a> {
+impl<'a> GetAll<'a> {
     pub fn new(
         author_repo: &'a dyn AuthorRepository,
         collection_repo: &'a dyn CollectionRepository,
         publication_repo: &'a dyn PublicationRepository,
     ) -> Self {
-        Search {
+        GetAll {
             author_repo,
             collection_repo,
             publication_repo,
         }
     }
 
-    pub async fn exec(&self, cmd: SearchCommand) -> Result<SearchResponse> {
-        let authors = self.author_repo.search(&cmd.name).await?;
+    pub async fn exec(&self) -> Result<GetAllResponse> {
+        let authors = self.author_repo.find_all().await?;
 
         let mut author_dtos = Vec::new();
         for author in authors.iter() {
@@ -58,7 +53,7 @@ impl<'a> Search<'a> {
             )
         }
 
-        Ok(SearchResponse {
+        Ok(GetAllResponse {
             authors: author_dtos,
         })
     }

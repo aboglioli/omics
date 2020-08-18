@@ -8,6 +8,7 @@ use crate::domain::author::{Author, AuthorId};
 pub trait AuthorRepository: Sync + Send {
     async fn next_id(&self) -> Result<AuthorId>;
 
+    async fn find_all(&self) -> Result<Vec<Author>>;
     async fn find_by_id(&self, id: &AuthorId) -> Result<Author>;
     async fn search(&self, text: &str) -> Result<Vec<Author>>;
 
