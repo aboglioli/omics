@@ -63,20 +63,17 @@ impl<'a> GetById<'a> {
                 .find_by_id(publication.header().category_id())
                 .await?;
 
-            publications.push(PublicationDto::new(
-                &publication,
-                AuthorDto::new(&author),
-                CategoryDto::new(&category),
-                false,
-                false,
-            ));
+            publications.push(
+                PublicationDto::new(&publication)
+                    .author(AuthorDto::new(&author))
+                    .category(CategoryDto::new(&category))
+                    .status(&publication),
+            )
         }
 
-        Ok(CollectionDto::new(
-            &collection,
-            AuthorDto::new(&author),
-            CategoryDto::new(&category),
-            publications,
-        ))
+        Ok(CollectionDto::new(&collection)
+            .author(AuthorDto::new(&author))
+            .category(CategoryDto::new(&category))
+            .publications(publications))
     }
 }

@@ -38,6 +38,8 @@ impl<'a> ChangeRole<'a> {
 
         user.change_role(role, &admin)?;
 
+        self.user_repo.save(&mut user).await?;
+
         Ok(())
     }
 }

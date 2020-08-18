@@ -38,6 +38,8 @@ impl<'a> GetById<'a> {
         }
     }
 
+    // TODO: delete publication
+    // TODO: only owner can view a draft publication
     pub async fn exec(&self, reader_id: String, publication_id: String) -> Result<PublicationDto> {
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
@@ -65,13 +67,16 @@ impl<'a> GetById<'a> {
                 .await?;
         }
 
-        Ok(PublicationDto::new(
-            &publication,
-            AuthorDto::new(&author),
-            CategoryDto::new(&category),
-            true,
-            is_reader_author,
-        ))
+        let mut publication_dto = PublicationDto::new(&publication)
+            .author(AuthorDto::new(&author))
+            .category(CategoryDto::new(&category))
+            .pages(&publication);
+
+        if is_reader_author {
+            publication_dto = publication_dto.status(&publication);
+        }
+
+        Ok(publication_dto)
     }
 }
 
@@ -110,9 +115,12 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(res.id, publication.base().id().value());
-        assert_eq!(res.author.id, author.base().id().value());
+        assert_eq!(res.author.unwrap().id, author.base().id().value());
         assert_eq!(res.name, publication.header().name().value());
-        assert_eq!(res.category.id, publication.header().category_id().value());
+        assert_eq!(
+            res.category.unwrap().id,
+            publication.header().category_id().value()
+        );
         assert!(res.pages.unwrap().len() > 0);
         assert_eq!(res.statistics.views, 0);
         assert_eq!(res.statistics.unique_views, 0);
@@ -181,7 +189,7 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(res.id, publication.base().id().value());
-        assert_eq!(res.author.id, publication.author_id().value());
+        assert_eq!(res.author.unwrap().id, publication.author_id().value());
         assert_eq!(res.pages.unwrap().len(), 2);
         assert_eq!(res.statistics.views, 1);
         assert_eq!(res.statistics.unique_views, 1);

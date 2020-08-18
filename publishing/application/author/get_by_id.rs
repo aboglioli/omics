@@ -31,18 +31,13 @@ impl<'a> GetById<'a> {
         let publications = self.publication_repo.find_by_author_id(&author_id).await?;
 
         let mut publication_dtos = Vec::new();
-        for publication in publications {
+        for publication in publications.iter() {
             let category = self
                 .category_repo
                 .find_by_id(publication.header().category_id())
                 .await?;
-            publication_dtos.push(PublicationDto::new(
-                &publication,
-                AuthorDto::new(&author),
-                CategoryDto::new(&category),
-                false,
-                false,
-            ));
+            publication_dtos
+                .push(PublicationDto::new(publication).category(CategoryDto::new(&category)));
         }
 
         Ok(AuthorDto::new(&author).publications(publication_dtos))

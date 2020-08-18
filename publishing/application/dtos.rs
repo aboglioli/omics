@@ -124,10 +124,12 @@ impl PageDto {
 #[derive(Serialize)]
 pub struct PublicationDto {
     pub id: String,
-    pub author: AuthorDto,
+    pub author_id: Option<String>,
+    pub author: Option<AuthorDto>,
     pub name: String,
     pub synopsis: String,
-    pub category: CategoryDto,
+    pub category_id: Option<String>,
+    pub category: Option<CategoryDto>,
     pub tags: Vec<String>,
     pub statistics: StatisticsDto,
     pub pages: Option<Vec<PageDto>>,
@@ -135,19 +137,15 @@ pub struct PublicationDto {
 }
 
 impl PublicationDto {
-    pub fn new(
-        publication: &Publication,
-        author: AuthorDto,
-        category: CategoryDto,
-        include_pages: bool,
-        include_status: bool,
-    ) -> Self {
+    pub fn new(publication: &Publication) -> Self {
         PublicationDto {
             id: publication.base().id().value().to_owned(),
-            author,
+            author_id: None,
+            author: None,
             name: publication.header().name().value().to_owned(),
             synopsis: publication.header().synopsis().value().to_owned(),
-            category,
+            category_id: None,
+            category: None,
             tags: publication
                 .header()
                 .tags()
@@ -155,71 +153,136 @@ impl PublicationDto {
                 .map(|tag| tag.name().to_owned())
                 .collect(),
             statistics: StatisticsDto::new(publication.statistics()),
-            pages: if include_pages {
-                Some(PageDto::new(publication.pages()))
-            } else {
-                None
-            },
-            status: if include_status {
-                Some(publication.status_history().current().status().to_string())
-            } else {
-                None
-            },
+            pages: None,
+            status: None,
         }
+    }
+
+    pub fn author_id(mut self, publication: &Publication) -> Self {
+        self.author_id = Some(publication.author_id().value().to_owned());
+        self
+    }
+
+    pub fn author(mut self, author: AuthorDto) -> Self {
+        self.author = Some(author);
+        self
+    }
+
+    pub fn category_id(mut self, publication: &Publication) -> Self {
+        self.category_id = Some(publication.header().category_id().value().to_owned());
+        self
+    }
+
+    pub fn category(mut self, category: CategoryDto) -> Self {
+        self.category = Some(category);
+        self
+    }
+
+    pub fn pages(mut self, publication: &Publication) -> Self {
+        self.pages = Some(PageDto::new(publication.pages()));
+        self
+    }
+
+    pub fn status(mut self, publication: &Publication) -> Self {
+        self.status = Some(publication.status_history().current().status().to_string());
+        self
     }
 }
 
 #[derive(Serialize)]
 pub struct CollectionDto {
     pub id: String,
-    pub author: AuthorDto,
+    pub author_id: Option<String>,
+    pub author: Option<AuthorDto>,
     pub name: String,
     pub synopsis: String,
-    pub category: CategoryDto,
+    pub category_id: Option<String>,
+    pub category: Option<CategoryDto>,
     pub tags: Vec<String>,
-    pub publications: Vec<PublicationDto>,
+    pub publication_count: Option<usize>,
+    pub publications: Option<Vec<PublicationDto>>,
 }
 
 impl CollectionDto {
-    pub fn new(
-        collection: &Collection,
-        author: AuthorDto,
-        category: CategoryDto,
-        publications: Vec<PublicationDto>,
-    ) -> Self {
+    pub fn new(collection: &Collection) -> Self {
         CollectionDto {
             id: collection.base().id().value().to_owned(),
-            author,
+            author_id: None,
+            author: None,
             name: collection.header().name().value().to_owned(),
             synopsis: collection.header().synopsis().value().to_owned(),
-            category,
+            category_id: None,
+            category: None,
             tags: collection
                 .header()
                 .tags()
                 .iter()
                 .map(|tag| tag.name().to_owned())
                 .collect(),
-            publications,
+            publication_count: None,
+            publications: None,
         }
+    }
+
+    pub fn author_id(mut self, collection: &Collection) -> Self {
+        self.author_id = Some(collection.author_id().value().to_owned());
+        self
+    }
+
+    pub fn author(mut self, author: AuthorDto) -> Self {
+        self.author = Some(author);
+        self
+    }
+
+    pub fn category_id(mut self, collection: &Collection) -> Self {
+        self.category_id = Some(collection.header().category_id().value().to_owned());
+        self
+    }
+
+    pub fn category(mut self, category: CategoryDto) -> Self {
+        self.category = Some(category);
+        self
+    }
+
+    pub fn publication_count(mut self, count: usize) -> Self {
+        self.publication_count = Some(count);
+        self
+    }
+
+    pub fn publications(mut self, publications: Vec<PublicationDto>) -> Self {
+        self.publications = Some(publications);
+        self
     }
 }
 
 #[derive(Serialize)]
 pub struct ReviewDto {
-    pub reader: ReaderDto,
+    pub reader_id: Option<String>,
+    pub reader: Option<ReaderDto>,
     pub publication_id: String,
     pub stars: u8,
     pub comment: String,
 }
 
 impl ReviewDto {
-    pub fn new(review: &Review, reader: ReaderDto) -> Self {
+    pub fn new(review: &Review, _reader: ReaderDto) -> Self {
         ReviewDto {
-            reader,
+            reader_id: None,
+            reader: None,
             publication_id: review.base().publication_id().value().to_owned(),
             stars: review.stars().value(),
             comment: review.comment().value().to_owned(),
         }
+    }
+
+    pub fn reader_id(mut self, review: &Review) -> Self {
+        self.reader_id = Some(review.base().reader_id().value().to_owned());
+        self
+    }
+
+    pub fn reader(mut self, review: ReaderDto) -> Self {
+        self.reader = Some(review);
+        self
     }
 }
 

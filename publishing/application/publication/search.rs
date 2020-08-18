@@ -93,13 +93,11 @@ impl<'a> Search<'a> {
                 .find_by_id(publication.header().category_id())
                 .await?;
 
-            publication_dtos.push(PublicationDto::new(
-                &publication,
-                AuthorDto::new(&author),
-                CategoryDto::new(&category),
-                false,
-                false,
-            ));
+            publication_dtos.push(
+                PublicationDto::new(&publication)
+                    .author(AuthorDto::new(&author))
+                    .category(CategoryDto::new(&category)),
+            );
         }
 
         Ok(SearchResponse {
