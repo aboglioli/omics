@@ -51,8 +51,8 @@ export class LoginRegisterComponent implements OnInit {
     // Login
     this.formLogin = this.fb.group({
 
-      correo    : ['', [ Validators.required, Validators.pattern( '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$' )] ],
-      password  : ['', [ Validators.required, Validators.minLength(5) ] ],
+      correoUsuario    : ['', [ Validators.required, Validators.minLength(5) ] ],
+      password         : ['', [ Validators.required, Validators.minLength(5) ] ],
 
     });
 
@@ -160,8 +160,8 @@ export class LoginRegisterComponent implements OnInit {
   }
 
   // getters
-  get correoLoginNovalido(): boolean {
-    return ( this.formLogin.get('correo').invalid && this.formLogin.get('correo').touched );
+  get correoUsuarioLoginNovalido(): boolean {
+    return ( this.formLogin.get('correoUsuario').invalid && this.formLogin.get('correoUsuario').touched );
   }
 
   get passwordLoginNoValido(): boolean {

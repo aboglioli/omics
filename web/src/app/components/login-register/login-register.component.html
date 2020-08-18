@@ -25,10 +25,9 @@
 
       <form autocomplete="off" [formGroup]="formLogin">
 
-        <!-- Correo -->
+        <!-- Correo o Usuario -->
         <div class="form-group row">
           <div class="col">
-
 
             <div class="top-field">
 
@@ -37,18 +36,18 @@
               </small>
 
               <!-- mensaje de error -->
-              <small  *ngIf="correoLoginNovalido"
+              <small  *ngIf="correoUsuarioLoginNovalido"
                       class="form-text text-danger">
-                Ingrese un correo válido
+                Ingrese un correo o usuario válido
               </small>
 
             </div>
 
             <input class="form-control"
-                   type="email"
-                   placeholder="Correo electrónico"
-                   formControlName="correo"
-                   [class.is-invalid]="correoLoginNovalido">
+                   type="text"
+                   placeholder="Correo / Usuario"
+                   formControlName="correoUsuario"
+                   [class.is-invalid]="correoUsuarioLoginNovalido">
 
 
           </div>
