@@ -8,7 +8,7 @@ use crate::domain::user::{AuthenticationService, PasswordHasher, UserRepository}
 
 #[derive(Deserialize)]
 pub struct LoginCommand {
-    pub username_or_email: String,
+    pub username: String,
     pub password: String,
 }
 
@@ -44,7 +44,7 @@ where
     pub async fn exec(&self, cmd: LoginCommand) -> Result<LoginResponse> {
         match self
             .authentication_serv
-            .authenticate(&cmd.username_or_email, &cmd.password)
+            .authenticate(&cmd.username, &cmd.password)
             .await
         {
             Ok((user, token)) => {
@@ -75,7 +75,7 @@ mod tests {
 
         assert!(uc
             .exec(LoginCommand {
-                username_or_email: user.identity().username().value().to_owned(),
+                username: user.identity().username().value().to_owned(),
                 password: "P@asswd!".to_owned(),
             })
             .await
@@ -92,7 +92,7 @@ mod tests {
 
         let res = uc
             .exec(LoginCommand {
-                username_or_email: user.identity().username().value().to_owned(),
+                username: user.identity().username().value().to_owned(),
                 password: "P@asswd!".to_owned(),
             })
             .await
@@ -103,7 +103,7 @@ mod tests {
 
         assert!(uc
             .exec(LoginCommand {
-                username_or_email: "non-existing".to_owned(),
+                username: "non-existing".to_owned(),
                 password: "P@asswd!".to_owned(),
             })
             .await
@@ -111,7 +111,7 @@ mod tests {
 
         assert!(uc
             .exec(LoginCommand {
-                username_or_email: user.identity().username().value().to_owned(),
+                username: user.identity().username().value().to_owned(),
                 password: "invalid".to_owned(),
             })
             .await
