@@ -15,9 +15,19 @@
   </div>
 
   <!-- User menu buttons -->
-  <button mat-stroked-button class="button-white-borders"
+
+  <!-- Ingresar -->
+  <button *ngIf="!isAccessUserLogIn"
+          mat-stroked-button class="button-white-borders"
           (click)="openLoginRegisterDialog()">
     Ingresar / Registrarse
+  </button>
+
+  <!--- Salir -->
+  <button *ngIf="isAccessUserLogIn"
+          mat-stroked-button class="button-white-borders"
+          (click)="logout()">
+      Log Out
   </button>
 
 

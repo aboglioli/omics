@@ -1,1 +1,14 @@
+<div class="listado-biblioteca">
+
+  <div class="comic-thumbail" *ngFor="let obra of listaObras">
+
+    <div (click)="goToObra( obra.id )">
+    <img src={{obra.thumbailUrl}} alt="250x250 Image Template">
+
+    </div>
+
+  </div>
+
+</div>
+
 <app-under-construction></app-under-construction>

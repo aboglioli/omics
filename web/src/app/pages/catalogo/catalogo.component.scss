@@ -1,0 +1,28 @@
+@import "src/scss/vars";
+
+div.listado-biblioteca {
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  div.comic-thumbail {
+
+    max-width: 150px;
+    margin: 2em 2em;
+
+    cursor: pointer;
+
+    &:hover {
+
+      box-shadow: 0px 0px 15px 4px $omics-neon-pink;
+
+    }
+
+    img {
+      height: auto;
+    }
+
+  }
+
+}

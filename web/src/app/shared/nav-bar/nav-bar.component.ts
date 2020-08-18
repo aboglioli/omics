@@ -12,41 +12,20 @@ import { AuthService } from 'src/app/domain/services/auth';
 })
 export class NavBarComponent implements OnInit {
 
-
   @Output() clickSideNavToggle = new EventEmitter();
 
   // Font Awseome icons
   public faBars = faBars;
 
   // Propios
-  access: boolean;  // Para habilitar algunas acciones según si esta el usuario logueado
-
+  isAccessUserLogIn: boolean;  // Para habilitar algunas acciones según si esta el usuario logueado
 
   constructor(  private router: Router,
                 private authService: AuthService,
                 public dialog: MatDialog ) {
 
 
-
-    // Para comprobar en tiempo real si tiene o no acceso el usuario
-    this.authService.accessUser$.subscribe( (data: boolean) => {
-
-      console.log('session state: ', data);
-
-      // Para actualizar si el usuario no esta más logueado
-      if ( data === false && this.access ) {
-
-        this.access = false;
-        this.logout();
-
-      } else {
-
-        this.access = data;
-
-      }
-
-    } );
-
+    this.subscribeAuthService();
 
   }
 
@@ -70,6 +49,29 @@ export class NavBarComponent implements OnInit {
     const dialogRef = this.dialog.open(LoginRegisterComponent);
 
   }
+
+  // Auth User
+  private subscribeAuthService(): void {
+
+    // Para comprobar en tiempo real si tiene o no acceso el usuario
+    this.authService.accessUser$.subscribe( (data: boolean) => {
+
+      // Para actualizar si el usuario no esta más logueado
+      if ( data === false && this.isAccessUserLogIn ) {
+
+        this.isAccessUserLogIn = false;
+        this.logout();
+
+      } else {
+
+        this.isAccessUserLogIn = data;
+
+      }
+
+    } );
+
+  }
+
 
   public logout(): void {
 
