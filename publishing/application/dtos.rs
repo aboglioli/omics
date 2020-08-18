@@ -229,6 +229,7 @@ pub struct ReaderDto {
     pub username: String,
     pub name: String,
     pub lastname: String,
+    pub subscribed: bool,
 }
 
 impl ReaderDto {
@@ -238,6 +239,7 @@ impl ReaderDto {
             username: reader.username().to_owned(),
             name: reader.name().to_owned(),
             lastname: reader.lastname().to_owned(),
+            subscribed: reader.is_subscribed(),
         }
     }
 }

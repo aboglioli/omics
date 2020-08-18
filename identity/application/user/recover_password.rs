@@ -3,7 +3,7 @@ use uuid::Uuid;
 use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::domain::user::{Password, PasswordHasher, UserId, UserRepository, UserService};
+use crate::domain::user::{Email, Password, PasswordHasher, UserRepository, UserService};
 
 pub struct RecoverPassword<'a, EPub, URepo, PHasher> {
     event_pub: &'a EPub,
@@ -31,9 +31,9 @@ where
         }
     }
 
-    pub async fn exec(&self, user_id: String) -> Result<()> {
-        let user_id = UserId::new(user_id)?;
-        let mut user = self.user_repo.find_by_id(&user_id).await?;
+    pub async fn exec(&self, email: String) -> Result<()> {
+        let email = Email::new(email)?;
+        let mut user = self.user_repo.find_by_email(&email).await?;
 
         let tmp_password = Uuid::new_v4().to_string();
         let hashed_password = self.user_serv.generate_password(&tmp_password)?;
