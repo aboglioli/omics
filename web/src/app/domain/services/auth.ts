@@ -60,6 +60,11 @@ export class AuthService {
     if ( !this.isLoggedIn() ) {
 
       this.router.navigate(['/home']);
+      this.updateStateSession(false);
+
+    } else {
+
+      this.updateStateSession(true);
 
     }
 
