@@ -44,6 +44,10 @@ impl UserRepository for InMemUserRepository {
         UserId::new(&uuid.to_string())
     }
 
+    async fn find_all(&self) -> Result<Vec<User>> {
+        Ok(self.cache.all().await)
+    }
+
     async fn find_by_id(&self, id: &UserId) -> Result<User> {
         self.cache
             .get(id)

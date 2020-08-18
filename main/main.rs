@@ -1,6 +1,7 @@
 mod authorization;
 mod container;
 mod development;
+mod events;
 mod handlers;
 mod infrastructure;
 mod response;
@@ -15,7 +16,8 @@ use common::config::Config;
 
 use container::Container;
 use handlers::{
-    author, catalogue, category, collection, contract, donation, publication, subscription, user,
+    author, catalogue, category, collection, contract, donation, publication, role, subscription,
+    user,
 };
 
 #[tokio::main]
@@ -31,6 +33,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
         if let Err(err) = development::run(&container).await {
             println!("{:?}", err);
         }
+    }
+
+    if let Err(err) = events::subscribe(&container).await {
+        println!("Subscriptions: {:?}", err);
     }
 
     // CORS
@@ -69,6 +75,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             health
                 .or(development::routes(&container))
                 .or(catalogue::routes(&container))
+                .or(role::routes(&container))
                 .or(user::routes(&container))
                 .or(publication::routes(&container))
                 .or(collection::routes(&container))

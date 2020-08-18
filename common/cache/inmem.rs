@@ -45,6 +45,10 @@ impl<K, V: Clone> InMemCache<K, V> {
             .collect()
     }
 
+    pub async fn all(&self) -> Vec<V> {
+        self.filter(|_| true).await
+    }
+
     pub async fn len(&self) -> usize {
         self.data.lock().await.len()
     }

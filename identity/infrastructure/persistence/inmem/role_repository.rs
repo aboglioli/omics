@@ -30,6 +30,10 @@ impl InMemRoleRepository {
 
 #[async_trait]
 impl RoleRepository for InMemRoleRepository {
+    async fn find_all(&self) -> Result<Vec<Role>> {
+        Ok(self.cache.all().await)
+    }
+
     async fn find_by_id(&self, id: &RoleId) -> Result<Role> {
         self.cache
             .get(id)

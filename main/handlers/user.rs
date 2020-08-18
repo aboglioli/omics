@@ -4,8 +4,9 @@ use warp::http::StatusCode;
 use warp::{Filter, Rejection, Reply};
 
 use identity::application::user::{
-    ChangePassword, ChangePasswordCommand, Delete, GetById, Login, LoginCommand, RecoverPassword,
-    Register, RegisterCommand, Update, UpdateCommand, Validate,
+    ChangePassword, ChangePasswordCommand, ChangeRole, ChangeRoleCommand, Delete, GetAll, GetById,
+    Login, LoginCommand, RecoverPassword, Register, RegisterCommand, Update, UpdateCommand,
+    Validate,
 };
 
 use crate::authorization::with_auth;
@@ -15,6 +16,13 @@ use crate::response;
 pub fn routes(
     container: &Arc<Container>,
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+    // GET /users
+    let _get_all = warp::get()
+        .and(warp::path::end())
+        .and(with_auth(container.clone()))
+        .and(with_container(container.clone()))
+        .and_then(get_all);
+
     // GET /users/:id
     let get_by_id = warp::get()
         .and(warp::path!(String))
@@ -71,6 +79,14 @@ pub fn routes(
         .and(with_container(container.clone()))
         .and_then(validate);
 
+    // POST /users/:id/role
+    let change_role = warp::put()
+        .and(warp::path!(String / "role"))
+        .and(warp::body::json())
+        .and(with_auth(container.clone()))
+        .and(with_container(container.clone()))
+        .and_then(change_role);
+
     warp::path("users").and(
         get_by_id
             .or(register)
@@ -79,8 +95,16 @@ pub fn routes(
             .or(delete)
             .or(change_password)
             .or(recover_password)
-            .or(validate),
+            .or(validate)
+            .or(change_role),
     )
+}
+
+pub async fn get_all(user_id: String, c: Arc<Container>) -> Result<impl Reply, Rejection> {
+    let uc = GetAll::new(c.identity.user_repo());
+    let res = uc.exec(user_id).await;
+
+    response::map(res, None)
 }
 
 pub async fn get_by_id(
@@ -165,6 +189,18 @@ pub async fn validate(
 ) -> Result<impl Reply, Rejection> {
     let uc = Validate::new(c.identity.event_pub(), c.identity.user_repo());
     let res = uc.exec(id, code).await;
+
+    response::map(res, None)
+}
+
+pub async fn change_role(
+    id: String,
+    cmd: ChangeRoleCommand,
+    user_id: String,
+    c: Arc<Container>,
+) -> Result<impl Reply, Rejection> {
+    let uc = ChangeRole::new(c.identity.role_repo(), c.identity.user_repo());
+    let res = uc.exec(user_id, id, cmd).await;
 
     response::map(res, None)
 }
