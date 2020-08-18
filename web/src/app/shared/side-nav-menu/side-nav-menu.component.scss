@@ -11,13 +11,13 @@ div.menu-box {
     display: flex;
     flex-direction: row;
     align-items: center;
-
     flex: 1;
+
+    min-height: 40px;
 
     background-color: $omics-background-flat;
 
     button {
-
 
       color: white;
       height: 75%;
@@ -33,20 +33,50 @@ div.menu-box {
     flex-direction: column;
     flex: 10;
 
-    margin: 0.25em 0.25em;
-
     button {
 
       height: 50px;
       margin: 0.5em 1em;
 
-      &.active {
+      &.admin-button {
 
-        background-color: $omics-background-button;
+        background-color: $omics-background-flat;
+
+        &.active {
+          background-color: $omics-background-flat-active;
+        }
+
+      }
+
+      &.user-button {
+
+        &.active {
+          background-color: $omics-background-button;
+        }
 
       }
 
 
+
+    }
+
+    .dir-column {
+
+      display: flex;
+      flex-direction: column;
+
+    }
+
+    .menu-admin {
+
+      background-color: $omics-background-flat;
+      border-top: 2px solid $omics-background-flat-active;
+
+    }
+
+    .menu-user {
+
+      background-color: $omics-background-menu;
 
     }
 
