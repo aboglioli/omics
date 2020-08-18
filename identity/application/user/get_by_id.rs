@@ -3,15 +3,12 @@ use common::result::Result;
 use crate::application::dtos::UserDto;
 use crate::domain::user::{UserId, UserRepository};
 
-pub struct GetById<'a, URepo> {
-    user_repo: &'a URepo,
+pub struct GetById<'a> {
+    user_repo: &'a dyn UserRepository,
 }
 
-impl<'a, URepo> GetById<'a, URepo>
-where
-    URepo: UserRepository,
-{
-    pub fn new(user_repo: &'a URepo) -> Self {
+impl<'a> GetById<'a> {
+    pub fn new(user_repo: &'a dyn UserRepository) -> Self {
         GetById { user_repo }
     }
 

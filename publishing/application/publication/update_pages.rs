@@ -22,18 +22,17 @@ impl UpdatePagesCommand {
     }
 }
 
-pub struct UpdatePages<'a, EPub, PRepo> {
-    event_pub: &'a EPub,
+pub struct UpdatePages<'a> {
+    event_pub: &'a dyn EventPublisher,
 
-    publication_repo: &'a PRepo,
+    publication_repo: &'a dyn PublicationRepository,
 }
 
-impl<'a, EPub, PRepo> UpdatePages<'a, EPub, PRepo>
-where
-    EPub: EventPublisher,
-    PRepo: PublicationRepository,
-{
-    pub fn new(event_pub: &'a EPub, publication_repo: &'a PRepo) -> Self {
+impl<'a> UpdatePages<'a> {
+    pub fn new(
+        event_pub: &'a dyn EventPublisher,
+        publication_repo: &'a dyn PublicationRepository,
+    ) -> Self {
         UpdatePages {
             event_pub,
             publication_repo,

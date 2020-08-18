@@ -8,7 +8,7 @@ use crate::domain::publication::PublicationId;
 use crate::domain::reader::ReaderId;
 
 #[async_trait]
-pub trait InteractionRepository {
+pub trait InteractionRepository: Sync + Send {
     async fn find_views(
         &self,
         reader_id: Option<&ReaderId>,

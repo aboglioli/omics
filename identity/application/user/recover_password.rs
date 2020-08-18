@@ -3,26 +3,21 @@ use uuid::Uuid;
 use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::domain::user::{Email, Password, PasswordHasher, UserRepository, UserService};
+use crate::domain::user::{Email, Password, UserRepository, UserService};
 
-pub struct RecoverPassword<'a, EPub, URepo, PHasher> {
-    event_pub: &'a EPub,
+pub struct RecoverPassword<'a> {
+    event_pub: &'a dyn EventPublisher,
 
-    user_repo: &'a URepo,
+    user_repo: &'a dyn UserRepository,
 
-    user_serv: &'a UserService<URepo, PHasher>,
+    user_serv: &'a UserService,
 }
 
-impl<'a, EPub, URepo, PHasher> RecoverPassword<'a, EPub, URepo, PHasher>
-where
-    EPub: EventPublisher,
-    URepo: UserRepository,
-    PHasher: PasswordHasher,
-{
+impl<'a> RecoverPassword<'a> {
     pub fn new(
-        event_pub: &'a EPub,
-        user_repo: &'a URepo,
-        user_serv: &'a UserService<URepo, PHasher>,
+        event_pub: &'a dyn EventPublisher,
+        user_repo: &'a dyn UserRepository,
+        user_serv: &'a UserService,
     ) -> Self {
         RecoverPassword {
             user_repo,

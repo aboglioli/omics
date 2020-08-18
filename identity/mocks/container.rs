@@ -8,14 +8,7 @@ use crate::infrastructure::persistence::inmem::{
 };
 use crate::mocks::{FakePasswordHasher, FakeTokenEncoder};
 
-pub fn container() -> Container<
-    FakeEventPublisher,
-    InMemRoleRepository,
-    InMemTokenRepository,
-    InMemUserRepository,
-    FakePasswordHasher,
-    FakeTokenEncoder,
-> {
+pub fn container() -> Container<FakeEventPublisher> {
     Container::new(
         Arc::new(FakeEventPublisher::new()),
         Arc::new(InMemRoleRepository::new()),

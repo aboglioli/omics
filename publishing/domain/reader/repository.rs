@@ -5,7 +5,7 @@ use common::result::Result;
 use crate::domain::reader::{Reader, ReaderId};
 
 #[async_trait]
-pub trait ReaderRepository {
+pub trait ReaderRepository: Sync + Send {
     async fn next_id(&self) -> Result<ReaderId>;
 
     async fn find_by_id(&self, id: &ReaderId) -> Result<Reader>;

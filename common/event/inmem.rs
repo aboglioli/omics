@@ -6,12 +6,12 @@ use tokio::sync::oneshot::{self, Receiver};
 use tokio::sync::Mutex;
 
 use crate::error::Error;
-use crate::event::{Event, EventHandler, EventPublisher, EventSubscriber};
+use crate::event::{Event, EventHandler, EventPublisher, EventSubscriber, PublicationResult};
 use crate::result::Result;
 
 #[derive(Default)]
 pub struct InMemEventBus {
-    handlers: Arc<Mutex<Vec<Box<dyn EventHandler<Output = bool> + Sync + Send>>>>,
+    handlers: Arc<Mutex<Vec<Box<dyn EventHandler + Sync + Send>>>>,
 }
 
 impl InMemEventBus {
@@ -22,40 +22,13 @@ impl InMemEventBus {
     }
 }
 
-#[derive(Default)]
-pub struct PublicationResult {
-    published_events: u32,
-    ok_handlers: u32,
-    err_handlers: u32,
-}
-
-impl PublicationResult {
-    pub fn published_events(&self) -> u32 {
-        self.published_events
-    }
-
-    pub fn ok_handlers(&self) -> u32 {
-        self.ok_handlers
-    }
-
-    pub fn err_handlers(&self) -> u32 {
-        self.err_handlers
-    }
-
-    pub fn activated_handlers(&self) -> u32 {
-        self.ok_handlers + self.err_handlers
-    }
-}
-
 #[async_trait]
 impl EventPublisher for InMemEventBus {
-    type Output = Receiver<PublicationResult>;
-
-    async fn publish(&self, event: Event) -> Result<Self::Output> {
+    async fn publish(&self, event: Event) -> Result<Receiver<PublicationResult>> {
         self.publish_all(vec![event]).await
     }
 
-    async fn publish_all(&self, events: Vec<Event>) -> Result<Self::Output> {
+    async fn publish_all(&self, events: Vec<Event>) -> Result<Receiver<PublicationResult>> {
         let handlers = Arc::clone(&self.handlers);
         let (tx, rx) = oneshot::channel();
         let mut publication_result = PublicationResult::default();
@@ -101,12 +74,7 @@ impl EventPublisher for InMemEventBus {
 
 #[async_trait]
 impl EventSubscriber for InMemEventBus {
-    type Output = bool;
-
-    async fn subscribe(
-        &self,
-        handler: Box<dyn EventHandler<Output = Self::Output> + Sync + Send>,
-    ) -> Result<Self::Output> {
+    async fn subscribe(&self, handler: Box<dyn EventHandler + Sync + Send>) -> Result<bool> {
         let mut handlers = self.handlers.lock().await;
         handlers.push(handler);
         Ok(true)
@@ -156,13 +124,11 @@ mod tests {
 
     #[async_trait]
     impl EventHandler for BasicHandler {
-        type Output = bool;
-
         fn topic(&self) -> &str {
             &self.topic
         }
 
-        async fn handle(&mut self, event: &Event) -> Result<Self::Output> {
+        async fn handle(&mut self, event: &Event) -> Result<bool> {
             self.counter.inc(event.topic());
             Ok(true)
         }
@@ -172,13 +138,11 @@ mod tests {
 
     #[async_trait]
     impl EventHandler for ErrorHandler {
-        type Output = bool;
-
         fn topic(&self) -> &str {
             "error.*"
         }
 
-        async fn handle(&mut self, _: &Event) -> Result<Self::Output> {
+        async fn handle(&mut self, _: &Event) -> Result<bool> {
             Err(Error::new("error_handler", "error"))
         }
     }
@@ -191,11 +155,11 @@ mod tests {
 
     #[tokio::test]
     async fn polymorphic() {
-        let _: Box<dyn EventSubscriber<Output = _>> = Box::new(InMemEventBus::new());
-        let _: Box<dyn EventPublisher<Output = _>> = Box::new(InMemEventBus::new());
+        let _: Box<dyn EventSubscriber> = Box::new(InMemEventBus::new());
+        let _: Box<dyn EventPublisher> = Box::new(InMemEventBus::new());
 
         let mut eb = InMemEventBus::new();
-        let subscriber: &mut dyn EventSubscriber<Output = _> = &mut eb;
+        let subscriber: &mut dyn EventSubscriber = &mut eb;
         let handler = BasicHandler::new(".*");
 
         subscriber
@@ -215,7 +179,7 @@ mod tests {
             .await
             .unwrap();
 
-        let publisher: &mut dyn EventPublisher<Output = _> = &mut eb;
+        let publisher: &mut dyn EventPublisher = &mut eb;
         let res = publisher
             .publish(create_event("evented"))
             .await

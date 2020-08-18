@@ -6,20 +6,19 @@ use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::publication::{PublicationId, PublicationRepository};
 
 // TODO: add comment
-pub struct Publish<'a, EPub, ARepo, PRepo> {
-    event_pub: &'a EPub,
+pub struct Publish<'a> {
+    event_pub: &'a dyn EventPublisher,
 
-    author_repo: &'a ARepo,
-    publication_repo: &'a PRepo,
+    author_repo: &'a dyn AuthorRepository,
+    publication_repo: &'a dyn PublicationRepository,
 }
 
-impl<'a, EPub, ARepo, PRepo> Publish<'a, EPub, ARepo, PRepo>
-where
-    EPub: EventPublisher,
-    ARepo: AuthorRepository,
-    PRepo: PublicationRepository,
-{
-    pub fn new(event_pub: &'a EPub, author_repo: &'a ARepo, publication_repo: &'a PRepo) -> Self {
+impl<'a> Publish<'a> {
+    pub fn new(
+        event_pub: &'a dyn EventPublisher,
+        author_repo: &'a dyn AuthorRepository,
+        publication_repo: &'a dyn PublicationRepository,
+    ) -> Self {
         Publish {
             event_pub,
             author_repo,

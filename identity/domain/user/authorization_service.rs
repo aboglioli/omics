@@ -3,22 +3,20 @@ use std::sync::Arc;
 use common::error::Error;
 use common::result::Result;
 
-use crate::domain::token::{Token, TokenEncoder, TokenRepository, TokenService};
+use crate::domain::token::{Token, TokenService};
 use crate::domain::user::{User, UserId, UserRepository};
 
-pub struct AuthorizationService<URepo, TRepo, TEnc> {
-    user_repo: Arc<URepo>,
+pub struct AuthorizationService {
+    user_repo: Arc<dyn UserRepository + Sync + Send>,
 
-    token_serv: Arc<TokenService<TRepo, TEnc>>,
+    token_serv: Arc<TokenService>,
 }
 
-impl<URepo, TRepo, TEnc> AuthorizationService<URepo, TRepo, TEnc>
-where
-    URepo: UserRepository,
-    TRepo: TokenRepository,
-    TEnc: TokenEncoder,
-{
-    pub fn new(user_repo: Arc<URepo>, token_serv: Arc<TokenService<TRepo, TEnc>>) -> Self {
+impl AuthorizationService {
+    pub fn new(
+        user_repo: Arc<dyn UserRepository + Sync + Send>,
+        token_serv: Arc<TokenService>,
+    ) -> Self {
         AuthorizationService {
             user_repo,
             token_serv,

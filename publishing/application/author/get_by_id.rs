@@ -5,22 +5,17 @@ use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::category::CategoryRepository;
 use crate::domain::publication::PublicationRepository;
 
-pub struct GetById<'a, ARepo, CRepo, PRepo> {
-    author_repo: &'a ARepo,
-    category_repo: &'a CRepo,
-    publication_repo: &'a PRepo,
+pub struct GetById<'a> {
+    author_repo: &'a dyn AuthorRepository,
+    category_repo: &'a dyn CategoryRepository,
+    publication_repo: &'a dyn PublicationRepository,
 }
 
-impl<'a, ARepo, CRepo, PRepo> GetById<'a, ARepo, CRepo, PRepo>
-where
-    ARepo: AuthorRepository,
-    CRepo: CategoryRepository,
-    PRepo: PublicationRepository,
-{
+impl<'a> GetById<'a> {
     pub fn new(
-        author_repo: &'a ARepo,
-        category_repo: &'a CRepo,
-        publication_repo: &'a PRepo,
+        author_repo: &'a dyn AuthorRepository,
+        category_repo: &'a dyn CategoryRepository,
+        publication_repo: &'a dyn PublicationRepository,
     ) -> Self {
         GetById {
             author_repo,

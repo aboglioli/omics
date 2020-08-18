@@ -12,17 +12,16 @@ pub struct ReviewsResponse {
     pub reviews: Vec<ReviewDto>,
 }
 
-pub struct Reviews<'a, IRepo, RRepo> {
-    interaction_repo: &'a IRepo,
-    reader_repo: &'a RRepo,
+pub struct Reviews<'a> {
+    interaction_repo: &'a dyn InteractionRepository,
+    reader_repo: &'a dyn ReaderRepository,
 }
 
-impl<'a, IRepo, RRepo> Reviews<'a, IRepo, RRepo>
-where
-    IRepo: InteractionRepository,
-    RRepo: ReaderRepository,
-{
-    pub fn new(interaction_repo: &'a IRepo, reader_repo: &'a RRepo) -> Self {
+impl<'a> Reviews<'a> {
+    pub fn new(
+        interaction_repo: &'a dyn InteractionRepository,
+        reader_repo: &'a dyn ReaderRepository,
+    ) -> Self {
         Reviews {
             interaction_repo,
             reader_repo,

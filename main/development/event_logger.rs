@@ -20,13 +20,11 @@ impl EventLogger {
 
 #[async_trait]
 impl EventHandler for EventLogger {
-    type Output = bool;
-
     fn topic(&self) -> &str {
         ".*"
     }
 
-    async fn handle(&mut self, event: &Event) -> Result<Self::Output> {
+    async fn handle(&mut self, event: &Event) -> Result<bool> {
         let payload = String::from_utf8_lossy(event.payload());
 
         println!("# EVENT");

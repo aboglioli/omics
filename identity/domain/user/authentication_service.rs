@@ -3,29 +3,23 @@ use std::sync::Arc;
 use common::error::Error;
 use common::result::Result;
 
-use crate::domain::token::{Data, Token, TokenEncoder, TokenRepository, TokenService};
+use crate::domain::token::{Data, Token, TokenService};
 use crate::domain::user::{Email, PasswordHasher, User, UserRepository, Username};
 
-pub struct AuthenticationService<URepo, PHasher, TRepo, TEnc> {
-    user_repo: Arc<URepo>,
+pub struct AuthenticationService {
+    user_repo: Arc<dyn UserRepository + Sync + Send>,
 
-    password_hasher: Arc<PHasher>,
+    password_hasher: Arc<dyn PasswordHasher + Sync + Send>,
 
-    token_serv: Arc<TokenService<TRepo, TEnc>>,
+    token_serv: Arc<TokenService>,
 }
 
 /// AutenticationService authenticate any user, validated or not.
-impl<URepo, PHasher, TRepo, TEnc> AuthenticationService<URepo, PHasher, TRepo, TEnc>
-where
-    URepo: UserRepository,
-    PHasher: PasswordHasher,
-    TRepo: TokenRepository,
-    TEnc: TokenEncoder,
-{
+impl AuthenticationService {
     pub fn new(
-        user_repo: Arc<URepo>,
-        password_hasher: Arc<PHasher>,
-        token_serv: Arc<TokenService<TRepo, TEnc>>,
+        user_repo: Arc<dyn UserRepository + Sync + Send>,
+        password_hasher: Arc<dyn PasswordHasher + Sync + Send>,
+        token_serv: Arc<TokenService>,
     ) -> Self {
         AuthenticationService {
             user_repo,

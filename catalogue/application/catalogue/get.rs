@@ -3,15 +3,12 @@ use common::result::Result;
 use crate::application::dtos::CatalogueDto;
 use crate::domain::catalogue::CatalogueRepository;
 
-pub struct Get<'a, CRepo> {
-    catalogue_repo: &'a CRepo,
+pub struct Get<'a> {
+    catalogue_repo: &'a dyn CatalogueRepository,
 }
 
-impl<'a, CRepo> Get<'a, CRepo>
-where
-    CRepo: CatalogueRepository,
-{
-    pub fn new(catalogue_repo: &'a CRepo) -> Self {
+impl<'a> Get<'a> {
+    pub fn new(catalogue_repo: &'a dyn CatalogueRepository) -> Self {
         Get { catalogue_repo }
     }
 

@@ -1,7 +1,8 @@
 use async_trait::async_trait;
+use tokio::sync::oneshot::{self, Receiver};
 use tokio::sync::Mutex;
 
-use crate::event::{Event, EventPublisher};
+use crate::event::{Event, EventPublisher, PublicationResult};
 use crate::result::Result;
 
 pub struct FakeEventPublisher {
@@ -22,15 +23,15 @@ impl FakeEventPublisher {
 
 #[async_trait]
 impl EventPublisher for FakeEventPublisher {
-    type Output = bool;
-
-    async fn publish(&self, event: Event) -> Result<Self::Output> {
+    async fn publish(&self, event: Event) -> Result<Receiver<PublicationResult>> {
         self.events.lock().await.push(event);
-        Ok(true)
+        let (_, tx) = oneshot::channel();
+        Ok(tx)
     }
 
-    async fn publish_all(&self, events: Vec<Event>) -> Result<Self::Output> {
+    async fn publish_all(&self, events: Vec<Event>) -> Result<Receiver<PublicationResult>> {
         self.events.lock().await.extend(events);
-        Ok(true)
+        let (_, tx) = oneshot::channel();
+        Ok(tx)
     }
 }

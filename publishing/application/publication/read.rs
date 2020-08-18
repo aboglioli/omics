@@ -1,31 +1,25 @@
 use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::domain::interaction::{InteractionRepository, InteractionService};
+use crate::domain::interaction::InteractionService;
 use crate::domain::publication::{PublicationId, PublicationRepository};
 use crate::domain::reader::{ReaderId, ReaderRepository};
 
-pub struct Read<'a, EPub, PRepo, RRepo, IRepo> {
-    event_pub: &'a EPub,
+pub struct Read<'a> {
+    event_pub: &'a dyn EventPublisher,
 
-    publication_repo: &'a PRepo,
-    reader_repo: &'a RRepo,
+    publication_repo: &'a dyn PublicationRepository,
+    reader_repo: &'a dyn ReaderRepository,
 
-    interaction_serv: &'a InteractionService<IRepo>,
+    interaction_serv: &'a InteractionService,
 }
 
-impl<'a, EPub, PRepo, RRepo, IRepo> Read<'a, EPub, PRepo, RRepo, IRepo>
-where
-    EPub: EventPublisher,
-    PRepo: PublicationRepository,
-    RRepo: ReaderRepository,
-    IRepo: InteractionRepository,
-{
+impl<'a> Read<'a> {
     pub fn new(
-        event_pub: &'a EPub,
-        publication_repo: &'a PRepo,
-        reader_repo: &'a RRepo,
-        interaction_serv: &'a InteractionService<IRepo>,
+        event_pub: &'a dyn EventPublisher,
+        publication_repo: &'a dyn PublicationRepository,
+        reader_repo: &'a dyn ReaderRepository,
+        interaction_serv: &'a InteractionService,
     ) -> Self {
         Read {
             event_pub,

@@ -5,14 +5,17 @@ use common::result::Result;
 
 use crate::domain::token::{Data, Token, TokenEncoder, TokenId, TokenRepository};
 
-pub struct TokenService<TRepo, TEnc> {
-    token_repo: Arc<TRepo>,
+pub struct TokenService {
+    token_repo: Arc<dyn TokenRepository + Sync + Send>,
 
-    token_enc: Arc<TEnc>,
+    token_enc: Arc<dyn TokenEncoder + Sync + Send>,
 }
 
-impl<TRepo: TokenRepository, TEnc: TokenEncoder> TokenService<TRepo, TEnc> {
-    pub fn new(token_repo: Arc<TRepo>, token_enc: Arc<TEnc>) -> Self {
+impl TokenService {
+    pub fn new(
+        token_repo: Arc<dyn TokenRepository + Sync + Send>,
+        token_enc: Arc<dyn TokenEncoder + Sync + Send>,
+    ) -> Self {
         TokenService {
             token_enc,
             token_repo,

@@ -10,15 +10,12 @@ pub struct GetAllResponse {
     pub categories: Vec<CategoryDto>,
 }
 
-pub struct GetAll<'a, CRepo> {
-    category_repo: &'a CRepo,
+pub struct GetAll<'a> {
+    category_repo: &'a dyn CategoryRepository,
 }
 
-impl<'a, CRepo> GetAll<'a, CRepo>
-where
-    CRepo: CategoryRepository,
-{
-    pub fn new(category_repo: &'a CRepo) -> Self {
+impl<'a> GetAll<'a> {
+    pub fn new(category_repo: &'a dyn CategoryRepository) -> Self {
         GetAll { category_repo }
     }
 

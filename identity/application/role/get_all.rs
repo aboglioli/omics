@@ -12,17 +12,13 @@ pub struct GetAllResponse {
     pub roles: Vec<RoleDto>,
 }
 
-pub struct GetAll<'a, RRepo, URepo> {
-    role_repo: &'a RRepo,
-    user_repo: &'a URepo,
+pub struct GetAll<'a> {
+    role_repo: &'a dyn RoleRepository,
+    user_repo: &'a dyn UserRepository,
 }
 
-impl<'a, RRepo, URepo> GetAll<'a, RRepo, URepo>
-where
-    RRepo: RoleRepository,
-    URepo: UserRepository,
-{
-    pub fn new(role_repo: &'a RRepo, user_repo: &'a URepo) -> Self {
+impl<'a> GetAll<'a> {
+    pub fn new(role_repo: &'a dyn RoleRepository, user_repo: &'a dyn UserRepository) -> Self {
         GetAll {
             role_repo,
             user_repo,

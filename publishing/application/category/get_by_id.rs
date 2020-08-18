@@ -3,15 +3,12 @@ use common::result::Result;
 use crate::application::dtos::CategoryDto;
 use crate::domain::category::{CategoryId, CategoryRepository};
 
-pub struct GetById<'a, CRepo> {
-    category_repo: &'a CRepo,
+pub struct GetById<'a> {
+    category_repo: &'a dyn CategoryRepository,
 }
 
-impl<'a, CRepo> GetById<'a, CRepo>
-where
-    CRepo: CategoryRepository,
-{
-    pub fn new(category_repo: &'a CRepo) -> Self {
+impl<'a> GetById<'a> {
+    pub fn new(category_repo: &'a dyn CategoryRepository) -> Self {
         GetById { category_repo }
     }
 

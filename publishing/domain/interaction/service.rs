@@ -9,15 +9,12 @@ use crate::domain::interaction::{
 use crate::domain::publication::Publication;
 use crate::domain::reader::Reader;
 
-pub struct InteractionService<IRepo> {
-    interaction_repo: Arc<IRepo>,
+pub struct InteractionService {
+    interaction_repo: Arc<dyn InteractionRepository>,
 }
 
-impl<IRepo> InteractionService<IRepo>
-where
-    IRepo: InteractionRepository,
-{
-    pub fn new(interaction_repo: Arc<IRepo>) -> Self {
+impl InteractionService {
+    pub fn new(interaction_repo: Arc<dyn InteractionRepository>) -> Self {
         InteractionService { interaction_repo }
     }
 

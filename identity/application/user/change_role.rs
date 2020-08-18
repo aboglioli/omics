@@ -10,17 +10,13 @@ pub struct ChangeRoleCommand {
     pub role_id: String,
 }
 
-pub struct ChangeRole<'a, RRepo, URepo> {
-    role_repo: &'a RRepo,
-    user_repo: &'a URepo,
+pub struct ChangeRole<'a> {
+    role_repo: &'a dyn RoleRepository,
+    user_repo: &'a dyn UserRepository,
 }
 
-impl<'a, RRepo, URepo> ChangeRole<'a, RRepo, URepo>
-where
-    URepo: UserRepository,
-    RRepo: RoleRepository,
-{
-    pub fn new(role_repo: &'a RRepo, user_repo: &'a URepo) -> Self {
+impl<'a> ChangeRole<'a> {
+    pub fn new(role_repo: &'a dyn RoleRepository, user_repo: &'a dyn UserRepository) -> Self {
         ChangeRole {
             role_repo,
             user_repo,

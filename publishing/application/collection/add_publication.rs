@@ -4,23 +4,18 @@ use common::result::Result;
 use crate::domain::collection::{CollectionId, CollectionRepository};
 use crate::domain::publication::{PublicationId, PublicationRepository};
 
-pub struct AddPublication<'a, EPub, CRepo, PRepo> {
-    event_pub: &'a EPub,
+pub struct AddPublication<'a> {
+    event_pub: &'a dyn EventPublisher,
 
-    collection_repo: &'a CRepo,
-    publication_repo: &'a PRepo,
+    collection_repo: &'a dyn CollectionRepository,
+    publication_repo: &'a dyn PublicationRepository,
 }
 
-impl<'a, EPub, CRepo, PRepo> AddPublication<'a, EPub, CRepo, PRepo>
-where
-    EPub: EventPublisher,
-    CRepo: CollectionRepository,
-    PRepo: PublicationRepository,
-{
+impl<'a> AddPublication<'a> {
     pub fn new(
-        event_pub: &'a EPub,
-        collection_repo: &'a CRepo,
-        publication_repo: &'a PRepo,
+        event_pub: &'a dyn EventPublisher,
+        collection_repo: &'a dyn CollectionRepository,
+        publication_repo: &'a dyn PublicationRepository,
     ) -> Self {
         AddPublication {
             event_pub,

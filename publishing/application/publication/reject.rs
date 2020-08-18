@@ -4,23 +4,18 @@ use common::result::Result;
 use crate::domain::content_manager::{ContentManagerId, ContentManagerRepository};
 use crate::domain::publication::{PublicationId, PublicationRepository};
 
-pub struct Reject<'a, EPub, CMRepo, PRepo> {
-    event_pub: &'a EPub,
+pub struct Reject<'a> {
+    event_pub: &'a dyn EventPublisher,
 
-    content_manager_repo: &'a CMRepo,
-    publication_repo: &'a PRepo,
+    content_manager_repo: &'a dyn ContentManagerRepository,
+    publication_repo: &'a dyn PublicationRepository,
 }
 
-impl<'a, EPub, CMRepo, PRepo> Reject<'a, EPub, CMRepo, PRepo>
-where
-    EPub: EventPublisher,
-    CMRepo: ContentManagerRepository,
-    PRepo: PublicationRepository,
-{
+impl<'a> Reject<'a> {
     pub fn new(
-        event_pub: &'a EPub,
-        content_manager_repo: &'a CMRepo,
-        publication_repo: &'a PRepo,
+        event_pub: &'a dyn EventPublisher,
+        content_manager_repo: &'a dyn ContentManagerRepository,
+        publication_repo: &'a dyn PublicationRepository,
     ) -> Self {
         Reject {
             event_pub,
