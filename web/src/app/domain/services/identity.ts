@@ -13,6 +13,7 @@ export interface IRegisterCommand {
 
 export interface IRegisterResponse {
   id: string;
+  validation_code: string;
 }
 
 export interface ILoginCommand {
