@@ -371,6 +371,18 @@ impl Publication {
             return Err(Error::new("publication", "not_a_draft"));
         }
 
+        if self.pages.len() == 0 {
+            return Err(Error::new("publication", "does_not_have_pages"));
+        }
+
+        for page in self.pages().iter() {
+            if page.images().len() == 0 {
+                return Err(Error::new("publication", "empty_page")
+                    .add_context("page", &page.number().to_string())
+                    .build());
+            }
+        }
+
         self.status_history.add_status(Status::WaitingApproval);
 
         self.base.record_event(PublicationEvent::ApprovalWaited {
@@ -444,7 +456,7 @@ mod tests {
         assert_eq!(publication.header().synopsis().value(), "Synopsis...");
         assert_eq!(publication.header().category_id().value(), "#category01");
         assert_eq!(publication.header().tags().len(), 2);
-        assert_eq!(publication.base().events().unwrap().len(), 1);
+        assert!(publication.base().events().unwrap().len() > 0);
         assert!(matches!(
             publication.status_history().current().status(),
             Status::Draft

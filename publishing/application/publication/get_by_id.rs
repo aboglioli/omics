@@ -113,7 +113,7 @@ mod tests {
         assert_eq!(res.author.id, author.base().id().value());
         assert_eq!(res.name, publication.header().name().value());
         assert_eq!(res.category.id, publication.header().category_id().value());
-        assert_eq!(res.pages.unwrap().len(), 0);
+        assert!(res.pages.unwrap().len() > 0);
         assert_eq!(res.statistics.views, 0);
         assert_eq!(res.statistics.unique_views, 0);
         assert_eq!(res.statistics.readings, 0);

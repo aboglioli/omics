@@ -8,7 +8,7 @@ use crate::domain::publication::{
 use crate::domain::reader::{Reader, ReaderId};
 
 pub fn publication1() -> Publication {
-    Publication::new(
+    let mut publication = Publication::new(
         PublicationId::new("#publication01").unwrap(),
         author1().base().id(),
         Header::new(
@@ -20,13 +20,31 @@ pub fn publication1() -> Publication {
         )
         .unwrap(),
     )
-    .unwrap()
+    .unwrap();
+
+    let mut page_1 = Page::new(0).unwrap();
+    page_1
+        .set_images(vec![
+            Image::new("domain.com/p1_image1.jpg").unwrap(),
+            Image::new("domain.com/p1_image2.jpg").unwrap(),
+        ])
+        .unwrap();
+    let mut page_2 = Page::new(1).unwrap();
+    page_2
+        .set_images(vec![
+            Image::new("domain.com/p2_image1.jpg").unwrap(),
+            Image::new("domain.com/p2_image2.jpg").unwrap(),
+        ])
+        .unwrap();
+    publication.set_pages(vec![page_1, page_2]).unwrap();
+
+    publication
 }
 
 pub fn published_publication1() -> Publication {
     let mut publication = publication1();
 
-    let mut page1 = Page::new(0).unwrap();
+    let mut page1 = Page::new(2).unwrap();
     page1
         .set_images(vec![
             Image::new("domain.com/img1.jpg").unwrap(),
@@ -35,7 +53,7 @@ pub fn published_publication1() -> Publication {
         ])
         .unwrap();
 
-    let mut page2 = Page::new(1).unwrap();
+    let mut page2 = Page::new(3).unwrap();
     page2
         .set_images(vec![
             Image::new("domain.com/img4.jpg").unwrap(),
