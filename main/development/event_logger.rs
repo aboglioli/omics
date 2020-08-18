@@ -1,16 +1,20 @@
+use std::sync::Arc;
+
 use async_trait::async_trait;
 
 use common::event::{Event, EventHandler};
 use common::result::Result;
 
+use crate::infrastructure::event::EventRepository;
+
 pub struct EventLogger {
-    events: Vec<Event>,
+    event_repo: Arc<EventRepository>,
 }
 
 impl EventLogger {
-    pub fn new() -> Self {
+    pub fn new(event_repo: Arc<EventRepository>) -> Self {
         println!("[DEV] EventLogger added");
-        EventLogger { events: Vec::new() }
+        EventLogger { event_repo }
     }
 }
 
@@ -30,7 +34,7 @@ impl EventHandler for EventLogger {
         println!("- code: {}", event.code());
         println!("- payload: {:?}", payload);
 
-        self.events.push(event.clone());
+        self.event_repo.add(event.clone()).await;
 
         Ok(true)
     }

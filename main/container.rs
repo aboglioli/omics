@@ -18,12 +18,14 @@ use publishing::infrastructure::persistence::inmem::{
     InMemReaderRepository,
 };
 
+use crate::infrastructure::event::EventRepository;
 use crate::infrastructure::publishing::{
     AuthorTranslator, ContentManagerTranslator, ReaderTranslator,
 };
 
 pub struct Container {
     pub event_bus: Arc<InMemEventBus>,
+    pub event_repo: Arc<EventRepository>,
     pub identity: IdentityContainer<
         InMemEventBus,
         InMemRoleRepository,
@@ -48,6 +50,7 @@ pub struct Container {
 impl Container {
     pub fn new() -> Self {
         let event_bus = Arc::new(InMemEventBus::new());
+        let event_repo = Arc::new(EventRepository::new());
 
         let role_repo = Arc::new(InMemRoleRepository::new());
         let token_repo = Arc::new(InMemTokenRepository::new());
@@ -70,6 +73,7 @@ impl Container {
 
         Container {
             event_bus: Arc::clone(&event_bus),
+            event_repo,
             identity: IdentityContainer::new(
                 Arc::clone(&event_bus),
                 role_repo,
@@ -94,6 +98,10 @@ impl Container {
 
     pub fn event_bus(&self) -> &InMemEventBus {
         &self.event_bus
+    }
+
+    pub fn event_repo(&self) -> Arc<EventRepository> {
+        Arc::clone(&self.event_repo)
     }
 }
 

@@ -30,24 +30,28 @@ async fn main() -> Result<(), Box<dyn Error>> {
         }
     }
 
+    // CORS
+    let cors = warp::cors().allow_any_origin();
+
     // General
     let health = warp::path::end().map(|| "Omics");
 
     // Routes
-    let routes = warp::path("api").and(
-        health
-            .or(development::routes(&container))
-            .or(catalogue::routes(&container))
-            .or(user::routes(&container))
-            .or(publication::routes(&container))
-            .or(collection::routes(&container))
-            .or(author::routes(&container))
-            .or(category::routes(&container))
-            .or(contract::routes(&container))
-            .or(subscription::routes(&container))
-            .or(donation::routes(&container))
-            .recover(response::handle_rejection),
-    );
+    let routes = warp::path("api")
+        .and(
+            health
+                .or(development::routes(&container))
+                .or(catalogue::routes(&container))
+                .or(user::routes(&container))
+                .or(publication::routes(&container))
+                .or(collection::routes(&container))
+                .or(author::routes(&container))
+                .or(category::routes(&container))
+                .or(contract::routes(&container))
+                .or(subscription::routes(&container))
+                .or(donation::routes(&container))
+                .recover(response::handle_rejection),
+        ).with(cors);
 
     // Server
     println!("Listening on {}", config.port());
