@@ -4,6 +4,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ValidadoresCustomService } from '../../services/validadores-custom.service';
 import { Router } from '@angular/router';
+import { IdentityService, IRegisterCommand, IRegisterResponse } from '../../domain/services/identity';
 
 @Component({
   selector: 'app-login-register',
@@ -28,7 +29,8 @@ export class LoginRegisterComponent implements OnInit {
   constructor(  private dialogRef: MatDialogRef<LoginRegisterComponent>,
                 private fb: FormBuilder,
                 private validadoresCustom: ValidadoresCustomService,
-                private router: Router ) {
+                private router: Router,
+                private identifyService: IdentityService ) {
 
     dialogRef.disableClose = true;
 
@@ -95,7 +97,6 @@ export class LoginRegisterComponent implements OnInit {
 
       console.log('TEST > Usuario login correcto');
 
-      localStorage.setItem('tokenJWT', 'adminToken'); // Uso temporal por ahora
       this.router.navigate(['/home']);
 
       this.closeMatDialog();
@@ -128,10 +129,28 @@ export class LoginRegisterComponent implements OnInit {
 
       console.log('TEST > Usuario Registrado');
 
-      localStorage.setItem('tokenJWT', 'adminToken'); // Uso temporal por ahora
-      this.router.navigate(['/home']);
+      const registerCommand: IRegisterCommand = {
 
-      this.closeMatDialog();
+        username: this.formSignUp.get('usuario').value,
+        email: this.formSignUp.get('correo').value,
+        password: this.formSignUp.get('password1').value
+
+      };
+      this.identifyService.register( registerCommand ).subscribe(
+
+        (result: IRegisterResponse) => {
+
+          console.log('TEST > ', result);
+
+          this.router.navigate(['/home']);
+          this.closeMatDialog();
+        },
+        (error: any ) => {
+
+          console.error( 'ERROR !!!', error );
+
+        }
+      );
 
     }
 
