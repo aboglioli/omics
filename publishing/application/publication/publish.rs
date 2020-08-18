@@ -1,4 +1,3 @@
-use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
 
@@ -28,16 +27,12 @@ impl<'a> Publish<'a> {
 
     pub async fn exec(&self, author_id: String, publication_id: String) -> Result<()> {
         let author_id = AuthorId::new(author_id)?;
-        self.author_repo.find_by_id(&author_id).await?;
+        let author = self.author_repo.find_by_id(&author_id).await?;
 
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        if publication.author_id() != &author_id {
-            return Err(Error::new("publication", "unauthorized"));
-        }
-
-        publication.publish()?;
+        publication.publish(&author)?;
 
         self.publication_repo.save(&mut publication).await?;
 

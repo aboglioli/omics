@@ -26,7 +26,7 @@ use common::model::{AggregateRoot, StatusHistory, StringId};
 use common::result::Result;
 use shared::event::PublicationEvent;
 
-use crate::domain::author::AuthorId;
+use crate::domain::author::{Author, AuthorId};
 use crate::domain::content_manager::ContentManager;
 use crate::domain::interaction::{Comment, Like, Reading, Review, Stars, View};
 use crate::domain::reader::Reader;
@@ -366,7 +366,11 @@ impl Publication {
         Ok(())
     }
 
-    pub fn publish(&mut self) -> Result<()> {
+    pub fn publish(&mut self, author: &Author) -> Result<()> {
+        if &author.base().id() != self.author_id() {
+            return Err(Error::new("publication", "invalid_author"));
+        }
+
         if !matches!(self.status_history().current().status(), Status::Draft) {
             return Err(Error::new("publication", "not_a_draft"));
         }
@@ -467,6 +471,7 @@ mod tests {
     fn status() {
         let mut publication = mocks::publication1();
         let cm1 = mocks::content_manager1();
+        let author = mocks::author1();
 
         assert!(publication.make_draft().is_ok());
         assert!(publication.make_draft().is_ok());
@@ -474,7 +479,7 @@ mod tests {
         assert!(publication.approve(&cm1).is_err());
         assert!(publication.reject(&cm1).is_err());
 
-        assert!(publication.publish().is_ok());
+        assert!(publication.publish(&author).is_ok());
         assert!(matches!(
             publication.status_history().current().status(),
             Status::WaitingApproval
@@ -484,18 +489,18 @@ mod tests {
         assert!(
             matches!(publication.status_history().current().status(), Status::Published { .. })
         );
-        assert!(publication.publish().is_err());
+        assert!(publication.publish(&author).is_err());
 
         assert!(publication.make_draft().is_ok());
         assert!(matches!(
             publication.status_history().current().status(),
             Status::Draft
         ));
-        assert!(publication.publish().is_ok());
+        assert!(publication.publish(&author).is_ok());
 
         assert!(publication.reject(&cm1).is_ok());
         assert!(matches!(publication.status_history().current().status(), Status::Rejected { .. }));
-        assert!(publication.publish().is_err());
+        assert!(publication.publish(&author).is_err());
 
         assert!(publication.make_draft().is_ok());
         assert!(matches!(

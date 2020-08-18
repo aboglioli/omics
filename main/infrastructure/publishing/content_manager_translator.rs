@@ -8,6 +8,7 @@ use publishing::domain::content_manager::{
     ContentManager, ContentManagerId, ContentManagerRepository,
 };
 
+// TODO: use role
 pub struct ContentManagerTranslator<URepo> {
     user_repo: Arc<URepo>,
 }

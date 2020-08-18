@@ -63,10 +63,11 @@ mod tests {
             c.publication_repo(),
         );
 
+        let author = mocks::author1();
         let mut cm = mocks::content_manager1();
         c.content_manager_repo().save(&mut cm).await.unwrap();
         let mut publication = mocks::publication1();
-        publication.publish().unwrap();
+        publication.publish(&author).unwrap();
         c.publication_repo().save(&mut publication).await.unwrap();
 
         uc.exec(
