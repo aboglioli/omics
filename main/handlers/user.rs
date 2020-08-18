@@ -33,21 +33,21 @@ pub fn routes(
     // POST /users/register
     let register = warp::post()
         .and(warp::path("register"))
-        .and(warp::body::json())
+        .and(warp::body::json::<RegisterCommand>())
         .and(with_container(container.clone()))
         .and_then(register);
 
     // POST /users/login
     let login = warp::post()
         .and(warp::path("login"))
-        .and(warp::body::json())
+        .and(warp::body::json::<LoginCommand>())
         .and(with_container(container.clone()))
         .and_then(login);
 
     // PUT /users/:id
     let update = warp::put()
         .and(warp::path!(String))
-        .and(warp::body::json())
+        .and(warp::body::json::<UpdateCommand>())
         .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(update);
@@ -62,7 +62,7 @@ pub fn routes(
     // PUT /users/:id/change-password
     let change_password = warp::put()
         .and(warp::path!(String / "change-password"))
-        .and(warp::body::json())
+        .and(warp::body::json::<ChangePasswordCommand>())
         .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(change_password);
@@ -70,7 +70,7 @@ pub fn routes(
     // POST /users/:id/recover-password
     let recover_password = warp::post()
         .and(warp::path("recover-password"))
-        .and(warp::body::json())
+        .and(warp::body::json::<RecoverPasswordCommand>())
         .and(with_container(container.clone()))
         .and_then(recover_password);
 
@@ -83,7 +83,7 @@ pub fn routes(
     // POST /users/:id/role
     let change_role = warp::put()
         .and(warp::path!(String / "role"))
-        .and(warp::body::json())
+        .and(warp::body::json::<ChangeRoleCommand>())
         .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(change_role);

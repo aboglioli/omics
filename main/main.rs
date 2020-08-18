@@ -43,28 +43,28 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let cors = warp::cors()
         .allow_any_origin()
         .allow_headers(vec![
-            "Content-Type",
-            "Access-Control-Allow-Origin",
-            "Access-Control-Request-Method",
-            "Access-Control-Request-Headers",
+            "content-type",
+            "access-control-allow-origin",
+            "access-control-request-method",
+            "access-control-request-headers",
         ])
-        .allow_methods(vec!["GET", "POST", "DELETE", "PUT", "OPTIONS"])
-        .allow_credentials(true);
+        .allow_methods(vec!["GET", "POST", "DELETE", "PUT", "OPTIONS"]);
+        // .allow_credentials(true);
 
-    let mut headers = HeaderMap::new();
-    headers.insert("Access-Control-Allow-Origin", HeaderValue::from_static("*"));
-    headers.insert(
-        "Access-Control-Allow-Methods",
-        HeaderValue::from_static("GET, POST, OPTIONS, PUT, PATCH, DELETE"),
-    );
-    headers.insert(
-        "Access-Control-Allow-Headers",
-        HeaderValue::from_static("X-Requested-With,content-type"),
-    );
-    headers.insert(
-        "Access-Control-Allow-Credentials",
-        HeaderValue::from_static("true"),
-    );
+    // let mut headers = HeaderMap::new();
+    // headers.insert("Access-Control-Allow-Origin", HeaderValue::from_static("*"));
+    // headers.insert(
+    //     "Access-Control-Allow-Methods",
+    //     HeaderValue::from_static("GET, POST, OPTIONS, PUT, PATCH, DELETE"),
+    // );
+    // headers.insert(
+    //     "Access-Control-Allow-Headers",
+    //     HeaderValue::from_static("X-Requested-With,content-type"),
+    // );
+    // headers.insert(
+    //     "Access-Control-Allow-Credentials",
+    //     HeaderValue::from_static("true"),
+    // );
 
     // General
     let health = warp::path::end().map(|| "Omics");
@@ -81,13 +81,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 .or(collection::routes(&container))
                 .or(author::routes(&container))
                 .or(category::routes(&container))
-                .or(contract::routes(&container))
-                .or(subscription::routes(&container))
-                .or(donation::routes(&container))
                 .recover(response::handle_rejection),
         )
         .with(cors)
-        .with(warp::reply::with::headers(headers))
+        // .with(warp::reply::with::headers(headers))
         .with(warp::log("cors test"));
 
     // let routes = warp::any().and(routes).with().with(cors).with(warp::log("cors test"));

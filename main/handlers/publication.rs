@@ -33,7 +33,7 @@ pub fn routes(
     // POST /publications
     let create = warp::post()
         .and(warp::path::end())
-        .and(warp::body::json())
+        .and(warp::body::json::<CreateCommand>())
         .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(create);
@@ -41,7 +41,7 @@ pub fn routes(
     // PUT /publications/:id
     let update = warp::put()
         .and(warp::path!(String))
-        .and(warp::body::json())
+        .and(warp::body::json::<UpdateCommand>())
         .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(update);
@@ -49,7 +49,7 @@ pub fn routes(
     // PUT /publications/:id/pages
     let update_pages = warp::put()
         .and(warp::path!(String / "pages"))
-        .and(warp::body::json())
+        .and(warp::body::json::<UpdatePagesCommand>())
         .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(update_pages);
@@ -106,7 +106,7 @@ pub fn routes(
     // POST /publications/:id/review
     let review = warp::post()
         .and(warp::path!(String / "review"))
-        .and(warp::body::json())
+        .and(warp::body::json::<AddReviewCommand>())
         .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(review);

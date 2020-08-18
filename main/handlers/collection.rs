@@ -31,7 +31,7 @@ pub fn routes(
     // POST /collections
     let create = warp::post()
         .and(warp::path::end())
-        .and(warp::body::json())
+        .and(warp::body::json::<CreateCommand>())
         .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(create);
@@ -39,7 +39,7 @@ pub fn routes(
     // PUT /collections/:id
     let update = warp::put()
         .and(warp::path!(String))
-        .and(warp::body::json())
+        .and(warp::body::json::<UpdateCommand>())
         .and(with_auth(container.clone()))
         .and(with_container(container.clone()))
         .and_then(update);
