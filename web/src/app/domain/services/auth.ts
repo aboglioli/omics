@@ -13,8 +13,10 @@ export class AuthService {
     }
   }
 
-  public setToken(authToken: string): void {
+  public setToken(authToken: string, idUser: string): void {
     this.authToken = authToken;
+    localStorage.setItem('auth_token', this.authToken);
+    localStorage.setItem('id_user', idUser);
   }
 
   public getToken(): string {

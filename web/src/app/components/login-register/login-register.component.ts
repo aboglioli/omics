@@ -4,8 +4,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ValidadoresCustomService } from '../../services/validadores-custom.service';
 import { Router } from '@angular/router';
-import { IdentityService, IRegisterCommand, IRegisterResponse } from '../../domain/services/identity';
-import { AuthService  } from '../../domain/services/auth';
+import { IdentityService, IRegisterCommand, IRegisterResponse, ILoginCommand, ILoginResponse } from '../../domain/services/identity';
+import { AuthService } from 'src/app/domain/services/auth';
 
 @Component({
   selector: 'app-login-register',
@@ -31,8 +31,8 @@ export class LoginRegisterComponent implements OnInit {
                 private fb: FormBuilder,
                 private validadoresCustom: ValidadoresCustomService,
                 private router: Router,
-                private identityServ: IdentityService,
-                private authServ: AuthService) {
+                private identityService: IdentityService,
+                private authService: AuthService) {
 
     dialogRef.disableClose = true;
 
@@ -56,7 +56,7 @@ export class LoginRegisterComponent implements OnInit {
     this.formLogin = this.fb.group({
 
       correoUsuario    : ['', [ Validators.required, Validators.minLength(5) ] ],
-      password         : ['', [ Validators.required, Validators.minLength(5) ] ],
+      password         : ['', [ Validators.required, Validators.minLength(8) ] ],
 
     });
 
@@ -65,8 +65,8 @@ export class LoginRegisterComponent implements OnInit {
 
       correo     : ['', [ Validators.required, Validators.pattern( '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$' )] ],
       usuario    : ['', [ Validators.required, Validators.minLength(5) ]],
-      password1  : ['', [ Validators.required, Validators.minLength(5) ] ],
-      password2  : ['', [ Validators.required, Validators.minLength(5) ] ],
+      password1  : ['', [ Validators.required, Validators.minLength(8) ] ],
+      password2  : ['', [ Validators.required, Validators.minLength(8) ] ],
 
     }, {
       // A nivel formulario asyncValidators (sino uno creado)
@@ -97,11 +97,27 @@ export class LoginRegisterComponent implements OnInit {
 
     } else {
 
-      console.log('TEST > Usuario login correcto');
+      const loginCommand: ILoginCommand = {
 
-      this.router.navigate(['/home']);
+        username: this.formLogin.get('correoUsuario').value,
+        password: this.formLogin.get('password').value
 
-      this.closeMatDialog();
+      };
+
+      this.identityService.login(loginCommand).subscribe(
+
+        (res: ILoginResponse) => {
+          console.log('TEST > Registro realizado con éxito', res);
+
+          this.authService.setToken( res.auth_token, res.user_id );
+          this.router.navigate(['/home']);
+          this.closeMatDialog();
+
+        },
+        (error: any) => {
+          console.error( 'ERROR !!!', error );
+        }
+      );
 
     }
 
@@ -129,7 +145,6 @@ export class LoginRegisterComponent implements OnInit {
 
     } else {
 
-      console.log('TEST > Usuario Registrado');
 
       const registerCommand: IRegisterCommand = {
 
@@ -138,11 +153,11 @@ export class LoginRegisterComponent implements OnInit {
         password: this.formSignUp.get('password1').value
 
       };
-      this.identityServ.register( registerCommand ).subscribe(
+      this.identityService.register( registerCommand ).subscribe(
 
         (result: IRegisterResponse) => {
 
-          console.log('TEST > ', result);
+          console.log('TEST > Registro realizado con éxito', result);
 
           this.router.navigate(['/home']);
           this.closeMatDialog();
