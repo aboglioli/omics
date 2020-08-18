@@ -13,6 +13,8 @@ import { DashboardReglasNegociosComponent } from './pages/dashboard-reglas-negoc
 import { DashboardGestionAdminComponent } from './pages/dashboard-gestion-admin/dashboard-gestion-admin.component';
 
 import { DevelopmentComponent } from './pages/development/development.component';
+import { VisorComicComponent } from './pages/visor-comic/visor-comic.component';
+import { NewPublicationComponent } from './components/deskboard/new-publication/new-publication.component';
 
 
 
@@ -24,7 +26,9 @@ const routes: Routes = [
   { path: 'catalogue', component: CatalogoComponent },
   { path: 'authors', component:  AutoresComponent},
   { path: 'deskboard', component:  DeskboardGeneralComponent},
+  { path: 'deskboard/publication/new', component:  NewPublicationComponent},
   { path: 'about', component: AboutComponent },
+  { path: 'read/:id', component: VisorComicComponent },
   { path: 'dashboard-reportes', component: DashboardReportesComponent },
   { path: 'dashboard-publicaciones-contratos', component: DashboardGestionContratosPublicacionesComponent },
   { path: 'dashboard-reglas-negocio', component: DashboardReglasNegociosComponent },

@@ -1,0 +1,25 @@
+div.mis-comics-container {
+
+  display: flex;
+  flex-direction: column;
+
+  div.top-menu {
+
+    display: flex;
+    justify-content: flex-start;
+
+    padding: 0.5em 0.5em;
+
+  }
+
+}
+
+
+
+// Generales
+button.button-white-borders {
+
+  color: white;
+  border-color: white;
+
+}
