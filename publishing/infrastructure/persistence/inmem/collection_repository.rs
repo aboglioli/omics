@@ -77,7 +77,7 @@ impl CollectionRepository for InMemCollectionRepository {
 
     async fn save(&self, collection: &mut Collection) -> Result<()> {
         self.cache
-            .set(collection.base().id(), collection.clone())
+            .set(collection.base().id().clone(), collection.clone())
             .await
     }
 }

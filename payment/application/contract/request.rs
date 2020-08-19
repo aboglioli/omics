@@ -45,7 +45,7 @@ where
             .await?;
 
         Ok(RequestReponse {
-            id: contract.base().id().value().to_owned(),
+            id: contract.base().id().to_string(),
         })
     }
 }

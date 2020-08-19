@@ -32,7 +32,7 @@ impl Collection {
         };
 
         collection.base.record_event(CollectionEvent::Created {
-            id: collection.base().id().value().to_owned(),
+            id: collection.base().id().to_string(),
             author_id: collection.author_id().value().to_owned(),
             name: collection.header().name().value().to_owned(),
             synopsis: collection.header().synopsis().value().to_owned(),
@@ -69,7 +69,7 @@ impl Collection {
         self.header = header;
 
         self.base.record_event(CollectionEvent::HeaderUpdated {
-            id: self.base().id().value().to_owned(),
+            id: self.base().id().to_string(),
             name: self.header().name().value().to_owned(),
             synopsis: self.header().synopsis().value().to_owned(),
             category_id: self.header().category_id().value().to_owned(),
@@ -90,12 +90,12 @@ impl Collection {
             return Err(Error::new("collection", "publication_is_not_published"));
         }
 
-        let item = Item::new(publication.base().id())?;
+        let item = Item::new(publication.base().id().clone())?;
         self.items.push(item);
 
         self.base.record_event(CollectionEvent::PublicationAdded {
-            id: self.base().id().value().to_owned(),
-            publication_id: publication.base().id().value().to_owned(),
+            id: self.base().id().to_string(),
+            publication_id: publication.base().id().to_string(),
         });
 
         Ok(())
@@ -106,7 +106,7 @@ impl Collection {
             .retain(|item| item.publication_id() != publication_id);
 
         self.base.record_event(CollectionEvent::PublicationRemoved {
-            id: self.base().id().value().to_owned(),
+            id: self.base().id().to_string(),
             publication_id: publication_id.value().to_owned(),
         });
 
@@ -117,7 +117,7 @@ impl Collection {
         self.base.delete();
 
         self.base.record_event(CollectionEvent::Deleted {
-            id: self.base().id().value().to_owned(),
+            id: self.base().id().to_string(),
         });
 
         Ok(())

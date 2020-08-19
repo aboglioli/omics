@@ -104,7 +104,7 @@ pub struct CatalogueDto {
 impl CatalogueDto {
     pub fn new(catalogue: &Catalogue) -> Self {
         CatalogueDto {
-            id: catalogue.base().id().value().to_owned(),
+            id: catalogue.base().id().to_string(),
             authors: catalogue
                 .authors()
                 .iter()

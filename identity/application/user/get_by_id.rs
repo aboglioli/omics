@@ -34,7 +34,7 @@ mod tests {
         let mut user = mocks::user1();
         c.user_repo().save(&mut user).await.unwrap();
 
-        let id = user.base().id().value().to_owned();
+        let id = user.base().id().to_string();
         let res = uc.exec(id.clone(), id).await.unwrap();
 
         assert!(res.email.is_some());
@@ -48,9 +48,9 @@ mod tests {
         let mut user = mocks::user1();
         c.user_repo().save(&mut user).await.unwrap();
 
-        let id = user.base().id().value().to_owned();
+        let id = user.base().id().to_string();
         let res = uc
-            .exec(mocks::user2().base().id().value().to_owned(), id)
+            .exec(mocks::user2().base().id().to_string(), id)
             .await
             .unwrap();
 
@@ -65,7 +65,7 @@ mod tests {
         let mut user = mocks::user1();
         c.user_repo().save(&mut user).await.unwrap();
 
-        let id = user.base().id().value().to_owned();
+        let id = user.base().id().to_string();
         let res = uc.exec(id.clone(), id).await.unwrap();
         assert_eq!(res.username, user.identity().username().value());
         assert!(res.name.is_none());
@@ -81,7 +81,7 @@ mod tests {
         user.set_person(mocks::person1()).unwrap();
         c.user_repo().save(&mut user).await.unwrap();
 
-        let id = user.base().id().value().to_owned();
+        let id = user.base().id().to_string();
         let res = uc.exec(id.clone(), id).await.unwrap();
         assert_eq!(res.id, user.base().id().value());
         assert_eq!(res.username, user.identity().username().value());

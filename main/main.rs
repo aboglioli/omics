@@ -9,7 +9,6 @@ mod response;
 use std::error::Error;
 use std::sync::Arc;
 
-
 use warp::Filter;
 
 use common::config::Config;

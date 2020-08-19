@@ -55,7 +55,7 @@ impl User {
         };
 
         user.base.record_event(UserEvent::Registered {
-            id: user.base().id().value().to_owned(),
+            id: user.base().id().to_string(),
             username: user.identity().username().value().to_owned(),
             email: user.identity().username().value().to_owned(),
             validation_code: user.validation().unwrap().code().to_owned(),
@@ -117,7 +117,7 @@ impl User {
         self.person = Some(person);
 
         self.base.record_event(UserEvent::Updated {
-            id: self.base().id().value().to_owned(),
+            id: self.base().id().to_string(),
             name: self.person().unwrap().fullname().name().to_owned(),
             lastname: self.person().unwrap().fullname().lastname().to_owned(),
         });
@@ -156,7 +156,7 @@ impl User {
         }
 
         self.base.record_event(UserEvent::Validated {
-            id: self.base().id().value().to_owned(),
+            id: self.base().id().to_string(),
         });
 
         Ok(())
@@ -172,7 +172,7 @@ impl User {
         }
 
         self.base.record_event(UserEvent::LoggedIn {
-            id: self.base().id().value().to_owned(),
+            id: self.base().id().to_string(),
             auth_token: token.value().to_owned(),
         });
 
@@ -183,7 +183,7 @@ impl User {
         self.identity.set_password(password)?;
         self.base
             .record_event(UserEvent::PasswordRecoveryRequested {
-                id: self.base().id().value().to_owned(),
+                id: self.base().id().to_string(),
                 temp_password: temp_password.to_owned(),
                 email: self.identity().email().value().to_owned(),
             });
@@ -199,7 +199,7 @@ impl User {
         self.base.delete();
 
         self.base.record_event(UserEvent::Deleted {
-            id: self.base().id().value().to_owned(),
+            id: self.base().id().to_string(),
         });
 
         Ok(())

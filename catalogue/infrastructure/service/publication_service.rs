@@ -44,7 +44,7 @@ where
             .await?;
 
         Ok(Publication::new(
-            publication.base().id().value().to_owned(),
+            publication.base().id().to_string(),
             Author::new(
                 author.base().id().value(),
                 author.username(),

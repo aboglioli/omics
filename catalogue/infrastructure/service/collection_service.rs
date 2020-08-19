@@ -45,7 +45,7 @@ where
             .await?;
 
         Ok(Collection::new(
-            collection.base().id().value().to_owned(),
+            collection.base().id().to_string(),
             Author::new(
                 author.base().id().value(),
                 author.username(),

@@ -12,7 +12,7 @@ pub struct AggregateRoot<ID, E> {
     events: Vec<E>,
 }
 
-impl<ID: Clone, E: ToEvent> AggregateRoot<ID, E> {
+impl<ID, E> AggregateRoot<ID, E> {
     pub fn new(id: ID) -> AggregateRoot<ID, E> {
         AggregateRoot {
             id,
@@ -38,8 +38,8 @@ impl<ID: Clone, E: ToEvent> AggregateRoot<ID, E> {
         }
     }
 
-    pub fn id(&self) -> ID {
-        self.id.clone()
+    pub fn id(&self) -> &ID {
+        &self.id
     }
 
     pub fn created_at(&self) -> &DateTime<Utc> {
@@ -61,7 +61,12 @@ impl<ID: Clone, E: ToEvent> AggregateRoot<ID, E> {
     pub fn delete(&mut self) {
         self.deleted_at = Some(Utc::now());
     }
+}
 
+impl<ID, E> AggregateRoot<ID, E>
+where
+    E: ToEvent,
+{
     pub fn record_event(&mut self, event: E) {
         self.events.push(event);
     }

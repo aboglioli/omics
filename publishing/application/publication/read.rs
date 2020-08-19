@@ -72,8 +72,8 @@ mod tests {
         c.publication_repo().save(&mut publication).await.unwrap();
 
         uc.exec(
-            reader.base().id().value().to_owned(),
-            publication.base().id().value().to_owned(),
+            reader.base().id().to_string(),
+            publication.base().id().to_string(),
         )
         .await
         .unwrap();
@@ -104,8 +104,8 @@ mod tests {
 
         assert!(uc
             .exec(
-                reader.base().id().value().to_owned(),
-                publication.base().id().value().to_owned()
+                reader.base().id().to_string(),
+                publication.base().id().to_string()
             )
             .await
             .is_err());
@@ -127,14 +127,11 @@ mod tests {
         c.publication_repo().save(&mut publication).await.unwrap();
 
         assert!(uc
-            .exec(reader.base().id().value().to_owned(), "#invalid".to_owned())
+            .exec(reader.base().id().to_string(), "#invalid".to_owned())
             .await
             .is_err());
         assert!(uc
-            .exec(
-                "#invalid".to_owned(),
-                publication.base().id().value().to_owned()
-            )
+            .exec("#invalid".to_owned(), publication.base().id().to_string())
             .await
             .is_err());
     }

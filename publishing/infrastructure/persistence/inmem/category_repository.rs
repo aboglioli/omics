@@ -54,6 +54,8 @@ impl CategoryRepository for InMemCategoryRepository {
     }
 
     async fn save(&self, category: &mut Category) -> Result<()> {
-        self.cache.set(category.base().id(), category.clone()).await
+        self.cache
+            .set(category.base().id().clone(), category.clone())
+            .await
     }
 }

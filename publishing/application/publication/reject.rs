@@ -70,8 +70,8 @@ mod tests {
         c.publication_repo().save(&mut publication).await.unwrap();
 
         uc.exec(
-            cm.base().id().value().to_owned(),
-            publication.base().id().value().to_owned(),
+            cm.base().id().to_string(),
+            publication.base().id().to_string(),
         )
         .await
         .unwrap();
@@ -87,7 +87,7 @@ mod tests {
         );
 
         if let Status::Rejected { admin_id } = publication.status_history().current().status() {
-            assert_eq!(admin_id, &cm.base().id());
+            assert_eq!(admin_id, cm.base().id());
         }
     }
 }

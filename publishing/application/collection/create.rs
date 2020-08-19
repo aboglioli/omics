@@ -82,7 +82,7 @@ impl<'a> Create<'a> {
             .await?;
 
         Ok(CreateResponse {
-            id: collection.base().id().value().to_owned(),
+            id: collection.base().id().to_string(),
         })
     }
 }

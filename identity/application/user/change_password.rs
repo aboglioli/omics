@@ -52,7 +52,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                user.base().id().value().to_owned(),
+                user.base().id().to_string(),
                 ChangePasswordCommand {
                     old_password: "P@asswd!".to_owned(),
                     new_password: "new-password".to_owned(),
@@ -75,7 +75,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                user.base().id().value().to_owned(),
+                user.base().id().to_string(),
                 ChangePasswordCommand {
                     old_password: "invalid".to_owned(),
                     new_password: "new-password".to_owned(),

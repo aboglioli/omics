@@ -83,7 +83,7 @@ impl<'a> Create<'a> {
             .await?;
 
         Ok(CreateResponse {
-            id: publication.base().id().value().to_owned(),
+            id: publication.base().id().to_string(),
         })
     }
 }
@@ -112,11 +112,11 @@ mod tests {
 
         let res = uc
             .exec(
-                author.base().id().value().to_owned(),
+                author.base().id().to_string(),
                 CreateCommand {
                     name: "Publication 1".to_owned(),
                     synopsis: "Synopsis...".to_owned(),
-                    category_id: category.base().id().value().to_owned(),
+                    category_id: category.base().id().to_string(),
                     tags: vec!["Tag 1".to_owned()],
                     cover: "cover.com/cover.jpg".to_owned(),
                 },
@@ -154,11 +154,11 @@ mod tests {
 
         assert!(uc
             .exec(
-                author.base().id().value().to_owned(),
+                author.base().id().to_string(),
                 CreateCommand {
                     name: "".to_owned(),
                     synopsis: "Synopsis...".to_owned(),
-                    category_id: category.base().id().value().to_owned(),
+                    category_id: category.base().id().to_string(),
                     tags: vec!["Tag 1".to_owned()],
                     cover: "cover.com/cover.jpg".to_owned(),
                 }
@@ -168,11 +168,11 @@ mod tests {
 
         assert!(uc
             .exec(
-                author.base().id().value().to_owned(),
+                author.base().id().to_string(),
                 CreateCommand {
                     name: "Publication 1".to_owned(),
                     synopsis: "".to_owned(),
-                    category_id: category.base().id().value().to_owned(),
+                    category_id: category.base().id().to_string(),
                     tags: vec!["Tag 1".to_owned()],
                     cover: "cover.com/cover.jpg".to_owned(),
                 }
@@ -197,11 +197,11 @@ mod tests {
 
         assert!(uc
             .exec(
-                author.base().id().value().to_owned(),
+                author.base().id().to_string(),
                 CreateCommand {
                     name: "Publication 1".to_owned(),
                     synopsis: "Synopsis...".to_owned(),
-                    category_id: category.base().id().value().to_owned(),
+                    category_id: category.base().id().to_string(),
                     tags: vec!["Tag 1".to_owned()],
                     cover: "cover.com/cover.jpg".to_owned(),
                 },

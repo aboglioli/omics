@@ -10,11 +10,11 @@ use crate::domain::reader::{Reader, ReaderId};
 pub fn publication1() -> Publication {
     let mut publication = Publication::new(
         PublicationId::new("#publication01").unwrap(),
-        author1().base().id(),
+        author1().base().id().clone(),
         Header::new(
             Name::new("Publication 01").unwrap(),
             Synopsis::new("Synopsis...").unwrap(),
-            category1().base().id(),
+            category1().base().id().clone(),
             vec![Tag::new("Tag 1").unwrap(), Tag::new("Tag 2").unwrap()],
             Image::new("domain.com/image.jpg").unwrap(),
         )
@@ -71,11 +71,11 @@ pub fn published_publication1() -> Publication {
 pub fn empty_collection1() -> Collection {
     Collection::new(
         CollectionId::new("#collection01").unwrap(),
-        author1().base().id(),
+        author1().base().id().clone(),
         Header::new(
             Name::new("Collection 01").unwrap(),
             Synopsis::new("Synopsis...").unwrap(),
-            category1().base().id(),
+            category1().base().id().clone(),
             vec![Tag::new("Tag 1").unwrap(), Tag::new("Tag 2").unwrap()],
             Image::new("domain.com/image.jpg").unwrap(),
         )

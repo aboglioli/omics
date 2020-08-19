@@ -105,12 +105,12 @@ mod tests {
         c.category_repo().save(&mut category).await.unwrap();
 
         uc.exec(
-            author.base().id().value().to_owned(),
-            publication.base().id().value().to_owned(),
+            author.base().id().to_string(),
+            publication.base().id().to_string(),
             UpdateCommand {
                 name: "New name".to_owned(),
                 synopsis: "New synopsis...".to_owned(),
-                category_id: category.base().id().value().to_owned(),
+                category_id: category.base().id().to_string(),
                 tags: vec!["New tag".to_owned()],
                 cover: "domain.com/new-cover.jpg".to_owned(),
             },
@@ -146,12 +146,12 @@ mod tests {
         c.category_repo().save(&mut category).await.unwrap();
 
         uc.exec(
-            author.base().id().value().to_owned(),
-            publication.base().id().value().to_owned(),
+            author.base().id().to_string(),
+            publication.base().id().to_string(),
             UpdateCommand {
                 name: "New name".to_owned(),
                 synopsis: "New synopsis...".to_owned(),
-                category_id: category.base().id().value().to_owned(),
+                category_id: category.base().id().to_string(),
                 tags: vec!["New tag".to_owned()],
                 cover: "domain.com/new-cover.jpg".to_owned(),
             },
@@ -183,12 +183,12 @@ mod tests {
 
         assert!(uc
             .exec(
-                author.base().id().value().to_owned(),
-                publication.base().id().value().to_owned(),
+                author.base().id().to_string(),
+                publication.base().id().to_string(),
                 UpdateCommand {
                     name: "New name".to_owned(),
                     synopsis: "New synopsis...".to_owned(),
-                    category_id: category.base().id().value().to_owned(),
+                    category_id: category.base().id().to_string(),
                     tags: vec!["New tag".to_owned()],
                     cover: "domain.com/new-cover.jpg".to_owned(),
                 },
@@ -209,12 +209,12 @@ mod tests {
 
         assert!(uc
             .exec(
-                author.base().id().value().to_owned(),
-                publication.base().id().value().to_owned(),
+                author.base().id().to_string(),
+                publication.base().id().to_string(),
                 UpdateCommand {
                     name: "New name".to_owned(),
                     synopsis: "New synopsis...".to_owned(),
-                    category_id: category.base().id().value().to_owned(),
+                    category_id: category.base().id().to_string(),
                     tags: vec!["New tag".to_owned()],
                     cover: "domain.com/new-cover.jpg".to_owned(),
                 },

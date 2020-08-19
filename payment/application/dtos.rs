@@ -12,7 +12,7 @@ pub struct UserDto {
 impl UserDto {
     pub fn new(user: &User) -> Self {
         UserDto {
-            id: user.id().value().to_owned(),
+            id: user.id().to_string(),
         }
     }
 }
@@ -26,7 +26,7 @@ pub struct PublicationDto {
 impl PublicationDto {
     pub fn new(publication: &Publication) -> Self {
         PublicationDto {
-            id: publication.id().value().to_owned(),
+            id: publication.id().to_string(),
             user: UserDto::new(publication.author()),
         }
     }
@@ -41,7 +41,7 @@ pub struct ContractDto {
 impl ContractDto {
     pub fn new(contract: &Contract) -> Self {
         ContractDto {
-            id: contract.base().id().value().to_owned(),
+            id: contract.base().id().to_string(),
             publication: PublicationDto::new(contract.publication()),
         }
     }

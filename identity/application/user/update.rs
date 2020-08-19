@@ -63,7 +63,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                user.base().id().value().to_owned(),
+                user.base().id().to_string(),
                 UpdateCommand {
                     name: "Name".to_owned(),
                     lastname: "Lastname".to_owned(),
@@ -83,7 +83,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                user.base().id().value().to_owned(),
+                user.base().id().to_string(),
                 UpdateCommand {
                     name: "N".to_owned(),
                     lastname: "L".to_owned(),
@@ -103,7 +103,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                user.base().id().value().to_owned(),
+                user.base().id().to_string(),
                 UpdateCommand {
                     name: "Name".to_owned(),
                     lastname: "Lastname".to_owned(),

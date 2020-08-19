@@ -45,8 +45,8 @@ mod tests {
         let mut user = mocks::validated_user1();
         c.user_repo().save(&mut user).await.unwrap();
 
-        assert!(uc.exec(user.base().id().value().to_owned()).await.is_ok());
-        assert!(uc.exec(user.base().id().value().to_owned()).await.is_err());
+        assert!(uc.exec(user.base().id().to_string()).await.is_ok());
+        assert!(uc.exec(user.base().id().to_string()).await.is_err());
 
         assert_eq!(c.event_pub().events().await.len(), 1);
     }
@@ -58,6 +58,6 @@ mod tests {
 
         let mut user = mocks::user1();
         c.user_repo().save(&mut user).await.unwrap();
-        assert!(uc.exec(user.base().id().value().to_owned()).await.is_err());
+        assert!(uc.exec(user.base().id().to_string()).await.is_err());
     }
 }

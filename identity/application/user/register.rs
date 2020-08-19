@@ -72,7 +72,7 @@ impl<'a> Register<'a> {
         self.event_pub.publish_all(user.base().events()?).await?;
 
         Ok(RegisterResponse {
-            id: user.base().id().value().to_owned(),
+            id: user.base().id().to_string(),
             validation_code: user.validation().unwrap().code().to_owned(),
         })
     }

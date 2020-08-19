@@ -62,8 +62,8 @@ mod tests {
         c.publication_repo().save(&mut publication).await.unwrap();
 
         uc.exec(
-            author.base().id().value().to_owned(),
-            publication.base().id().value().to_owned(),
+            author.base().id().to_string(),
+            publication.base().id().to_string(),
         )
         .await
         .unwrap();
@@ -79,7 +79,7 @@ mod tests {
         );
 
         if let Status::Published { admin_id } = publication.status_history().current().status() {
-            assert_eq!(admin_id, &author.base().id());
+            assert_eq!(admin_id, author.base().id());
         }
     }
 }

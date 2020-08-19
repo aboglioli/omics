@@ -58,8 +58,8 @@ mod tests {
 
         assert!(uc
             .exec(
-                author.base().id().value().to_owned(),
-                publication.base().id().value().to_owned()
+                author.base().id().to_string(),
+                publication.base().id().to_string()
             )
             .await
             .is_ok());
@@ -83,7 +83,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                author.base().id().value().to_owned(),
+                author.base().id().to_string(),
                 "#invalid-publication".to_owned()
             )
             .await
@@ -91,7 +91,7 @@ mod tests {
         assert!(uc
             .exec(
                 "#invald-author".to_owned(),
-                publication.base().id().value().to_owned()
+                publication.base().id().to_string()
             )
             .await
             .is_err());

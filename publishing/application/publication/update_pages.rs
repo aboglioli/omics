@@ -95,8 +95,8 @@ mod tests {
         c.publication_repo().save(&mut publication).await.unwrap();
 
         uc.exec(
-            author.base().id().value().to_owned(),
-            publication.base().id().value().to_owned(),
+            author.base().id().to_string(),
+            publication.base().id().to_string(),
             UpdatePagesCommand {
                 pages: vec![
                     PageDto {
@@ -139,7 +139,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                author.base().id().value().to_owned(),
+                author.base().id().to_string(),
                 "#invalid".to_owned(),
                 UpdatePagesCommand {
                     pages: vec![

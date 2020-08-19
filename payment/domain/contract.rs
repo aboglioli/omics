@@ -51,7 +51,7 @@ impl Contract {
         }
 
         self.status_history.add_status(Status::Approved {
-            admin_id: admin.base().id(),
+            admin_id: admin.base().id().clone(),
         });
 
         Ok(())
@@ -63,7 +63,7 @@ impl Contract {
         }
 
         self.status_history.add_status(Status::Rejected {
-            admin_id: admin.base().id(),
+            admin_id: admin.base().id().clone(),
         });
 
         Ok(())

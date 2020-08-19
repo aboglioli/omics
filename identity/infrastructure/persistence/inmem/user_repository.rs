@@ -70,7 +70,7 @@ impl UserRepository for InMemUserRepository {
     }
 
     async fn save(&self, user: &mut User) -> Result<()> {
-        self.cache.set(user.base().id(), user.clone()).await
+        self.cache.set(user.base().id().clone(), user.clone()).await
     }
 }
 

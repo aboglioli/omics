@@ -60,7 +60,7 @@ impl UserService {
 
         let mut user = self.user_repo.find_by_id(user_id).await?;
 
-        if &user.base().id() != user_id {
+        if user.base().id() != user_id {
             return Err(Error::new("user", "unauthorized"));
         }
 

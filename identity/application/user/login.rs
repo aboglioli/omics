@@ -44,7 +44,7 @@ impl<'a> Login<'a> {
                 self.event_pub.publish_all(user.base().events()?).await?;
 
                 Ok(LoginResponse {
-                    user_id: user.base().id().value().to_owned(),
+                    user_id: user.base().id().to_string(),
                     auth_token: token.value().to_owned(),
                 })
             }

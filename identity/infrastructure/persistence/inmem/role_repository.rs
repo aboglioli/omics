@@ -42,6 +42,6 @@ impl RoleRepository for InMemRoleRepository {
     }
 
     async fn save(&self, role: &mut Role) -> Result<()> {
-        self.cache.set(role.base().id(), role.clone()).await
+        self.cache.set(role.base().id().clone(), role.clone()).await
     }
 }

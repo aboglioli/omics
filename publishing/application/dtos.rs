@@ -44,7 +44,7 @@ pub struct AuthorDto {
 impl AuthorDto {
     pub fn new(author: &Author) -> Self {
         AuthorDto {
-            id: author.base().id().value().to_owned(),
+            id: author.base().id().to_string(),
             username: author.username().to_owned(),
             name: author.name().to_owned(),
             lastname: author.lastname().to_owned(),
@@ -80,7 +80,7 @@ pub struct CategoryDto {
 impl CategoryDto {
     pub fn new(category: &Category) -> Self {
         CategoryDto {
-            id: category.base().id().value().to_owned(),
+            id: category.base().id().to_string(),
             name: category.name().value().to_owned(),
             publications: None,
         }
@@ -139,7 +139,7 @@ pub struct PublicationDto {
 impl PublicationDto {
     pub fn new(publication: &Publication) -> Self {
         PublicationDto {
-            id: publication.base().id().value().to_owned(),
+            id: publication.base().id().to_string(),
             author_id: None,
             author: None,
             name: publication.header().name().value().to_owned(),
@@ -206,7 +206,7 @@ pub struct CollectionDto {
 impl CollectionDto {
     pub fn new(collection: &Collection) -> Self {
         CollectionDto {
-            id: collection.base().id().value().to_owned(),
+            id: collection.base().id().to_string(),
             author_id: None,
             author: None,
             name: collection.header().name().value().to_owned(),
@@ -298,7 +298,7 @@ pub struct ReaderDto {
 impl ReaderDto {
     pub fn new(reader: &Reader) -> Self {
         ReaderDto {
-            id: reader.base().id().value().to_owned(),
+            id: reader.base().id().to_string(),
             username: reader.username().to_owned(),
             name: reader.name().to_owned(),
             lastname: reader.lastname().to_owned(),

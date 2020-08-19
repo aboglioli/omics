@@ -85,7 +85,7 @@ impl PublicationRepository for InMemPublicationRepository {
 
     async fn save(&self, publication: &mut Publication) -> Result<()> {
         self.cache
-            .set(publication.base().id(), publication.clone())
+            .set(publication.base().id().clone(), publication.clone())
             .await
     }
 }

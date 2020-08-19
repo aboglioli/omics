@@ -47,10 +47,7 @@ mod tests {
         c.user_repo().save(&mut user).await.unwrap();
 
         assert!(uc
-            .exec(
-                user.base().id().value().to_owned(),
-                "invalid-123".to_owned()
-            )
+            .exec(user.base().id().to_string(), "invalid-123".to_owned())
             .await
             .is_err());
     }
@@ -66,7 +63,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                user.base().id().value().to_owned(),
+                user.base().id().to_string(),
                 user.validation().unwrap().code().to_owned()
             )
             .await
@@ -77,7 +74,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                user.base().id().value().to_owned(),
+                user.base().id().to_string(),
                 user.validation().unwrap().code().to_owned()
             )
             .await

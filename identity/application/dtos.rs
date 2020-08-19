@@ -17,7 +17,7 @@ pub struct UserDto {
 impl UserDto {
     pub fn new(user: &User, include_email: bool) -> Self {
         UserDto {
-            id: user.base().id().value().to_owned(),
+            id: user.base().id().to_string(),
             username: user.identity().username().value().to_owned(),
             email: if include_email {
                 Some(user.identity().email().value().to_owned())
@@ -27,7 +27,7 @@ impl UserDto {
             name: user.person().map(|p| p.fullname().name().to_owned()),
             lastname: user.person().map(|p| p.fullname().lastname().to_owned()),
             validated: user.is_validated(),
-            role: user.role().base().id().value().to_owned(),
+            role: user.role().base().id().to_string(),
         }
     }
 }
@@ -41,7 +41,7 @@ pub struct RoleDto {
 impl RoleDto {
     pub fn new(role: &Role) -> Self {
         RoleDto {
-            id: role.base().id().value().to_owned(),
+            id: role.base().id().to_string(),
             name: role.name().to_owned(),
         }
     }

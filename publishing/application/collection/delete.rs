@@ -58,8 +58,8 @@ mod tests {
 
         assert!(uc
             .exec(
-                author.base().id().value().to_owned(),
-                collection.base().id().value().to_owned()
+                author.base().id().to_string(),
+                collection.base().id().to_string()
             )
             .await
             .is_ok());
@@ -83,7 +83,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                author.base().id().value().to_owned(),
+                author.base().id().to_string(),
                 "#invalid-collection".to_owned()
             )
             .await
@@ -91,7 +91,7 @@ mod tests {
         assert!(uc
             .exec(
                 "#invald-author".to_owned(),
-                collection.base().id().value().to_owned()
+                collection.base().id().to_string()
             )
             .await
             .is_err());

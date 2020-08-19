@@ -29,7 +29,7 @@ async fn with_user<S: Into<String>>(authorization_header: S, c: &Container) -> R
     let token = extract_token(authorization_header)?;
     let authorization_serv = c.identity.authorization_serv();
     if let Ok(user) = authorization_serv.authorize(&token).await {
-        return Ok(user.base().id().value().to_owned());
+        return Ok(user.base().id().to_string());
     }
 
     Err(Error::new("authorization", "unauthorized")

@@ -50,7 +50,7 @@ impl ContentManagerRepository for InMemContentManagerRepository {
 
     async fn save(&self, content_manager: &mut ContentManager) -> Result<()> {
         self.cache
-            .set(content_manager.base().id(), content_manager.clone())
+            .set(content_manager.base().id().clone(), content_manager.clone())
             .await
     }
 }
