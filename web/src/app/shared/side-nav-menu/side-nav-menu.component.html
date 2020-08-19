@@ -19,7 +19,8 @@
   <div class="body">
 
     <!-- Admin Options -->
-    <div class="menu-admin dir-column">
+    <div  *ngIf="isAccessUserLogIn"
+          class="menu-admin dir-column">
 
       <button mat-stroked-button class="button-white-borders admin-button"
               [ngClass]="{'active': ( activePathSelected === 'dashboard-reportes' ) }"
@@ -50,7 +51,8 @@
     <!-- User Options -->
     <div class="menu-user dir-column">
 
-      <button mat-stroked-button class="button-white-borders user-button"
+      <button *ngIf="isAccessUserLogIn"
+              mat-stroked-button class="button-white-borders user-button"
               [ngClass]="{'active': ( activePathSelected === 'favorites' ) }"
               (click)="goToPage('favorites')">
         Favoritos
@@ -62,7 +64,8 @@
         Biblioteca
       </button>
 
-      <button mat-stroked-button class="button-white-borders user-button"
+      <button *ngIf="isAccessUserLogIn"
+              mat-stroked-button class="button-white-borders user-button"
               [ngClass]="{'active': ( activePathSelected === 'deskboard' ) }"
               (click)="goToPage('deskboard')">
         Deskboard

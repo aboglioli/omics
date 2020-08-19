@@ -2,6 +2,7 @@ import { Component, OnInit, EventEmitter, Output, OnDestroy } from '@angular/cor
 import { faChevronCircleLeft } from '@fortawesome/free-solid-svg-icons';
 import { Router, NavigationStart, Event as NavigationEvent  } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { AuthService } from 'src/app/domain/services/auth';
 
 @Component({
   selector: 'app-side-nav-menu',
@@ -21,8 +22,15 @@ export class SideNavMenuComponent implements OnInit, OnDestroy {
 
   // Atributos propios
   activePathSelected: string;
+  isAccessUserLogIn: boolean;  // Para habilitar algunas acciones según si esta el usuario logueado
 
-  constructor(  private router: Router ) {}
+
+  constructor(  private router: Router,
+                private authService: AuthService ) {
+
+    this.subscribeAuthService();
+
+  }
 
   ngOnInit(): void {
 
@@ -62,6 +70,35 @@ export class SideNavMenuComponent implements OnInit, OnDestroy {
 
     this.closeSideNavMenu();
     this.clickRegisterLoginDialog.emit();
+
+  }
+
+  // Auth User
+  private subscribeAuthService(): void {
+
+    // Para comprobar en tiempo real si tiene o no acceso el usuario
+    this.authService.accessUser$.subscribe( (data: boolean) => {
+
+      // Para actualizar si el usuario no esta más logueado
+      if ( data === false && this.isAccessUserLogIn ) {
+
+        this.isAccessUserLogIn = false;
+        this.logout();
+
+      } else {
+
+        this.isAccessUserLogIn = data;
+
+      }
+
+    } );
+
+  }
+
+  public logout(): void {
+
+    this.authService.logout();
+    this.router.navigate(['/home']);
 
   }
 

@@ -107,8 +107,8 @@ export class LoginRegisterComponent implements OnInit {
       this.identityService.login(loginCommand).subscribe(
 
         (res: ILoginResponse) => {
-          console.log('TEST > Registro realizado con éxito', res);
 
+          console.log('TEST > Registro realizado con éxito', res);
           this.authService.setToken( res.auth_token, res.user_id );
           this.router.navigate(['/home']);
           this.closeMatDialog();
