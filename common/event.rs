@@ -21,10 +21,10 @@ pub struct Event {
 }
 
 impl Event {
-    pub fn new(topic: &str, code: &str, payload: Vec<u8>) -> Self {
+    pub fn new<S: Into<String>>(topic: S, code: S, payload: Vec<u8>) -> Self {
         Event {
-            topic: topic.to_owned(),
-            code: code.to_owned(),
+            topic: topic.into(),
+            code: code.into(),
             timestamp: Utc::now(),
             payload,
         }
@@ -54,5 +54,16 @@ pub trait ToEvent {
 impl ToEvent for Event {
     fn to_event(&self) -> Result<Event> {
         Ok(self.clone())
+    }
+}
+
+pub trait ApplyEvent<E> {
+    fn apply(&self, event: E) -> Result<()>;
+
+    fn apply_all(&self, events: Vec<E>) -> Result<()> {
+        for event in events.into_iter() {
+            self.apply(event)?;
+        }
+        Ok(())
     }
 }

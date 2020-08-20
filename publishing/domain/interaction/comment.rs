@@ -21,3 +21,9 @@ impl Comment {
         &self.comment
     }
 }
+
+impl ToString for Comment {
+    fn to_string(&self) -> String {
+        self.value().to_owned()
+    }
+}

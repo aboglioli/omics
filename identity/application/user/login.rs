@@ -45,7 +45,7 @@ impl<'a> Login<'a> {
 
                 Ok(LoginResponse {
                     user_id: user.base().id().to_string(),
-                    auth_token: token.value().to_owned(),
+                    auth_token: token.to_string(),
                 })
             }
             Err(e) => Err(e),
@@ -69,7 +69,7 @@ mod tests {
 
         assert!(uc
             .exec(LoginCommand {
-                username: user.identity().username().value().to_owned(),
+                username: user.identity().username().to_string(),
                 password: "P@asswd!".to_owned(),
             })
             .await
@@ -86,7 +86,7 @@ mod tests {
 
         let res = uc
             .exec(LoginCommand {
-                username: user.identity().username().value().to_owned(),
+                username: user.identity().username().to_string(),
                 password: "P@asswd!".to_owned(),
             })
             .await
@@ -104,7 +104,7 @@ mod tests {
 
         assert!(uc
             .exec(LoginCommand {
-                username: user.identity().username().value().to_owned(),
+                username: user.identity().username().to_string(),
                 password: "invalid".to_owned(),
             })
             .await

@@ -55,16 +55,16 @@ where
                     .await?
                     .len(),
             )?,
-            publication.header().name().value().to_owned(),
-            publication.header().synopsis().value().to_owned(),
+            publication.header().name().to_string(),
+            publication.header().synopsis().to_string(),
             Category::new(category.base().id().value(), category.name().value())?,
             publication
                 .header()
                 .tags()
                 .iter()
-                .map(|tag| tag.name().to_owned())
+                .map(|tag| tag.name().to_string())
                 .collect(),
-            publication.header().cover().url().to_owned(),
+            publication.header().cover().url().to_string(),
             Statistics::new(
                 publication.statistics().views(),
                 publication.statistics().unique_views(),

@@ -15,9 +15,10 @@ pub use publication_service::*;
 pub use repository::*;
 pub use statistics::*;
 
-use common::event::Event;
+use common::event::{ApplyEvent, Event};
 use common::model::{AggregateRoot, StringId};
 use common::result::Result;
+use shared::event::PublicationEvent;
 
 pub type CatalogueId = StringId;
 
@@ -71,5 +72,18 @@ impl Catalogue {
     pub fn remove_collection(&mut self, id: &str) {
         self.collections.retain(|collection| collection.id() != id);
         self.base.update();
+    }
+}
+
+impl ApplyEvent<PublicationEvent> for Catalogue {
+    fn apply(&self, event: PublicationEvent) -> Result<()> {
+        match event {
+            PublicationEvent::Published { .. } => {
+                println!("{:?}", event);
+            }
+            _ => {}
+        }
+
+        Ok(())
     }
 }

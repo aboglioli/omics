@@ -3,7 +3,6 @@ use std::sync::Arc;
 use warp::{Filter, Rejection, Reply};
 
 use crate::container::{with_container, Container};
-use crate::handlers::common::Uninmplemented;
 
 pub fn routes(
     container: &Arc<Container>,
@@ -17,5 +16,5 @@ pub fn routes(
 }
 
 pub async fn get_by_id(_id: String, _container: Arc<Container>) -> Result<impl Reply, Rejection> {
-    Ok(warp::reply::json(&Uninmplemented::new()))
+    Ok(warp::reply::html("<b>Unimplemented</b>"))
 }

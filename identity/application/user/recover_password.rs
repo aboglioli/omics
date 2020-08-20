@@ -64,7 +64,7 @@ mod tests {
         let user = mocks::user1();
         assert!(uc
             .exec(RecoverPasswordCommand {
-                email: user.identity().email().value().to_owned(),
+                email: user.identity().email().to_string(),
             })
             .await
             .is_err())
@@ -76,12 +76,12 @@ mod tests {
         let uc = RecoverPassword::new(c.event_pub(), c.user_repo(), c.user_serv());
 
         let mut user = mocks::user1();
-        let old_password = user.identity().password().unwrap().value().to_owned();
+        let old_password = user.identity().password().unwrap().to_string();
         c.user_repo().save(&mut user).await.unwrap();
 
         assert!(uc
             .exec(RecoverPasswordCommand {
-                email: user.identity().email().value().to_owned(),
+                email: user.identity().email().to_string(),
             })
             .await
             .is_ok());

@@ -99,10 +99,10 @@ mod tests {
     }
 
     impl BasicHandler {
-        fn new(topic: &str) -> Self {
+        fn new<S: Into<String>>(topic: S) -> Self {
             BasicHandler {
                 counter: Arc::new(Counter::new()),
-                topic: topic.to_owned(),
+                topic: topic.into(),
             }
         }
 
@@ -110,10 +110,10 @@ mod tests {
             &self.counter
         }
 
-        pub fn clone_with_topic(&self, topic: &str) -> Self {
+        pub fn clone_with_topic<S: Into<String>>(&self, topic: S) -> Self {
             BasicHandler {
                 counter: Arc::clone(&self.counter),
-                topic: topic.to_owned(),
+                topic: topic.into(),
             }
         }
 

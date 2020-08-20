@@ -39,6 +39,12 @@ impl Email {
     }
 }
 
+impl ToString for Email {
+    fn to_string(&self) -> String {
+        self.value().to_owned()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

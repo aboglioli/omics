@@ -22,6 +22,12 @@ impl Password {
     }
 }
 
+impl ToString for Password {
+    fn to_string(&self) -> String {
+        self.value().to_owned()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

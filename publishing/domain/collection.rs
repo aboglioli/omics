@@ -33,17 +33,17 @@ impl Collection {
 
         collection.base.record_event(CollectionEvent::Created {
             id: collection.base().id().to_string(),
-            author_id: collection.author_id().value().to_owned(),
-            name: collection.header().name().value().to_owned(),
-            synopsis: collection.header().synopsis().value().to_owned(),
-            category_id: collection.header().category_id().value().to_owned(),
+            author_id: collection.author_id().to_string(),
+            name: collection.header().name().to_string(),
+            synopsis: collection.header().synopsis().to_string(),
+            category_id: collection.header().category_id().to_string(),
             tags: collection
                 .header()
                 .tags()
                 .iter()
-                .map(|t| t.name().to_owned())
+                .map(|t| t.name().to_string())
                 .collect(),
-            cover: collection.header().cover().url().to_owned(),
+            cover: collection.header().cover().url().to_string(),
         });
 
         Ok(collection)
@@ -70,16 +70,16 @@ impl Collection {
 
         self.base.record_event(CollectionEvent::HeaderUpdated {
             id: self.base().id().to_string(),
-            name: self.header().name().value().to_owned(),
-            synopsis: self.header().synopsis().value().to_owned(),
-            category_id: self.header().category_id().value().to_owned(),
+            name: self.header().name().to_string(),
+            synopsis: self.header().synopsis().to_string(),
+            category_id: self.header().category_id().to_string(),
             tags: self
                 .header()
                 .tags()
                 .iter()
-                .map(|t| t.name().to_owned())
+                .map(|t| t.name().to_string())
                 .collect(),
-            cover: self.header().cover().url().to_owned(),
+            cover: self.header().cover().url().to_string(),
         });
 
         Ok(())
@@ -107,7 +107,7 @@ impl Collection {
 
         self.base.record_event(CollectionEvent::PublicationRemoved {
             id: self.base().id().to_string(),
-            publication_id: publication_id.value().to_owned(),
+            publication_id: publication_id.to_string(),
         });
 
         Ok(())

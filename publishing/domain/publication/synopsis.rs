@@ -21,3 +21,9 @@ impl Synopsis {
         &self.synopsis
     }
 }
+
+impl ToString for Synopsis {
+    fn to_string(&self) -> String {
+        self.value().to_owned()
+    }
+}

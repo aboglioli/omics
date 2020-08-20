@@ -46,6 +46,6 @@ impl ToEvent for ContractEvent {
     fn to_event(&self) -> Result<Event> {
         let payload = util::serialize(&self, "contract")?;
 
-        Ok(Event::new("contract", &self.to_string(), payload))
+        Ok(Event::new("contract".to_owned(), self.to_string(), payload))
     }
 }

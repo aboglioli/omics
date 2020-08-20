@@ -49,6 +49,12 @@ impl<S: Into<String>> From<S> for TokenId {
     }
 }
 
+impl ToString for TokenId {
+    fn to_string(&self) -> String {
+        self.id().to_owned()
+    }
+}
+
 // Token
 #[derive(Debug, Clone)]
 pub struct Token {
@@ -73,6 +79,12 @@ impl PartialEq for Token {
     }
 }
 
+impl ToString for Token {
+    fn to_string(&self) -> String {
+        self.value().to_owned()
+    }
+}
+
 // Data
 #[derive(Default, Debug, Clone)]
 pub struct Data {
@@ -86,11 +98,11 @@ impl Data {
         }
     }
 
-    pub fn add(&mut self, k: &str, v: &str) {
-        self.data.insert(k.to_owned(), v.to_owned());
+    pub fn add<S: Into<String>>(&mut self, k: S, v: S) {
+        self.data.insert(k.into(), v.into());
     }
 
-    pub fn get(&self, k: &str) -> Option<&String> {
-        self.data.get(&k.to_owned())
+    pub fn get<S: Into<String>>(&self, k: S) -> Option<&String> {
+        self.data.get(&k.into())
     }
 }

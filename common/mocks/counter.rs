@@ -13,13 +13,14 @@ impl Counter {
         }
     }
 
-    pub fn inc(&self, name: &str) {
+    pub fn inc<S: Into<String>>(&self, name: S) {
+        let name = name.into();
         let mut counts = self.counts.lock().unwrap();
-        if let Some(count) = counts.get_mut(name) {
+        if let Some(count) = counts.get_mut(&name) {
             *count += 1;
             return;
         }
-        counts.insert(name.to_owned(), 1);
+        counts.insert(name, 1);
     }
 
     pub fn count(&self, name: &str) -> u32 {

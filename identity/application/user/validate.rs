@@ -64,7 +64,7 @@ mod tests {
         assert!(uc
             .exec(
                 user.base().id().to_string(),
-                user.validation().unwrap().code().to_owned()
+                user.validation().unwrap().code().to_string()
             )
             .await
             .is_ok());
@@ -75,7 +75,7 @@ mod tests {
         assert!(uc
             .exec(
                 user.base().id().to_string(),
-                user.validation().unwrap().code().to_owned()
+                user.validation().unwrap().code().to_string()
             )
             .await
             .is_err());

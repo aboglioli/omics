@@ -21,3 +21,9 @@ impl Name {
         &self.name
     }
 }
+
+impl ToString for Name {
+    fn to_string(&self) -> String {
+        self.value().to_owned()
+    }
+}

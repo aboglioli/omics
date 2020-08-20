@@ -45,9 +45,9 @@ impl AuthorDto {
     pub fn new(author: &Author) -> Self {
         AuthorDto {
             id: author.base().id().to_string(),
-            username: author.username().to_owned(),
-            name: author.name().to_owned(),
-            lastname: author.lastname().to_owned(),
+            username: author.username().to_string(),
+            name: author.name().to_string(),
+            lastname: author.lastname().to_string(),
             publications: None,
             publication_count: None,
             collection_count: None,
@@ -81,7 +81,7 @@ impl CategoryDto {
     pub fn new(category: &Category) -> Self {
         CategoryDto {
             id: category.base().id().to_string(),
-            name: category.name().value().to_owned(),
+            name: category.name().to_string(),
             publications: None,
         }
     }
@@ -113,7 +113,7 @@ impl PageDto {
                     .images()
                     .iter()
                     .map(|image| ImageDto {
-                        url: image.url().to_owned(),
+                        url: image.url().to_string(),
                     })
                     .collect(),
             })
@@ -142,15 +142,15 @@ impl PublicationDto {
             id: publication.base().id().to_string(),
             author_id: None,
             author: None,
-            name: publication.header().name().value().to_owned(),
-            synopsis: publication.header().synopsis().value().to_owned(),
+            name: publication.header().name().to_string(),
+            synopsis: publication.header().synopsis().to_string(),
             category_id: None,
             category: None,
             tags: publication
                 .header()
                 .tags()
                 .iter()
-                .map(|tag| tag.name().to_owned())
+                .map(|tag| tag.name().to_string())
                 .collect(),
             statistics: StatisticsDto::new(publication.statistics()),
             pages: None,
@@ -159,7 +159,7 @@ impl PublicationDto {
     }
 
     pub fn author_id(mut self, publication: &Publication) -> Self {
-        self.author_id = Some(publication.author_id().value().to_owned());
+        self.author_id = Some(publication.author_id().to_string());
         self
     }
 
@@ -169,7 +169,7 @@ impl PublicationDto {
     }
 
     pub fn category_id(mut self, publication: &Publication) -> Self {
-        self.category_id = Some(publication.header().category_id().value().to_owned());
+        self.category_id = Some(publication.header().category_id().to_string());
         self
     }
 
@@ -209,15 +209,15 @@ impl CollectionDto {
             id: collection.base().id().to_string(),
             author_id: None,
             author: None,
-            name: collection.header().name().value().to_owned(),
-            synopsis: collection.header().synopsis().value().to_owned(),
+            name: collection.header().name().to_string(),
+            synopsis: collection.header().synopsis().to_string(),
             category_id: None,
             category: None,
             tags: collection
                 .header()
                 .tags()
                 .iter()
-                .map(|tag| tag.name().to_owned())
+                .map(|tag| tag.name().to_string())
                 .collect(),
             publication_count: None,
             publications: None,
@@ -225,7 +225,7 @@ impl CollectionDto {
     }
 
     pub fn author_id(mut self, collection: &Collection) -> Self {
-        self.author_id = Some(collection.author_id().value().to_owned());
+        self.author_id = Some(collection.author_id().to_string());
         self
     }
 
@@ -235,7 +235,7 @@ impl CollectionDto {
     }
 
     pub fn category_id(mut self, collection: &Collection) -> Self {
-        self.category_id = Some(collection.header().category_id().value().to_owned());
+        self.category_id = Some(collection.header().category_id().to_string());
         self
     }
 
@@ -269,14 +269,14 @@ impl ReviewDto {
         ReviewDto {
             reader_id: None,
             reader: None,
-            publication_id: review.base().publication_id().value().to_owned(),
+            publication_id: review.base().publication_id().to_string(),
             stars: review.stars().value(),
-            comment: review.comment().value().to_owned(),
+            comment: review.comment().to_string(),
         }
     }
 
     pub fn reader_id(mut self, review: &Review) -> Self {
-        self.reader_id = Some(review.base().reader_id().value().to_owned());
+        self.reader_id = Some(review.base().reader_id().to_string());
         self
     }
 
@@ -299,9 +299,9 @@ impl ReaderDto {
     pub fn new(reader: &Reader) -> Self {
         ReaderDto {
             id: reader.base().id().to_string(),
-            username: reader.username().to_owned(),
-            name: reader.name().to_owned(),
-            lastname: reader.lastname().to_owned(),
+            username: reader.username().to_string(),
+            name: reader.name().to_string(),
+            lastname: reader.lastname().to_string(),
             subscribed: reader.is_subscribed(),
         }
     }

@@ -53,6 +53,10 @@ impl ToEvent for CollectionEvent {
     fn to_event(&self) -> Result<Event> {
         let payload = util::serialize(&self, "collection")?;
 
-        Ok(Event::new("collection", &self.to_string(), payload))
+        Ok(Event::new(
+            "collection".to_owned(),
+            self.to_string(),
+            payload,
+        ))
     }
 }

@@ -60,17 +60,17 @@ impl Publication {
 
         publication.base.record_event(PublicationEvent::Created {
             id: publication.base().id().to_string(),
-            author_id: publication.author_id().value().to_owned(),
-            name: publication.header().name().value().to_owned(),
-            synopsis: publication.header().synopsis().value().to_owned(),
-            category_id: publication.header().category_id().value().to_owned(),
+            author_id: publication.author_id().to_string(),
+            name: publication.header().name().to_string(),
+            synopsis: publication.header().synopsis().to_string(),
+            category_id: publication.header().category_id().to_string(),
             tags: publication
                 .header()
                 .tags()
                 .iter()
-                .map(|t| t.name().to_owned())
+                .map(|t| t.name().to_string())
                 .collect(),
-            cover: publication.header().cover().url().to_owned(),
+            cover: publication.header().cover().url().to_string(),
         });
 
         Ok(publication)
@@ -116,16 +116,16 @@ impl Publication {
 
         self.base.record_event(PublicationEvent::HeaderUpdated {
             id: self.base().id().to_string(),
-            name: self.header().name().value().to_owned(),
-            synopsis: self.header().synopsis().value().to_owned(),
-            category_id: self.header().category_id().value().to_owned(),
+            name: self.header().name().to_string(),
+            synopsis: self.header().synopsis().to_string(),
+            category_id: self.header().category_id().to_string(),
             tags: self
                 .header()
                 .tags()
                 .iter()
-                .map(|t| t.name().to_owned())
+                .map(|t| t.name().to_string())
                 .collect(),
-            cover: self.header().cover().url().to_owned(),
+            cover: self.header().cover().url().to_string(),
         });
 
         Ok(())
@@ -282,7 +282,7 @@ impl Publication {
             reader_id: reader.base().id().to_string(),
             publication_id: self.base().id().to_string(),
             stars: stars.value(),
-            comment: comment.value().to_owned(),
+            comment: comment.to_string(),
         });
 
         self.base.record_event(PublicationEvent::StatisticsUpdated {

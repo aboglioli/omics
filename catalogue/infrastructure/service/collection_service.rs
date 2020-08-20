@@ -56,16 +56,16 @@ where
                     .await?
                     .len(),
             )?,
-            collection.header().name().value().to_owned(),
-            collection.header().synopsis().value().to_owned(),
+            collection.header().name().to_string(),
+            collection.header().synopsis().to_string(),
             Category::new(category.base().id().value(), category.name().value())?,
             collection
                 .header()
                 .tags()
                 .iter()
-                .map(|tag| tag.name().to_owned())
+                .map(|tag| tag.name().to_string())
                 .collect(),
-            collection.header().cover().url().to_owned(),
+            collection.header().cover().url().to_string(),
             collection.items().len(),
         )?)
     }

@@ -25,7 +25,7 @@ impl JWTEncoder {
 impl TokenEncoder for JWTEncoder {
     fn encode(&self, token_id: &TokenId) -> Result<Token> {
         let claims = Claims {
-            sub: token_id.id().to_owned(),
+            sub: token_id.to_string(),
             company: "Omics".to_owned(),
             exp: 10000000000,
         };

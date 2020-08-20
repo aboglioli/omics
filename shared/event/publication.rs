@@ -115,6 +115,10 @@ impl ToEvent for PublicationEvent {
     fn to_event(&self) -> Result<Event> {
         let payload = util::serialize(&self, "publication")?;
 
-        Ok(Event::new("publication", &self.to_string(), payload))
+        Ok(Event::new(
+            "publication".to_owned(),
+            self.to_string(),
+            payload,
+        ))
     }
 }

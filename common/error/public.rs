@@ -36,8 +36,8 @@ impl PublicError {
 
         Some(PublicError {
             kind: err.kind().to_string(),
-            code: err.code().to_owned(),
-            path: err.path().to_owned(),
+            code: err.code().to_string(),
+            path: err.path().to_string(),
             status: err.status(),
             message: err.message().cloned(),
             context: err.context().clone(),

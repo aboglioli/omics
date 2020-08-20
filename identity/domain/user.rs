@@ -56,9 +56,9 @@ impl User {
 
         user.base.record_event(UserEvent::Registered {
             id: user.base().id().to_string(),
-            username: user.identity().username().value().to_owned(),
-            email: user.identity().username().value().to_owned(),
-            validation_code: user.validation().unwrap().code().to_owned(),
+            username: user.identity().username().to_string(),
+            email: user.identity().username().to_string(),
+            validation_code: user.validation().unwrap().code().to_string(),
         });
 
         Ok(user)
@@ -118,8 +118,8 @@ impl User {
 
         self.base.record_event(UserEvent::Updated {
             id: self.base().id().to_string(),
-            name: self.person().unwrap().fullname().name().to_owned(),
-            lastname: self.person().unwrap().fullname().lastname().to_owned(),
+            name: self.person().unwrap().fullname().name().to_string(),
+            lastname: self.person().unwrap().fullname().lastname().to_string(),
         });
 
         Ok(())
@@ -173,7 +173,7 @@ impl User {
 
         self.base.record_event(UserEvent::LoggedIn {
             id: self.base().id().to_string(),
-            auth_token: token.value().to_owned(),
+            auth_token: token.to_string(),
         });
 
         Ok(())
@@ -185,7 +185,7 @@ impl User {
             .record_event(UserEvent::PasswordRecoveryRequested {
                 id: self.base().id().to_string(),
                 temp_password: temp_password.to_owned(),
-                email: self.identity().email().value().to_owned(),
+                email: self.identity().email().to_string(),
             });
 
         Ok(())

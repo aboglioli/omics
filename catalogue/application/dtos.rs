@@ -36,10 +36,10 @@ pub struct AuthorDto {
 impl AuthorDto {
     pub fn new(author: &Author) -> Self {
         AuthorDto {
-            id: author.id().to_owned(),
-            username: author.username().to_owned(),
-            name: author.name().to_owned(),
-            lastname: author.lastname().to_owned(),
+            id: author.id().to_string(),
+            username: author.username().to_string(),
+            name: author.name().to_string(),
+            lastname: author.lastname().to_string(),
         }
     }
 }
@@ -53,8 +53,8 @@ pub struct CategoryDto {
 impl CategoryDto {
     pub fn new(category: &Category) -> Self {
         CategoryDto {
-            id: category.id().to_owned(),
-            name: category.name().to_owned(),
+            id: category.id().to_string(),
+            name: category.name().to_string(),
         }
     }
 }
@@ -76,17 +76,17 @@ pub struct PublicationDto {
 impl PublicationDto {
     pub fn new(publication: &Publication) -> Self {
         PublicationDto {
-            id: publication.id().to_owned(),
+            id: publication.id().to_string(),
             author: AuthorDto::new(publication.author()),
-            name: publication.name().to_owned(),
-            synopsis: publication.synopsis().to_owned(),
+            name: publication.name().to_string(),
+            synopsis: publication.synopsis().to_string(),
             category: CategoryDto::new(publication.category()),
             tags: publication
                 .tags()
                 .iter()
-                .map(|tag| tag.to_owned())
+                .map(|tag| tag.to_string())
                 .collect(),
-            cover: publication.cover().to_owned(),
+            cover: publication.cover().to_string(),
             statistics: StatisticsDto::new(publication.statistics()),
             premium: publication.is_premium(),
             pages: publication.pages(),

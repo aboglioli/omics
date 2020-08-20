@@ -47,7 +47,7 @@ mod tests {
         let uc = ChangePassword::new(c.user_serv());
 
         let mut user = mocks::user1();
-        let old_password = user.identity().password().unwrap().value().to_owned();
+        let old_password = user.identity().password().unwrap().to_string();
         c.user_repo().save(&mut user).await.unwrap();
 
         assert!(uc

@@ -39,6 +39,12 @@ impl Username {
     }
 }
 
+impl ToString for Username {
+    fn to_string(&self) -> String {
+        self.value().to_owned()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

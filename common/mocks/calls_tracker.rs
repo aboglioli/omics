@@ -13,14 +13,15 @@ impl<T: Clone> CallsTracker<T> {
         }
     }
 
-    pub fn register(&self, name: &str, v: T) {
+    pub fn register<S: Into<String>>(&self, name: S, v: T) {
+        let name = name.into();
         let mut calls = self.calls.lock().unwrap();
-        if let Some(calls) = calls.get_mut(name) {
+        if let Some(calls) = calls.get_mut(&name) {
             calls.push(v);
             return;
         }
 
-        calls.insert(name.to_owned(), vec![v]);
+        calls.insert(name, vec![v]);
     }
 
     pub fn get(&self, name: &str) -> Vec<T> {

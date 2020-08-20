@@ -73,7 +73,7 @@ impl<'a> Register<'a> {
 
         Ok(RegisterResponse {
             id: user.base().id().to_string(),
-            validation_code: user.validation().unwrap().code().to_owned(),
+            validation_code: user.validation().unwrap().code().to_string(),
         })
     }
 }
@@ -159,8 +159,8 @@ mod tests {
 
         assert!(uc
             .exec(RegisterCommand {
-                username: user.identity().username().value().to_owned(),
-                email: user.identity().email().value().to_owned(),
+                username: user.identity().username().to_string(),
+                email: user.identity().email().to_string(),
                 password: "P@asswd!".to_owned(),
             })
             .await
@@ -169,7 +169,7 @@ mod tests {
         assert!(uc
             .exec(RegisterCommand {
                 username: "other".to_owned(),
-                email: user.identity().email().value().to_owned(),
+                email: user.identity().email().to_string(),
                 password: "P@asswd!".to_owned(),
             })
             .await
@@ -177,7 +177,7 @@ mod tests {
 
         assert!(uc
             .exec(RegisterCommand {
-                username: user.identity().username().value().to_owned(),
+                username: user.identity().username().to_string(),
                 email: "other@other.com".to_owned(),
                 password: "P@asswd!".to_owned(),
             })
