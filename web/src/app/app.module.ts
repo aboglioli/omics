@@ -40,6 +40,9 @@ import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
 import { LoadingIndicadorComponent } from './shared/loading-indicador/loading-indicador.component';
 import { SideNavMenuComponent } from './shared/side-nav-menu/side-nav-menu.component';
 import { AutoresComponent } from './pages/autores/autores.component';
+import { UnderConstructionComponent } from './shared/under-construction/under-construction.component';
+import { DeskboardMisComicsComponent } from './components/deskboard/deskboard-mis-comics/deskboard-mis-comics.component';
+import { NewPublicationComponent } from './components/deskboard/new-publication/new-publication.component';
 // --->
 
 // Development
@@ -47,9 +50,6 @@ import { DevelopmentComponent } from './pages/development/development.component'
 
 // Domain
 import { DomainModule } from './domain/module';
-import { UnderConstructionComponent } from './shared/under-construction/under-construction.component';
-import { DeskboardMisComicsComponent } from './components/deskboard/deskboard-mis-comics/deskboard-mis-comics.component';
-import { NewPublicationComponent } from './components/deskboard/new-publication/new-publication.component';
 
 
 @NgModule({
@@ -76,13 +76,9 @@ import { NewPublicationComponent } from './components/deskboard/new-publication/
     LoadingIndicadorComponent,
     SideNavMenuComponent,
     AutoresComponent,
-
     DevelopmentComponent,
-
     UnderConstructionComponent,
-
     DeskboardMisComicsComponent,
-
     NewPublicationComponent,
   ],
   imports: [

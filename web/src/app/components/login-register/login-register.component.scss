@@ -70,7 +70,30 @@ mat-dialog-actions {
       }
     }
 
+    div.input-with-icon {
+
+      display: flex;
+      flex-direction: row;
+
+      input {
+        flex: 10;
+      }
+
+      fa-icon {
+        flex: 1;
+        margin: 0.6em 0em 0em 0.5em;
+        width: 100%;
+      }
+
+    }
+
   }
+
+}
+
+fa-icon.button {
+
+  cursor: pointer;
 
 }
 
@@ -88,6 +111,7 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
+
   }
 
 }
