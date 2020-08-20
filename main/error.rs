@@ -1,8 +1,10 @@
 use std::collections::HashMap;
 
+use actix_http::ResponseBuilder;
+use actix_web::{error, http::header, http::StatusCode, HttpResponse};
 use serde::Serialize;
 
-use crate::error::{Error, ErrorKind};
+use common::error::{Error, ErrorKind};
 
 #[derive(Debug, Clone, Serialize)]
 pub struct PublicError {
@@ -15,26 +17,40 @@ pub struct PublicError {
     cause: Option<Box<PublicError>>,
 }
 
-impl PublicError {
-    pub fn from(err: &Error, include_internal: bool) -> Option<PublicError> {
+impl std::fmt::Display for PublicError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl std::error::Error for PublicError {}
+
+impl From<Error> for PublicError {
+    fn from(err: Error) -> Self {
+        if let ErrorKind::Internal = err.kind() {
+            return PublicError {
+                kind: ErrorKind::Application.to_string(),
+                code: "unknown".to_owned(),
+                path: "error".to_owned(),
+                status: Some(500),
+                message: None,
+                context: HashMap::new(),
+                cause: None,
+            };
+        }
+
         let cause = match err.cause() {
-            Some(err) => match err.kind() {
-                ErrorKind::Internal if include_internal => {
-                    match PublicError::from(err, include_internal) {
-                        Some(pub_err) => Some(Box::new(pub_err)),
-                        _ => None,
-                    }
+            Some(err) => {
+                if let ErrorKind::Application = err.kind() {
+                    Some(Box::new(Self::from(err.clone())))
+                } else {
+                    None
                 }
-                ErrorKind::Application => match PublicError::from(err, include_internal) {
-                    Some(pub_err) => Some(Box::new(pub_err)),
-                    _ => None,
-                },
-                _ => None,
-            },
+            }
             _ => None,
         };
 
-        Some(PublicError {
+        PublicError {
             kind: err.kind().to_string(),
             code: err.code().to_string(),
             path: err.path().to_string(),
@@ -42,11 +58,31 @@ impl PublicError {
             message: err.message().cloned(),
             context: err.context().clone(),
             cause,
-        })
+        }
     }
 }
 
-impl warp::reject::Reject for PublicError {}
+// impl error::ResponseError for PublicError { }
+
+impl error::ResponseError for PublicError {
+    fn error_response(&self) -> HttpResponse {
+        ResponseBuilder::new(self.status_code())
+            .set_header(header::CONTENT_TYPE, "application/json")
+            .body(serde_json::to_string(self).unwrap())
+    }
+    fn status_code(&self) -> StatusCode {
+        match self.status {
+            Some(status) => {
+                if let Ok(status) = StatusCode::from_u16(status as u16) {
+                    status
+                } else {
+                    StatusCode::BAD_REQUEST
+                }
+            }
+            None => StatusCode::BAD_REQUEST,
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -98,48 +134,12 @@ mod tests {
             .build()
     }
 
-    #[test]
-    fn with_internal_errors() {
-        let err = err();
-
-        let public_err = PublicError::from(&err, true).unwrap();
-        assert_eq!(public_err.kind, "application");
-        assert_eq!(public_err.context.len(), 2);
-        assert_eq!(public_err.path, "one");
-        assert_eq!(public_err.code, "one");
-
-        let two = public_err.cause.unwrap();
-        assert_eq!(two.kind, "application");
-        assert_eq!(two.context.len(), 1);
-        assert_eq!(two.path, "two");
-        assert_eq!(two.code, "two");
-
-        let three = two.cause.unwrap();
-        assert_eq!(three.kind, "internal");
-        assert_eq!(three.path, "three");
-        assert_eq!(three.code, "three");
-
-        let four = three.cause.unwrap();
-        assert_eq!(four.kind, "application");
-        assert_eq!(four.path, "four");
-        assert_eq!(four.code, "prop2_invalid");
-
-        let five = four.cause.unwrap();
-        assert_eq!(five.kind, "internal");
-        assert_eq!(five.path, "five");
-        assert_eq!(five.code, "five");
-
-        let six = five.cause.unwrap();
-        assert_eq!(six.kind, "internal");
-        assert_eq!(six.code, "raw");
-        assert_eq!(six.message.unwrap(), "INSERT failed");
-    }
-
+    // TODO: test internal error without application
     #[test]
     fn without_internal_errors() {
         let err = err();
 
-        let public_err = PublicError::from(&err, false).unwrap();
+        let public_err = PublicError::from(err);
         assert_eq!(public_err.kind, "application");
         assert_eq!(public_err.path, "one");
         assert_eq!(public_err.code, "one");

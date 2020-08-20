@@ -1,6 +1,5 @@
 use serde::Serialize;
-use warp::http::StatusCode;
-use warp::{Rejection, Reply};
+use actix_web::{http::StatusCode, error}
 
 use common::error::{public::PublicError, Error};
 use common::result::Result as CustomResult;

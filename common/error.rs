@@ -1,5 +1,3 @@
-pub mod public;
-
 use std::cmp;
 use std::collections::HashMap;
 use std::error;
@@ -159,8 +157,6 @@ impl cmp::PartialEq for Error {
         self.code == other.code && self.path == other.path && self.status == other.status
     }
 }
-
-impl warp::reject::Reject for Error {}
 
 #[cfg(test)]
 mod tests {

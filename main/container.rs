@@ -1,7 +1,4 @@
-use std::convert::Infallible;
 use std::sync::Arc;
-
-use warp::Filter;
 
 use catalogue::container::Container as CatalogueContainer;
 use catalogue::infrastructure::persistence::inmem::InMemCatalogueRepository;
@@ -116,10 +113,4 @@ impl Container {
     pub fn event_repo(&self) -> Arc<EventRepository> {
         Arc::clone(&self.event_repo)
     }
-}
-
-pub fn with_container(
-    container: Arc<Container>,
-) -> impl Filter<Extract = (Arc<Container>,), Error = Infallible> + Clone {
-    warp::any().map(move || Arc::clone(&container))
 }
