@@ -26,7 +26,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let config = Config::get();
 
     // Dependencies
-    let container = Arc::new(Container::new());
+    let container = Arc::new(Container::new().await);
 
     if config.env() == "development" {
         if let Err(err) = development::run(&container).await {

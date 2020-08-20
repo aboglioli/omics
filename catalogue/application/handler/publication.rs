@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use async_trait::async_trait;
 
 use common::error::Error;
@@ -7,14 +9,17 @@ use shared::event::PublicationEvent;
 
 use crate::domain::catalogue::{CatalogueRepository, PublicationService};
 
-pub struct PublicationHandler<'a, CRepo, PServ> {
-    catalogue_repo: &'a CRepo,
+pub struct PublicationHandler {
+    catalogue_repo: Arc<dyn CatalogueRepository>,
 
-    publication_serv: &'a PServ,
+    publication_serv: Arc<dyn PublicationService>,
 }
 
-impl<'a, CRepo, PServ> PublicationHandler<'a, CRepo, PServ> {
-    pub fn new(catalogue_repo: &'a CRepo, publication_serv: &'a PServ) -> Self {
+impl PublicationHandler {
+    pub fn new(
+        catalogue_repo: Arc<dyn CatalogueRepository>,
+        publication_serv: Arc<dyn PublicationService>,
+    ) -> Self {
         PublicationHandler {
             catalogue_repo,
             publication_serv,
@@ -23,11 +28,7 @@ impl<'a, CRepo, PServ> PublicationHandler<'a, CRepo, PServ> {
 }
 
 #[async_trait]
-impl<'a, CRepo, PServ> EventHandler for PublicationHandler<'a, CRepo, PServ>
-where
-    CRepo: CatalogueRepository + Sync + Send,
-    PServ: PublicationService + Sync + Send,
-{
+impl EventHandler for PublicationHandler {
     fn topic(&self) -> &str {
         "publication"
     }

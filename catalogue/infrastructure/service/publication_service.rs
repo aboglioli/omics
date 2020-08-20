@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use async_trait::async_trait;
 
 use common::result::Result;
@@ -7,17 +9,17 @@ use publishing::domain::author::AuthorRepository;
 use publishing::domain::category::CategoryRepository;
 use publishing::domain::publication::{PublicationId, PublicationRepository};
 
-pub struct SyncPublicationService<'a, ARepo, CRepo, PRepo> {
-    author_repo: &'a ARepo,
-    category_repo: &'a CRepo,
-    publication_repo: &'a PRepo,
+pub struct SyncPublicationService {
+    author_repo: Arc<dyn AuthorRepository>,
+    category_repo: Arc<dyn CategoryRepository>,
+    publication_repo: Arc<dyn PublicationRepository>,
 }
 
-impl<'a, ARepo, CRepo, PRepo> SyncPublicationService<'a, ARepo, CRepo, PRepo> {
+impl SyncPublicationService {
     pub fn new(
-        author_repo: &'a ARepo,
-        category_repo: &'a CRepo,
-        publication_repo: &'a PRepo,
+        author_repo: Arc<dyn AuthorRepository>,
+        category_repo: Arc<dyn CategoryRepository>,
+        publication_repo: Arc<dyn PublicationRepository>,
     ) -> Self {
         SyncPublicationService {
             author_repo,
@@ -28,12 +30,7 @@ impl<'a, ARepo, CRepo, PRepo> SyncPublicationService<'a, ARepo, CRepo, PRepo> {
 }
 
 #[async_trait]
-impl<'a, ARepo, CRepo, PRepo> PublicationService for SyncPublicationService<'a, ARepo, CRepo, PRepo>
-where
-    ARepo: AuthorRepository + Sync + Send,
-    CRepo: CategoryRepository + Sync + Send,
-    PRepo: PublicationRepository + Sync + Send,
-{
+impl PublicationService for SyncPublicationService {
     async fn get_by_id(&self, id: &str) -> Result<Publication> {
         let publication_id = PublicationId::new(id)?;
         let publication = self.publication_repo.find_by_id(&publication_id).await?;

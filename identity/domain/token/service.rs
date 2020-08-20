@@ -6,16 +6,13 @@ use common::result::Result;
 use crate::domain::token::{Data, Token, TokenEncoder, TokenId, TokenRepository};
 
 pub struct TokenService {
-    token_repo: Arc<dyn TokenRepository + Sync + Send>,
+    token_repo: Arc<dyn TokenRepository>,
 
-    token_enc: Arc<dyn TokenEncoder + Sync + Send>,
+    token_enc: Arc<dyn TokenEncoder>,
 }
 
 impl TokenService {
-    pub fn new(
-        token_repo: Arc<dyn TokenRepository + Sync + Send>,
-        token_enc: Arc<dyn TokenEncoder + Sync + Send>,
-    ) -> Self {
+    pub fn new(token_repo: Arc<dyn TokenRepository>, token_enc: Arc<dyn TokenEncoder>) -> Self {
         TokenService {
             token_enc,
             token_repo,

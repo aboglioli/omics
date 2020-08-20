@@ -7,9 +7,9 @@ use crate::domain::token::{Data, Token, TokenService};
 use crate::domain::user::{Email, PasswordHasher, User, UserRepository, Username};
 
 pub struct AuthenticationService {
-    user_repo: Arc<dyn UserRepository + Sync + Send>,
+    user_repo: Arc<dyn UserRepository>,
 
-    password_hasher: Arc<dyn PasswordHasher + Sync + Send>,
+    password_hasher: Arc<dyn PasswordHasher>,
 
     token_serv: Arc<TokenService>,
 }
@@ -17,8 +17,8 @@ pub struct AuthenticationService {
 /// AutenticationService authenticate any user, validated or not.
 impl AuthenticationService {
     pub fn new(
-        user_repo: Arc<dyn UserRepository + Sync + Send>,
-        password_hasher: Arc<dyn PasswordHasher + Sync + Send>,
+        user_repo: Arc<dyn UserRepository>,
+        password_hasher: Arc<dyn PasswordHasher>,
         token_serv: Arc<TokenService>,
     ) -> Self {
         AuthenticationService {

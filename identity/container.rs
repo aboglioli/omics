@@ -11,12 +11,12 @@ use crate::domain::user::{
 pub struct Container<EPub> {
     event_pub: Arc<EPub>,
 
-    role_repo: Arc<dyn RoleRepository + Sync + Send>,
-    token_repo: Arc<dyn TokenRepository + Sync + Send>,
-    user_repo: Arc<dyn UserRepository + Sync + Send>,
+    role_repo: Arc<dyn RoleRepository>,
+    token_repo: Arc<dyn TokenRepository>,
+    user_repo: Arc<dyn UserRepository>,
 
-    password_hasher: Arc<dyn PasswordHasher + Sync + Send>,
-    token_enc: Arc<dyn TokenEncoder + Sync + Send>,
+    password_hasher: Arc<dyn PasswordHasher>,
+    token_enc: Arc<dyn TokenEncoder>,
 
     token_serv: Arc<TokenService>,
     user_serv: Arc<UserService>,
@@ -24,33 +24,30 @@ pub struct Container<EPub> {
     authorization_serv: Arc<AuthorizationService>,
 }
 
-impl<EPub: EventPublisher> Container<EPub> {
+impl<EPub> Container<EPub>
+where
+    EPub: EventPublisher,
+{
     pub fn new(
         event_pub: Arc<EPub>,
 
-        role_repo: Arc<dyn RoleRepository + Sync + Send>,
-        token_repo: Arc<dyn TokenRepository + Sync + Send>,
-        user_repo: Arc<dyn UserRepository + Sync + Send>,
+        role_repo: Arc<dyn RoleRepository>,
+        token_repo: Arc<dyn TokenRepository>,
+        user_repo: Arc<dyn UserRepository>,
 
-        password_hasher: Arc<dyn PasswordHasher + Sync + Send>,
-        token_enc: Arc<dyn TokenEncoder + Sync + Send>,
+        password_hasher: Arc<dyn PasswordHasher>,
+        token_enc: Arc<dyn TokenEncoder>,
     ) -> Self {
-        let token_serv = Arc::new(TokenService::new(
-            Arc::clone(&token_repo),
-            Arc::clone(&token_enc),
-        ));
-        let user_serv = Arc::new(UserService::new(
-            Arc::clone(&user_repo),
-            Arc::clone(&password_hasher),
-        ));
+        let token_serv = Arc::new(TokenService::new(token_repo.clone(), token_enc.clone()));
+        let user_serv = Arc::new(UserService::new(user_repo.clone(), password_hasher.clone()));
         let authentication_serv = Arc::new(AuthenticationService::new(
-            Arc::clone(&user_repo),
-            Arc::clone(&password_hasher),
-            Arc::clone(&token_serv),
+            user_repo.clone(),
+            password_hasher.clone(),
+            token_serv.clone(),
         ));
         let authorization_serv = Arc::new(AuthorizationService::new(
-            Arc::clone(&user_repo),
-            Arc::clone(&token_serv),
+            user_repo.clone(),
+            token_serv.clone(),
         ));
 
         Container {

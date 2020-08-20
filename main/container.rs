@@ -5,15 +5,16 @@ use warp::Filter;
 
 use catalogue::container::Container as CatalogueContainer;
 use catalogue::infrastructure::persistence::inmem::InMemCatalogueRepository;
+use catalogue::infrastructure::service::{SyncCollectionService, SyncPublicationService};
 use common::event::inmem::InMemEventBus;
 use identity::container::Container as IdentityContainer;
-use identity::domain::user::UserRepository;
+
 use identity::infrastructure::persistence::inmem::{
     InMemRoleRepository, InMemTokenRepository, InMemUserRepository,
 };
 use identity::infrastructure::service::{BcryptHasher, JWTEncoder};
 use publishing::container::Container as PublishingContainer;
-use publishing::domain::publication::PublicationRepository;
+
 use publishing::infrastructure::persistence::inmem::{
     InMemAuthorRepository, InMemCategoryRepository, InMemCollectionRepository,
     InMemContentManagerRepository, InMemInteractionRepository, InMemPublicationRepository,
@@ -34,7 +35,7 @@ pub struct Container {
 }
 
 impl Container {
-    pub fn new() -> Self {
+    pub async fn new() -> Self {
         let event_bus = Arc::new(InMemEventBus::new());
         let event_repo = Arc::new(EventRepository::new());
 
@@ -52,41 +53,59 @@ impl Container {
         let publication_repo = Arc::new(InMemPublicationRepository::new());
         let _reader_repo = Arc::new(InMemReaderRepository::new());
 
-        let reader_repo = Arc::new(ReaderTranslator::new(
-            Arc::clone(&user_repo) as Arc<dyn UserRepository>
-        ));
+        let reader_repo = Arc::new(ReaderTranslator::new(user_repo.clone()));
         let author_repo = Arc::new(AuthorTranslator::new(
-            Arc::clone(&publication_repo) as Arc<dyn PublicationRepository>,
-            Arc::clone(&user_repo) as Arc<dyn UserRepository>,
+            publication_repo.clone(),
+            user_repo.clone(),
         ));
-        let content_manager_repo = Arc::new(ContentManagerTranslator::new(
-            Arc::clone(&user_repo) as Arc<dyn UserRepository>
-        ));
+        let content_manager_repo = Arc::new(ContentManagerTranslator::new(user_repo.clone()));
 
         let catalogue_repo = Arc::new(InMemCatalogueRepository::new());
+        let collection_serv = Arc::new(SyncCollectionService::new(
+            author_repo.clone(),
+            category_repo.clone(),
+            collection_repo.clone(),
+        ));
+        let publication_serv = Arc::new(SyncPublicationService::new(
+            author_repo.clone(),
+            category_repo.clone(),
+            publication_repo.clone(),
+        ));
+
+        let identity = IdentityContainer::new(
+            event_bus.clone(),
+            role_repo,
+            token_repo,
+            user_repo,
+            password_hasher,
+            token_enc,
+        );
+
+        let publishing = PublishingContainer::new(
+            event_bus.clone(),
+            author_repo,
+            category_repo,
+            collection_repo,
+            content_manager_repo,
+            interaction_repo,
+            publication_repo,
+            reader_repo,
+        );
+
+        let catalogue = CatalogueContainer::new(
+            event_bus.clone(),
+            catalogue_repo,
+            collection_serv,
+            publication_serv,
+        );
+        catalogue.subscribe(event_bus.as_ref()).await.unwrap();
 
         Container {
-            event_bus: Arc::clone(&event_bus),
+            event_bus,
             event_repo,
-            identity: IdentityContainer::new(
-                Arc::clone(&event_bus),
-                role_repo,
-                token_repo,
-                user_repo,
-                password_hasher,
-                token_enc,
-            ),
-            publishing: PublishingContainer::new(
-                Arc::clone(&event_bus),
-                author_repo,
-                category_repo,
-                collection_repo,
-                content_manager_repo,
-                interaction_repo,
-                publication_repo,
-                reader_repo,
-            ),
-            catalogue: CatalogueContainer::new(Arc::clone(&event_bus), catalogue_repo),
+            identity,
+            publishing,
+            catalogue,
         }
     }
 

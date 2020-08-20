@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use async_trait::async_trait;
 
 use common::error::Error;
@@ -7,14 +9,17 @@ use shared::event::CollectionEvent;
 
 use crate::domain::catalogue::{CatalogueRepository, CollectionService};
 
-pub struct CollectionHandler<'a, CRepo, CServ> {
-    catalogue_repo: &'a CRepo,
+pub struct CollectionHandler {
+    catalogue_repo: Arc<dyn CatalogueRepository>,
 
-    collection_serv: &'a CServ,
+    collection_serv: Arc<dyn CollectionService>,
 }
 
-impl<'a, CRepo, CServ> CollectionHandler<'a, CRepo, CServ> {
-    pub fn new(catalogue_repo: &'a CRepo, collection_serv: &'a CServ) -> Self {
+impl CollectionHandler {
+    pub fn new(
+        catalogue_repo: Arc<dyn CatalogueRepository>,
+        collection_serv: Arc<dyn CollectionService>,
+    ) -> Self {
         CollectionHandler {
             catalogue_repo,
             collection_serv,
@@ -23,11 +28,7 @@ impl<'a, CRepo, CServ> CollectionHandler<'a, CRepo, CServ> {
 }
 
 #[async_trait]
-impl<'a, CRepo, CServ> EventHandler for CollectionHandler<'a, CRepo, CServ>
-where
-    CRepo: CatalogueRepository + Sync + Send,
-    CServ: CollectionService + Sync + Send,
-{
+impl EventHandler for CollectionHandler {
     fn topic(&self) -> &str {
         "collection"
     }

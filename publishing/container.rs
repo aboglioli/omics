@@ -25,7 +25,10 @@ pub struct Container<EPub> {
     interaction_serv: Arc<InteractionService>,
 }
 
-impl<EPub: EventPublisher> Container<EPub> {
+impl<EPub> Container<EPub>
+where
+    EPub: EventPublisher,
+{
     pub fn new(
         event_pub: Arc<EPub>,
         author_repo: Arc<dyn AuthorRepository>,
@@ -36,8 +39,8 @@ impl<EPub: EventPublisher> Container<EPub> {
         publication_repo: Arc<dyn PublicationRepository>,
         reader_repo: Arc<dyn ReaderRepository>,
     ) -> Self {
-        let statistics_serv = Arc::new(StatisticsService::new(Arc::clone(&interaction_repo)));
-        let interaction_serv = Arc::new(InteractionService::new(Arc::clone(&interaction_repo)));
+        let statistics_serv = Arc::new(StatisticsService::new(interaction_repo.clone()));
+        let interaction_serv = Arc::new(InteractionService::new(interaction_repo.clone()));
 
         Container {
             event_pub,

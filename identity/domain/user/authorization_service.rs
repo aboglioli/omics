@@ -7,16 +7,13 @@ use crate::domain::token::{Token, TokenService};
 use crate::domain::user::{User, UserId, UserRepository};
 
 pub struct AuthorizationService {
-    user_repo: Arc<dyn UserRepository + Sync + Send>,
+    user_repo: Arc<dyn UserRepository>,
 
     token_serv: Arc<TokenService>,
 }
 
 impl AuthorizationService {
-    pub fn new(
-        user_repo: Arc<dyn UserRepository + Sync + Send>,
-        token_serv: Arc<TokenService>,
-    ) -> Self {
+    pub fn new(user_repo: Arc<dyn UserRepository>, token_serv: Arc<TokenService>) -> Self {
         AuthorizationService {
             user_repo,
             token_serv,

@@ -7,6 +7,6 @@ use crate::result::Result;
 pub trait EventSubscriber {
     async fn subscribe(
         &self,
-        handler: Box<dyn EventHandler + Sync + Send>, // TODO: use generics.
+        handler: Box<dyn EventHandler>, // TODO: use generics.
     ) -> Result<bool>;
 }

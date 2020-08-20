@@ -11,7 +11,7 @@ use crate::result::Result;
 
 #[derive(Default)]
 pub struct InMemEventBus {
-    handlers: Arc<Mutex<Vec<Box<dyn EventHandler + Sync + Send>>>>,
+    handlers: Arc<Mutex<Vec<Box<dyn EventHandler>>>>,
 }
 
 impl InMemEventBus {
@@ -74,7 +74,7 @@ impl EventPublisher for InMemEventBus {
 
 #[async_trait]
 impl EventSubscriber for InMemEventBus {
-    async fn subscribe(&self, handler: Box<dyn EventHandler + Sync + Send>) -> Result<bool> {
+    async fn subscribe(&self, handler: Box<dyn EventHandler>) -> Result<bool> {
         let mut handlers = self.handlers.lock().await;
         handlers.push(handler);
         Ok(true)

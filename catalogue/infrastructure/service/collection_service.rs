@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use async_trait::async_trait;
 
 use common::result::Result;
@@ -7,17 +9,17 @@ use publishing::domain::author::AuthorRepository;
 use publishing::domain::category::CategoryRepository;
 use publishing::domain::collection::{CollectionId, CollectionRepository};
 
-pub struct SyncCollectionService<'a, ARepo, CatRepo, CollRepo> {
-    author_repo: &'a ARepo,
-    category_repo: &'a CatRepo,
-    collection_repo: &'a CollRepo,
+pub struct SyncCollectionService {
+    author_repo: Arc<dyn AuthorRepository>,
+    category_repo: Arc<dyn CategoryRepository>,
+    collection_repo: Arc<dyn CollectionRepository>,
 }
 
-impl<'a, ARepo, CatRepo, CollRepo> SyncCollectionService<'a, ARepo, CatRepo, CollRepo> {
+impl SyncCollectionService {
     pub fn new(
-        author_repo: &'a ARepo,
-        category_repo: &'a CatRepo,
-        collection_repo: &'a CollRepo,
+        author_repo: Arc<dyn AuthorRepository>,
+        category_repo: Arc<dyn CategoryRepository>,
+        collection_repo: Arc<dyn CollectionRepository>,
     ) -> Self {
         SyncCollectionService {
             author_repo,
@@ -28,13 +30,7 @@ impl<'a, ARepo, CatRepo, CollRepo> SyncCollectionService<'a, ARepo, CatRepo, Col
 }
 
 #[async_trait]
-impl<'a, ARepo, CatRepo, CollRepo> CollectionService
-    for SyncCollectionService<'a, ARepo, CatRepo, CollRepo>
-where
-    ARepo: AuthorRepository + Sync + Send,
-    CatRepo: CategoryRepository + Sync + Send,
-    CollRepo: CollectionRepository + Sync + Send,
-{
+impl CollectionService for SyncCollectionService {
     async fn get_by_id(&self, id: &str) -> Result<Collection> {
         let collection_id = CollectionId::new(id)?;
         let collection = self.collection_repo.find_by_id(&collection_id).await?;
