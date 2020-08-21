@@ -1,4 +1,4 @@
-use actix_web::{error, web, HttpRequest, HttpResponse, Responder, Result};
+use actix_web::{web, HttpRequest, HttpResponse, Responder, Result};
 
 use identity::application::user::{
     ChangePassword, ChangePasswordCommand, ChangeRole, ChangeRoleCommand, Delete, GetAll, GetById,
@@ -6,43 +6,74 @@ use identity::application::user::{
     RegisterResponse, Update, UpdateCommand, Validate,
 };
 
+use crate::authorization::auth;
 use crate::container::Container;
 use crate::error::PublicError;
-
-async fn index() -> impl Responder {
-    HttpResponse::Ok().body("/users")
-}
 
 async fn register(
     cmd: web::Json<RegisterCommand>,
     c: web::Data<Container>,
 ) -> Result<HttpResponse, PublicError> {
-    let uc = Register::new(
+    Register::new(
         c.identity.event_pub(),
         c.identity.user_repo(),
         c.identity.user_serv(),
-    );
-    let res = uc.exec(cmd.into_inner()).await;
-
-    res.map(|res| HttpResponse::Ok().json(res))
-        .map_err(PublicError::from)
+    )
+    .exec(cmd.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
 }
 
 async fn login(
     cmd: web::Json<LoginCommand>,
     c: web::Data<Container>,
 ) -> Result<HttpResponse, PublicError> {
-    let uc = Login::new(c.identity.event_pub(), c.identity.authentication_serv());
-    let res = uc.exec(cmd.into_inner()).await;
+    Login::new(c.identity.event_pub(), c.identity.authentication_serv())
+        .exec(cmd.into_inner())
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
+}
 
-    res.map(|res| HttpResponse::Ok().json(res))
+async fn get_all(req: HttpRequest, c: web::Data<Container>) -> Result<HttpResponse, PublicError> {
+    let user_id = auth(&req, &c).await?;
+
+    GetAll::new(c.identity.user_repo())
+        .exec(user_id)
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
+}
+
+async fn get_by_id(
+    req: HttpRequest,
+    path: web::Path<String>,
+    c: web::Data<Container>,
+) -> impl Responder {
+    let user_id = auth(&req, &c).await?;
+
+    let id = path.into_inner();
+    GetById::new(c.identity.user_repo())
+        .exec(user_id, id)
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
 }
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.route("/register", web::post().to(register))
         .route("/login", web::post().to(login))
-        .service(web::resource("/users").route(web::get().to(index)));
+        // .route("/recover-password", web::post().to(recover_password))
+        .service(
+            web::scope("/users")
+                .route("", web::get().to(get_all))
+                .route("/{user_id}", web::get().to(get_by_id)), // .route("/{user_id}", web::put().to(update))
+                                                                // .route("/{user_id}", web::delete().to(delete))
+                                                                // .route("/{user_id}/password", web::put().to(change_password))
+                                                                // .route("/{user_id}/validate/{validation_code}", web::get().to(validate))
+                                                                // .route("/{user_id}/role}", web::put().to(change_role))
+        );
 }
 
 // pub async fn get_all(user_id: String, c: Arc<Container>) -> Result<impl Reply, Rejection> {

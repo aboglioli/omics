@@ -1020,7 +1020,6 @@ dependencies = [
  "catalogue",
  "common",
  "env_logger",
- "futures",
  "identity",
  "log",
  "payment",

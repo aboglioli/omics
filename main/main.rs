@@ -1,4 +1,4 @@
-// mod authorization;
+mod authorization;
 mod container;
 mod development;
 mod error;

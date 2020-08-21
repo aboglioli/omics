@@ -27,7 +27,10 @@ impl AuthorizationService {
             let user = self.user_repo.find_by_id(&user_id).await?;
             return Ok(user);
         }
-        Err(Error::new("authorization", "unauthorized"))
+        Err(Error::new("authorization", "unauthorized")
+            .set_status(401)
+            .set_message("User is not logged in")
+            .build())
     }
 }
 
