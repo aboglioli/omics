@@ -11,7 +11,7 @@ use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use common::config::Config;
 
 use container::Container;
-use handlers::user;
+use handlers::{author, category, collection, publication, role, user};
 
 async fn index() -> impl Responder {
     HttpResponse::Ok().body("Omics")
@@ -38,7 +38,12 @@ async fn main() -> std::io::Result<()> {
         App::new().app_data(container.clone()).service(
             web::scope("/api")
                 .route("/dev", web::get().to(index))
-                .configure(user::routes),
+                .configure(user::routes)
+                .configure(publication::routes)
+                .configure(collection::routes)
+                .configure(author::routes)
+                .configure(role::routes)
+                .configure(category::routes),
         )
     })
     .bind(format!("0.0.0.0:{}", config.port()))?

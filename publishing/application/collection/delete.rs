@@ -21,9 +21,9 @@ impl<'a> Delete<'a> {
         }
     }
 
-    pub async fn exec(&self, author_id: String, publication_id: String) -> Result<()> {
-        let publication_id = CollectionId::new(publication_id)?;
-        let mut collection = self.collection_repo.find_by_id(&publication_id).await?;
+    pub async fn exec(&self, author_id: String, collection_id: String) -> Result<()> {
+        let collection_id = CollectionId::new(collection_id)?;
+        let mut collection = self.collection_repo.find_by_id(&collection_id).await?;
 
         if collection.author_id().value() != author_id {
             return Err(Error::new("collection", "unauthorized"));
