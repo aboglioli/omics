@@ -43,6 +43,8 @@ export class SideNavMenuComponent implements OnInit, OnDestroy {
 
     });
 
+    this.isAccessUserLogIn = this.authService.isLoggedIn();
+
   }
 
   ngOnDestroy(): void {

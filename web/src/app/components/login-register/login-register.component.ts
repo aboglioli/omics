@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { faTimesCircle, faChevronCircleRight, faChevronCircleDown, faEnvelopeSquare } from '@fortawesome/free-solid-svg-icons';
+import { faTimesCircle, faChevronCircleRight, faChevronCircleDown, faEnvelopeSquare, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ValidadoresCustomService } from '../../services/validadores-custom.service';
@@ -19,6 +19,8 @@ export class LoginRegisterComponent implements OnInit {
   public faSubmit = faChevronCircleRight;
   public faEmail = faEnvelopeSquare;
   public faSignUp = faChevronCircleDown;
+  public faEyeOpen = faEye;
+  public faEyeSlash = faEyeSlash;
 
   // Forms
   formLogin: FormGroup;
@@ -26,6 +28,29 @@ export class LoginRegisterComponent implements OnInit {
 
   // Otros atributos
   isLoginOptionShow = true;
+
+  passwordListType = {
+
+    login: {
+
+      type: 'password',
+      visible: false
+
+    },
+    signUpFirst: {
+
+      type: 'password',
+      visible: false
+
+    },
+    signUpSecond: {
+
+      type: 'password',
+      visible: false
+
+    },
+
+  };
 
   constructor(  private dialogRef: MatDialogRef<LoginRegisterComponent>,
                 private fb: FormBuilder,
@@ -192,6 +217,16 @@ export class LoginRegisterComponent implements OnInit {
 
     }
 
+
+  }
+
+  // Show password
+  public showPasswordLogin( passwordType: string, show: boolean ): void {
+
+    const newValueVisible = !show;
+
+    this.passwordListType[passwordType].visible = newValueVisible;
+    this.passwordListType[passwordType].type = ( newValueVisible ) ? 'text' : 'password';
 
   }
 

@@ -49,7 +49,6 @@
                    formControlName="correoUsuario"
                    [class.is-invalid]="correoUsuarioLoginNovalido">
 
-
           </div>
         </div>
 
@@ -71,12 +70,20 @@
 
             </div>
 
-            <input  class="form-control"
-                    type="password"
-                    placeholder="Contraseña"
-                    formControlName="password"
-                    [class.is-invalid]="passwordLoginNoValido">
+            <div class="input-with-icon">
+              <input  class="form-control"
+                      [type]="passwordListType.login.type"
+                      placeholder="Contraseña"
+                      formControlName="password"
+                      [class.is-invalid]="passwordLoginNoValido">
 
+              <fa-icon  class="button"
+                        (click)="showPasswordLogin( 'login', passwordListType.login.visible )"
+                        [icon]="(passwordListType.login.visible)  ? faEyeSlash : faEyeOpen"
+                        size="1x">
+              </fa-icon>
+
+            </div>
 
           </div>
         </div>
@@ -152,11 +159,21 @@
               Contraseña
             </small>
 
-            <input  class="form-control"
-                    type="password"
-                    placeholder="Contraseña"
-                    formControlName="password1"
-                    [class.is-invalid]="password1SignUpNoValido">
+            <div class="input-with-icon">
+
+              <input  class="form-control"
+                      [type]="passwordListType.signUpFirst.type"
+                      placeholder="Contraseña"
+                      formControlName="password1"
+                      [class.is-invalid]="password1SignUpNoValido">
+
+              <fa-icon  class="button"
+                        (click)="showPasswordLogin( 'signUpFirst', passwordListType.signUpFirst.visible )"
+                        [icon]="(passwordListType.signUpFirst.visible)  ? faEyeSlash : faEyeOpen"
+                        size="1x">
+              </fa-icon>
+
+            </div>
 
           </div>
         </div>
@@ -169,12 +186,21 @@
               Repetir Contraseña
             </small>
 
-            <input  class="form-control"
-                    type="password"
-                    placeholder="Repita Contraseña"
-                    formControlName="password2"
-                    [class.is-invalid]="password2SignUpNoValido">
+            <div class="input-with-icon">
 
+              <input  class="form-control"
+                      [type]="passwordListType.signUpSecond.type"
+                      placeholder="Repita Contraseña"
+                      formControlName="password2"
+                      [class.is-invalid]="password2SignUpNoValido">
+
+              <fa-icon  class="button"
+                        (click)="showPasswordLogin( 'signUpSecond', passwordListType.signUpSecond.visible )"
+                        [icon]="(passwordListType.signUpSecond.visible)  ? faEyeSlash : faEyeOpen"
+                        size="1x">
+              </fa-icon>
+
+            </div>
           </div>
         </div>
 

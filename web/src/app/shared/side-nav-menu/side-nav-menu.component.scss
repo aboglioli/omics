@@ -6,6 +6,10 @@ div.menu-box {
   flex-direction: column;
   height: 100%;
 
+  @media screen and (max-width: $break-small) {
+    width: 100vw;
+  }
+
   .header {
 
     display: flex;

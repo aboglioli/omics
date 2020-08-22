@@ -30,6 +30,9 @@ export class NavBarComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    this.isAccessUserLogIn = this.authService.isLoggedIn();
+
   }
 
   public toggleSideNavMenu(): void {
