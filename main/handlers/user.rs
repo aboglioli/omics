@@ -121,13 +121,9 @@ async fn change_password(
 }
 
 async fn validate(
-    req: HttpRequest,
     path: web::Path<(String, String)>,
-    _cmd: web::Json<ChangePasswordCommand>,
     c: web::Data<Container>,
 ) -> Result<HttpResponse, PublicError> {
-    let _user_id = auth(&req, &c).await?;
-
     let path = path.into_inner();
     Validate::new(c.identity.event_pub(), c.identity.user_repo())
         .exec(path.0, path.1)

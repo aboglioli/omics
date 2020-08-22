@@ -6,6 +6,7 @@ mod handlers;
 mod infrastructure;
 mod response;
 
+use actix_cors::Cors;
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 
 use common::config::Config;
@@ -35,16 +36,19 @@ async fn main() -> std::io::Result<()> {
     println!("Listening on {}", config.port());
 
     HttpServer::new(move || {
-        App::new().app_data(container.clone()).service(
-            web::scope("/api")
-                .route("/dev", web::get().to(index))
-                .configure(user::routes)
-                .configure(publication::routes)
-                .configure(collection::routes)
-                .configure(author::routes)
-                .configure(role::routes)
-                .configure(category::routes),
-        )
+        App::new()
+            .wrap(Cors::new().finish())
+            .app_data(container.clone())
+            .service(
+                web::scope("/api")
+                    .route("/dev", web::get().to(index))
+                    .configure(user::routes)
+                    .configure(publication::routes)
+                    .configure(collection::routes)
+                    .configure(author::routes)
+                    .configure(role::routes)
+                    .configure(category::routes),
+            )
     })
     .bind(format!("0.0.0.0:{}", config.port()))?
     .run()

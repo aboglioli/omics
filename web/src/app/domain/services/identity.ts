@@ -40,7 +40,7 @@ export interface IChangePasswordCommand {
 export class IdentityService {
   private baseUrl: string;
 
-  constructor(private http: HttpClient, configServ: ConfigService) {
+  constructor(private http: HttpClient, private configServ: ConfigService) {
     this.baseUrl = `${configServ.baseUrl()}/users`;
   }
 
@@ -49,11 +49,11 @@ export class IdentityService {
   }
 
   public register(cmd: IRegisterCommand): Observable<IRegisterResponse> {
-    return this.http.post<IRegisterResponse>(`${this.baseUrl}/register`, cmd);
+    return this.http.post<IRegisterResponse>(`${this.configServ.baseUrl()}/register`, cmd);
   }
 
   public login(cmd: ILoginCommand): Observable<ILoginResponse> {
-    return this.http.post<ILoginResponse>(`${this.baseUrl}/login`, cmd);
+    return this.http.post<ILoginResponse>(`${this.configServ.baseUrl()}/login`, cmd);
   }
 
   public update(id: string, cmd: IUpdateCommand): Observable<any> {

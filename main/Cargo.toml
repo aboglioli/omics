@@ -21,6 +21,7 @@ identity = { path = "../identity" }
 payment = { path = "../payment" }
 publishing = { path = "../publishing" }
 
+actix-cors = "*"
 actix-http = "*"
 actix-rt = "1.0"
 actix-web = "2.0"
