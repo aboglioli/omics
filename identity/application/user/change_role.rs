@@ -25,11 +25,11 @@ impl<'a> ChangeRole<'a> {
 
     pub async fn exec(
         &self,
-        admin_id: String,
+        auth_id: String,
         user_id: String,
         cmd: ChangeRoleCommand,
     ) -> Result<()> {
-        let admin = self.user_repo.find_by_id(&UserId::new(admin_id)?).await?;
+        let admin = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
         let mut user = self.user_repo.find_by_id(&UserId::new(user_id)?).await?;
         let role = self
             .role_repo

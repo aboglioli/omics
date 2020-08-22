@@ -4,7 +4,7 @@ use crate::domain::author::Author;
 use crate::domain::category::Category;
 use crate::domain::collection::Collection;
 use crate::domain::interaction::Review;
-use crate::domain::publication::{Page, Publication, Statistics};
+use crate::domain::publication::{Image, Page, Publication, Statistics};
 use crate::domain::reader::Reader;
 
 #[derive(Serialize)]
@@ -17,8 +17,8 @@ pub struct StatisticsDto {
     pub stars: f32,
 }
 
-impl StatisticsDto {
-    pub fn new(statistics: &Statistics) -> Self {
+impl From<&Statistics> for StatisticsDto {
+    fn from(statistics: &Statistics) -> Self {
         StatisticsDto {
             views: statistics.views(),
             unique_views: statistics.unique_views(),
@@ -41,8 +41,8 @@ pub struct AuthorDto {
     pub collection_count: Option<usize>,
 }
 
-impl AuthorDto {
-    pub fn new(author: &Author) -> Self {
+impl From<&Author> for AuthorDto {
+    fn from(author: &Author) -> Self {
         AuthorDto {
             id: author.base().id().to_string(),
             username: author.username().to_string(),
@@ -53,7 +53,9 @@ impl AuthorDto {
             collection_count: None,
         }
     }
+}
 
+impl AuthorDto {
     pub fn publications(mut self, publications: Vec<PublicationDto>) -> Self {
         self.publications = Some(publications);
         self
@@ -77,15 +79,17 @@ pub struct CategoryDto {
     pub publications: Option<Vec<PublicationDto>>,
 }
 
-impl CategoryDto {
-    pub fn new(category: &Category) -> Self {
+impl From<&Category> for CategoryDto {
+    fn from(category: &Category) -> Self {
         CategoryDto {
             id: category.base().id().to_string(),
             name: category.name().to_string(),
             publications: None,
         }
     }
+}
 
+impl CategoryDto {
     pub fn publications(mut self, publications: Vec<PublicationDto>) -> Self {
         self.publications = Some(publications);
         self
@@ -97,27 +101,30 @@ pub struct ImageDto {
     pub url: String,
 }
 
+impl From<&Image> for ImageDto {
+    fn from(image: &Image) -> Self {
+        ImageDto {
+            url: image.url().to_string(),
+        }
+    }
+}
+
 #[derive(Serialize)]
 pub struct PageDto {
     pub number: u32,
     pub images: Vec<ImageDto>,
 }
 
-impl PageDto {
-    pub fn new(pages: &[Page]) -> Vec<Self> {
-        pages
-            .iter()
-            .map(|page| PageDto {
-                number: page.number(),
-                images: page
-                    .images()
-                    .iter()
-                    .map(|image| ImageDto {
-                        url: image.url().to_string(),
-                    })
-                    .collect(),
-            })
-            .collect()
+impl From<&Page> for PageDto {
+    fn from(page: &Page) -> Self {
+        PageDto {
+            number: page.number(),
+            images: page
+                .images()
+                .iter()
+                .map(|image| ImageDto::from(image))
+                .collect(),
+        }
     }
 }
 
@@ -136,8 +143,8 @@ pub struct PublicationDto {
     pub status: Option<String>,
 }
 
-impl PublicationDto {
-    pub fn new(publication: &Publication) -> Self {
+impl From<&Publication> for PublicationDto {
+    fn from(publication: &Publication) -> Self {
         PublicationDto {
             id: publication.base().id().to_string(),
             author_id: None,
@@ -152,12 +159,14 @@ impl PublicationDto {
                 .iter()
                 .map(|tag| tag.name().to_string())
                 .collect(),
-            statistics: StatisticsDto::new(publication.statistics()),
+            statistics: StatisticsDto::from(publication.statistics()),
             pages: None,
             status: None,
         }
     }
+}
 
+impl PublicationDto {
     pub fn author_id(mut self, publication: &Publication) -> Self {
         self.author_id = Some(publication.author_id().to_string());
         self
@@ -179,7 +188,13 @@ impl PublicationDto {
     }
 
     pub fn pages(mut self, publication: &Publication) -> Self {
-        self.pages = Some(PageDto::new(publication.pages()));
+        self.pages = Some(
+            publication
+                .pages()
+                .iter()
+                .map(|page| PageDto::from(page))
+                .collect(),
+        );
         self
     }
 
@@ -203,8 +218,8 @@ pub struct CollectionDto {
     pub publications: Option<Vec<PublicationDto>>,
 }
 
-impl CollectionDto {
-    pub fn new(collection: &Collection) -> Self {
+impl From<&Collection> for CollectionDto {
+    fn from(collection: &Collection) -> Self {
         CollectionDto {
             id: collection.base().id().to_string(),
             author_id: None,
@@ -223,7 +238,9 @@ impl CollectionDto {
             publications: None,
         }
     }
+}
 
+impl CollectionDto {
     pub fn author_id(mut self, collection: &Collection) -> Self {
         self.author_id = Some(collection.author_id().to_string());
         self
@@ -264,8 +281,8 @@ pub struct ReviewDto {
     pub comment: String,
 }
 
-impl ReviewDto {
-    pub fn new(review: &Review, _reader: ReaderDto) -> Self {
+impl From<&Review> for ReviewDto {
+    fn from(review: &Review) -> Self {
         ReviewDto {
             reader_id: None,
             reader: None,
@@ -274,7 +291,9 @@ impl ReviewDto {
             comment: review.comment().to_string(),
         }
     }
+}
 
+impl ReviewDto {
     pub fn reader_id(mut self, review: &Review) -> Self {
         self.reader_id = Some(review.base().reader_id().to_string());
         self
@@ -295,8 +314,8 @@ pub struct ReaderDto {
     pub subscribed: bool,
 }
 
-impl ReaderDto {
-    pub fn new(reader: &Reader) -> Self {
+impl From<&Reader> for ReaderDto {
+    fn from(reader: &Reader) -> Self {
         ReaderDto {
             id: reader.base().id().to_string(),
             username: reader.username().to_string(),

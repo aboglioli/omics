@@ -52,10 +52,10 @@ async fn recover_password(
 }
 
 async fn get_all(req: HttpRequest, c: web::Data<Container>) -> Result<HttpResponse, PublicError> {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     GetAll::new(c.identity.user_repo())
-        .exec(user_id)
+        .exec(auth_id)
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -66,11 +66,10 @@ async fn get_by_id(
     path: web::Path<String>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
-    let id = path.into_inner();
     GetById::new(c.identity.user_repo())
-        .exec(user_id, id)
+        .exec(auth_id, path.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -82,10 +81,10 @@ async fn update(
     cmd: web::Json<UpdateCommand>,
     c: web::Data<Container>,
 ) -> Result<HttpResponse, PublicError> {
-    let _user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     Update::new(c.identity.event_pub(), c.identity.user_repo())
-        .exec(path.into_inner(), cmd.into_inner())
+        .exec(auth_id, path.into_inner(), cmd.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -96,10 +95,10 @@ async fn delete(
     path: web::Path<String>,
     c: web::Data<Container>,
 ) -> Result<HttpResponse, PublicError> {
-    let _user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     Delete::new(c.identity.event_pub(), c.identity.user_repo())
-        .exec(path.into_inner())
+        .exec(auth_id, path.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -111,10 +110,10 @@ async fn change_password(
     cmd: web::Json<ChangePasswordCommand>,
     c: web::Data<Container>,
 ) -> Result<HttpResponse, PublicError> {
-    let _user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
-    ChangePassword::new(c.identity.user_serv())
-        .exec(path.into_inner(), cmd.into_inner())
+    ChangePassword::new(c.identity.user_repo(), c.identity.user_serv())
+        .exec(auth_id, path.into_inner(), cmd.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -138,10 +137,10 @@ async fn change_role(
     cmd: web::Json<ChangeRoleCommand>,
     c: web::Data<Container>,
 ) -> Result<HttpResponse, PublicError> {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     ChangeRole::new(c.identity.role_repo(), c.identity.user_repo())
-        .exec(user_id, path.into_inner(), cmd.into_inner())
+        .exec(auth_id, path.into_inner(), cmd.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -154,14 +153,14 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
         .service(
             web::scope("/users")
                 .route("", web::get().to(get_all))
-                .route("/{user_id}", web::get().to(get_by_id))
-                .route("/{user_id}", web::put().to(update))
-                .route("/{user_id}", web::delete().to(delete))
-                .route("/{user_id}/password", web::put().to(change_password))
+                .route("/{auth_id}", web::get().to(get_by_id))
+                .route("/{auth_id}", web::put().to(update))
+                .route("/{auth_id}", web::delete().to(delete))
+                .route("/{auth_id}/password", web::put().to(change_password))
                 .route(
-                    "/{user_id}/validate/{validation_code}",
+                    "/{auth_id}/validate/{validation_code}",
                     web::get().to(validate),
                 )
-                .route("/{user_id}/role}", web::put().to(change_role)),
+                .route("/{auth_id}/role}", web::put().to(change_role)),
         );
 }

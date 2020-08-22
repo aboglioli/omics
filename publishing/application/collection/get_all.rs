@@ -58,18 +58,18 @@ impl<'a> GetAll<'a> {
                     .find_by_id(publication.header().category_id())
                     .await?;
 
-                let publication_dto = PublicationDto::new(&publication)
-                    .author(AuthorDto::new(&author))
-                    .category(CategoryDto::new(&category))
+                let publication_dto = PublicationDto::from(&publication)
+                    .author(AuthorDto::from(&author))
+                    .category(CategoryDto::from(&category))
                     .status(&publication);
 
                 publications.push(publication_dto);
             }
 
             collection_dtos.push(
-                CollectionDto::new(&collection)
-                    .author(AuthorDto::new(&author))
-                    .category(CategoryDto::new(&category))
+                CollectionDto::from(collection)
+                    .author(AuthorDto::from(&author))
+                    .category(CategoryDto::from(&category))
                     .publications(publications),
             )
         }

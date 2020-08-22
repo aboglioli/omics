@@ -10,6 +10,7 @@ use crate::domain::publication::{Publication, PublicationId};
 pub trait PublicationRepository: Sync + Send {
     async fn next_id(&self) -> Result<PublicationId>;
 
+    async fn find_all(&self) -> Result<Vec<Publication>>;
     async fn find_by_id(&self, id: &PublicationId) -> Result<Publication>;
     async fn find_by_author_id(&self, author_id: &AuthorId) -> Result<Vec<Publication>>;
     async fn find_by_category_id(&self, category_id: &CategoryId) -> Result<Vec<Publication>>;

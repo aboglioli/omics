@@ -4,7 +4,7 @@ use common::result::Result;
 
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};
 use crate::domain::author::{AuthorId, AuthorRepository};
-use crate::domain::category::{CategoryId, CategoryRepository};
+use crate::domain::category::CategoryRepository;
 use crate::domain::content_manager::{ContentManagerId, ContentManagerRepository};
 use crate::domain::publication::{PublicationRepository, Status};
 
@@ -13,7 +13,7 @@ pub struct SearchCommand {
     author_id: Option<String>,
     category_id: Option<String>,
     status: Option<String>,
-    text: Option<String>,
+    name: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -43,50 +43,60 @@ impl<'a> Search<'a> {
         }
     }
 
-    pub async fn exec(&self, viewer_id: String, cmd: SearchCommand) -> Result<SearchResponse> {
-        let mut publications = Vec::new();
-        let content_manager_id = ContentManagerId::new(&viewer_id)?;
+    pub async fn exec(&self, auth_id: String, cmd: SearchCommand) -> Result<SearchResponse> {
+        let content_manager_id = ContentManagerId::new(&auth_id)?;
         let is_content_manager = self
             .content_manager_repo
             .find_by_id(&content_manager_id)
             .await
             .is_ok();
-        let author_id = AuthorId::new(&viewer_id)?;
+        let author_id = AuthorId::new(&auth_id)?;
+
+        let mut publications = self.publication_repo.find_all().await?;
 
         if let Some(author_id) = cmd.author_id {
-            let author_id = AuthorId::new(author_id)?;
-            publications.extend(self.publication_repo.find_by_author_id(&author_id).await?);
+            publications = publications
+                .into_iter()
+                .filter(|publication| publication.author_id().value() == author_id)
+                .collect();
         }
 
         if let Some(category_id) = cmd.category_id {
-            let category_id = CategoryId::new(category_id)?;
-            publications.extend(
-                self.publication_repo
-                    .find_by_category_id(&category_id)
-                    .await?,
-            );
+            publications = publications
+                .into_iter()
+                .filter(|publication| publication.header().category_id().value() == category_id)
+                .collect();
         }
 
         if let Some(status) = cmd.status {
-            publications.extend(self.publication_repo.find_by_status(&status).await?);
+            publications = publications
+                .into_iter()
+                .filter(|publication| {
+                    publication.status_history().current().status().to_string() == status
+                })
+                .collect();
         }
 
-        if let Some(text) = cmd.text {
-            publications.extend(self.publication_repo.search(&text).await?);
+        if let Some(name) = cmd.name {
+            publications = publications
+                .into_iter()
+                .filter(|publication| publication.header().name().value().contains(&name))
+                .collect();
         }
 
-        let publications = publications.into_iter().filter(|publication| {
-            if is_content_manager || publication.author_id() == &author_id {
-                return true;
-            }
+        publications = publications
+            .into_iter()
+            .filter(|publication| {
+                if is_content_manager || publication.author_id() == &author_id {
+                    return true;
+                }
 
-            matches!(publication.status_history().current().status(), Status::Published { .. })
-        });
-
-        // TODO: dedup
+                matches!(publication.status_history().current().status(), Status::Published { .. })
+            })
+            .collect();
 
         let mut publication_dtos = Vec::new();
-        for publication in publications {
+        for publication in publications.iter() {
             let author = self.author_repo.find_by_id(publication.author_id()).await?;
             let category = self
                 .category_repo
@@ -94,9 +104,9 @@ impl<'a> Search<'a> {
                 .await?;
 
             publication_dtos.push(
-                PublicationDto::new(&publication)
-                    .author(AuthorDto::new(&author))
-                    .category(CategoryDto::new(&category)),
+                PublicationDto::from(publication)
+                    .author(AuthorDto::from(&author))
+                    .category(CategoryDto::from(&category)),
             );
         }
 

@@ -20,18 +20,16 @@ impl<'a> GetAll<'a> {
         GetAll { user_repo }
     }
 
-    pub async fn exec(&self, viewer_id: String) -> Result<GetAllResponse> {
-        let user_id = UserId::new(viewer_id)?;
-        let user = self.user_repo.find_by_id(&user_id).await?;
-
-        if !user.role().is("admin") {
-            return Err(Error::new("user", "unauthorized"));
+    pub async fn exec(&self, auth_id: String) -> Result<GetAllResponse> {
+        let auth_user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
+        if !auth_user.role().is("admin") {
+            return Err(Error::unauthorized());
         }
 
         let users = self.user_repo.find_all().await?;
 
         Ok(GetAllResponse {
-            users: users.iter().map(|user| UserDto::new(user, true)).collect(),
+            users: users.iter().map(|user| UserDto::from(user)).collect(),
         })
     }
 }

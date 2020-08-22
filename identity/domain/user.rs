@@ -127,7 +127,7 @@ impl User {
 
     pub fn change_role(&mut self, role: Role, admin: &User) -> Result<()> {
         if !admin.role().is("admin") {
-            return Err(Error::new("user", "is_not_an_admin"));
+            return Err(Error::unauthorized());
         }
 
         self.role = role;

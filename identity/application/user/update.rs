@@ -1,5 +1,6 @@
 use serde::Deserialize;
 
+use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
 
@@ -9,12 +10,6 @@ use crate::domain::user::{Fullname, Person, UserId, UserRepository};
 pub struct UpdateCommand {
     pub name: String,
     pub lastname: String,
-}
-
-impl UpdateCommand {
-    pub fn validate(&self) -> Result<()> {
-        Ok(())
-    }
 }
 
 pub struct Update<'a> {
@@ -31,11 +26,15 @@ impl<'a> Update<'a> {
         }
     }
 
-    pub async fn exec(&self, user_id: String, cmd: UpdateCommand) -> Result<()> {
-        cmd.validate()?;
+    pub async fn exec(&self, auth_id: String, user_id: String, cmd: UpdateCommand) -> Result<()> {
+        if auth_id != user_id {
+            let auth_user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
+            if !auth_user.role().is("admin") {
+                return Err(Error::unauthorized());
+            }
+        }
 
-        let user_id = UserId::new(user_id)?;
-        let mut user = self.user_repo.find_by_id(&user_id).await?;
+        let mut user = self.user_repo.find_by_id(&UserId::new(user_id)?).await?;
 
         let person = Person::new(Fullname::new(cmd.name, cmd.lastname)?)?;
         user.set_person(person)?;
@@ -64,6 +63,7 @@ mod tests {
         assert!(uc
             .exec(
                 user.base().id().to_string(),
+                user.base().id().to_string(),
                 UpdateCommand {
                     name: "Name".to_owned(),
                     lastname: "Lastname".to_owned(),
@@ -84,6 +84,7 @@ mod tests {
         assert!(uc
             .exec(
                 user.base().id().to_string(),
+                user.base().id().to_string(),
                 UpdateCommand {
                     name: "N".to_owned(),
                     lastname: "L".to_owned(),
@@ -103,6 +104,7 @@ mod tests {
 
         assert!(uc
             .exec(
+                user.base().id().to_string(),
                 user.base().id().to_string(),
                 UpdateCommand {
                     name: "Name".to_owned(),

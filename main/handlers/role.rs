@@ -7,10 +7,10 @@ use crate::container::Container;
 use crate::error::PublicError;
 
 async fn get_all(req: HttpRequest, c: web::Data<Container>) -> impl Responder {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     GetAll::new(c.identity.role_repo(), c.identity.user_repo())
-        .exec(user_id)
+        .exec(auth_id)
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)

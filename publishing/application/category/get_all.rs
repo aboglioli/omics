@@ -24,7 +24,7 @@ impl<'a> GetAll<'a> {
         Ok(GetAllResponse {
             categories: categories
                 .iter()
-                .map(|category| CategoryDto::new(category))
+                .map(|category| CategoryDto::from(category))
                 .collect(),
         })
     }

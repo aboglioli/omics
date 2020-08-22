@@ -1,3 +1,5 @@
+pub mod common;
+
 use std::cmp;
 use std::collections::HashMap;
 use std::error;

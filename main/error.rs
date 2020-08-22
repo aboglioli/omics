@@ -30,7 +30,7 @@ impl From<Error> for PublicError {
         if let ErrorKind::Internal = err.kind() {
             return PublicError {
                 kind: ErrorKind::Application.to_string(),
-                code: "unknown".to_owned(),
+                code: "internal_server".to_owned(),
                 path: "error".to_owned(),
                 status: Some(500),
                 message: None,

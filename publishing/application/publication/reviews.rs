@@ -40,7 +40,7 @@ impl<'a> Reviews<'a> {
                 .reader_repo
                 .find_by_id(review.base().reader_id())
                 .await?;
-            review_dtos.push(ReviewDto::new(review, ReaderDto::new(&reader)));
+            review_dtos.push(ReviewDto::from(review).reader(ReaderDto::from(&reader)));
         }
 
         Ok(ReviewsResponse {

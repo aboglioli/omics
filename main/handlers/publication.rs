@@ -15,7 +15,7 @@ async fn create(
     cmd: web::Json<CreateCommand>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     Create::new(
         c.publishing.event_pub(),
@@ -23,7 +23,7 @@ async fn create(
         c.publishing.category_repo(),
         c.publishing.publication_repo(),
     )
-    .exec(user_id, cmd.into_inner())
+    .exec(auth_id, cmd.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -31,10 +31,10 @@ async fn create(
 
 async fn search(
     req: HttpRequest,
-    cmd: web::Json<SearchCommand>,
+    cmd: web::Query<SearchCommand>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     Search::new(
         c.publishing.author_repo(),
@@ -42,7 +42,7 @@ async fn search(
         c.publishing.content_manager_repo(),
         c.publishing.publication_repo(),
     )
-    .exec(user_id, cmd.into_inner())
+    .exec(auth_id, cmd.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -53,7 +53,7 @@ async fn get_by_id(
     path: web::Path<String>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     GetById::new(
         c.publishing.event_pub(),
@@ -63,7 +63,7 @@ async fn get_by_id(
         c.publishing.reader_repo(),
         c.publishing.interaction_serv(),
     )
-    .exec(user_id, path.into_inner())
+    .exec(auth_id, path.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -75,14 +75,14 @@ async fn update(
     cmd: web::Json<UpdateCommand>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     Update::new(
         c.publishing.event_pub(),
         c.publishing.category_repo(),
         c.publishing.publication_repo(),
     )
-    .exec(user_id, path.into_inner(), cmd.into_inner())
+    .exec(auth_id, path.into_inner(), cmd.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -94,10 +94,10 @@ async fn update_pages(
     cmd: web::Json<UpdatePagesCommand>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     UpdatePages::new(c.publishing.event_pub(), c.publishing.publication_repo())
-        .exec(user_id, path.into_inner(), cmd.into_inner())
+        .exec(auth_id, path.into_inner(), cmd.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -108,10 +108,10 @@ async fn delete(
     path: web::Path<String>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     Delete::new(c.publishing.event_pub(), c.publishing.publication_repo())
-        .exec(user_id, path.into_inner())
+        .exec(auth_id, path.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -122,14 +122,14 @@ async fn publish(
     path: web::Path<String>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     Publish::new(
         c.publishing.event_pub(),
         c.publishing.author_repo(),
         c.publishing.publication_repo(),
     )
-    .exec(user_id, path.into_inner())
+    .exec(auth_id, path.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -140,14 +140,14 @@ async fn approve(
     path: web::Path<String>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     Approve::new(
         c.publishing.event_pub(),
         c.publishing.content_manager_repo(),
         c.publishing.publication_repo(),
     )
-    .exec(user_id, path.into_inner())
+    .exec(auth_id, path.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -158,14 +158,14 @@ async fn reject(
     path: web::Path<String>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     Reject::new(
         c.publishing.event_pub(),
         c.publishing.content_manager_repo(),
         c.publishing.publication_repo(),
     )
-    .exec(user_id, path.into_inner())
+    .exec(auth_id, path.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -176,7 +176,7 @@ async fn read(
     path: web::Path<String>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     Read::new(
         c.publishing.event_pub(),
@@ -184,7 +184,7 @@ async fn read(
         c.publishing.reader_repo(),
         c.publishing.interaction_serv(),
     )
-    .exec(user_id, path.into_inner())
+    .exec(auth_id, path.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -195,7 +195,7 @@ async fn like(
     path: web::Path<String>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     Like::new(
         c.publishing.event_pub(),
@@ -203,7 +203,7 @@ async fn like(
         c.publishing.reader_repo(),
         c.publishing.interaction_serv(),
     )
-    .exec(user_id, path.into_inner())
+    .exec(auth_id, path.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -214,7 +214,7 @@ async fn unlike(
     path: web::Path<String>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     Unlike::new(
         c.publishing.event_pub(),
@@ -222,7 +222,7 @@ async fn unlike(
         c.publishing.reader_repo(),
         c.publishing.interaction_serv(),
     )
-    .exec(user_id, path.into_inner())
+    .exec(auth_id, path.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -234,7 +234,7 @@ async fn review(
     cmd: web::Json<AddReviewCommand>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     AddReview::new(
         c.publishing.event_pub(),
@@ -242,7 +242,7 @@ async fn review(
         c.publishing.reader_repo(),
         c.publishing.interaction_serv(),
     )
-    .exec(user_id, path.into_inner(), cmd.into_inner())
+    .exec(auth_id, path.into_inner(), cmd.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -253,7 +253,7 @@ async fn delete_review(
     path: web::Path<String>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     DeleteReview::new(
         c.publishing.event_pub(),
@@ -261,7 +261,7 @@ async fn delete_review(
         c.publishing.reader_repo(),
         c.publishing.interaction_serv(),
     )
-    .exec(user_id, path.into_inner())
+    .exec(auth_id, path.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)

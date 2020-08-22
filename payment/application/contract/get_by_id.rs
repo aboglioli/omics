@@ -19,6 +19,6 @@ where
         let contract_id = ContractId::new(contract_id)?;
         let contract = self.contract_repo.find_by_id(&contract_id).await?;
 
-        Ok(ContractDto::new(&contract))
+        Ok(ContractDto::from(&contract))
     }
 }

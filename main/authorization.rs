@@ -25,7 +25,6 @@ pub async fn auth(req: &HttpRequest, c: &Container) -> Result<String, PublicErro
         .authorization_serv()
         .authorize(&token)
         .await
-        .map(|user| user.base().id().to_string())
         .map_err(PublicError::from)
 }
 

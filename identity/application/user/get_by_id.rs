@@ -1,3 +1,4 @@
+use common::error::Error;
 use common::result::Result;
 
 use crate::application::dtos::UserDto;
@@ -12,11 +13,17 @@ impl<'a> GetById<'a> {
         GetById { user_repo }
     }
 
-    pub async fn exec(&self, viewer_id: String, user_id: String) -> Result<UserDto> {
-        let user_id = UserId::new(user_id)?;
-        let user = self.user_repo.find_by_id(&user_id).await?;
+    pub async fn exec(&self, auth_id: String, user_id: String) -> Result<UserDto> {
+        if auth_id != user_id {
+            let auth_user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
+            if !auth_user.role().is("admin") {
+                return Err(Error::unauthorized());
+            }
+        }
 
-        Ok(UserDto::new(&user, viewer_id == user_id.value()))
+        let user = self.user_repo.find_by_id(&UserId::new(user_id)?).await?;
+
+        Ok(UserDto::from(&user))
     }
 }
 
@@ -37,7 +44,7 @@ mod tests {
         let id = user.base().id().to_string();
         let res = uc.exec(id.clone(), id).await.unwrap();
 
-        assert!(res.email.is_some());
+        assert_eq!(res.id, user.base().id().value());
     }
 
     #[tokio::test]
@@ -49,12 +56,26 @@ mod tests {
         c.user_repo().save(&mut user).await.unwrap();
 
         let id = user.base().id().to_string();
-        let res = uc
+        assert!(uc
             .exec(mocks::user2().base().id().to_string(), id)
             .await
-            .unwrap();
+            .is_err());
+    }
 
-        assert!(res.email.is_none());
+    #[tokio::test]
+    async fn admin_not_owner() {
+        let c = mocks::container();
+        let uc = GetById::new(c.user_repo());
+
+        let mut user = mocks::user1();
+        c.user_repo().save(&mut user).await.unwrap();
+        let mut admin = mocks::admin1();
+        c.user_repo().save(&mut admin).await.unwrap();
+
+        assert!(uc
+            .exec(admin.base().id().to_string(), user.base().id().to_string())
+            .await
+            .is_ok());
     }
 
     #[tokio::test]

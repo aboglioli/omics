@@ -38,13 +38,11 @@ impl<'a> GetById<'a> {
         }
     }
 
-    // TODO: delete publication
-    // TODO: only owner can view a draft publication
-    pub async fn exec(&self, reader_id: String, publication_id: String) -> Result<PublicationDto> {
+    pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<PublicationDto> {
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        let reader_id = ReaderId::new(reader_id)?;
+        let reader_id = ReaderId::new(auth_id)?;
         let reader = self.reader_repo.find_by_id(&reader_id).await?;
 
         let author = self.author_repo.find_by_id(publication.author_id()).await?;
@@ -67,9 +65,9 @@ impl<'a> GetById<'a> {
                 .await?;
         }
 
-        let mut publication_dto = PublicationDto::new(&publication)
-            .author(AuthorDto::new(&author))
-            .category(CategoryDto::new(&category))
+        let mut publication_dto = PublicationDto::from(&publication)
+            .author(AuthorDto::from(&author))
+            .category(CategoryDto::from(&category))
             .pages(&publication);
 
         if is_reader_author {

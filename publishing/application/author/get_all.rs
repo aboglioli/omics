@@ -53,7 +53,7 @@ impl<'a> GetAll<'a> {
             }
 
             author_dtos.push(
-                AuthorDto::new(author)
+                AuthorDto::from(author)
                     .publication_count(publication_count)
                     .collection_count(collection_count),
             )

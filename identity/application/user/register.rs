@@ -16,12 +16,6 @@ pub struct RegisterCommand {
     pub password: String,
 }
 
-impl RegisterCommand {
-    pub fn validate(&self) -> Result<()> {
-        Ok(())
-    }
-}
-
 #[derive(Serialize)]
 pub struct RegisterResponse {
     pub id: String,
@@ -50,8 +44,6 @@ impl<'a> Register<'a> {
     }
 
     pub async fn exec(&self, cmd: RegisterCommand) -> Result<RegisterResponse> {
-        cmd.validate()?;
-
         self.user_serv.available(&cmd.username, &cmd.email).await?;
 
         let hashed_password = self.user_serv.generate_password(&cmd.password)?;

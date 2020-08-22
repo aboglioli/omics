@@ -1,3 +1,4 @@
+use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
 
@@ -17,9 +18,15 @@ impl<'a> Delete<'a> {
         }
     }
 
-    pub async fn exec(&self, user_id: String) -> Result<()> {
-        let user_id = UserId::new(user_id)?;
-        let mut user = self.user_repo.find_by_id(&user_id).await?;
+    pub async fn exec(&self, auth_id: String, user_id: String) -> Result<()> {
+        if auth_id != user_id {
+            let auth_user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
+            if !auth_user.role().is("admin") {
+                return Err(Error::unauthorized());
+            }
+        }
+
+        let mut user = self.user_repo.find_by_id(&UserId::new(user_id)?).await?;
 
         user.delete()?;
 
@@ -45,8 +52,9 @@ mod tests {
         let mut user = mocks::validated_user1();
         c.user_repo().save(&mut user).await.unwrap();
 
-        assert!(uc.exec(user.base().id().to_string()).await.is_ok());
-        assert!(uc.exec(user.base().id().to_string()).await.is_err());
+        let user_id = user.base().id().to_string();
+        assert!(uc.exec(user_id.clone(), user_id.clone()).await.is_ok());
+        assert!(uc.exec(user_id.clone(), user_id).await.is_err());
 
         assert_eq!(c.event_pub().events().await.len(), 1);
     }
@@ -58,6 +66,8 @@ mod tests {
 
         let mut user = mocks::user1();
         c.user_repo().save(&mut user).await.unwrap();
-        assert!(uc.exec(user.base().id().to_string()).await.is_err());
+
+        let user_id = user.base().id().to_string();
+        assert!(uc.exec(user_id.clone(), user_id).await.is_err());
     }
 }

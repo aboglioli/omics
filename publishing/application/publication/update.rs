@@ -46,7 +46,7 @@ impl<'a> Update<'a> {
 
     pub async fn exec(
         &self,
-        author_id: String,
+        auth_id: String,
         publication_id: String,
         cmd: UpdateCommand,
     ) -> Result<()> {
@@ -55,8 +55,8 @@ impl<'a> Update<'a> {
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        if publication.author_id().value() != author_id {
-            return Err(Error::new("publication", "unauthorized"));
+        if publication.author_id().value() != auth_id {
+            return Err(Error::unauthorized());
         }
 
         let name = Name::new(cmd.name)?;

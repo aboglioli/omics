@@ -9,8 +9,8 @@ pub struct UserDto {
     id: String,
 }
 
-impl UserDto {
-    pub fn new(user: &User) -> Self {
+impl From<&User> for UserDto {
+    fn from(user: &User) -> Self {
         UserDto {
             id: user.id().to_string(),
         }
@@ -23,11 +23,11 @@ pub struct PublicationDto {
     user: UserDto,
 }
 
-impl PublicationDto {
-    pub fn new(publication: &Publication) -> Self {
+impl From<&Publication> for PublicationDto {
+    fn from(publication: &Publication) -> Self {
         PublicationDto {
             id: publication.id().to_string(),
-            user: UserDto::new(publication.author()),
+            user: UserDto::from(publication.author()),
         }
     }
 }
@@ -38,11 +38,11 @@ pub struct ContractDto {
     pub publication: PublicationDto,
 }
 
-impl ContractDto {
-    pub fn new(contract: &Contract) -> Self {
+impl From<&Contract> for ContractDto {
+    fn from(contract: &Contract) -> Self {
         ContractDto {
             id: contract.base().id().to_string(),
-            publication: PublicationDto::new(contract.publication()),
+            publication: PublicationDto::from(contract.publication()),
         }
     }
 }

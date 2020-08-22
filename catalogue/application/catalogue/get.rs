@@ -14,6 +14,6 @@ impl<'a> Get<'a> {
 
     pub async fn exec(&self) -> Result<CatalogueDto> {
         let catalogue = self.catalogue_repo.find().await?;
-        Ok(CatalogueDto::new(&catalogue))
+        Ok(CatalogueDto::from(&catalogue))
     }
 }

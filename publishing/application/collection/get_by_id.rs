@@ -64,16 +64,16 @@ impl<'a> GetById<'a> {
                 .await?;
 
             publications.push(
-                PublicationDto::new(&publication)
-                    .author(AuthorDto::new(&author))
-                    .category(CategoryDto::new(&category))
+                PublicationDto::from(&publication)
+                    .author(AuthorDto::from(&author))
+                    .category(CategoryDto::from(&category))
                     .status(&publication),
             )
         }
 
-        Ok(CollectionDto::new(&collection)
-            .author(AuthorDto::new(&author))
-            .category(CategoryDto::new(&category))
+        Ok(CollectionDto::from(&collection)
+            .author(AuthorDto::from(&author))
+            .category(CategoryDto::from(&category))
             .publications(publications))
     }
 }

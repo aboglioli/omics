@@ -46,6 +46,10 @@ impl PublicationRepository for InMemPublicationRepository {
         PublicationId::new(id.to_string())
     }
 
+    async fn find_all(&self) -> Result<Vec<Publication>> {
+        Ok(self.cache.all().await)
+    }
+
     async fn find_by_id(&self, id: &PublicationId) -> Result<Publication> {
         self.cache
             .get(id)

@@ -12,8 +12,8 @@ pub struct StatisticsDto {
     pub stars: f32,
 }
 
-impl StatisticsDto {
-    pub fn new(statistics: &Statistics) -> Self {
+impl From<&Statistics> for StatisticsDto {
+    fn from(statistics: &Statistics) -> Self {
         StatisticsDto {
             views: statistics.views(),
             unique_views: statistics.unique_views(),
@@ -33,8 +33,8 @@ pub struct AuthorDto {
     pub lastname: String,
 }
 
-impl AuthorDto {
-    pub fn new(author: &Author) -> Self {
+impl From<&Author> for AuthorDto {
+    fn from(author: &Author) -> Self {
         AuthorDto {
             id: author.id().to_string(),
             username: author.username().to_string(),
@@ -50,8 +50,8 @@ pub struct CategoryDto {
     pub name: String,
 }
 
-impl CategoryDto {
-    pub fn new(category: &Category) -> Self {
+impl From<&Category> for CategoryDto {
+    fn from(category: &Category) -> Self {
         CategoryDto {
             id: category.id().to_string(),
             name: category.name().to_string(),
@@ -73,21 +73,21 @@ pub struct PublicationDto {
     pub pages: usize,
 }
 
-impl PublicationDto {
-    pub fn new(publication: &Publication) -> Self {
+impl From<&Publication> for PublicationDto {
+    fn from(publication: &Publication) -> Self {
         PublicationDto {
             id: publication.id().to_string(),
-            author: AuthorDto::new(publication.author()),
+            author: AuthorDto::from(publication.author()),
             name: publication.name().to_string(),
             synopsis: publication.synopsis().to_string(),
-            category: CategoryDto::new(publication.category()),
+            category: CategoryDto::from(publication.category()),
             tags: publication
                 .tags()
                 .iter()
                 .map(|tag| tag.to_string())
                 .collect(),
             cover: publication.cover().to_string(),
-            statistics: StatisticsDto::new(publication.statistics()),
+            statistics: StatisticsDto::from(publication.statistics()),
             premium: publication.is_premium(),
             pages: publication.pages(),
         }
@@ -101,19 +101,19 @@ pub struct CatalogueDto {
     publications: Vec<PublicationDto>,
 }
 
-impl CatalogueDto {
-    pub fn new(catalogue: &Catalogue) -> Self {
+impl From<&Catalogue> for CatalogueDto {
+    fn from(catalogue: &Catalogue) -> Self {
         CatalogueDto {
             id: catalogue.base().id().to_string(),
             authors: catalogue
                 .authors()
                 .iter()
-                .map(|author| AuthorDto::new(author))
+                .map(|author| AuthorDto::from(author))
                 .collect(),
             publications: catalogue
                 .publications()
                 .iter()
-                .map(|publication| PublicationDto::new(publication))
+                .map(|publication| PublicationDto::from(publication))
                 .collect(),
         }
     }

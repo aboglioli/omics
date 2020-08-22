@@ -18,12 +18,6 @@ pub struct CreateCommand {
     pub cover: String,
 }
 
-impl CreateCommand {
-    fn validate(&self) -> Result<()> {
-        Ok(())
-    }
-}
-
 #[derive(Serialize)]
 pub struct CreateResponse {
     pub id: String,
@@ -52,9 +46,7 @@ impl<'a> Create<'a> {
         }
     }
 
-    pub async fn exec(&self, author_id: String, cmd: CreateCommand) -> Result<CreateResponse> {
-        cmd.validate()?;
-
+    pub async fn exec(&self, auth_id: String, cmd: CreateCommand) -> Result<CreateResponse> {
         let name = Name::new(cmd.name)?;
         let synopsis = Synopsis::new(cmd.synopsis)?;
 
@@ -70,7 +62,7 @@ impl<'a> Create<'a> {
 
         let header = Header::new(name, synopsis, category_id, tags, cover)?;
 
-        let author_id = AuthorId::new(author_id)?;
+        let author_id = AuthorId::new(auth_id)?;
         self.author_repo.find_by_id(&author_id).await?;
 
         let mut publication =

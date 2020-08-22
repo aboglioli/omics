@@ -45,10 +45,7 @@ where
             password_hasher.clone(),
             token_serv.clone(),
         ));
-        let authorization_serv = Arc::new(AuthorizationService::new(
-            user_repo.clone(),
-            token_serv.clone(),
-        ));
+        let authorization_serv = Arc::new(AuthorizationService::new(token_serv.clone()));
 
         Container {
             event_pub,

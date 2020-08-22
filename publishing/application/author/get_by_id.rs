@@ -37,9 +37,9 @@ impl<'a> GetById<'a> {
                 .find_by_id(publication.header().category_id())
                 .await?;
             publication_dtos
-                .push(PublicationDto::new(publication).category(CategoryDto::new(&category)));
+                .push(PublicationDto::from(publication).category(CategoryDto::from(&category)));
         }
 
-        Ok(AuthorDto::new(&author).publications(publication_dtos))
+        Ok(AuthorDto::from(&author).publications(publication_dtos))
     }
 }
