@@ -15,7 +15,7 @@ pub async fn auth(req: &HttpRequest, c: &Container) -> Result<String, PublicErro
                 Err(Error::new("authorization", "invalid_header"))
             }
         }
-        None => Err(Error::new("authorization", "no_header")),
+        None => Err(Error::new("authorization", "header_is_not_present")),
     }
     .map_err(PublicError::from)?;
 

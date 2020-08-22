@@ -21,11 +21,12 @@ impl AuthorizationService {
     }
 
     pub async fn authorize(&self, token: &Token) -> Result<User> {
-        let data = self.token_serv.validate(token).await?;
-        if let Some(user_id) = data.get("user_id") {
-            let user_id = UserId::new(user_id)?;
-            let user = self.user_repo.find_by_id(&user_id).await?;
-            return Ok(user);
+        if let Ok(data) = self.token_serv.validate(token).await {
+            if let Some(user_id) = data.get("user_id") {
+                let user_id = UserId::new(user_id)?;
+                let user = self.user_repo.find_by_id(&user_id).await?;
+                return Ok(user);
+            }
         }
         Err(Error::new("authorization", "unauthorized")
             .set_status(401)

@@ -4,7 +4,7 @@ mod development;
 mod error;
 mod handlers;
 mod infrastructure;
-// mod response;
+mod response;
 
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 

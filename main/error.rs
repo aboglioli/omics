@@ -62,8 +62,6 @@ impl From<Error> for PublicError {
     }
 }
 
-// impl error::ResponseError for PublicError { }
-
 impl error::ResponseError for PublicError {
     fn error_response(&self) -> HttpResponse {
         ResponseBuilder::new(self.status_code())
