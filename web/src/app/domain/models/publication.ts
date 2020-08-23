@@ -16,7 +16,9 @@ export interface IPublication {
   id: string;
   author_id?: string;
   author?: IAuthor;
+  cover: string;
   name: string;
+  collection: string;
   synopsis: string;
   category_id?: string;
   category?: ICategory;

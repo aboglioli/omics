@@ -65,7 +65,7 @@ export class LoginRegisterComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.createForms();
+    this.buildForms();
 
   }
 
@@ -75,7 +75,7 @@ export class LoginRegisterComponent implements OnInit {
 
   }
 
-  private createForms(): void {
+  private buildForms(): void {
 
     // Login
     this.formLogin = this.fb.group({

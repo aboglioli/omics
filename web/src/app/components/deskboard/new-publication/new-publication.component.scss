@@ -50,12 +50,100 @@ div.deskboard-body {
 
       display: flex;
       align-items: center;
+      justify-content: space-between;
 
       h1 {
         font-style: italic;
         font-weight: bolder;
         margin: 0px;
       }
+
+    }
+
+    div.body {
+
+      display: flex;
+      flex-direction: column;
+
+      margin: 0em 1em;
+
+      .image-button {
+
+        cursor: pointer;
+        text-align: center;
+
+        &.portada {
+          width: 250px;
+          height: 250px;
+          line-height: 250px;
+
+          margin: 1em 1em;
+
+        }
+
+        &.no-image {
+
+          color: #838383;
+          background-color: #1B1A18;
+
+        }
+
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+
+        -webkit-user-drag: none;
+        -webkit-tap-highlight-color: transparent;
+
+
+      }
+
+      div.input-field-row {
+
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+
+        padding-right: 2em;
+        margin-top: 1em;
+        margin-left: 1em;
+
+        p.text-danger {
+          text-align: end;
+          font-weight: bold;
+          font-size: medium;
+          margin: 0;
+        }
+
+        div.tile-and-field {
+
+          display: flex;
+          flex-direction: row;
+
+          p.field-name {
+            display: flex;
+            align-items: center;
+            margin: 0px;
+            margin-right: 1em;
+
+            font-weight: bold;
+            font-size: initial;
+
+          }
+
+        }
+
+
+      }
+
+
+    }
+
+    div.center-container {
+
+      display: flex;
+      justify-content: center;
 
     }
 
@@ -69,5 +157,53 @@ button.button-white-borders {
 
   color: white;
   border-color: white;
+
+}
+
+.border-pink-glow {
+
+  box-shadow: 0px 0px 4px 4px  $omics-neon-pink;
+
+}
+
+
+div.align-center {
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+}
+
+
+
+.dropdown {
+
+  width: 100%;
+
+  button {
+    width: 100%;
+    background-color: $omics-background-flat;
+    text-align: initial;
+  }
+
+  .dropdown-menu {
+
+    width: 100%;
+    color: black;
+    background-color: white;
+    margin-top: 0px;
+
+    max-height: 250px;
+    overflow-y: auto;
+
+    ul {
+      list-style-type: none;
+      padding-left: 0px;
+      margin-top: 4px;
+      margin-bottom: 0px;
+    }
+  }
 
 }

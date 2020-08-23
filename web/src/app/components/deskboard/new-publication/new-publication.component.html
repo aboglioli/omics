@@ -11,12 +11,126 @@
           Cancelar
       </button>
 
+      <button mat-stroked-button class="button-white-borders" style="background-color: gray;"
+              (click)="guardarBorrador()">
+          Guardar Borrador
+      </button>
+
+      <button mat-flat-button color="accent"  class="button-white-borders"
+              (click)="submitPublication()">
+          Publicar
+      </button>
+
 
     </div>
 
     <div class="body">
 
-      <app-under-construction></app-under-construction>
+      <form autocomplete="off" [formGroup]="formPublication">
+
+        <!-- Block: Portada publicación, campo nombre y colección -->
+        <div class="row">
+
+          <!-- Portada -->
+          <div class="col-12 col-md-4 center-container">
+            <div  class="image-button portada border-pink-glow no-image"
+                  matRipple
+                  [matRippleCentered]="ripplePortadaEnable"
+                  (click)="uploadImagePortada()">
+
+              <span>Subir imagen de Portada</span>
+
+            </div>
+          </div>
+
+          <!-- Block campo nombre y colección -->
+          <div class="col-12 col-md-8 align-center" style="padding: 0px">
+
+            <!-- Block: campo nombre -->
+            <div class="input-field-row">
+
+              <!-- mensaje de error -->
+              <p  *ngIf="nombreNovalido"
+                  class="form-text text-danger">
+                  Ingrese un título válido
+              </p>
+
+              <!-- Input text -->
+              <div class="tile-and-field">
+
+                <p class="field-name">Título: </p>
+
+                <input class="form-control"
+                        type="text"
+                        placeholder="Título"
+                        formControlName="name"
+                        [class.is-invalid]="nombreNovalido">
+
+              </div>
+
+            </div>
+
+            <!-- Block: colección -->
+            <div class="input-field-row">
+
+              <!-- Input text -->
+              <div class="tile-and-field">
+
+                <p class="field-name">Colección: </p>
+
+                <div  class="d-inline-block"
+                      ngbDropdown
+                      #dropdownColection="ngbDropdown">
+
+                  <button class="btn button-white-borders hover-white mr-2"
+                          id="dropdown-colection" ngbDropdownAnchor
+                          (focus)="dropdownColection.open();">
+                            Lista de colecciones disponibles
+                  </button>
+
+                  <div ngbDropdownMenu aria-labelledby="dropdown-colection">
+
+                    <ul *ngFor="let collection of collectionList">
+                      <li style="width: 100%; padding-left: 1em;">
+                        <mat-checkbox color="primary">{{ collection.name }}</mat-checkbox>
+                      </li>
+                    </ul>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div >
+
+        <!-- Block: Categoria -->
+        <br>
+        <div class="row">
+
+          <div class="col">Block:  Categoria </div>
+
+        </div>
+
+        <!-- Block: Descripción -->
+        <div class="row">
+
+          <div class="col">Block: Descripción</div>
+
+        </div>
+
+        <!-- Block: Subir páginas -->
+        <div class="row">
+
+          <div class="col">Block: Subir páginas</div>
+
+        </div>
+
+      </form>
 
     </div>
 
