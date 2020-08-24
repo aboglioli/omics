@@ -12,7 +12,7 @@ use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use common::config::Config;
 
 use container::Container;
-use handlers::{author, catalogue, category, collection, publication, role, user};
+use handlers::{author, catalogue, category, collection, event, publication, role, user};
 
 async fn index() -> impl Responder {
     HttpResponse::Ok().body("Omics")
@@ -31,6 +31,12 @@ async fn main() -> std::io::Result<()> {
         return Ok(());
     }
 
+    if config.env() == "development" {
+        if let Err(err) = development::populate(&container).await {
+            println!("{:?}", err);
+        }
+    }
+
     println!("Listening on {}", config.port());
 
     HttpServer::new(move || {
@@ -40,13 +46,14 @@ async fn main() -> std::io::Result<()> {
             .service(
                 web::scope("/api")
                     .route("/dev", web::get().to(index))
-                    .configure(user::routes)
-                    .configure(catalogue::routes)
-                    .configure(publication::routes)
-                    .configure(collection::routes)
                     .configure(author::routes)
+                    .configure(catalogue::routes)
+                    .configure(category::routes)
+                    .configure(collection::routes)
+                    .configure(event::routes)
+                    .configure(publication::routes)
                     .configure(role::routes)
-                    .configure(category::routes),
+                    .configure(user::routes),
             )
     })
     .bind(format!("0.0.0.0:{}", config.port()))?

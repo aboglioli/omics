@@ -7,8 +7,6 @@ pub use publisher::*;
 pub use repository::*;
 pub use subscriber::*;
 
-use std::fmt::Debug;
-
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
