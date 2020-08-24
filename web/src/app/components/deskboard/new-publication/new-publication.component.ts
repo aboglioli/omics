@@ -2,9 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../domain/services/auth';
 import { IPublication } from '../../../domain/models/publication';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
 
 import { IDropdownItem } from '../../../models/dropdown-item.interface';
+import { CollectionFilterService } from '../../../services/collections.service';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 
 @Component({
@@ -17,28 +20,7 @@ export class NewPublicationComponent implements OnInit {
   // Usados para Forms
   formPublication: FormGroup;
   publicationNewObject: IPublication;
-  collectionList: IDropdownItem[] = [
-    {
-      valueId: 'id1',
-      name: 'Colección 1'
-    },
-    {
-      valueId: 'id2',
-      name: 'Colección 2'
-    },
-    {
-      valueId: 'id3',
-      name: 'Colección 3'
-    },
-    {
-      valueId: 'id4',
-      name: 'Colección 4'
-    },
-    {
-      valueId: 'id5',
-      name: 'Colección 5'
-    }
-  ];
+  collectionList: IDropdownItem[];
 
   // Otros
   ripplePortadaEnable = true;
@@ -48,12 +30,15 @@ export class NewPublicationComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     private fb: FormBuilder,
+    private spinnerService: NgxSpinnerService,
+    private collectionFilterService: CollectionFilterService,
   ) { }
 
   ngOnInit(): void {
 
     this.authService.authStart();
     this.buildForms();
+    this.setSubscriptionData();
 
   }
 
@@ -69,7 +54,7 @@ export class NewPublicationComponent implements OnInit {
 
       cover: ['', Validators.required ],
       name: ['', [ Validators.required, Validators.minLength(5) ] ],
-      collection: [ '' ],
+      collectionArray: this.fb.array([]),
       synopsis: [ '', [ Validators.required, Validators.minLength(5) ] ],
       category_id: [ '', Validators.required ],
       tagstags: [ null ],
@@ -86,9 +71,22 @@ export class NewPublicationComponent implements OnInit {
     return [this.fb.group({
 
       number: [ null ],
-      images: [ '']
+      images: ['']
 
     })];
+
+  }
+
+  public setSubscriptionData(): void {
+
+    this.spinnerService.show();
+
+    this.collectionFilterService.getCollectionDropdownData().subscribe(  data => {
+
+      this.collectionList = data;
+      this.spinnerService.hide();
+
+    });
 
   }
 
@@ -133,9 +131,65 @@ export class NewPublicationComponent implements OnInit {
 
   }
 
+
+  // #region Dropdown Checkbox Collection
+
+  public onCheckboxChangeCollection( event: MatCheckbox ): void {
+
+    // Comprobar si debe agregarlo a lista o no
+    if (  event.checked ) {
+
+      this.collectionArrayCheck.push( new FormControl( event.value ) );
+
+    } else {
+
+      // Busca en todo el array el elemento que tiene el mismo valor que el que se saco para quitarlo del array
+      let i = 0;
+      this.collectionArrayCheck.controls.forEach( (item: FormControl) => {
+
+        if ( item.value === event.value ) {
+
+          this.collectionArrayCheck.removeAt(i);
+          return;
+
+        }
+
+        i++;
+
+      });
+
+    }
+
+  }
+
+  public onRadioChangeCollection(): void {
+
+    this.collectionArrayCheck.clear();
+
+  }
+
+  public isNotCheckedAllCollection(): boolean {
+
+    return (this.collectionArrayCheck.length === 0);
+
+  }
+
+  public isCheckedCollectionItem( item: IDropdownItem ): boolean {
+
+    return( (this.collectionArrayCheck.value as Array<string> ).indexOf(item.valueId) > -1 );
+
+  }
+
+  // #endregion
+
   // Getters
   get nombreNovalido(): boolean {
     return ( this.formPublication.get('name').invalid && this.formPublication.get('name').touched );
   }
+
+  get collectionArrayCheck(): FormArray {
+    return this.formPublication.get('collectionArray') as FormArray;
+  }
+
 
 }

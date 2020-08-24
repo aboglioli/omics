@@ -90,9 +90,32 @@
 
                   <div ngbDropdownMenu aria-labelledby="dropdown-colection">
 
-                    <ul *ngFor="let collection of collectionList">
+                    <ul >
+
+                      <!-- Sin colección (deseleccionar los checkbox) -->
                       <li style="width: 100%; padding-left: 1em;">
-                        <mat-checkbox color="primary">{{ collection.name }}</mat-checkbox>
+
+                        <mat-radio-button color="primary"
+                                          [checked]="isNotCheckedAllCollection()"
+                                          (change)="onRadioChangeCollection()">
+                          Sin colección asignada
+                        </mat-radio-button>
+                        <hr>
+
+                      </li>
+
+                      <!-- Opciones múltiples -->
+                      <li style="width: 100%; padding-left: 1em;"
+                          *ngFor="let collection of collectionList">
+
+                        <mat-checkbox color="primary"
+                                      [value]="collection.valueId"
+                                      [checked]="isCheckedCollectionItem(collection)"
+                                      (click)="$event.stopPropagation()"
+                                      (change)="onCheckboxChangeCollection($event.source);">
+                          {{ collection.name }}
+                        </mat-checkbox>
+
                       </li>
                     </ul>
 

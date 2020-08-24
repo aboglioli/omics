@@ -13,6 +13,7 @@ import { ServiceWorkerModule } from '@angular/service-worker'; // PWA dependenci
 import { ToastrModule } from 'ngx-toastr';
 import { ChartsModule } from 'ng2-charts';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 // Modulos auxiliares
 import { MaterialModule } from './auxiliar-modules/material.module';
@@ -37,7 +38,6 @@ import { RealizarAnalisisComponent } from './components/realizar-analisis/realiz
 import { ColeccionInfoComponent } from './pages/coleccion-info/coleccion-info.component';
 import { ComicInfoComponent } from './components/comic-info/comic-info.component';
 import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
-import { LoadingIndicadorComponent } from './shared/loading-indicador/loading-indicador.component';
 import { SideNavMenuComponent } from './shared/side-nav-menu/side-nav-menu.component';
 import { AutoresComponent } from './pages/autores/autores.component';
 import { UnderConstructionComponent } from './shared/under-construction/under-construction.component';
@@ -73,7 +73,6 @@ import { DomainModule } from './domain/module';
     ColeccionInfoComponent,
     ComicInfoComponent,
     NavBarComponent,
-    LoadingIndicadorComponent,
     SideNavMenuComponent,
     AutoresComponent,
     DevelopmentComponent,
@@ -94,6 +93,7 @@ import { DomainModule } from './domain/module';
     ChartsModule,
     ToastrModule.forRoot(),
     FontAwesomeModule,
+    NgxSpinnerModule,
 
     // Custom modules
     DomainModule,
