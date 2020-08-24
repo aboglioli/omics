@@ -1,10 +1,10 @@
-use actix_web::{web, HttpRequest, HttpResponse, Responder};
+use actix_web::{web, HttpResponse, Responder};
 use serde::Serialize;
 use serde_json::Value;
 
 use common::event::EventRepository;
 
-use crate::authorization::auth;
+
 use crate::container::Container;
 use crate::error::PublicError;
 
@@ -33,8 +33,7 @@ async fn get(c: web::Data<Container>) -> impl Responder {
                     id: event.id().to_string(),
                     timestamp: event.timestamp().to_string(),
                     payload: serde_json::from_slice(event.payload()).unwrap(),
-                }
-                )
+                })
                 .collect()
         })
         .map(|events| HttpResponse::Ok().json(GetAllResponse { events }))
