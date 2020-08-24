@@ -12,7 +12,7 @@ use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use common::config::Config;
 
 use container::Container;
-use handlers::{author, category, collection, publication, role, user};
+use handlers::{author, catalogue, category, collection, publication, role, user};
 
 async fn index() -> impl Responder {
     HttpResponse::Ok().body("Omics")
@@ -26,11 +26,9 @@ async fn main() -> std::io::Result<()> {
 
     // Dependencies
     let container = web::Data::new(Container::new().await);
-
-    if config.env() == "development" {
-        if let Err(err) = development::run(&container).await {
-            println!("{:?}", err);
-        }
+    if let Err(err) = container.subscribe().await {
+        println!("Subscriptions: {}", err);
+        return Ok(());
     }
 
     println!("Listening on {}", config.port());
@@ -43,6 +41,7 @@ async fn main() -> std::io::Result<()> {
                 web::scope("/api")
                     .route("/dev", web::get().to(index))
                     .configure(user::routes)
+                    .configure(catalogue::routes)
                     .configure(publication::routes)
                     .configure(collection::routes)
                     .configure(author::routes)

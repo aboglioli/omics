@@ -37,16 +37,12 @@ where
     where
         ES: EventSubscriber,
     {
-        let handler = PublicationHandler::new(
-            Arc::clone(&self.catalogue_repo),
-            Arc::clone(&self.publication_serv),
-        );
+        let handler =
+            PublicationHandler::new(self.catalogue_repo.clone(), self.publication_serv.clone());
         event_sub.subscribe(Box::new(handler)).await?;
 
-        let handler = CollectionHandler::new(
-            Arc::clone(&self.catalogue_repo),
-            Arc::clone(&self.collection_serv),
-        );
+        let handler =
+            CollectionHandler::new(self.catalogue_repo.clone(), self.collection_serv.clone());
         event_sub.subscribe(Box::new(handler)).await?;
 
         Ok(())

@@ -5,6 +5,7 @@ use publishing::application::category::GetAll;
 use crate::container::Container;
 use crate::error::PublicError;
 
+// GET /categories
 async fn get_all(c: web::Data<Container>) -> impl Responder {
     GetAll::new(c.publishing.category_repo())
         .exec()

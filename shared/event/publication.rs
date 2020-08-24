@@ -36,6 +36,13 @@ pub enum PublicationEvent {
     },
     Published {
         id: String,
+        author_id: String,
+        name: String,
+        synopsis: String,
+        category_id: String,
+        tags: Vec<String>,
+        cover: String,
+        pages_count: usize,
     },
     Rejected {
         id: String,

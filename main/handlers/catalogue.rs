@@ -1,27 +1,19 @@
-use std::sync::Arc;
-
-use warp::{Filter, Rejection, Reply};
+use actix_web::{web, HttpResponse, Responder};
 
 use catalogue::application::catalogue::Get;
 
-use crate::container::{with_container, Container};
-use crate::response;
+use crate::container::Container;
+use crate::error::PublicError;
 
-pub fn routes(
-    container: &Arc<Container>,
-) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
-    // GET /catalogue
-    let catalogue = warp::get()
-        .and(warp::path::end())
-        .and(with_container(container.clone()))
-        .and_then(catalogue);
-
-    warp::path("catalogue").and(catalogue)
+// GET /catalogue
+async fn get(c: web::Data<Container>) -> impl Responder {
+    Get::new(c.catalogue.catalogue_repo())
+        .exec()
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
 }
 
-pub async fn catalogue(c: Arc<Container>) -> Result<impl Reply, Rejection> {
-    let uc = Get::new(c.catalogue.catalogue_repo());
-    let res = uc.exec().await;
-
-    response::map(res, None)
+pub fn routes(cfg: &mut web::ServiceConfig) {
+    cfg.service(web::scope("/catalogue").route("", web::get().to(get)));
 }

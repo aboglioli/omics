@@ -1,4 +1,3 @@
-use common::event::EventSubscriber;
 use common::model::AggregateRoot;
 use common::result::Result;
 use identity::domain::role::*;
@@ -6,18 +5,6 @@ use identity::domain::user::*;
 use publishing::domain::category::{Name as CategoryName, *};
 
 use crate::container::Container;
-use crate::development::EventLogger;
-
-pub async fn run(c: &Container) -> Result<()> {
-    populate(c).await?;
-
-    let event_bus = c.event_bus();
-    event_bus
-        .subscribe(Box::new(EventLogger::new(c.event_repo())))
-        .await?;
-
-    Ok(())
-}
 
 pub async fn populate(c: &Container) -> Result<()> {
     // Identity

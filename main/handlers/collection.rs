@@ -9,6 +9,7 @@ use crate::authorization::auth;
 use crate::container::Container;
 use crate::error::PublicError;
 
+// POST /collections
 async fn create(
     req: HttpRequest,
     cmd: web::Json<CreateCommand>,
@@ -28,6 +29,7 @@ async fn create(
     .map_err(PublicError::from)
 }
 
+// GET /collections
 async fn get_all(req: HttpRequest, c: web::Data<Container>) -> impl Responder {
     let _user_id = auth(&req, &c).await?;
 
@@ -43,6 +45,7 @@ async fn get_all(req: HttpRequest, c: web::Data<Container>) -> impl Responder {
     .map_err(PublicError::from)
 }
 
+// GET /collections/:id
 async fn get_by_id(
     req: HttpRequest,
     path: web::Path<String>,
@@ -62,6 +65,7 @@ async fn get_by_id(
     .map_err(PublicError::from)
 }
 
+// PUT /collections/:id
 async fn update(
     req: HttpRequest,
     path: web::Path<String>,
@@ -81,6 +85,7 @@ async fn update(
     .map_err(PublicError::from)
 }
 
+// DELETE /collections/:id
 async fn delete(
     req: HttpRequest,
     path: web::Path<String>,
@@ -95,6 +100,7 @@ async fn delete(
         .map_err(PublicError::from)
 }
 
+// POST /collections/:id/publication/:publication_id
 async fn add_publication(
     req: HttpRequest,
     path: web::Path<(String, String)>,
@@ -114,6 +120,7 @@ async fn add_publication(
     .map_err(PublicError::from)
 }
 
+// DELETE /collections/:id/publication/:publication_id
 async fn remove_publication(
     req: HttpRequest,
     path: web::Path<(String, String)>,

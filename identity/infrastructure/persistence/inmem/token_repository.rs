@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 
-use common::cache::{inmem::InMemCache, Cache};
+use common::cache::Cache;
+use common::infrastructure::cache::InMemCache;
 use common::result::Result;
 
 use crate::domain::token::{Data, TokenId, TokenRepository};

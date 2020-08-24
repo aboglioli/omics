@@ -420,6 +420,18 @@ impl Publication {
 
         self.base.record_event(PublicationEvent::Published {
             id: self.base().id().to_string(),
+            author_id: self.author_id().to_string(),
+            name: self.header().name().to_string(),
+            synopsis: self.header().synopsis().to_string(),
+            category_id: self.header().category_id().to_string(),
+            tags: self
+                .header()
+                .tags()
+                .iter()
+                .map(|t| t.name().to_string())
+                .collect(),
+            cover: self.header().cover().url().to_string(),
+            pages_count: self.pages().len(),
         });
 
         Ok(())

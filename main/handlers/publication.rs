@@ -10,6 +10,7 @@ use crate::authorization::auth;
 use crate::container::Container;
 use crate::error::PublicError;
 
+// POST /publications
 async fn create(
     req: HttpRequest,
     cmd: web::Json<CreateCommand>,
@@ -29,6 +30,7 @@ async fn create(
     .map_err(PublicError::from)
 }
 
+// GET /publications?q
 async fn search(
     req: HttpRequest,
     cmd: web::Query<SearchCommand>,
@@ -48,6 +50,7 @@ async fn search(
     .map_err(PublicError::from)
 }
 
+// GET /publications/:id
 async fn get_by_id(
     req: HttpRequest,
     path: web::Path<String>,
@@ -69,6 +72,7 @@ async fn get_by_id(
     .map_err(PublicError::from)
 }
 
+// PUT /publications/:id
 async fn update(
     req: HttpRequest,
     path: web::Path<String>,
@@ -88,6 +92,7 @@ async fn update(
     .map_err(PublicError::from)
 }
 
+// PUT /publications/:id/pages
 async fn update_pages(
     req: HttpRequest,
     path: web::Path<String>,
@@ -103,6 +108,7 @@ async fn update_pages(
         .map_err(PublicError::from)
 }
 
+// DELETE /publications/:id
 async fn delete(
     req: HttpRequest,
     path: web::Path<String>,
@@ -117,6 +123,7 @@ async fn delete(
         .map_err(PublicError::from)
 }
 
+// POST /publications/:id/publish
 async fn publish(
     req: HttpRequest,
     path: web::Path<String>,
@@ -135,6 +142,7 @@ async fn publish(
     .map_err(PublicError::from)
 }
 
+// POST /publications/:id/approve
 async fn approve(
     req: HttpRequest,
     path: web::Path<String>,
@@ -153,6 +161,7 @@ async fn approve(
     .map_err(PublicError::from)
 }
 
+// POST /publications/:id/reject
 async fn reject(
     req: HttpRequest,
     path: web::Path<String>,
@@ -171,6 +180,7 @@ async fn reject(
     .map_err(PublicError::from)
 }
 
+// POST /publications/:id/read
 async fn read(
     req: HttpRequest,
     path: web::Path<String>,
@@ -190,6 +200,7 @@ async fn read(
     .map_err(PublicError::from)
 }
 
+// POST /publications/:id/like
 async fn like(
     req: HttpRequest,
     path: web::Path<String>,
@@ -209,6 +220,7 @@ async fn like(
     .map_err(PublicError::from)
 }
 
+// POST /publications/:id/unlike
 async fn unlike(
     req: HttpRequest,
     path: web::Path<String>,
@@ -228,6 +240,7 @@ async fn unlike(
     .map_err(PublicError::from)
 }
 
+// POST /publications/:id/review
 async fn review(
     req: HttpRequest,
     path: web::Path<String>,
@@ -248,6 +261,7 @@ async fn review(
     .map_err(PublicError::from)
 }
 
+// DELETE /publications/:id/review
 async fn delete_review(
     req: HttpRequest,
     path: web::Path<String>,
@@ -267,6 +281,7 @@ async fn delete_review(
     .map_err(PublicError::from)
 }
 
+// GET /publications/:id/reviews
 async fn reviews(
     req: HttpRequest,
     path: web::Path<String>,

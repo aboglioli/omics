@@ -34,15 +34,13 @@ impl EventHandler for PublicationHandler {
     }
 
     async fn handle(&mut self, event: &Event) -> Result<bool> {
-        let event = match serde_json::from_slice(event.payload()) {
-            Ok(event) => event,
-            Err(err) => return Err(Error::new("handler", "deserialize").wrap_raw(err).build()),
-        };
+        let event = serde_json::from_slice(event.payload())
+            .map_err(|err| Error::new("handler", "deserialize").wrap_raw(err).build())?;
 
         let mut catalogue = self.catalogue_repo.find().await?;
 
         match event {
-            PublicationEvent::Published { id } => {
+            PublicationEvent::Published { id, .. } => {
                 let publication = self.publication_serv.get_by_id(&id).await?;
                 catalogue.add_publication(publication);
             }

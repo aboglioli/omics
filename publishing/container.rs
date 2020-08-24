@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
-use common::event::EventPublisher;
+use common::event::{EventPublisher, EventSubscriber};
+use common::result::Result;
 
 use crate::domain::author::AuthorRepository;
 use crate::domain::category::CategoryRepository;
@@ -56,6 +57,13 @@ where
             statistics_serv,
             interaction_serv,
         }
+    }
+
+    pub async fn subscribe<ES>(&self, _event_sub: &ES) -> Result<()>
+    where
+        ES: EventSubscriber,
+    {
+        Ok(())
     }
 
     pub fn event_pub(&self) -> &EPub {

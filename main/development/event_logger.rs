@@ -2,17 +2,15 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 
-use common::event::{Event, EventHandler};
+use common::event::{Event, EventHandler, EventRepository};
 use common::result::Result;
 
-use crate::infrastructure::event::EventRepository;
-
 pub struct EventLogger {
-    event_repo: Arc<EventRepository>,
+    event_repo: Arc<dyn EventRepository>,
 }
 
 impl EventLogger {
-    pub fn new(event_repo: Arc<EventRepository>) -> Self {
+    pub fn new(event_repo: Arc<dyn EventRepository>) -> Self {
         println!("[DEV] EventLogger added");
         EventLogger { event_repo }
     }
@@ -32,7 +30,7 @@ impl EventHandler for EventLogger {
         println!("- code: {}", event.code());
         println!("- payload: {:?}", payload);
 
-        self.event_repo.add(event.clone()).await;
+        self.event_repo.save(&event).await;
 
         Ok(true)
     }
