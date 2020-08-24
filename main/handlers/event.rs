@@ -1,7 +1,7 @@
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
 use serde::Serialize;
 
-use common::event::{EventRepository};
+use common::event::EventRepository;
 
 use crate::authorization::auth;
 use crate::container::Container;

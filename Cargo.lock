@@ -516,6 +516,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "regex",
+ "serde",
  "tokio",
  "uuid",
 ]
