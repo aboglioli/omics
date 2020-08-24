@@ -3,33 +3,29 @@
 ## What is Omics?
 
 Omics emerges as a solution for independent authors who do not have a clear way
-of distributing comics of their own authorship. Moreover, it is important for
-them to get a retribution for their works. This platform aims to create an
-interactive space to bring authors closer to potential readers in the same
-place. Anyone can upload and publish their work after going through a selection
-process. The platform will distribute high-quality content, supporting new
-authors and those who already have experience in the field. 
+of distributing their own comics. Moreover, it is important for them to get a
+retribution for their works. This platform aims to create an interactive space
+to bring authors closer to potential readers. Anyone can upload and publish
+their work after going through a selection process. The platform will
+distribute high-quality content, supporting new authors and those who already
+have experience in the field. It is important to emphasize the closeness
+between authors and readers.
 
-An author will be rewarded with monthly payments according to the impact of
-their work and the interaction achieved with the readers. On the other hand,
-the readers can subscribe to a plan to access premium content.  This content
-represents the works whose author has a contract with the platform. It is
-important to emphasize the closeness between authors and readers. 
-
-Omics has a rating system to promote its catalogue. Any reader can rate, review
-and follow his favorite comics. Following the works is an easy way to keep them
-at hand.
+An author is rewarded with monthly payments according to the impact of their
+work and the interaction achieved with the readers. On the other hand, the
+readers can subscribe to a plan to get access to premium content whose author
+has contracts with the platform. Omics has a rating system to promote its
+catalog. Any reader can rate, review and follow his favorite comics. By this
+way keeping them at hand is easier.
 
 Nobody has to invest in paper, protecting the environment, and each reader will
-get personalized readings according to their preferences. A reader can access
-his favorite publications by author, category and style, among other features.
+get personalized readings according to their preferences.
 
-The process is simple: an author uploads and publishes a comic, a content
-manager approves his work. After generating enough engagement from the
+The process is simple: a user uploads and publishes a comic, and a
+content-manager approves his work. After generating enough engagement from the
 readings, the author can apply for a contract to earn money. At the same time,
-a reader can access all the content of the platform, except those publications
-that have a contract. If a reader wants to access premium content, they must
-pay a monthly subscription. The Omics income will be distributed between the
+a reader can get access to free content and pay a monthly subscription to read
+the publications that have a contract. The income is distributed among the
 authors.
 
 ### Tools
