@@ -9,3 +9,5 @@
   Anyone can access /events.
 - [ ] If request is a GET and an error occurs, a 404 error should be returned.
 - [ ] Split publicaton view and publication read.
+- [ ] Add Reader preferences.
+- [ ] Add Reader interaction for a viewed publication. DTO.
