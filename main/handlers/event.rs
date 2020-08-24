@@ -1,5 +1,6 @@
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
 use serde::Serialize;
+use serde_json::Value;
 
 use common::event::EventRepository;
 
@@ -11,7 +12,7 @@ use crate::error::PublicError;
 pub struct PublicEvent {
     pub id: String,
     pub timestamp: String,
-    pub payload: String,
+    pub payload: Value,
 }
 
 #[derive(Serialize)]
@@ -20,20 +21,20 @@ pub struct GetAllResponse {
 }
 
 // GET /events
-async fn get(req: HttpRequest, c: web::Data<Container>) -> impl Responder {
-    let _auth_id = auth(&req, &c).await?;
-
+async fn get(c: web::Data<Container>) -> impl Responder {
     c.event_repo()
         .find_all()
         .await
-        .map(|events| {
+        .map(|mut events| {
+            events.sort_by(|a, b| a.timestamp().cmp(b.timestamp()));
             events
                 .into_iter()
                 .map(|event| PublicEvent {
                     id: event.id().to_string(),
                     timestamp: event.timestamp().to_string(),
-                    payload: String::from_utf8_lossy(event.payload()).into_owned(),
-                })
+                    payload: serde_json::from_slice(event.payload()).unwrap(),
+                }
+                )
                 .collect()
         })
         .map(|events| HttpResponse::Ok().json(GetAllResponse { events }))

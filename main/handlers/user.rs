@@ -162,6 +162,6 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
                     "/{user_id}/validate/{validation_code}",
                     web::get().to(validate),
                 )
-                .route("/{user_id}/role}", web::put().to(change_role)),
+                .route("/{user_id}/role", web::put().to(change_role)),
         );
 }
