@@ -100,6 +100,10 @@ impl Publication {
         &self.statistics
     }
 
+    pub fn statistics_mut(&mut self) -> &mut Statistics {
+        &mut self.statistics
+    }
+
     pub fn status_history(&self) -> &StatusHistory<Status> {
         &self.status_history
     }

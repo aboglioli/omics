@@ -1,14 +1,19 @@
-use crate::domain::category::CategoryId;
+use common::result::Result;
 
-#[derive(Debug, Clone)]
+use crate::domain::category::CategoryId;
+use crate::domain::publication::{Publication, PublicationId};
+
+#[derive(Debug, Clone, Default)]
 pub struct Preferences {
     categories: Vec<CategoryId>,
+    publications: Vec<PublicationId>,
 }
 
-impl Default for Preferences {
-    fn default() -> Self {
-        Preferences {
-            categories: Vec::new(),
-        }
+impl Preferences {
+    pub fn add_publication(&mut self, publication: &Publication) -> Result<()> {
+        self.publications.push(publication.base().id().clone());
+        self.categories
+            .push(publication.header().category_id().clone());
+        Ok(())
     }
 }

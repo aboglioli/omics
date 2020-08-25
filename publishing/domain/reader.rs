@@ -51,6 +51,14 @@ impl Reader {
         self.subscribed
     }
 
+    pub fn preferences(&self) -> &Preferences {
+        &self.preferences
+    }
+
+    pub fn preferences_mut(&mut self) -> &mut Preferences {
+        &mut self.preferences
+    }
+
     pub fn subscribe(&mut self) -> Result<()> {
         self.subscribed = true;
         Ok(())
@@ -58,6 +66,11 @@ impl Reader {
 
     pub fn unsubscribe(&mut self) -> Result<()> {
         self.subscribed = false;
+        Ok(())
+    }
+
+    pub fn set_preferences(&mut self, preferences: Preferences) -> Result<()> {
+        self.preferences = preferences;
         Ok(())
     }
 }
