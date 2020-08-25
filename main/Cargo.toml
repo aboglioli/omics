@@ -15,7 +15,6 @@ publishing = { path = "../publishing" }
 
 
 [dependencies]
-catalogue = { path = "../catalogue" }
 common = { path = "../common" }
 identity = { path = "../identity" }
 payment = { path = "../payment" }

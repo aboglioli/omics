@@ -4,7 +4,6 @@ use serde_json::Value;
 
 use common::event::EventRepository;
 
-
 use crate::container::Container;
 use crate::error::PublicError;
 

@@ -30,7 +30,7 @@ impl EventHandler for EventLogger {
         println!("- code: {}", event.code());
         println!("- payload: {:?}", payload);
 
-        self.event_repo.save(&event).await;
+        self.event_repo.save(&event).await?;
 
         Ok(true)
     }

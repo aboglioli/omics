@@ -1,8 +1,5 @@
 use std::sync::Arc;
 
-use catalogue::container::Container as CatalogueContainer;
-use catalogue::infrastructure::persistence::inmem::InMemCatalogueRepository;
-use catalogue::infrastructure::service::{SyncCollectionService, SyncPublicationService};
 use common::event::EventSubscriber;
 use common::infrastructure::event::{InMemEventBus, InMemEventRepository};
 use common::result::Result;
@@ -27,7 +24,6 @@ pub struct Container {
     pub event_repo: Arc<InMemEventRepository>,
     pub identity: IdentityContainer<InMemEventBus>,
     pub publishing: PublishingContainer<InMemEventBus>,
-    pub catalogue: CatalogueContainer<InMemEventBus>,
 }
 
 impl Container {
@@ -56,19 +52,7 @@ impl Container {
         let content_manager_repo = Arc::new(ContentManagerTranslator::new(user_repo.clone()));
         let reader_repo = Arc::new(ReaderTranslator::new(user_repo.clone()));
 
-        // Catalogue
-        let catalogue_repo = Arc::new(InMemCatalogueRepository::new());
-        let collection_serv = Arc::new(SyncCollectionService::new(
-            author_repo.clone(),
-            category_repo.clone(),
-            collection_repo.clone(),
-        ));
-        let publication_serv = Arc::new(SyncPublicationService::new(
-            author_repo.clone(),
-            category_repo.clone(),
-            publication_repo.clone(),
-        ));
-
+        // Containers
         let identity = IdentityContainer::new(
             event_bus.clone(),
             role_repo,
@@ -89,27 +73,17 @@ impl Container {
             reader_repo,
         );
 
-        let catalogue = CatalogueContainer::new(
-            event_bus.clone(),
-            catalogue_repo,
-            collection_serv,
-            publication_serv,
-        );
-
         Container {
             event_bus,
             event_repo,
             identity,
             publishing,
-            catalogue,
         }
     }
 
     pub async fn subscribe(&self) -> Result<()> {
         let event_logger = EventLogger::new(self.event_repo.clone());
         self.event_bus.subscribe(Box::new(event_logger)).await?;
-
-        self.catalogue.subscribe(self.event_bus.as_ref()).await?;
 
         Ok(())
     }

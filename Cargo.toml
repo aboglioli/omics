@@ -1,6 +1,5 @@
 [workspace]
 members = [
-  "catalogue",
   "common",
   "shared",
   "identity",

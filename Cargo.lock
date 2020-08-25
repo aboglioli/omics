@@ -464,20 +464,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "catalogue"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "chrono",
- "common",
- "publishing",
- "serde",
- "serde_json",
- "shared",
- "tokio",
-]
-
-[[package]]
 name = "cc"
 version = "1.0.59"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1032,7 +1018,6 @@ dependencies = [
  "actix-rt",
  "actix-web",
  "async-trait",
- "catalogue",
  "common",
  "env_logger",
  "identity",
