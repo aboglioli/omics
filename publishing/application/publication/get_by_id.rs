@@ -78,11 +78,10 @@ impl<'a> GetById<'a> {
 
         let mut publication_dto = PublicationDto::from(&publication)
             .author(AuthorDto::from(&author))
-            .category(CategoryDto::from(&category))
-            .pages(&publication);
+            .category(CategoryDto::from(&category));
 
         if is_reader_author {
-            publication_dto = publication_dto.status(&publication);
+            publication_dto = publication_dto.status(&publication).pages(&publication);
         }
 
         let reader_statistics = self
@@ -219,7 +218,7 @@ mod tests {
         let res = res.publication;
         assert_eq!(res.id, publication.base().id().value());
         assert_eq!(res.author.unwrap().id, publication.author_id().value());
-        assert_eq!(res.pages.unwrap().len(), 2);
+        assert!(res.pages.is_none());
         assert_eq!(res.statistics.views, 1);
         assert_eq!(res.statistics.unique_views, 1);
         assert!(res.status.is_none());

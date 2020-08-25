@@ -309,7 +309,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .route("/{publicaton_id}/publish", web::post().to(publish))
             .route("/{publicaton_id}/approve", web::post().to(approve))
             .route("/{publicaton_id}/reject", web::post().to(reject))
-            .route("/{publicaton_id}/read", web::post().to(read)) // TODO: should be GET with pages
+            .route("/{publicaton_id}/read", web::get().to(read))
             .route("/{publicaton_id}/like", web::post().to(like))
             .route("/{publicaton_id}/unlike", web::post().to(unlike))
             .route("/{publicaton_id}/review", web::post().to(review))

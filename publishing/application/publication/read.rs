@@ -1,9 +1,18 @@
+use serde::Serialize;
+
 use common::event::EventPublisher;
 use common::result::Result;
 
+use crate::application::dtos::PageDto;
 use crate::domain::interaction::InteractionService;
 use crate::domain::publication::{PublicationId, PublicationRepository};
 use crate::domain::reader::{ReaderId, ReaderRepository};
+
+#[derive(Serialize)]
+pub struct ReadResponse {
+    id: String,
+    pages: Vec<PageDto>,
+}
 
 pub struct Read<'a> {
     event_pub: &'a dyn EventPublisher,
@@ -29,7 +38,7 @@ impl<'a> Read<'a> {
         }
     }
 
-    pub async fn exec(&self, reader_id: String, publication_id: String) -> Result<()> {
+    pub async fn exec(&self, reader_id: String, publication_id: String) -> Result<ReadResponse> {
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
@@ -46,7 +55,10 @@ impl<'a> Read<'a> {
             .publish_all(publication.base().events()?)
             .await?;
 
-        Ok(())
+        Ok(ReadResponse {
+            id: publication.base().id().to_string(),
+            pages: publication.pages().iter().map(PageDto::from).collect(),
+        })
     }
 }
 
