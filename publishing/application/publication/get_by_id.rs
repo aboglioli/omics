@@ -1,12 +1,20 @@
+use serde::Serialize;
+
 use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};
+use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto, ReaderInteractionDto};
 use crate::domain::author::AuthorRepository;
 use crate::domain::category::CategoryRepository;
 use crate::domain::interaction::InteractionService;
-use crate::domain::publication::{PublicationId, PublicationRepository};
+use crate::domain::publication::{PublicationId, PublicationRepository, StatisticsService};
 use crate::domain::reader::{ReaderId, ReaderRepository};
+
+#[derive(Serialize)]
+pub struct GetByIdResponse {
+    pub publication: PublicationDto,
+    pub reader: ReaderInteractionDto,
+}
 
 pub struct GetById<'a> {
     event_pub: &'a dyn EventPublisher,
@@ -17,6 +25,7 @@ pub struct GetById<'a> {
     reader_repo: &'a dyn ReaderRepository,
 
     interaction_serv: &'a InteractionService,
+    statistics_serv: &'a StatisticsService,
 }
 
 impl<'a> GetById<'a> {
@@ -27,6 +36,7 @@ impl<'a> GetById<'a> {
         publication_repo: &'a dyn PublicationRepository,
         reader_repo: &'a dyn ReaderRepository,
         interaction_serv: &'a InteractionService,
+        statistics_serv: &'a StatisticsService,
     ) -> Self {
         GetById {
             event_pub,
@@ -35,10 +45,11 @@ impl<'a> GetById<'a> {
             publication_repo,
             reader_repo,
             interaction_serv,
+            statistics_serv,
         }
     }
 
-    pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<PublicationDto> {
+    pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<GetByIdResponse> {
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
@@ -74,7 +85,22 @@ impl<'a> GetById<'a> {
             publication_dto = publication_dto.status(&publication);
         }
 
-        Ok(publication_dto)
+        let reader_statistics = self
+            .statistics_serv
+            .get_history(Some(&reader_id), Some(&publication_id), None, None)
+            .await?;
+
+        let reader_interaction_dto = ReaderInteractionDto::new(
+            reader_statistics.views() > 0,
+            reader_statistics.readings() > 0,
+            reader_statistics.likes() > 0,
+            reader_statistics.reviews() > 0,
+        );
+
+        Ok(GetByIdResponse {
+            publication: publication_dto,
+            reader: reader_interaction_dto,
+        })
     }
 }
 
@@ -94,6 +120,7 @@ mod tests {
             c.publication_repo(),
             c.reader_repo(),
             c.interaction_serv(),
+            c.statistics_serv(),
         );
 
         let mut reader = mocks::author_as_reader1();
@@ -112,6 +139,7 @@ mod tests {
             )
             .await
             .unwrap();
+        let res = res.publication;
         assert_eq!(res.id, publication.base().id().value());
         assert_eq!(res.author.unwrap().id, author.base().id().value());
         assert_eq!(res.name, publication.header().name().value());
@@ -138,6 +166,7 @@ mod tests {
             c.publication_repo(),
             c.reader_repo(),
             c.interaction_serv(),
+            c.statistics_serv(),
         );
 
         let mut reader = mocks::reader1();
@@ -168,6 +197,7 @@ mod tests {
             c.publication_repo(),
             c.reader_repo(),
             c.interaction_serv(),
+            c.statistics_serv(),
         );
 
         let mut reader = mocks::reader1();
@@ -186,6 +216,7 @@ mod tests {
             )
             .await
             .unwrap();
+        let res = res.publication;
         assert_eq!(res.id, publication.base().id().value());
         assert_eq!(res.author.unwrap().id, publication.author_id().value());
         assert_eq!(res.pages.unwrap().len(), 2);
@@ -206,6 +237,7 @@ mod tests {
             c.publication_repo(),
             c.reader_repo(),
             c.interaction_serv(),
+            c.statistics_serv(),
         );
 
         let mut reader = mocks::reader1();
@@ -221,5 +253,46 @@ mod tests {
             .exec(reader.base().id().to_string(), "#invalid".to_owned(),)
             .await
             .is_err());
+    }
+
+    #[tokio::test]
+    async fn reader_interaction() {
+        let c = mocks::container();
+        let uc = GetById::new(
+            c.event_pub(),
+            c.author_repo(),
+            c.category_repo(),
+            c.publication_repo(),
+            c.reader_repo(),
+            c.interaction_serv(),
+            c.statistics_serv(),
+        );
+
+        let mut reader = mocks::reader1();
+        c.reader_repo().save(&mut reader).await.unwrap();
+        let mut publication = mocks::published_publication1();
+        c.publication_repo().save(&mut publication).await.unwrap();
+        let mut author = mocks::author1();
+        c.author_repo().save(&mut author).await.unwrap();
+        let mut category = mocks::category1();
+        c.category_repo().save(&mut category).await.unwrap();
+
+        c.interaction_serv()
+            .add_like(&reader, &mut publication)
+            .await
+            .unwrap();
+
+        let res = uc
+            .exec(
+                reader.base().id().to_string(),
+                publication.base().id().to_string(),
+            )
+            .await
+            .unwrap();
+        let res = res.reader;
+        assert!(res.viewed);
+        assert!(res.liked);
+        assert!(!res.read);
+        assert!(!res.reviewed);
     }
 }

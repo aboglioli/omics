@@ -325,3 +325,22 @@ impl From<&Reader> for ReaderDto {
         }
     }
 }
+
+#[derive(Serialize)]
+pub struct ReaderInteractionDto {
+    pub viewed: bool,
+    pub read: bool,
+    pub liked: bool,
+    pub reviewed: bool,
+}
+
+impl ReaderInteractionDto {
+    pub fn new(viewed: bool, read: bool, liked: bool, reviewed: bool) -> Self {
+        ReaderInteractionDto {
+            viewed,
+            read,
+            liked,
+            reviewed,
+        }
+    }
+}

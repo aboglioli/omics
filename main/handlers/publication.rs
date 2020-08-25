@@ -65,6 +65,7 @@ async fn get_by_id(
         c.publishing.publication_repo(),
         c.publishing.reader_repo(),
         c.publishing.interaction_serv(),
+        c.publishing.statistics_serv(),
     )
     .exec(auth_id, path.into_inner())
     .await
