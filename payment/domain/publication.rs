@@ -3,16 +3,17 @@ mod statistics;
 pub use repository::*;
 pub use statistics::*;
 
-use common::model::StringId;
+use common::event::Event;
+use common::model::{AggregateRoot, StringId};
 use common::result::Result;
-
-pub type PublicationId = StringId;
 
 use crate::domain::user::User;
 
+pub type PublicationId = StringId;
+
 #[derive(Debug, Clone)]
 pub struct Publication {
-    id: PublicationId,
+    base: AggregateRoot<PublicationId, Event>,
     author: User,
     statistics: Statistics,
 }
@@ -20,14 +21,14 @@ pub struct Publication {
 impl Publication {
     pub fn new(id: PublicationId, author: User, statistics: Statistics) -> Result<Self> {
         Ok(Publication {
-            id,
+            base: AggregateRoot::new(id),
             author,
             statistics,
         })
     }
 
-    pub fn id(&self) -> &PublicationId {
-        &self.id
+    pub fn base(&self) -> &AggregateRoot<PublicationId, Event> {
+        &self.base
     }
 
     pub fn author(&self) -> &User {

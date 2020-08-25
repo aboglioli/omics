@@ -8,8 +8,8 @@ pub struct Days {
 
 impl Days {
     pub fn new(days: u32) -> Result<Self> {
-        if days < 0.0 {
-            return Err(Error::new("days", "negative"));
+        if days < 1 {
+            return Err(Error::new("days", "invalid_range"));
         }
 
         Ok(Days { days })

@@ -12,7 +12,7 @@ pub struct UserDto {
 impl From<&User> for UserDto {
     fn from(user: &User) -> Self {
         UserDto {
-            id: user.id().to_string(),
+            id: user.base().id().to_string(),
         }
     }
 }
@@ -26,7 +26,7 @@ pub struct PublicationDto {
 impl From<&Publication> for PublicationDto {
     fn from(publication: &Publication) -> Self {
         PublicationDto {
-            id: publication.id().to_string(),
+            id: publication.base().id().to_string(),
             user: UserDto::from(publication.author()),
         }
     }
