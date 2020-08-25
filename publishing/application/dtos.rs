@@ -5,7 +5,7 @@ use crate::domain::category::Category;
 use crate::domain::collection::Collection;
 use crate::domain::interaction::Review;
 use crate::domain::publication::{Image, Page, Publication, Statistics};
-use crate::domain::reader::Reader;
+use crate::domain::reader::{Preferences, Reader};
 
 #[derive(Serialize)]
 pub struct StatisticsDto {
@@ -306,12 +306,36 @@ impl ReviewDto {
 }
 
 #[derive(Serialize)]
+pub struct PreferencesDto {
+    pub categories: Vec<String>,
+    pub publications: Vec<String>,
+}
+
+impl From<&Preferences> for PreferencesDto {
+    fn from(preferences: &Preferences) -> Self {
+        PreferencesDto {
+            categories: preferences
+                .category_ids()
+                .into_iter()
+                .map(|category_id| category_id.to_string())
+                .collect(),
+            publications: preferences
+                .publication_ids()
+                .into_iter()
+                .map(|publication_id| publication_id.to_string())
+                .collect(),
+        }
+    }
+}
+
+#[derive(Serialize)]
 pub struct ReaderDto {
     pub id: String,
     pub username: String,
     pub name: String,
     pub lastname: String,
     pub subscribed: bool,
+    pub preferences: PreferencesDto,
 }
 
 impl From<&Reader> for ReaderDto {
@@ -322,6 +346,7 @@ impl From<&Reader> for ReaderDto {
             name: reader.name().to_string(),
             lastname: reader.lastname().to_string(),
             subscribed: reader.is_subscribed(),
+            preferences: PreferencesDto::from(reader.preferences()),
         }
     }
 }
