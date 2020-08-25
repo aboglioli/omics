@@ -1,6 +1,7 @@
 use common::event::EventPublisher;
 use common::result::Result;
 
+use crate::application::dtos::CommandResponse;
 use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::publication::{PublicationId, PublicationRepository};
 
@@ -25,7 +26,7 @@ impl<'a> Publish<'a> {
         }
     }
 
-    pub async fn exec(&self, author_id: String, publication_id: String) -> Result<()> {
+    pub async fn exec(&self, author_id: String, publication_id: String) -> Result<CommandResponse> {
         let author_id = AuthorId::new(author_id)?;
         let author = self.author_repo.find_by_id(&author_id).await?;
 
@@ -40,7 +41,7 @@ impl<'a> Publish<'a> {
             .publish_all(publication.base().events()?)
             .await?;
 
-        Ok(())
+        Ok(CommandResponse::default())
     }
 }
 

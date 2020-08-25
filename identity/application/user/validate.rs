@@ -1,6 +1,7 @@
 use common::event::EventPublisher;
 use common::result::Result;
 
+use crate::application::dtos::CommandResponse;
 use crate::domain::user::{UserId, UserRepository, Validation};
 
 pub struct Validate<'a> {
@@ -17,7 +18,7 @@ impl<'a> Validate<'a> {
         }
     }
 
-    pub async fn exec(&self, user_id: String, validation_code: String) -> Result<()> {
+    pub async fn exec(&self, user_id: String, validation_code: String) -> Result<CommandResponse> {
         let user_id = UserId::new(user_id)?;
         let mut user = self.user_repo.find_by_id(&user_id).await?;
 
@@ -28,7 +29,7 @@ impl<'a> Validate<'a> {
 
         self.event_pub.publish_all(user.base().events()?).await?;
 
-        Ok(())
+        Ok(CommandResponse::default())
     }
 }
 

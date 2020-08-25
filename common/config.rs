@@ -15,7 +15,7 @@ impl Config {
                 },
                 _ => 80,
             },
-            env: env::var("ENV").unwrap_or("development".to_owned()),
+            env: env::var("ENV").unwrap_or_else(|_| "development".to_owned()),
         }
     }
 

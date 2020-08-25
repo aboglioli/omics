@@ -4,6 +4,7 @@ use uuid::Uuid;
 use common::event::EventPublisher;
 use common::result::Result;
 
+use crate::application::dtos::CommandResponse;
 use crate::domain::user::{Email, Password, UserRepository, UserService};
 
 #[derive(Deserialize)]
@@ -32,7 +33,7 @@ impl<'a> RecoverPassword<'a> {
         }
     }
 
-    pub async fn exec(&self, cmd: RecoverPasswordCommand) -> Result<()> {
+    pub async fn exec(&self, cmd: RecoverPasswordCommand) -> Result<CommandResponse> {
         let email = Email::new(cmd.email)?;
         let mut user = self.user_repo.find_by_email(&email).await?;
 
@@ -46,7 +47,7 @@ impl<'a> RecoverPassword<'a> {
 
         self.event_pub.publish_all(user.base().events()?).await?;
 
-        Ok(())
+        Ok(CommandResponse::default())
     }
 }
 

@@ -52,6 +52,10 @@ impl<K, V: Clone> InMemCache<K, V> {
     pub async fn len(&self) -> usize {
         self.data.lock().await.len()
     }
+
+    pub async fn is_empty(&self) -> bool {
+        self.data.lock().await.is_empty()
+    }
 }
 
 #[async_trait]

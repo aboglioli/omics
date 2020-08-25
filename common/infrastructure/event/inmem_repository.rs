@@ -18,6 +18,12 @@ impl InMemEventRepository {
     }
 }
 
+impl Default for InMemEventRepository {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[async_trait]
 impl EventRepository for InMemEventRepository {
     async fn find_all(&self) -> Result<Vec<Event>> {

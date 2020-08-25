@@ -21,6 +21,12 @@ impl FakeEventPublisher {
     }
 }
 
+impl Default for FakeEventPublisher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[async_trait]
 impl EventPublisher for FakeEventPublisher {
     async fn publish(&self, event: Event) -> Result<Receiver<PublicationResult>> {

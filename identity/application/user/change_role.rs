@@ -2,6 +2,7 @@ use serde::Deserialize;
 
 use common::result::Result;
 
+use crate::application::dtos::CommandResponse;
 use crate::domain::role::{RoleId, RoleRepository};
 use crate::domain::user::{UserId, UserRepository};
 
@@ -28,7 +29,7 @@ impl<'a> ChangeRole<'a> {
         auth_id: String,
         user_id: String,
         cmd: ChangeRoleCommand,
-    ) -> Result<()> {
+    ) -> Result<CommandResponse> {
         let admin = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
         let mut user = self.user_repo.find_by_id(&UserId::new(user_id)?).await?;
         let role = self
@@ -40,6 +41,6 @@ impl<'a> ChangeRole<'a> {
 
         self.user_repo.save(&mut user).await?;
 
-        Ok(())
+        Ok(CommandResponse::default())
     }
 }

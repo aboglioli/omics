@@ -1,6 +1,7 @@
 use common::event::EventPublisher;
 use common::result::Result;
 
+use crate::application::dtos::CommandResponse;
 use crate::domain::collection::{CollectionId, CollectionRepository};
 use crate::domain::publication::PublicationId;
 
@@ -21,7 +22,11 @@ impl<'a> RemovePublication<'a> {
         }
     }
 
-    pub async fn exec(&self, collection_id: String, publication_id: String) -> Result<()> {
+    pub async fn exec(
+        &self,
+        collection_id: String,
+        publication_id: String,
+    ) -> Result<CommandResponse> {
         let collection_id = CollectionId::new(collection_id)?;
         let mut collection = self.collection_repo.find_by_id(&collection_id).await?;
 
@@ -35,6 +40,6 @@ impl<'a> RemovePublication<'a> {
             .publish_all(collection.base().events()?)
             .await?;
 
-        Ok(())
+        Ok(CommandResponse::default())
     }
 }

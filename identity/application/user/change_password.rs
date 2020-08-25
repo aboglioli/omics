@@ -3,6 +3,7 @@ use serde::Deserialize;
 use common::error::Error;
 use common::result::Result;
 
+use crate::application::dtos::CommandResponse;
 use crate::domain::user::{UserId, UserRepository, UserService};
 
 #[derive(Deserialize)]
@@ -30,7 +31,7 @@ impl<'a> ChangePassword<'a> {
         auth_id: String,
         user_id: String,
         cmd: ChangePasswordCommand,
-    ) -> Result<()> {
+    ) -> Result<CommandResponse> {
         if auth_id != user_id {
             let auth_user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
             if !auth_user.role().is("admin") {
@@ -40,7 +41,9 @@ impl<'a> ChangePassword<'a> {
 
         self.user_serv
             .change_password(&UserId::new(user_id)?, &cmd.old_password, &cmd.new_password)
-            .await
+            .await?;
+
+        Ok(CommandResponse::default())
     }
 }
 

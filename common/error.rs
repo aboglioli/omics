@@ -80,7 +80,7 @@ impl Error {
     }
 
     pub fn status(&self) -> Option<u32> {
-        self.status.clone()
+        self.status
     }
 
     pub fn message(&self) -> Option<&String> {

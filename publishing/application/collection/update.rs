@@ -4,6 +4,7 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
 
+use crate::application::dtos::CommandResponse;
 use crate::domain::category::{CategoryId, CategoryRepository};
 use crate::domain::collection::{CollectionId, CollectionRepository};
 use crate::domain::publication::{Header, Image, Name, Synopsis, Tag};
@@ -48,7 +49,7 @@ impl<'a> Update<'a> {
         author_id: String,
         collection_id: String,
         cmd: UpdateCommand,
-    ) -> Result<()> {
+    ) -> Result<CommandResponse> {
         cmd.validate()?;
 
         let collection_id = CollectionId::new(collection_id)?;
@@ -81,7 +82,7 @@ impl<'a> Update<'a> {
             .publish_all(collection.base().events()?)
             .await?;
 
-        Ok(())
+        Ok(CommandResponse::default())
     }
 }
 

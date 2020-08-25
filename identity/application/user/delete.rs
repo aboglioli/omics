@@ -2,6 +2,7 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
 
+use crate::application::dtos::CommandResponse;
 use crate::domain::user::{UserId, UserRepository};
 
 pub struct Delete<'a> {
@@ -18,7 +19,7 @@ impl<'a> Delete<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, user_id: String) -> Result<()> {
+    pub async fn exec(&self, auth_id: String, user_id: String) -> Result<CommandResponse> {
         if auth_id != user_id {
             let auth_user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
             if !auth_user.role().is("admin") {
@@ -34,7 +35,7 @@ impl<'a> Delete<'a> {
 
         self.event_pub.publish_all(user.base().events()?).await?;
 
-        Ok(())
+        Ok(CommandResponse::default())
     }
 }
 

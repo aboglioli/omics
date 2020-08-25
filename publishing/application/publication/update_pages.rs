@@ -4,6 +4,7 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
 
+use crate::application::dtos::CommandResponse;
 use crate::domain::publication::{Image, Page, PublicationId, PublicationRepository};
 
 #[derive(Deserialize)]
@@ -44,7 +45,7 @@ impl<'a> UpdatePages<'a> {
         author_id: String,
         publication_id: String,
         cmd: UpdatePagesCommand,
-    ) -> Result<()> {
+    ) -> Result<CommandResponse> {
         cmd.validate()?;
 
         let publication_id = PublicationId::new(&publication_id)?;
@@ -75,7 +76,7 @@ impl<'a> UpdatePages<'a> {
             .publish_all(publication.base().events()?)
             .await?;
 
-        Ok(())
+        Ok(CommandResponse::default())
     }
 }
 

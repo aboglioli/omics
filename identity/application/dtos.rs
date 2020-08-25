@@ -4,6 +4,17 @@ use crate::domain::role::Role;
 use crate::domain::user::User;
 
 #[derive(Serialize)]
+pub struct CommandResponse {
+    ok: bool,
+}
+
+impl Default for CommandResponse {
+    fn default() -> Self {
+        CommandResponse { ok: true }
+    }
+}
+
+#[derive(Serialize)]
 pub struct UserDto {
     pub id: String,
     pub username: String,

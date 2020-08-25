@@ -8,6 +8,17 @@ use crate::domain::publication::{Image, Page, Publication, Statistics};
 use crate::domain::reader::{Preferences, Reader};
 
 #[derive(Serialize)]
+pub struct CommandResponse {
+    ok: bool,
+}
+
+impl Default for CommandResponse {
+    fn default() -> Self {
+        CommandResponse { ok: true }
+    }
+}
+
+#[derive(Serialize)]
 pub struct StatisticsDto {
     pub views: u32,
     pub unique_views: u32,
