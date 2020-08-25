@@ -45,10 +45,7 @@ impl Container {
         let interaction_repo = Arc::new(InMemInteractionRepository::new());
         let publication_repo = Arc::new(InMemPublicationRepository::new());
 
-        let author_repo = Arc::new(AuthorTranslator::new(
-            publication_repo.clone(),
-            user_repo.clone(),
-        ));
+        let author_repo = Arc::new(AuthorTranslator::new(user_repo.clone()));
         let content_manager_repo = Arc::new(ContentManagerTranslator::new(user_repo.clone()));
         let reader_repo = Arc::new(ReaderTranslator::new(user_repo.clone()));
 
@@ -88,6 +85,7 @@ impl Container {
         Ok(())
     }
 
+    #[allow(dead_code)]
     pub fn event_bus(&self) -> &InMemEventBus {
         &self.event_bus
     }

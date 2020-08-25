@@ -6,7 +6,6 @@ use common::infrastructure::cache::InMemCache;
 use common::result::Result;
 
 use crate::domain::role::{Role, RoleId, RoleRepository};
-use crate::mocks;
 
 pub struct InMemRoleRepository {
     cache: InMemCache<RoleId, Role>,
@@ -18,14 +17,11 @@ impl InMemRoleRepository {
             cache: InMemCache::new(),
         }
     }
+}
 
-    pub async fn populated() -> Self {
-        let repo = Self::new();
-
-        repo.save(&mut mocks::user_role()).await.unwrap();
-        repo.save(&mut mocks::admin_role()).await.unwrap();
-
-        repo
+impl Default for InMemRoleRepository {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -39,7 +35,7 @@ impl RoleRepository for InMemRoleRepository {
         self.cache
             .get(id)
             .await
-            .ok_or(Error::new("role", "not_found"))
+            .ok_or_else(|| Error::not_found("role"))
     }
 
     async fn save(&self, role: &mut Role) -> Result<()> {

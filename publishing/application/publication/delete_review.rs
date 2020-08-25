@@ -1,7 +1,7 @@
 use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::domain::interaction::{InteractionRepository, InteractionService};
+use crate::domain::interaction::InteractionService;
 use crate::domain::publication::{PublicationId, PublicationRepository};
 use crate::domain::reader::{ReaderId, ReaderRepository};
 

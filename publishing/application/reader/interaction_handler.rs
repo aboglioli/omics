@@ -40,27 +40,25 @@ impl EventHandler for InteractionHandler {
                 .build()
         })?;
 
-        match event {
-            PublicationEvent::Read {
-                reader_id,
-                publication_id,
-            } => {
-                let mut reader = self
-                    .reader_repo
-                    .find_by_id(&ReaderId::new(reader_id)?)
-                    .await?;
-                let publication = self
-                    .publication_repo
-                    .find_by_id(&PublicationId::new(publication_id)?)
-                    .await?;
+        if let PublicationEvent::Read {
+            reader_id,
+            publication_id,
+        } = event
+        {
+            let mut reader = self
+                .reader_repo
+                .find_by_id(&ReaderId::new(reader_id)?)
+                .await?;
+            let publication = self
+                .publication_repo
+                .find_by_id(&PublicationId::new(publication_id)?)
+                .await?;
 
-                reader.preferences_mut().add_publication(&publication)?;
+            reader.preferences_mut().add_publication(&publication)?;
 
-                self.reader_repo.save(&mut reader).await?;
+            self.reader_repo.save(&mut reader).await?;
 
-                return Ok(true);
-            }
-            _ => {}
+            return Ok(true);
         }
 
         Ok(false)

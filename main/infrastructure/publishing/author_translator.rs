@@ -6,22 +6,14 @@ use common::error::Error;
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
 use publishing::domain::author::{Author, AuthorId, AuthorRepository};
-use publishing::domain::publication::PublicationRepository;
 
 pub struct AuthorTranslator {
-    publication_repo: Arc<dyn PublicationRepository>,
     user_repo: Arc<dyn UserRepository>,
 }
 
 impl AuthorTranslator {
-    pub fn new(
-        publication_repo: Arc<dyn PublicationRepository>,
-        user_repo: Arc<dyn UserRepository>,
-    ) -> Self {
-        AuthorTranslator {
-            publication_repo,
-            user_repo,
-        }
+    pub fn new(user_repo: Arc<dyn UserRepository>) -> Self {
+        AuthorTranslator { user_repo }
     }
 }
 

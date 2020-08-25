@@ -52,7 +52,7 @@ impl CollectionRepository for InMemCollectionRepository {
         self.cache
             .get(id)
             .await
-            .ok_or(Error::new("collection", "not_found"))
+            .ok_or_else(|| Error::not_found("collection"))
     }
 
     async fn find_by_author_id(&self, author_id: &AuthorId) -> Result<Vec<Collection>> {

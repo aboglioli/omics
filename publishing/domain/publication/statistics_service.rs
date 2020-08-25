@@ -60,39 +60,19 @@ impl StatisticsService {
     ) -> Result<Statistics> {
         let views = self
             .interaction_repo
-            .find_views(
-                reader_id.clone(),
-                publication_id.clone(),
-                from.clone(),
-                to.clone(),
-            )
+            .find_views(reader_id, publication_id, from, to)
             .await?;
         let readings = self
             .interaction_repo
-            .find_readings(
-                reader_id.clone(),
-                publication_id.clone(),
-                from.clone(),
-                to.clone(),
-            )
+            .find_readings(reader_id, publication_id, from, to)
             .await?;
         let likes = self
             .interaction_repo
-            .find_likes(
-                reader_id.clone(),
-                publication_id.clone(),
-                from.clone(),
-                to.clone(),
-            )
+            .find_likes(reader_id, publication_id, from, to)
             .await?;
         let reviews = self
             .interaction_repo
-            .find_reviews(
-                reader_id.clone(),
-                publication_id.clone(),
-                from.clone(),
-                to.clone(),
-            )
+            .find_reviews(reader_id, publication_id, from, to)
             .await?;
 
         self.from_interactions(&views, &readings, &likes, &reviews)

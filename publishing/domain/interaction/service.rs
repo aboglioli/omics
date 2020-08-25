@@ -29,7 +29,7 @@ impl InteractionService {
             )
             .await;
         let unique = if let Ok(views) = views_res {
-            views.len() == 0
+            views.is_empty()
         } else {
             true
         };
@@ -62,7 +62,7 @@ impl InteractionService {
             )
             .await;
         if let Ok(likes) = likes_res {
-            if likes.len() > 0 {
+            if !likes.is_empty() {
                 return Err(Error::new("like", "already_liked"));
             }
         }
@@ -83,7 +83,7 @@ impl InteractionService {
                 None,
             )
             .await?;
-        if likes.len() == 0 {
+        if likes.is_empty() {
             return Err(Error::new("like", "not_liked"));
         }
 
@@ -113,7 +113,7 @@ impl InteractionService {
             )
             .await;
         if let Ok(reviews) = reviews_res {
-            if reviews.len() > 0 {
+            if !reviews.is_empty() {
                 return Err(Error::new("review", "existing"));
             }
         }
@@ -138,7 +138,7 @@ impl InteractionService {
                 None,
             )
             .await?;
-        if reviews.len() == 0 {
+        if reviews.is_empty() {
             return Err(Error::new("review", "not_reviewed"));
         }
 

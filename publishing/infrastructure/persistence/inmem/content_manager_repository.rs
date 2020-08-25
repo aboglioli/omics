@@ -46,7 +46,7 @@ impl ContentManagerRepository for InMemContentManagerRepository {
         self.cache
             .get(id)
             .await
-            .ok_or(Error::new("content_manager", "not_found"))
+            .ok_or_else(|| Error::not_found("content_manager"))
     }
 
     async fn save(&self, content_manager: &mut ContentManager) -> Result<()> {

@@ -4,7 +4,6 @@ mod development;
 mod error;
 mod handlers;
 mod infrastructure;
-mod response;
 
 use actix_cors::Cors;
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
@@ -12,7 +11,7 @@ use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use common::config::Config;
 
 use container::Container;
-use handlers::{author, category, collection, event, publication, role, user};
+use handlers::{author, category, collection, event, publication, reader, role, user};
 
 async fn index() -> impl Responder {
     HttpResponse::Ok().body("Omics")
@@ -52,7 +51,8 @@ async fn main() -> std::io::Result<()> {
                     .configure(event::routes)
                     .configure(publication::routes)
                     .configure(role::routes)
-                    .configure(user::routes),
+                    .configure(user::routes)
+                    .configure(reader::routes),
             )
     })
     .bind(format!("0.0.0.0:{}", config.port()))?

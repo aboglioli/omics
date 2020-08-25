@@ -26,6 +26,12 @@ impl InMemInteractionRepository {
     }
 }
 
+impl Default for InMemInteractionRepository {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[async_trait]
 impl InteractionRepository for InMemInteractionRepository {
     async fn find_views(

@@ -47,7 +47,7 @@ impl CategoryRepository for InMemCategoryRepository {
         self.cache
             .get(id)
             .await
-            .ok_or(Error::new("category", "not_found"))
+            .ok_or_else(|| Error::not_found("category"))
     }
 
     async fn find_all_categories(&self) -> Result<Vec<Category>> {

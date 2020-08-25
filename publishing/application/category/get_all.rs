@@ -22,10 +22,7 @@ impl<'a> GetAll<'a> {
     pub async fn exec(&self) -> Result<GetAllResponse> {
         let categories = self.category_repo.find_all_categories().await?;
         Ok(GetAllResponse {
-            categories: categories
-                .iter()
-                .map(|category| CategoryDto::from(category))
-                .collect(),
+            categories: categories.iter().map(CategoryDto::from).collect(),
         })
     }
 }

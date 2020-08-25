@@ -34,7 +34,7 @@ impl<'a> GetAll<'a> {
         let roles = self.role_repo.find_all().await?;
 
         Ok(GetAllResponse {
-            roles: roles.iter().map(|role| RoleDto::from(role)).collect(),
+            roles: roles.iter().map(RoleDto::from).collect(),
         })
     }
 }

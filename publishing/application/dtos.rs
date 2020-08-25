@@ -119,11 +119,7 @@ impl From<&Page> for PageDto {
     fn from(page: &Page) -> Self {
         PageDto {
             number: page.number(),
-            images: page
-                .images()
-                .iter()
-                .map(|image| ImageDto::from(image))
-                .collect(),
+            images: page.images().iter().map(ImageDto::from).collect(),
         }
     }
 }
@@ -188,13 +184,7 @@ impl PublicationDto {
     }
 
     pub fn pages(mut self, publication: &Publication) -> Self {
-        self.pages = Some(
-            publication
-                .pages()
-                .iter()
-                .map(|page| PageDto::from(page))
-                .collect(),
-        );
+        self.pages = Some(publication.pages().iter().map(PageDto::from).collect());
         self
     }
 
@@ -316,12 +306,12 @@ impl From<&Preferences> for PreferencesDto {
         PreferencesDto {
             categories: preferences
                 .category_ids()
-                .into_iter()
+                .iter()
                 .map(|category_id| category_id.to_string())
                 .collect(),
             publications: preferences
                 .publication_ids()
-                .into_iter()
+                .iter()
                 .map(|publication_id| publication_id.to_string())
                 .collect(),
         }

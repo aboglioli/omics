@@ -29,7 +29,7 @@ impl<'a> GetAll<'a> {
         let users = self.user_repo.find_all().await?;
 
         Ok(GetAllResponse {
-            users: users.iter().map(|user| UserDto::from(user)).collect(),
+            users: users.iter().map(UserDto::from).collect(),
         })
     }
 }

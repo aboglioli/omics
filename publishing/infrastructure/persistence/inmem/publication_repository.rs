@@ -55,7 +55,7 @@ impl PublicationRepository for InMemPublicationRepository {
         self.cache
             .get(id)
             .await
-            .ok_or(Error::new("publication", "not_found"))
+            .ok_or_else(|| Error::not_found("publication"))
     }
 
     async fn find_by_author_id(&self, author_id: &AuthorId) -> Result<Vec<Publication>> {

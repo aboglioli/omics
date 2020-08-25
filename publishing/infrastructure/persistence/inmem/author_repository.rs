@@ -51,7 +51,7 @@ impl AuthorRepository for InMemAuthorRepository {
         self.cache
             .get(id)
             .await
-            .ok_or(Error::new("author", "not_found"))
+            .ok_or_else(|| Error::not_found("author"))
     }
 
     async fn search(&self, text: &str) -> Result<Vec<Author>> {

@@ -47,7 +47,7 @@ impl ReaderRepository for InMemReaderRepository {
         self.cache
             .get(id)
             .await
-            .ok_or(Error::new("reader", "not_found"))
+            .ok_or_else(|| Error::not_found("reader"))
     }
 
     async fn save(&self, reader: &mut Reader) -> Result<()> {

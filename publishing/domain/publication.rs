@@ -389,12 +389,12 @@ impl Publication {
             return Err(Error::new("publication", "not_a_draft"));
         }
 
-        if self.pages.len() == 0 {
+        if self.pages.is_empty() {
             return Err(Error::new("publication", "does_not_have_pages"));
         }
 
         for page in self.pages().iter() {
-            if page.images().len() == 0 {
+            if page.images().is_empty() {
                 return Err(Error::new("publication", "empty_page")
                     .add_context("page", &page.number().to_string())
                     .build());
