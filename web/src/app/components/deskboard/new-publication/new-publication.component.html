@@ -11,12 +11,153 @@
           Cancelar
       </button>
 
+      <button mat-stroked-button class="button-white-borders" style="background-color: gray;"
+              (click)="guardarBorrador()">
+          Guardar Borrador
+      </button>
+
+      <button mat-flat-button color="accent"  class="button-white-borders"
+              (click)="submitPublication()">
+          Publicar
+      </button>
+
 
     </div>
 
     <div class="body">
 
-      <app-under-construction></app-under-construction>
+      <form autocomplete="off" [formGroup]="formPublication">
+
+        <!-- Block: Portada publicación, campo nombre y colección -->
+        <div class="row">
+
+          <!-- Portada -->
+          <div class="image-field" style="flex: 1">
+
+            <div  class="image-button portada border-pink-glow"
+                  matRipple
+                  [ngClass]="{'no-image': !portadaImage}"
+                  [matRippleCentered]="ripplePortadaEnable"
+                  (click)="uploadImagePortada()">
+
+
+              <span *ngIf="!portadaImage" class="text">Subir imagen de Portada</span>
+              <img  *ngIf="portadaImage" [src]="portadaImage" alt="Thumbail image">
+
+            </div>
+          </div>
+
+          <!-- Block campo nombre y colección -->
+          <div class="align-center" style="padding: 0px; flex: 3">
+
+            <!-- Block: campo nombre -->
+            <div class="input-field-row">
+
+              <!-- mensaje de error -->
+              <p  *ngIf="nombreNovalido"
+                  class="form-text text-danger">
+                  Ingrese un título válido
+              </p>
+
+              <!-- Input text -->
+              <div class="tile-and-field">
+
+                <p class="field-name">Título: </p>
+
+                <input class="form-control"
+                        type="text"
+                        placeholder="Título"
+                        formControlName="name"
+                        [class.is-invalid]="nombreNovalido">
+
+              </div>
+
+            </div>
+
+            <!-- Block: colección -->
+            <div class="input-field-row">
+
+              <!-- Input text -->
+              <div class="tile-and-field">
+
+                <p class="field-name">Colección: </p>
+
+                <div  class="d-inline-block"
+                      ngbDropdown
+                      #dropdownColection="ngbDropdown">
+
+                  <button class="btn button-white-borders hover-white mr-2"
+                          id="dropdown-colection" ngbDropdownAnchor
+                          (focus)="dropdownColection.open();">
+                            Lista de colecciones disponibles
+                  </button>
+
+                  <div ngbDropdownMenu aria-labelledby="dropdown-colection">
+
+                    <ul >
+
+                      <!-- Sin colección (deseleccionar los checkbox) -->
+                      <li style="width: 100%; padding-left: 1em;">
+
+                        <mat-radio-button color="primary"
+                                          [checked]="isNotCheckedAllCollection()"
+                                          (change)="onRadioChangeCollection()">
+                          Sin colección asignada
+                        </mat-radio-button>
+                        <hr>
+
+                      </li>
+
+                      <!-- Opciones múltiples -->
+                      <li style="width: 100%; padding-left: 1em;"
+                          *ngFor="let collection of collectionList">
+
+                        <mat-checkbox color="primary"
+                                      [value]="collection.valueId"
+                                      [checked]="isCheckedCollectionItem(collection)"
+                                      (click)="$event.stopPropagation()"
+                                      (change)="onCheckboxChangeCollection($event.source);">
+                          {{ collection.name }}
+                        </mat-checkbox>
+
+                      </li>
+                    </ul>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div >
+
+        <!-- Block: Categoria -->
+        <br>
+        <div class="row">
+
+          <div class="col">Block:  Categoria </div>
+
+        </div>
+
+        <!-- Block: Descripción -->
+        <div class="row">
+
+          <div class="col">Block: Descripción</div>
+
+        </div>
+
+        <!-- Block: Subir páginas -->
+        <div class="row">
+
+          <div class="col">Block: Subir páginas</div>
+
+        </div>
+
+      </form>
 
     </div>
 
