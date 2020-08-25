@@ -45,15 +45,17 @@ impl<'a> Read<'a> {
         let reader_id = ReaderId::new(reader_id)?;
         let reader = self.reader_repo.find_by_id(&reader_id).await?;
 
-        self.interaction_serv
-            .add_reading(&reader, &mut publication)
-            .await?;
+        if publication.author_id() != &reader_id {
+            self.interaction_serv
+                .add_reading(&reader, &mut publication)
+                .await?;
 
-        self.publication_repo.save(&mut publication).await?;
+            self.publication_repo.save(&mut publication).await?;
 
-        self.event_pub
-            .publish_all(publication.base().events()?)
-            .await?;
+            self.event_pub
+                .publish_all(publication.base().events()?)
+                .await?;
+        }
 
         Ok(ReadResponse {
             id: publication.base().id().to_string(),

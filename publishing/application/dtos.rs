@@ -336,7 +336,7 @@ pub struct ReaderDto {
     pub name: String,
     pub lastname: String,
     pub subscribed: bool,
-    pub preferences: PreferencesDto,
+    pub preferences: Option<PreferencesDto>,
 }
 
 impl From<&Reader> for ReaderDto {
@@ -347,8 +347,15 @@ impl From<&Reader> for ReaderDto {
             name: reader.name().to_string(),
             lastname: reader.lastname().to_string(),
             subscribed: reader.is_subscribed(),
-            preferences: PreferencesDto::from(reader.preferences()),
+            preferences: None,
         }
+    }
+}
+
+impl ReaderDto {
+    pub fn preferences(mut self, reader: &Reader) -> Self {
+        self.preferences = Some(PreferencesDto::from(reader.preferences()));
+        self
     }
 }
 

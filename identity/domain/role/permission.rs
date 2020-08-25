@@ -41,7 +41,7 @@ impl Permission {
         }
 
         let mut chars: Vec<char> = permissions.to_uppercase().chars().collect();
-        chars.sort();
+        chars.sort_unstable();
         chars.dedup();
         let permissions: String = chars.into_iter().collect();
 

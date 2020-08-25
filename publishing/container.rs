@@ -30,6 +30,7 @@ impl<EPub> Container<EPub>
 where
     EPub: EventPublisher,
 {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         event_pub: Arc<EPub>,
         author_repo: Arc<dyn AuthorRepository>,

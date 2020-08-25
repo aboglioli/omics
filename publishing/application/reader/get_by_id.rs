@@ -23,6 +23,6 @@ impl<'a> GetById<'a> {
             .find_by_id(&ReaderId::new(reader_id)?)
             .await?;
 
-        Ok(ReaderDto::from(&reader))
+        Ok(ReaderDto::from(&reader).preferences(&reader))
     }
 }
