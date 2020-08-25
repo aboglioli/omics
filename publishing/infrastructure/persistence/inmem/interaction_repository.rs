@@ -4,7 +4,10 @@ use tokio::sync::Mutex;
 
 use common::result::Result;
 
-use crate::domain::interaction::{InteractionRepository, Like, Reading, Review, View};
+use crate::domain::author::AuthorId;
+use crate::domain::interaction::{
+    Favorite, Follow, InteractionRepository, Like, Reading, Review, View,
+};
 use crate::domain::publication::PublicationId;
 use crate::domain::reader::ReaderId;
 
@@ -13,6 +16,8 @@ pub struct InMemInteractionRepository {
     readings: Mutex<Vec<Reading>>,
     likes: Mutex<Vec<Like>>,
     reviews: Mutex<Vec<Review>>,
+    favorites: Mutex<Vec<Favorite>>,
+    follows: Mutex<Vec<Follow>>,
 }
 
 impl InMemInteractionRepository {
@@ -22,6 +27,8 @@ impl InMemInteractionRepository {
             readings: Mutex::new(Vec::new()),
             likes: Mutex::new(Vec::new()),
             reviews: Mutex::new(Vec::new()),
+            favorites: Mutex::new(Vec::new()),
+            follows: Mutex::new(Vec::new()),
         }
     }
 }
@@ -158,6 +165,68 @@ impl InteractionRepository for InMemInteractionRepository {
             .collect())
     }
 
+    async fn find_favorites(
+        &self,
+        reader_id: Option<&ReaderId>,
+        publication_id: Option<&PublicationId>,
+        _from: Option<&DateTime<Utc>>,
+        _to: Option<&DateTime<Utc>>,
+    ) -> Result<Vec<Favorite>> {
+        Ok(self
+            .favorites
+            .lock()
+            .await
+            .iter()
+            .filter(|favorite| {
+                if let Some(reader_id) = reader_id {
+                    if favorite.reader_id() != reader_id {
+                        return false;
+                    }
+                }
+
+                if let Some(publication_id) = publication_id {
+                    if favorite.publication_id() != publication_id {
+                        return false;
+                    }
+                }
+
+                true
+            })
+            .cloned()
+            .collect())
+    }
+
+    async fn find_follows(
+        &self,
+        reader_id: Option<&ReaderId>,
+        author_id: Option<&AuthorId>,
+        _from: Option<&DateTime<Utc>>,
+        _to: Option<&DateTime<Utc>>,
+    ) -> Result<Vec<Follow>> {
+        Ok(self
+            .follows
+            .lock()
+            .await
+            .iter()
+            .filter(|follow| {
+                if let Some(reader_id) = reader_id {
+                    if follow.reader_id() != reader_id {
+                        return false;
+                    }
+                }
+
+                if let Some(author_id) = author_id {
+                    if follow.author_id() != author_id {
+                        return false;
+                    }
+                }
+
+                true
+            })
+            .cloned()
+            .collect())
+    }
+
     async fn save_view(&self, view: &mut View) -> Result<()> {
         self.views.lock().await.push(view.clone());
         Ok(())
@@ -175,6 +244,16 @@ impl InteractionRepository for InMemInteractionRepository {
 
     async fn save_review(&self, review: &mut Review) -> Result<()> {
         self.reviews.lock().await.push(review.clone());
+        Ok(())
+    }
+
+    async fn save_favorite(&self, favorite: &mut Favorite) -> Result<()> {
+        self.favorites.lock().await.push(favorite.clone());
+        Ok(())
+    }
+
+    async fn save_follow(&self, follow: &mut Follow) -> Result<()> {
+        self.follows.lock().await.push(follow.clone());
         Ok(())
     }
 
@@ -198,6 +277,25 @@ impl InteractionRepository for InMemInteractionRepository {
             review.base().reader_id() != reader_id
                 && review.base().publication_id() != publication_id
         });
+        Ok(())
+    }
+
+    async fn delete_favorite(
+        &self,
+        reader_id: &ReaderId,
+        publication_id: &PublicationId,
+    ) -> Result<()> {
+        self.favorites.lock().await.retain(|favorite| {
+            favorite.reader_id() != reader_id && favorite.publication_id() != publication_id
+        });
+        Ok(())
+    }
+
+    async fn delete_follow(&self, reader_id: &ReaderId, author_id: &AuthorId) -> Result<()> {
+        self.follows
+            .lock()
+            .await
+            .retain(|follow| follow.reader_id() != reader_id && follow.author_id() != author_id);
         Ok(())
     }
 }

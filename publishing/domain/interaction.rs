@@ -1,5 +1,7 @@
 mod base;
 mod comment;
+mod favorite;
+mod follow;
 mod like;
 mod reading;
 mod repository;
@@ -9,6 +11,8 @@ mod stars;
 mod view;
 pub use base::*;
 pub use comment::*;
+pub use favorite::*;
+pub use follow::*;
 pub use like::*;
 pub use reading::*;
 pub use repository::*;
