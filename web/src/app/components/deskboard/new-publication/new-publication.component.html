@@ -33,12 +33,16 @@
 
           <!-- Portada -->
           <div class="image-field" style="flex: 1">
-            <div  class="image-button portada border-pink-glow no-image"
+
+            <div  class="image-button portada border-pink-glow"
                   matRipple
+                  [ngClass]="{'no-image': !portadaImage}"
                   [matRippleCentered]="ripplePortadaEnable"
                   (click)="uploadImagePortada()">
 
-              <span class="text">Subir imagen de Portada</span>
+
+              <span *ngIf="!portadaImage" class="text">Subir imagen de Portada</span>
+              <img  *ngIf="portadaImage" [src]="portadaImage" alt="Thumbail image">
 
             </div>
           </div>

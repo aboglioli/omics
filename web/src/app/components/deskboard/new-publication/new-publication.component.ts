@@ -21,6 +21,7 @@ export class NewPublicationComponent implements OnInit {
   formPublication: FormGroup;
   publicationNewObject: IPublication;
   collectionList: IDropdownItem[];
+  portadaImage = null;
 
   // Otros
   ripplePortadaEnable = true;
@@ -93,6 +94,42 @@ export class NewPublicationComponent implements OnInit {
   public uploadImagePortada(): void {
 
     console.log('TEST > ', 'Subir imagen');
+
+    // Crear elemento input de tipo 'file' para poder manejarlo desde el botón que lo llama
+    const inputFileElement = document.createElement('input');
+    inputFileElement.type = 'file'; // Nota:  Solo uno a la vez, para varios: inputFileElement.multiple = multiple
+    inputFileElement.accept = '.png, .jpg, .jpeg';
+    inputFileElement.click();
+
+    // Definir la función del llamado al hacer click (cuando realiza un cambio)
+    inputFileElement.onchange = ( event: any ) => {
+
+      const fdImage: FormData = new FormData();
+      const imagePortada  = event.target.files[0];
+
+
+      //#region Cargar para previsualizar en pantalla
+
+      const reader = new FileReader();
+      reader.onload = (eventReader: any ) => {
+
+        this.portadaImage = eventReader.target.result;
+
+      };
+
+      reader.readAsDataURL(imagePortada);
+
+      //#endregion
+
+      fdImage.append('image', imagePortada, 'testName');
+
+      // this.portadaImage = event.target.files[0];
+      const fileToUpload: File = null;
+
+      console.log(imagePortada );
+      console.log(fdImage );
+
+    };
 
   }
 
