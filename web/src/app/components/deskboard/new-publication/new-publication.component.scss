@@ -67,35 +67,55 @@ div.deskboard-body {
 
       margin: 0em 1em;
 
-      .image-button {
+      div.image-field {
 
-        cursor: pointer;
-        text-align: center;
+        display: flex;
+        justify-content: center;
+        padding: 1em;
 
-        &.portada {
-          width: 250px;
-          height: 250px;
-          line-height: 250px;
+        .image-button {
 
-          margin: 1em 1em;
+          cursor: pointer;
+          text-align: center;
+
+          min-width: 250px;
+          min-height: 250px;
+
+          &.portada {
+
+            img {
+              object-fit: cover;
+            }
+
+          }
+
+          &.no-image {
+
+            color: #838383;
+            background-color: #1B1A18;
+
+            span.text {
+
+              height: 100%;
+              width: 100%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+
+            }
+
+          }
+
+          user-select: none;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+
+          -webkit-user-drag: none;
+          -webkit-tap-highlight-color: transparent;
+
 
         }
-
-        &.no-image {
-
-          color: #838383;
-          background-color: #1B1A18;
-
-        }
-
-        user-select: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-
-        -webkit-user-drag: none;
-        -webkit-tap-highlight-color: transparent;
-
 
       }
 
@@ -140,12 +160,6 @@ div.deskboard-body {
 
     }
 
-    div.center-container {
-
-      display: flex;
-      justify-content: center;
-
-    }
 
   }
 
