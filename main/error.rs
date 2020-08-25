@@ -112,27 +112,16 @@ mod tests {
             .wrap(
                 Error::new("two", "two")
                     .add_context("prop1", "invalid")
-                    .wrap(
-                        Error::internal("three", "three")
-                            .wrap(
-                                Error::new("four", "prop2_invalid")
-                                    .wrap(
-                                        Error::internal("five", "five")
-                                            .wrap_raw(StringError {
-                                                error: "INSERT failed".to_owned(),
-                                            })
-                                            .build(),
-                                    )
-                                    .build(),
-                            )
-                            .build(),
-                    )
-                    .build(),
+                    .wrap(Error::internal("three", "three").wrap(
+                        Error::new("four", "prop2_invalid").wrap(
+                            Error::internal("five", "five").wrap_raw(StringError {
+                                error: "INSERT failed".to_owned(),
+                            }),
+                        ),
+                    )),
             )
-            .build()
     }
 
-    // TODO: test internal error without application
     #[test]
     fn without_internal_errors() {
         let err = err();

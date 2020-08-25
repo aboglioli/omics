@@ -17,32 +17,32 @@ impl Fullname {
         let mut err = Error::new("fullname", "invalid");
 
         if name.len() < 2 {
-            err.add_context("name", "too_short");
+            err = err.add_context("name", "too_short");
         }
 
         if name.len() > 64 {
-            err.add_context("name", "too_long");
+            err = err.add_context("name", "too_long");
         }
 
         if lastname.len() < 2 {
-            err.add_context("lastname", "too_short");
+            err = err.add_context("lastname", "too_short");
         }
 
         if lastname.len() > 64 {
-            err.add_context("lastname", "too_long");
+            err = err.add_context("lastname", "too_long");
         }
 
         match Regex::new("^[a-zA-Z]+ *[a-zA-Z]+$") {
             Ok(re) => {
                 if !re.is_match(&name) {
-                    err.add_context("name", "invalid_characters");
+                    err = err.add_context("name", "invalid_characters");
                 }
                 if !re.is_match(&lastname) {
-                    err.add_context("lastname", "invalid_characters");
+                    err = err.add_context("lastname", "invalid_characters");
                 }
             }
             Err(_) => {
-                err.add_context("name-lastname", "invalid_regex");
+                err = err.add_context("name-lastname", "invalid_regex");
             }
         }
 

@@ -34,11 +34,8 @@ impl EventHandler for InteractionHandler {
     }
 
     async fn handle(&mut self, event: &Event) -> Result<bool> {
-        let event: PublicationEvent = serde_json::from_slice(event.payload()).map_err(|err| {
-            Error::new("interaction_handler", "deserialize")
-                .wrap_raw(err)
-                .build()
-        })?;
+        let event: PublicationEvent = serde_json::from_slice(event.payload())
+            .map_err(|err| Error::new("interaction_handler", "deserialize").wrap_raw(err))?;
 
         if let PublicationEvent::Read {
             reader_id,

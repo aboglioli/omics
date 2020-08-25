@@ -33,7 +33,7 @@ impl TokenEncoder for JWTEncoder {
 
         let token = match encode(&Header::default(), &claims, &EncodingKey::from_secret(key)) {
             Ok(token) => token,
-            Err(err) => return Err(Error::new("token", "encode").wrap_raw(err).build()),
+            Err(err) => return Err(Error::new("token", "encode").wrap_raw(err)),
         };
 
         Ok(Token::new(token))
@@ -48,7 +48,7 @@ impl TokenEncoder for JWTEncoder {
             &Validation::default(),
         ) {
             Ok(data) => data,
-            Err(err) => return Err(Error::new("token", "decode").wrap_raw(err).build()),
+            Err(err) => return Err(Error::new("token", "decode").wrap_raw(err)),
         };
 
         Ok(TokenId::build(token_data.claims.sub))

@@ -33,7 +33,7 @@ impl AuthenticationService {
         username_or_email: &str,
         password: &str,
     ) -> Result<(User, Token)> {
-        let mut err = Error::new("credentials", "invalid");
+        let err = Error::new("credentials", "invalid");
 
         let mut user = match (
             Username::new(username_or_email),
@@ -55,7 +55,7 @@ impl AuthenticationService {
 
             let token = match self.token_serv.create(data).await {
                 Ok(token) => token,
-                Err(e) => return Err(err.wrap(e).build()),
+                Err(e) => return Err(err.wrap(e)),
             };
 
             user.login(&token)?;

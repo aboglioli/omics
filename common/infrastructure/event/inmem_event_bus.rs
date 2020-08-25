@@ -43,8 +43,7 @@ impl EventPublisher for InMemEventBus {
                                 // Execute handler
                                 if let Err(err) = handler.handle(&event).await {
                                     let err = Error::internal("event_publisher", "handler_error")
-                                        .wrap(err)
-                                        .build();
+                                        .wrap(err);
                                     println!("{:?}", err);
 
                                     publication_result.err_handlers += 1;
@@ -55,8 +54,7 @@ impl EventPublisher for InMemEventBus {
                         }
                         Err(err) => {
                             let err = Error::internal("event_publisher", "invalid_topic_regex")
-                                .wrap_raw(err)
-                                .build();
+                                .wrap_raw(err);
                             println!("{:?}", err);
                         }
                     }

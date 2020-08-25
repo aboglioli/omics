@@ -16,11 +16,11 @@ impl Permission {
 
         let mut err = Error::new("permission", "invalid");
         if module.is_empty() {
-            err.add_context("module", "empty");
+            err = err.add_context("module", "empty");
         }
 
         if permissions.is_empty() {
-            err.add_context("permissions", "empty");
+            err = err.add_context("permissions", "empty");
         }
 
         let permissions = permissions.to_uppercase();
@@ -28,11 +28,11 @@ impl Permission {
         match Regex::new(r"^[CRUD]+$") {
             Ok(re) => {
                 if !re.is_match(&permissions) {
-                    err.add_context("permissions", "invalid_characters");
+                    err = err.add_context("permissions", "invalid_characters");
                 }
             }
             Err(e) => {
-                err.wrap_raw(e);
+                err = err.wrap_raw(e);
             }
         }
 

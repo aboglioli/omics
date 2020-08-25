@@ -396,8 +396,7 @@ impl Publication {
         for page in self.pages().iter() {
             if page.images().is_empty() {
                 return Err(Error::new("publication", "empty_page")
-                    .add_context("page", &page.number().to_string())
-                    .build());
+                    .add_context("page", &page.number().to_string()));
             }
         }
 

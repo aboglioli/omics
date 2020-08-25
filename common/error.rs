@@ -55,16 +55,12 @@ impl Error {
     }
 
     // Common errors
-    pub fn not_found<S: Into<String>>(entity: S) -> Error {
-        Error::new(entity.into(), "not_found".to_owned())
-            .set_status(404)
-            .build()
+    pub fn not_found<S: Into<String>>(entity: S) -> Self {
+        Error::new(entity.into(), "not_found".to_owned()).set_status(404)
     }
 
-    pub fn unauthorized() -> Error {
-        Error::new("authorization", "unauthorized")
-            .set_status(401)
-            .build()
+    pub fn unauthorized() -> Self {
+        Error::new("authorization", "unauthorized").set_status(401)
     }
 
     pub fn kind(&self) -> &ErrorKind {
@@ -102,37 +98,37 @@ impl Error {
         }
     }
 
-    pub fn set_path<S: Into<String>>(&mut self, path: S) -> &mut Error {
+    pub fn set_path<S: Into<String>>(mut self, path: S) -> Self {
         self.path = path.into();
         self
     }
 
-    pub fn set_code<S: Into<String>>(&mut self, code: S) -> &mut Error {
+    pub fn set_code<S: Into<String>>(mut self, code: S) -> Self {
         self.code = code.into();
         self
     }
 
-    pub fn set_status(&mut self, status: u32) -> &mut Error {
+    pub fn set_status(mut self, status: u32) -> Self {
         self.status = Some(status);
         self
     }
 
-    pub fn set_message<S: Into<String>>(&mut self, message: S) -> &mut Error {
+    pub fn set_message<S: Into<String>>(mut self, message: S) -> Self {
         self.message = Some(message.into());
         self
     }
 
-    pub fn add_context<S: Into<String>>(&mut self, k: S, v: S) -> &mut Error {
+    pub fn add_context<S: Into<String>>(mut self, k: S, v: S) -> Self {
         self.context.insert(k.into(), v.into());
         self
     }
 
-    pub fn wrap(&mut self, err: Error) -> &mut Error {
+    pub fn wrap(mut self, err: Error) -> Self {
         self.cause = Some(Box::new(err));
         self
     }
 
-    pub fn wrap_raw<E: error::Error>(&mut self, err: E) -> &mut Error {
+    pub fn wrap_raw<E: error::Error>(mut self, err: E) -> Self {
         let err = Error {
             kind: ErrorKind::Internal,
             path: "".to_owned(),
@@ -146,14 +142,10 @@ impl Error {
         self
     }
 
-    pub fn merge(&mut self, err: Error) -> &mut Error {
-        self.add_context(err.path(), err.code());
+    pub fn merge(mut self, err: Error) -> Self {
+        self = self.add_context(err.path(), err.code());
         self.context.extend(err.context);
         self
-    }
-
-    pub fn build(&self) -> Error {
-        self.clone()
     }
 }
 
@@ -185,8 +177,7 @@ mod tests {
             .set_status(404)
             .add_context("k1", "v1")
             .add_context("k2", "v2")
-            .add_context("k2", "v3")
-            .build();
+            .add_context("k2", "v3");
         assert_eq!(err.code(), "code");
         assert_eq!(err.message().unwrap(), "message");
         assert_eq!(err.path(), "my.path");
@@ -214,13 +205,10 @@ mod tests {
         let raw_err = StringError {
             error: "raw_err".to_owned(),
         };
-        let inner_err = Error::new("inner", "inner")
-            .wrap_raw(raw_err.clone())
-            .build();
+        let inner_err = Error::new("inner", "inner").wrap_raw(raw_err.clone());
         let outer_err = Error::new("outer", "outer")
             .set_code("outer")
-            .wrap(inner_err.build())
-            .build();
+            .wrap(inner_err.clone());
 
         assert_eq!(
             inner_err.cause().unwrap().message().unwrap(),
@@ -232,17 +220,17 @@ mod tests {
     #[test]
     fn merge() {
         let mut err1 = Error::internal("err1", "err1");
-        err1.add_context("e1-key1", "value1");
-        err1.add_context("e1-key2", "value2");
+        err1 = err1.add_context("e1-key1", "value1");
+        err1 = err1.add_context("e1-key2", "value2");
 
         let mut err2 = Error::internal("err2", "err2");
-        err2.add_context("e2-key", "value");
-        err2.merge(err1);
+        err2 = err2.add_context("e2-key", "value");
+        err2 = err2.merge(err1);
 
         let mut err3 = Error::new("err3", "err3");
-        err3.add_context("e1-key1", "value");
-        err3.add_context("e3-key", "value");
-        err3.merge(err2);
+        err3 = err3.add_context("e1-key1", "value");
+        err3 = err3.add_context("e3-key", "value");
+        err3 = err3.merge(err2);
 
         assert_eq!(err3.context().len(), 6);
         assert_eq!(err3.context().get("err1"), Some(&"err1".to_owned()));

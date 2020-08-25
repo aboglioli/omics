@@ -20,7 +20,7 @@ impl PasswordHasher for BcryptHasher {
     fn hash(&self, plain_password: &str) -> Result<String> {
         match hash(plain_password, self.cost) {
             Ok(hashed) => Ok(hashed),
-            Err(err) => Err(Error::new("password", "hash").wrap_raw(err).build()),
+            Err(err) => Err(Error::new("password", "hash").wrap_raw(err)),
         }
     }
 

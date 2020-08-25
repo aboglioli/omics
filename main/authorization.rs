@@ -12,12 +12,10 @@ pub async fn auth(req: &HttpRequest, c: &Container) -> Result<String, PublicErro
             if let Ok(header) = header.to_str() {
                 Ok(header.to_owned())
             } else {
-                Err(Error::unauthorized().set_message("Invalid header").build())
+                Err(Error::unauthorized().set_message("Invalid header"))
             }
         }
-        None => Err(Error::unauthorized()
-            .set_message("Header is not present")
-            .build()),
+        None => Err(Error::unauthorized().set_message("Header is not present")),
     }
     .map_err(PublicError::from)?;
 
@@ -41,8 +39,7 @@ fn extract_token<S: Into<String>>(authorization: S) -> Result<Token, Error> {
 
     Err(Error::new("authorization", "invalid_header")
         .set_status(401)
-        .set_message("Authorization header is not present")
-        .build())
+        .set_message("Authorization header is not present"))
 }
 
 #[cfg(test)]

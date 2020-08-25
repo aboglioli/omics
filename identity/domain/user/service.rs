@@ -30,7 +30,7 @@ impl UserService {
             .await
             .is_ok()
         {
-            err.add_context("username", "not_available");
+            err = err.add_context("username", "not_available");
         }
         if self
             .user_repo
@@ -38,7 +38,7 @@ impl UserService {
             .await
             .is_ok()
         {
-            err.add_context("email", "not_available");
+            err = err.add_context("email", "not_available");
         }
 
         if err.has_context() {
