@@ -93,8 +93,6 @@ export class NewPublicationComponent implements OnInit {
 
   public uploadImagePortada(): void {
 
-    console.log('TEST > ', 'Subir imagen');
-
     // Crear elemento input de tipo 'file' para poder manejarlo desde el botón que lo llama
     const inputFileElement = document.createElement('input');
     inputFileElement.type = 'file'; // Nota:  Solo uno a la vez, para varios: inputFileElement.multiple = multiple
@@ -107,8 +105,7 @@ export class NewPublicationComponent implements OnInit {
       const fdImage: FormData = new FormData();
       const imagePortada  = event.target.files[0];
 
-
-      //#region Cargar para previsualizar en pantalla
+      // #region Cargar para previsualizar en pantalla
 
       const reader = new FileReader();
       reader.onload = (eventReader: any ) => {
@@ -121,13 +118,16 @@ export class NewPublicationComponent implements OnInit {
 
       //#endregion
 
-      fdImage.append('image', imagePortada, 'testName');
+      // #region Generar un nombre para enviar el archivo
+      let imageName =  imagePortada.lastModified + imagePortada.name;
+      imageName = imageName.replace(/\s+/g, '-').toLowerCase();
+      imageName = imageName.substr(0, imageName.lastIndexOf('.'));
+      // #endregion
 
-      // this.portadaImage = event.target.files[0];
-      const fileToUpload: File = null;
+      fdImage.append('image', imagePortada, imageName);
 
-      console.log(imagePortada );
-      console.log(fdImage );
+      // console.log('TEST > ', imagePortada );
+      // console.log('TEST > ', fdImage.getAll('image') );
 
     };
 
