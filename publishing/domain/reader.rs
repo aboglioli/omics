@@ -1,4 +1,6 @@
+mod preferences;
 mod repository;
+pub use preferences::*;
 pub use repository::*;
 
 use common::event::Event;
@@ -14,6 +16,7 @@ pub struct Reader {
     name: String,
     lastname: String,
     subscribed: bool,
+    preferences: Preferences,
 }
 
 impl Reader {
@@ -24,6 +27,7 @@ impl Reader {
             name: name.into(),
             lastname: lastname.into(),
             subscribed: false,
+            preferences: Preferences::default(),
         })
     }
 
