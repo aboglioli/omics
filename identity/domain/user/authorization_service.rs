@@ -20,8 +20,7 @@ impl AuthorizationService {
                 return Ok(user_id.to_string());
             }
         }
-        Err(Error::new("authorization", "unauthorized")
-            .set_status(401)
+        Err(Error::unauthorized()
             .set_message("User is not logged in")
             .build())
     }

@@ -12,10 +12,12 @@ pub async fn auth(req: &HttpRequest, c: &Container) -> Result<String, PublicErro
             if let Ok(header) = header.to_str() {
                 Ok(header.to_owned())
             } else {
-                Err(Error::new("authorization", "invalid_header"))
+                Err(Error::unauthorized().set_message("Invalid header").build())
             }
         }
-        None => Err(Error::new("authorization", "header_is_not_present")),
+        None => Err(Error::unauthorized()
+            .set_message("Header is not present")
+            .build()),
     }
     .map_err(PublicError::from)?;
 
