@@ -12,6 +12,11 @@ export interface IPage {
   images: string[];
 }
 
+export interface ITag {
+  id: string;
+  name: string;
+}
+
 export interface IPublication {
   id: string;
   author_id?: string;
@@ -22,7 +27,7 @@ export interface IPublication {
   synopsis: string;
   category_id?: string;
   category?: ICategory;
-  tags: string[];
+  tags: ITag[];
   statistics?: IStatistics;
   status?: string;
   pages?: IPage[];

@@ -155,6 +155,23 @@ div.deskboard-body {
 
       }
 
+      div.tag-list {
+
+       mat-form-field {
+
+        background-color: white;
+        color: black;
+        padding-left: 0.5em;
+        padding-right: 0.5em;
+        border-radius: 6px;
+
+        ::ng-deep div.mat-form-field-infix{
+          border-top-width: 18px;
+        }
+
+       }
+
+      }
 
     }
 
@@ -216,6 +233,15 @@ div.align-center {
     }
   }
 
+}
+
+::ng-deep .mat-form-field-ripple {
+  background-color: $omics-neon-pink !important;
+}
+
+::ng-deep .mat-form-field-underline {
+  background-color: $omics-background-flat !important;
+  height: 2px !important;
 }
 
 

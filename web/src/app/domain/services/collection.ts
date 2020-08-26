@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { ConfigService } from './config';
 import { ICollection } from '../models';
+import { ITag } from '../models/publication';
 
 export interface ISearchCommand {
   author_id?: string;
@@ -20,7 +21,7 @@ export interface ICreateCommand {
   name: string;
   synopsis: string;
   category_id: string;
-  tags: string[];
+  tags: ITag[];
   cover: string;
 }
 
@@ -32,7 +33,7 @@ export interface IUpdateCommand {
   name: string;
   synopsis: string;
   category_id: string;
-  tags: string[];
+  tags: ITag[];
   cover: string;
 }
 

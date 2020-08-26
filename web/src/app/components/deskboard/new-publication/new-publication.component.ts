@@ -8,7 +8,7 @@ import { AuthService } from '../../../domain/services/auth';
 import { DropdownDataObrasService } from '../../../services/dropdown-data-obras.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 
-import { IPublication } from '../../../domain/models/publication';
+import { IPublication, ITag } from '../../../domain/models/publication';
 import { IDropdownItem } from '../../../models/dropdown-item.interface';
 
 
@@ -25,6 +25,7 @@ export class NewPublicationComponent implements OnInit {
   collectionList: IDropdownItem[];
   portadaImage = null;
   categoryList: IDropdownItem[];
+  tagsList: ITag[];
 
   // Otros
   ripplePortadaEnable = true;
@@ -229,9 +230,15 @@ export class NewPublicationComponent implements OnInit {
 
   // #endregion
 
-  // #region Dropdown Checkbox Collection
+  // #region Tags
 
+  public addTag( event: Event ): void {
 
+  }
+
+  public removeTag( tag: string ): void {
+
+  }
 
   // #endregion
 

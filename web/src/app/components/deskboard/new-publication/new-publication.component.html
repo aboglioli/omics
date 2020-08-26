@@ -142,7 +142,7 @@
             <div class="input-field-row">
 
               <div class="title-and-error" >
-              <p class="field-name">Categoría: </p>
+                <p class="field-name">Categoría: </p>
               </div>
 
               <div  class="d-inline-block"
@@ -181,7 +181,36 @@
           </div>
 
           <!-- Tags -->
-          <div class="col-md-12 col-lg-6">Block:  Tags </div>
+          <div class="col-md-12 col-lg-6 tag-list">
+            <div class="input-field-row">
+
+              <div class="title-and-error" >
+                <p class="field-name">Tags: </p>
+              </div>
+
+              <mat-form-field style="width: 100%">
+                <mat-chip-list #chipTagList aria-label="Tag selection">
+                  <mat-chip *ngFor="let tag of tagsList"
+                            [selectable]="true"
+                            [removable]="true"
+                            (removed)="removeTag(tag)">
+                    {{tag.name}}
+                    <mat-icon matChipRemove>cancel</mat-icon>
+                  </mat-chip>
+
+                  <input  placeholder="Lista de Etiquetas..."
+                          [matChipInputFor]="chipTagList"
+                          [matChipInputAddOnBlur]="true"
+                          (matChipInputTokenEnd)="addTag($event)">
+
+                </mat-chip-list>
+
+              </mat-form-field>
+
+            </div>
+
+
+          </div>
 
         </div>
 
