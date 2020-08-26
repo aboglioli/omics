@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../domain/services/auth';
-import { IPublication } from '../../../domain/models/publication';
+import { forkJoin } from 'rxjs';
 import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
-
-import { IDropdownItem } from '../../../models/dropdown-item.interface';
-import { CollectionFilterService } from '../../../services/collections.service';
-import { NgxSpinnerService } from 'ngx-spinner';
 import { MatCheckbox } from '@angular/material/checkbox';
+
+import { AuthService } from '../../../domain/services/auth';
+import { DropdownDataObrasService } from '../../../services/dropdown-data-obras.service';
+import { NgxSpinnerService } from 'ngx-spinner';
+
+import { IPublication } from '../../../domain/models/publication';
+import { IDropdownItem } from '../../../models/dropdown-item.interface';
 
 
 @Component({
@@ -22,6 +24,7 @@ export class NewPublicationComponent implements OnInit {
   publicationNewObject: IPublication;
   collectionList: IDropdownItem[];
   portadaImage = null;
+  categoryList: IDropdownItem[];
 
   // Otros
   ripplePortadaEnable = true;
@@ -32,7 +35,7 @@ export class NewPublicationComponent implements OnInit {
     private authService: AuthService,
     private fb: FormBuilder,
     private spinnerService: NgxSpinnerService,
-    private collectionFilterService: CollectionFilterService,
+    private dropdownDataObrasService: DropdownDataObrasService,
   ) { }
 
   ngOnInit(): void {
@@ -82,12 +85,19 @@ export class NewPublicationComponent implements OnInit {
 
     this.spinnerService.show();
 
-    this.collectionFilterService.getCollectionDropdownData().subscribe(  data => {
+    const observableList =  [ this.dropdownDataObrasService.getAllCollectionDropdownDataById(),
+                              this.dropdownDataObrasService.getAllCategoryDropdown()
+                            ];
 
-      this.collectionList = data;
+    forkJoin( observableList).subscribe(([ dataCollection, dataCategory ]) => {
+
+      this.collectionList = dataCollection;
+      this.categoryList = dataCategory;
+
       this.spinnerService.hide();
 
-    });
+
+      });
 
   }
 
@@ -216,6 +226,12 @@ export class NewPublicationComponent implements OnInit {
     return( (this.collectionArrayCheck.value as Array<string> ).indexOf(item.valueId) > -1 );
 
   }
+
+  // #endregion
+
+  // #region Dropdown Checkbox Collection
+
+
 
   // #endregion
 
