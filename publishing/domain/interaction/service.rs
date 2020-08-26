@@ -4,10 +4,11 @@ use common::error::Error;
 use common::result::Result;
 
 use crate::domain::interaction::{
-    Comment, InteractionRepository, Like, Reading, Review, Stars, View,
+    Comment, Favorite, InteractionRepository, Like, Reading, Review, Stars, View, Follow,
 };
 use crate::domain::publication::Publication;
 use crate::domain::reader::Reader;
+use crate::domain::author::Author;
 
 pub struct InteractionService {
     interaction_repo: Arc<dyn InteractionRepository>,
@@ -22,8 +23,8 @@ impl InteractionService {
         let views_res = self
             .interaction_repo
             .find_views(
-                Some(&reader.base().id()),
-                Some(&publication.base().id()),
+                Some(reader.base().id()),
+                Some(publication.base().id()),
                 None,
                 None,
             )
@@ -55,8 +56,8 @@ impl InteractionService {
         let likes_res = self
             .interaction_repo
             .find_likes(
-                Some(&reader.base().id()),
-                Some(&publication.base().id()),
+                Some(reader.base().id()),
+                Some(publication.base().id()),
                 None,
                 None,
             )
@@ -77,8 +78,8 @@ impl InteractionService {
         let likes = self
             .interaction_repo
             .find_likes(
-                Some(&reader.base().id()),
-                Some(&publication.base().id()),
+                Some(reader.base().id()),
+                Some(publication.base().id()),
                 None,
                 None,
             )
@@ -106,8 +107,8 @@ impl InteractionService {
         let reviews_res = self
             .interaction_repo
             .find_reviews(
-                Some(&reader.base().id()),
-                Some(&publication.base().id()),
+                Some(reader.base().id()),
+                Some(publication.base().id()),
                 None,
                 None,
             )
@@ -132,8 +133,8 @@ impl InteractionService {
         let mut reviews = self
             .interaction_repo
             .find_reviews(
-                Some(&reader.base().id()),
-                Some(&publication.base().id()),
+                Some(reader.base().id()),
+                Some(publication.base().id()),
                 None,
                 None,
             )
@@ -149,6 +150,97 @@ impl InteractionService {
         self.interaction_repo
             .delete_review(&reader.base().id(), &publication.base().id())
             .await?;
+
+        Ok(())
+    }
+
+    pub async fn add_favorite(&self, reader: &Reader, publication: &Publication) -> Result<()> {
+        let favorites_res = self
+            .interaction_repo
+            .find_favorites(
+                Some(reader.base().id()),
+                Some(publication.base().id()),
+                None,
+                None,
+            )
+            .await;
+
+        if let Ok(favorites) = favorites_res {
+            if !favorites.is_empty() {
+                return Err(Error::new("favorite", "already_exists"));
+            }
+        }
+
+        let mut favorite =
+            Favorite::new(reader.base().id().clone(), publication.base().id().clone())?;
+
+        self.interaction_repo.save_favorite(&mut favorite).await?;
+
+        Ok(())
+    }
+
+    pub async fn delete_favorite(&self, reader: &Reader, publication: &Publication) -> Result<()> {
+        let favorites = self
+            .interaction_repo
+            .find_favorites(
+                Some(reader.base().id()),
+                Some(publication.base().id()),
+                None,
+                None,
+            )
+            .await?;
+
+        if favorites.is_empty() {
+            return Err(Error::new("favorite", "does_not_exist"));
+        }
+
+        self.interaction_repo
+            .delete_favorite(reader.base().id(), publication.base().id())
+            .await?;
+
+        Ok(())
+    }
+
+    pub async fn add_follow(&self, reader: &Reader, author: &Author) -> Result<()> {
+        let follows_res = self
+            .interaction_repo
+            .find_follows(
+                Some(reader.base().id()),
+                Some(author.base().id()),
+                None,
+                None,
+            )
+            .await;
+
+        if let Ok(follows) = follows_res {
+            if !follows.is_empty() {
+                return Err(Error::new("follow", "already_exists"));
+            }
+        }
+
+        let mut follow = Follow::new(reader.base().id().clone(), author.base().id().clone())?;
+
+        self.interaction_repo.save_follow(&mut follow).await?;
+
+        Ok(())
+    }
+
+    pub async fn delete_follow(&self, reader: &Reader, author: &Author) -> Result<()> {
+        let follows = self
+            .interaction_repo
+            .find_follows(
+                Some(reader.base().id()),
+                Some(author.base().id()),
+                None,
+                None,
+            )
+            .await?;
+
+        if follows.is_empty() {
+            return Err(Error::new("follow", "does_not_exist"));
+        }
+
+        self.interaction_repo.delete_follow(reader.base().id(), author.base().id()).await?;
 
         Ok(())
     }
