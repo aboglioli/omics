@@ -46,7 +46,7 @@ impl Contract {
     }
 
     pub fn approve(&mut self, admin: &Admin) -> Result<()> {
-        if !matches!(self.status_history().current().status(), Status::Requested) {
+        if !matches!(self.status_history().current(), Status::Requested) {
             return Err(Error::new("contract", "not_requested"));
         }
 
@@ -58,7 +58,7 @@ impl Contract {
     }
 
     pub fn reject(&mut self, admin: &Admin) -> Result<()> {
-        if !matches!(self.status_history().current().status(), Status::Requested) {
+        if !matches!(self.status_history().current(), Status::Requested) {
             return Err(Error::new("contract", "not_requested"));
         }
 

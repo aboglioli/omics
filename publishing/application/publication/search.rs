@@ -71,9 +71,7 @@ impl<'a> Search<'a> {
         if let Some(status) = cmd.status {
             publications = publications
                 .into_iter()
-                .filter(|publication| {
-                    publication.status_history().current().status().to_string() == status
-                })
+                .filter(|publication| publication.status_history().current().to_string() == status)
                 .collect();
         }
 
@@ -91,7 +89,7 @@ impl<'a> Search<'a> {
                     return true;
                 }
 
-                matches!(publication.status_history().current().status(), Status::Published { .. })
+                matches!(publication.status_history().current(), Status::Published { .. })
             })
             .collect();
 

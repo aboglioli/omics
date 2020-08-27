@@ -87,11 +87,11 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(
-            publication.status_history().current().status().to_string(),
+            publication.status_history().current().to_string(),
             "rejected"
         );
 
-        if let Status::Rejected { admin_id } = publication.status_history().current().status() {
+        if let Status::Rejected { admin_id } = publication.status_history().current() {
             assert_eq!(admin_id, cm.base().id());
         }
     }

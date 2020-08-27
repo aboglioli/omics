@@ -76,7 +76,7 @@ impl PublicationRepository for InMemPublicationRepository {
         Ok(self
             .cache
             .filter(|&(_, publication)| {
-                publication.status_history().current().status().to_string() == status
+                publication.status_history().current().to_string() == status
             })
             .await)
     }

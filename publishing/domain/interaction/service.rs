@@ -3,12 +3,12 @@ use std::sync::Arc;
 use common::error::Error;
 use common::result::Result;
 
+use crate::domain::author::Author;
 use crate::domain::interaction::{
-    Comment, Favorite, InteractionRepository, Like, Reading, Review, Stars, View, Follow,
+    Comment, Favorite, Follow, InteractionRepository, Like, Reading, Review, Stars, View,
 };
 use crate::domain::publication::Publication;
 use crate::domain::reader::Reader;
-use crate::domain::author::Author;
 
 pub struct InteractionService {
     interaction_repo: Arc<dyn InteractionRepository>,
@@ -240,7 +240,9 @@ impl InteractionService {
             return Err(Error::new("follow", "does_not_exist"));
         }
 
-        self.interaction_repo.delete_follow(reader.base().id(), author.base().id()).await?;
+        self.interaction_repo
+            .delete_follow(reader.base().id(), author.base().id())
+            .await?;
 
         Ok(())
     }

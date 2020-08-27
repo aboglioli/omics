@@ -128,7 +128,7 @@ mod tests {
         assert_eq!(publication.header().synopsis().value(), "New synopsis...");
         assert_eq!(publication.header().category_id().value(), "#category02");
         assert!(matches!(
-            publication.status_history().current().status(),
+            publication.status_history().current(),
             Status::Draft
         ));
 
@@ -166,7 +166,7 @@ mod tests {
             .await
             .unwrap();
         assert!(matches!(
-            publication.status_history().current().status(),
+            publication.status_history().current(),
             Status::Draft
         ));
     }

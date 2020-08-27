@@ -200,7 +200,7 @@ impl PublicationDto {
     }
 
     pub fn status(mut self, publication: &Publication) -> Self {
-        self.status = Some(publication.status_history().current().status().to_string());
+        self.status = Some(publication.status_history().current().to_string());
         self
     }
 }

@@ -76,6 +76,28 @@ impl Publication {
         Ok(publication)
     }
 
+    pub fn build(
+        base: AggregateRoot<PublicationId, PublicationEvent>,
+        author_id: AuthorId,
+        header: Header,
+
+        pages: Vec<Page>,
+        contract: bool,
+        statistics: Statistics,
+
+        status_history: StatusHistory<Status>,
+    ) -> Self {
+        Publication {
+            base,
+            author_id,
+            header,
+            pages,
+            contract,
+            statistics,
+            status_history,
+        }
+    }
+
     pub fn base(&self) -> &AggregateRoot<PublicationId, PublicationEvent> {
         &self.base
     }
@@ -110,7 +132,7 @@ impl Publication {
 
     pub fn is_published(&self) -> bool {
         self.base.deleted_at().is_none()
-            && matches!(self.status_history().current().status(), Status::Published { .. })
+            && matches!(self.status_history().current(), Status::Published { .. })
     }
 
     pub fn set_header(&mut self, header: Header) -> Result<()> {
@@ -149,7 +171,7 @@ impl Publication {
     }
 
     pub fn view(&mut self, reader: &Reader, unique: bool) -> Result<View> {
-        if !matches!(self.status_history().current().status(), Status::Published { .. }) {
+        if !matches!(self.status_history().current(), Status::Published { .. }) {
             return Err(Error::new("publication", "not_published"));
         }
 
@@ -179,7 +201,7 @@ impl Publication {
     }
 
     pub fn read(&mut self, reader: &Reader) -> Result<Reading> {
-        if !matches!(self.status_history().current().status(), Status::Published { .. }) {
+        if !matches!(self.status_history().current(), Status::Published { .. }) {
             return Err(Error::new("publication", "not_published"));
         }
 
@@ -211,7 +233,7 @@ impl Publication {
     }
 
     pub fn like(&mut self, reader: &Reader) -> Result<Like> {
-        if !matches!(self.status_history().current().status(), Status::Published { .. }) {
+        if !matches!(self.status_history().current(), Status::Published { .. }) {
             return Err(Error::new("publication", "not_published"));
         }
 
@@ -243,7 +265,7 @@ impl Publication {
     }
 
     pub fn unlike(&mut self, reader: &Reader) -> Result<()> {
-        if !matches!(self.status_history().current().status(), Status::Published { .. }) {
+        if !matches!(self.status_history().current(), Status::Published { .. }) {
             return Err(Error::new("publication", "not_published"));
         }
 
@@ -272,7 +294,7 @@ impl Publication {
     }
 
     pub fn review(&mut self, reader: &Reader, stars: Stars, comment: Comment) -> Result<Review> {
-        if !matches!(self.status_history().current().status(), Status::Published { .. }) {
+        if !matches!(self.status_history().current(), Status::Published { .. }) {
             return Err(Error::new("publication", "not_published"));
         }
 
@@ -308,7 +330,7 @@ impl Publication {
     }
 
     pub fn delete_review(&mut self, reader: &Reader, stars: &Stars) -> Result<()> {
-        if !matches!(self.status_history().current().status(), Status::Published { .. }) {
+        if !matches!(self.status_history().current(), Status::Published { .. }) {
             return Err(Error::new("publication", "not_published"));
         }
 
@@ -337,7 +359,7 @@ impl Publication {
     }
 
     pub fn add_contract(&mut self) -> Result<()> {
-        if !matches!(self.status_history().current().status(), Status::Published { .. }) {
+        if !matches!(self.status_history().current(), Status::Published { .. }) {
             return Err(Error::new("publication", "not_published"));
         }
 
@@ -369,7 +391,7 @@ impl Publication {
     }
 
     pub fn make_draft(&mut self) -> Result<()> {
-        if !matches!(self.status_history().current().status(), Status::Draft) {
+        if !matches!(self.status_history().current(), Status::Draft) {
             self.status_history.add_status(Status::Draft);
 
             self.base.record_event(PublicationEvent::ChangedToDraft {
@@ -385,7 +407,7 @@ impl Publication {
             return Err(Error::new("publication", "invalid_author"));
         }
 
-        if !matches!(self.status_history().current().status(), Status::Draft) {
+        if !matches!(self.status_history().current(), Status::Draft) {
             return Err(Error::new("publication", "not_a_draft"));
         }
 
@@ -410,10 +432,7 @@ impl Publication {
     }
 
     pub fn approve(&mut self, content_manager: &ContentManager) -> Result<()> {
-        if !matches!(
-            self.status_history().current().status(),
-            Status::WaitingApproval
-        ) {
+        if !matches!(self.status_history().current(), Status::WaitingApproval) {
             return Err(Error::new("publication", "not_waiting_approval"));
         }
 
@@ -441,10 +460,7 @@ impl Publication {
     }
 
     pub fn reject(&mut self, content_manager: &ContentManager) -> Result<()> {
-        if !matches!(
-            self.status_history().current().status(),
-            Status::WaitingApproval
-        ) {
+        if !matches!(self.status_history().current(), Status::WaitingApproval) {
             return Err(Error::new("publication", "not_waiting_approval"));
         }
 
@@ -487,7 +503,7 @@ mod tests {
         assert_eq!(publication.header().tags().len(), 2);
         assert!(publication.base().events().unwrap().len() > 0);
         assert!(matches!(
-            publication.status_history().current().status(),
+            publication.status_history().current(),
             Status::Draft
         ));
     }
@@ -506,30 +522,28 @@ mod tests {
 
         assert!(publication.publish(&author).is_ok());
         assert!(matches!(
-            publication.status_history().current().status(),
+            publication.status_history().current(),
             Status::WaitingApproval
         ));
 
         assert!(publication.approve(&cm1).is_ok());
-        assert!(
-            matches!(publication.status_history().current().status(), Status::Published { .. })
-        );
+        assert!(matches!(publication.status_history().current(), Status::Published { .. }));
         assert!(publication.publish(&author).is_err());
 
         assert!(publication.make_draft().is_ok());
         assert!(matches!(
-            publication.status_history().current().status(),
+            publication.status_history().current(),
             Status::Draft
         ));
         assert!(publication.publish(&author).is_ok());
 
         assert!(publication.reject(&cm1).is_ok());
-        assert!(matches!(publication.status_history().current().status(), Status::Rejected { .. }));
+        assert!(matches!(publication.status_history().current(), Status::Rejected { .. }));
         assert!(publication.publish(&author).is_err());
 
         assert!(publication.make_draft().is_ok());
         assert!(matches!(
-            publication.status_history().current().status(),
+            publication.status_history().current(),
             Status::Draft
         ));
     }
