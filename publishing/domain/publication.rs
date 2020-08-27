@@ -171,7 +171,7 @@ impl Publication {
     }
 
     pub fn view(&mut self, reader: &Reader, unique: bool) -> Result<View> {
-        if !matches!(self.status_history().current(), Status::Published { .. }) {
+        if !self.is_published() {
             return Err(Error::new("publication", "not_published"));
         }
 
@@ -201,7 +201,7 @@ impl Publication {
     }
 
     pub fn read(&mut self, reader: &Reader) -> Result<Reading> {
-        if !matches!(self.status_history().current(), Status::Published { .. }) {
+        if !self.is_published() {
             return Err(Error::new("publication", "not_published"));
         }
 
@@ -233,7 +233,7 @@ impl Publication {
     }
 
     pub fn like(&mut self, reader: &Reader) -> Result<Like> {
-        if !matches!(self.status_history().current(), Status::Published { .. }) {
+        if !self.is_published() {
             return Err(Error::new("publication", "not_published"));
         }
 
@@ -265,7 +265,7 @@ impl Publication {
     }
 
     pub fn unlike(&mut self, reader: &Reader) -> Result<()> {
-        if !matches!(self.status_history().current(), Status::Published { .. }) {
+        if !self.is_published() {
             return Err(Error::new("publication", "not_published"));
         }
 
@@ -294,7 +294,7 @@ impl Publication {
     }
 
     pub fn review(&mut self, reader: &Reader, stars: Stars, comment: Comment) -> Result<Review> {
-        if !matches!(self.status_history().current(), Status::Published { .. }) {
+        if !self.is_published() {
             return Err(Error::new("publication", "not_published"));
         }
 
@@ -330,7 +330,7 @@ impl Publication {
     }
 
     pub fn delete_review(&mut self, reader: &Reader, stars: &Stars) -> Result<()> {
-        if !matches!(self.status_history().current(), Status::Published { .. }) {
+        if !self.is_published() {
             return Err(Error::new("publication", "not_published"));
         }
 
@@ -359,7 +359,7 @@ impl Publication {
     }
 
     pub fn add_contract(&mut self) -> Result<()> {
-        if !matches!(self.status_history().current(), Status::Published { .. }) {
+        if !self.is_published() {
             return Err(Error::new("publication", "not_published"));
         }
 
@@ -392,7 +392,8 @@ impl Publication {
 
     pub fn make_draft(&mut self) -> Result<()> {
         if !matches!(self.status_history().current(), Status::Draft) {
-            self.status_history.add_status(Status::Draft);
+            let draft = self.status_history.current().draft()?;
+            self.status_history.add_status(draft);
 
             self.base.record_event(PublicationEvent::ChangedToDraft {
                 id: self.base().id().to_string(),
@@ -407,9 +408,7 @@ impl Publication {
             return Err(Error::new("publication", "invalid_author"));
         }
 
-        if !matches!(self.status_history().current(), Status::Draft) {
-            return Err(Error::new("publication", "not_a_draft"));
-        }
+        let waiting_approval = self.status_history.current().publish()?;
 
         if self.pages.is_empty() {
             return Err(Error::new("publication", "does_not_have_pages"));
@@ -422,7 +421,7 @@ impl Publication {
             }
         }
 
-        self.status_history.add_status(Status::WaitingApproval);
+        self.status_history.add_status(waiting_approval);
 
         self.base.record_event(PublicationEvent::ApprovalWaited {
             id: self.base().id().to_string(),
@@ -432,13 +431,11 @@ impl Publication {
     }
 
     pub fn approve(&mut self, content_manager: &ContentManager) -> Result<()> {
-        if !matches!(self.status_history().current(), Status::WaitingApproval) {
-            return Err(Error::new("publication", "not_waiting_approval"));
-        }
-
-        self.status_history.add_status(Status::Published {
-            admin_id: content_manager.base().id().clone(),
-        });
+        let published = self
+            .status_history
+            .current()
+            .approve(content_manager.base().id().clone())?;
+        self.status_history.add_status(published);
 
         self.base.record_event(PublicationEvent::Published {
             id: self.base().id().to_string(),
@@ -460,13 +457,11 @@ impl Publication {
     }
 
     pub fn reject(&mut self, content_manager: &ContentManager) -> Result<()> {
-        if !matches!(self.status_history().current(), Status::WaitingApproval) {
-            return Err(Error::new("publication", "not_waiting_approval"));
-        }
-
-        self.status_history.add_status(Status::Rejected {
-            admin_id: content_manager.base().id().clone(),
-        });
+        let rejected = self
+            .status_history()
+            .current()
+            .reject(content_manager.base().id().clone())?;
+        self.status_history.add_status(rejected);
 
         self.base.record_event(PublicationEvent::Rejected {
             id: self.base().id().to_string(),
