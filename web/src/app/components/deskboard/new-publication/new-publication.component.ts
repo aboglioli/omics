@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
 import { MatCheckbox } from '@angular/material/checkbox';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
 
 import { AuthService } from '../../../domain/services/auth';
 import { DropdownDataObrasService } from '../../../services/dropdown-data-obras.service';
@@ -10,6 +11,8 @@ import { NgxSpinnerService } from 'ngx-spinner';
 
 import { IPublication, ITag } from '../../../domain/models/publication';
 import { IDropdownItem } from '../../../models/dropdown-item.interface';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { throwToolbarMixedModesError } from '@angular/material/toolbar';
 
 
 @Component({
@@ -25,11 +28,13 @@ export class NewPublicationComponent implements OnInit {
   collectionList: IDropdownItem[];
   portadaImage = null;
   categoryList: IDropdownItem[];
-  tagsList: ITag[];
+  tagsList: ITag[] = [];
 
   // Otros
   ripplePortadaEnable = true;
   totalPages = 0;
+
+  chipTagsKeysCodes: number[] = [ENTER, COMMA]; // Usado para los tags
 
   constructor(
     private router: Router,
@@ -62,7 +67,7 @@ export class NewPublicationComponent implements OnInit {
       collectionArray: this.fb.array([]),
       synopsis: [ '', [ Validators.required, Validators.minLength(5) ] ],
       category_id: [ '', Validators.required ],
-      tagstags: [ null ],
+      tags: [ null ],
       pages: this.fb.array( this.buildPageForm() )
 
     });
@@ -136,7 +141,7 @@ export class NewPublicationComponent implements OnInit {
       // #endregion
 
       fdImage.append('image', imagePortada, imageName);
-
+      this.formPublication.get('cover').setValue(fdImage);
       // console.log('TEST > ', imagePortada );
       // console.log('TEST > ', fdImage.getAll('image') );
 
@@ -151,6 +156,8 @@ export class NewPublicationComponent implements OnInit {
   }
 
   public submitPublication(): void {
+
+    this.formPublication.get('tags').setValue(this.tagsList);
 
     console.log('TEST > Submit Publication > ', this.formPublication.value );
 
@@ -232,11 +239,33 @@ export class NewPublicationComponent implements OnInit {
 
   // #region Tags
 
-  public addTag( event: Event ): void {
+  public addTag( event: MatChipInputEvent): void {
 
+    const input = event.input;
+    const value = event.value.trim();
+
+    if ((value || '')) {
+
+      this.tagsList.push({
+        id: value.replace(/\s+/g, '-').toLowerCase(),
+        name: value
+      });
+
+    }
+
+    // Reset the input value
+    if (input) {
+      input.value = '';
+    }
   }
 
-  public removeTag( tag: string ): void {
+  public removeTag( tag: ITag ): void {
+
+    const index = this.tagsList.indexOf(tag);
+
+    if (index >= 0) {
+      this.tagsList.splice(index, 1);
+    }
 
   }
 

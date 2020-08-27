@@ -5,11 +5,11 @@ div.deskboard-body {
   flex-direction: row;
 
   @media screen and (min-width: $break-small) {
-    height: calc(100vh - 4.6em);
+    min-height: calc(100vh - 4.6em);
   }
 
   @media screen and (max-width: $break-small) {
-    height: 100vh;
+    min-height: 100vh;
   }
 
 

@@ -137,7 +137,7 @@
         <div class="row">
 
           <!-- Categoria -->
-          <div class="col-md-12 col-lg-6"  style="margin-bottom: 1em">
+          <div class="col-md-12 col-lg-6" style="margin-bottom: 1em">
 
             <div class="input-field-row">
 
@@ -181,15 +181,17 @@
           </div>
 
           <!-- Tags -->
-          <div class="col-md-12 col-lg-6 tag-list">
+          <div class="col-md-12 col-lg-6 tag-list"  style="margin-bottom: 1em">
             <div class="input-field-row">
 
               <div class="title-and-error" >
-                <p class="field-name">Tags: </p>
+                <p class="field-name">Etiquetas: </p>
               </div>
 
               <mat-form-field style="width: 100%">
+
                 <mat-chip-list #chipTagList aria-label="Tag selection">
+
                   <mat-chip *ngFor="let tag of tagsList"
                             [selectable]="true"
                             [removable]="true"
@@ -201,6 +203,7 @@
                   <input  placeholder="Lista de Etiquetas..."
                           [matChipInputFor]="chipTagList"
                           [matChipInputAddOnBlur]="true"
+                          [matChipInputSeparatorKeyCodes]="chipTagsKeysCodes"
                           (matChipInputTokenEnd)="addTag($event)">
 
                 </mat-chip-list>
