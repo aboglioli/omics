@@ -11,6 +11,8 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatRadioModule} from '@angular/material/radio';
 import {MatChipsModule} from '@angular/material/chips';
+import { MatInputModule } from '@angular/material/input';
+
 @NgModule({
   declarations: [],
   imports: [
@@ -25,7 +27,8 @@ import {MatChipsModule} from '@angular/material/chips';
     MatSelectModule,
     MatCheckboxModule,
     MatRadioModule,
-    MatChipsModule
+    MatChipsModule,
+    MatInputModule,
   ],
   exports: [
     MatToolbarModule,
@@ -39,7 +42,8 @@ import {MatChipsModule} from '@angular/material/chips';
     MatSelectModule,
     MatCheckboxModule,
     MatRadioModule,
-    MatChipsModule
+    MatChipsModule,
+    MatInputModule
   ]
 })
 

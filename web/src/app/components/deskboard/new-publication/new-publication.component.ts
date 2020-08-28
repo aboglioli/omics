@@ -65,7 +65,7 @@ export class NewPublicationComponent implements OnInit {
       cover: ['', Validators.required ],
       name: ['', [ Validators.required, Validators.minLength(5) ] ],
       collectionArray: this.fb.array([]),
-      synopsis: [ '', [ Validators.required, Validators.minLength(5) ] ],
+      synopsis: [ '', [ Validators.required, Validators.minLength(5),  Validators.maxLength(512) ] ],
       category_id: [ '', Validators.required ],
       tags: [ null ],
       pages: this.fb.array( this.buildPageForm() )
@@ -90,6 +90,9 @@ export class NewPublicationComponent implements OnInit {
   public setSubscriptionData(): void {
 
     this.spinnerService.show();
+    setTimeout(() => {
+      this.spinnerService.hide();
+    }, 5000);
 
     const observableList =  [ this.dropdownDataObrasService.getAllCollectionDropdownDataById(),
                               this.dropdownDataObrasService.getAllCategoryDropdown()
@@ -158,6 +161,10 @@ export class NewPublicationComponent implements OnInit {
   public submitPublication(): void {
 
     this.formPublication.get('tags').setValue(this.tagsList);
+
+    // Reducir descripción los espacios vacios que pueda tener al final
+    const description = this.formPublication.get('synopsis');
+    this.formPublication.get('synopsis').setValue(description.value.trim());
 
     console.log('TEST > Submit Publication > ', this.formPublication.value );
 
@@ -275,6 +282,11 @@ export class NewPublicationComponent implements OnInit {
   get nombreNovalido(): boolean {
     return ( this.formPublication.get('name').invalid && this.formPublication.get('name').touched );
   }
+
+  get nombreSynopsis(): boolean {
+    return ( this.formPublication.get('synopsis').invalid && this.formPublication.get('synopsis').touched );
+  }
+
 
   get collectionArrayCheck(): FormArray {
     return this.formPublication.get('collectionArray') as FormArray;

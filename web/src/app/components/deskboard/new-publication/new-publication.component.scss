@@ -155,21 +155,31 @@ div.deskboard-body {
 
       }
 
+      .text-area {
+        margin-top: 0.5em;
+
+        ::ng-deep div.mat-form-field-flex {
+          background-color: white;
+          color: black;
+          border-radius: 6px;
+        }
+      }
+
       div.tag-list {
 
-       mat-form-field {
+        ::ng-deep div.mat-form-field-flex {
+          margin-top: 0.5em;
+          background-color: white;
+          color: black;
+          padding-left: 0.5em;
+          padding-right: 0.5em;
+          border-radius: 6px;
 
-        background-color: white;
-        color: black;
-        padding-left: 0.5em;
-        padding-right: 0.5em;
-        border-radius: 6px;
+          ::ng-deep div.mat-form-field-infix{
+            border-top-width: 18px;
+          }
 
-        ::ng-deep div.mat-form-field-infix{
-          border-top-width: 18px;
         }
-
-       }
 
       }
 
