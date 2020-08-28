@@ -227,7 +227,7 @@
                 <p class="field-name">Descripción: </p>
 
                 <!-- mensaje de error -->
-                <p  *ngIf="nombreSynopsis"
+                <p  *ngIf="synopsisNovalido"
                     class="form-text text-danger">
                   <mat-error>Requiere que sea más de 5 caracteres o menos de 512</mat-error>
                 </p>
@@ -235,7 +235,7 @@
               </div>
 
               <mat-form-field appearance="fill" class="text-area">
-                <mat-label>Textarea</mat-label>
+                <mat-label>{{ synopsisLenght }} / 512</mat-label>
                 <textarea matInput
                           formControlName="synopsis"></textarea>
               </mat-form-field>
@@ -250,7 +250,25 @@
         <!-- Block: Subir páginas -->
         <div class="row">
 
-          <div class="col-12">Block: Subir páginas</div>
+          <div class="col-12">
+            <div class="input-field-row">
+
+              <!-- Cabecera -->
+              <div class="title-and-error" >
+                <p class="field-name">
+                  Páginas
+                </p>
+              </div>
+
+              <!-- Paginas box -->
+              <div class="page-box">
+
+              </div>
+
+            </div>
+
+
+          </div>
 
         </div>
 

@@ -283,10 +283,13 @@ export class NewPublicationComponent implements OnInit {
     return ( this.formPublication.get('name').invalid && this.formPublication.get('name').touched );
   }
 
-  get nombreSynopsis(): boolean {
+  get synopsisNovalido(): boolean {
     return ( this.formPublication.get('synopsis').invalid && this.formPublication.get('synopsis').touched );
   }
 
+  get synopsisLenght(): number {
+    return this.formPublication.get('synopsis').value.length;
+  }
 
   get collectionArrayCheck(): FormArray {
     return this.formPublication.get('collectionArray') as FormArray;
