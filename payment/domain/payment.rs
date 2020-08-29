@@ -37,6 +37,10 @@ impl Payment {
         &self.amount
     }
 
+    pub fn date(&self) -> &DateTime<Utc> {
+        &self.date
+    }
+
     pub fn status_history(&self) -> &StatusHistory<Status> {
         &self.status_history
     }

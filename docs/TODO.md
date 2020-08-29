@@ -11,6 +11,8 @@
 - [ ] Split publicaton view and publication read.
 - [ ] Add Reader preferences.
 - [ ] Add Reader interaction for a viewed publication. DTO.
+- [ ] Allow client to specify the 'fields' to get from a request
+- [ ] Add DateTime and Date support and examples.
 
 # Progress
 

@@ -9,7 +9,7 @@ pub struct Amount {
 impl Amount {
     pub fn new(amount: f64) -> Result<Self> {
         if amount < 0.0 {
-            return Err(Error::new("amount", "negative"));
+            return Err(Error::new("amount", "invalid_range"));
         }
 
         Ok(Amount { amount })

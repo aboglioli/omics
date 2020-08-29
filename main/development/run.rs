@@ -28,7 +28,11 @@ pub async fn populate(c: &Container) -> Result<()> {
             Email::new("admin@omics.com")?,
             Some(Password::new(hashed_password.clone())?),
         )?,
-        Some(Person::new(Fullname::new("Admin", "Superpowers")?)?),
+        Some(Person::new(
+            Fullname::new("Admin", "Superpowers")?,
+            None,
+            None,
+        )?),
         admin_role.clone(),
         None,
     );
@@ -40,7 +44,11 @@ pub async fn populate(c: &Container) -> Result<()> {
             Email::new("content-manager@omics.com")?,
             Some(Password::new(hashed_password.clone())?),
         )?,
-        Some(Person::new(Fullname::new("Content", "Manager")?)?),
+        Some(Person::new(
+            Fullname::new("Content", "Manager")?,
+            None,
+            None,
+        )?),
         content_manager_role.clone(),
         None,
     );
@@ -52,7 +60,7 @@ pub async fn populate(c: &Container) -> Result<()> {
             Email::new("user@omics.com")?,
             Some(Password::new(hashed_password.clone())?),
         )?,
-        Some(Person::new(Fullname::new("TheFirst", "User")?)?),
+        Some(Person::new(Fullname::new("TheFirst", "User")?, None, None)?),
         user_role.clone(),
         None,
     );

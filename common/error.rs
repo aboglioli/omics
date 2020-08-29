@@ -63,6 +63,10 @@ impl Error {
         Error::new("authorization", "unauthorized").set_status(401)
     }
 
+    pub fn bad_format<S: Into<String>>(field: S) -> Self {
+        Error::new(field.into(), "bad_format".to_owned()).set_status(400)
+    }
+
     pub fn kind(&self) -> &ErrorKind {
         &self.kind
     }

@@ -28,7 +28,7 @@ impl User {
 
     pub fn add_subscription(&mut self, subscription: Subscription) -> Result<()> {
         if let Some(subscription) = self.current_subscription() {
-            if matches!(subscription.status_history().current(), Status::Open) {
+            if matches!(subscription.status_history().current(), Status::Active) {
                 return Err(Error::new("subscription", "already_exists"));
             }
         }

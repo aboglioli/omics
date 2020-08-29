@@ -79,5 +79,5 @@ pub fn admin_role() -> Role {
 }
 
 pub fn person1() -> Person {
-    Person::new(Fullname::new("User", "One").unwrap()).unwrap()
+    Person::new(Fullname::new("User", "One").unwrap(), None, None).unwrap()
 }

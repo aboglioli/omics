@@ -6,6 +6,7 @@ use common::error::Error;
 use common::infrastructure::cache::InMemCache;
 use common::result::Result;
 
+use crate::domain::role::RoleId;
 use crate::domain::user::{Email, User, UserId, UserRepository, Username};
 use crate::mocks;
 
@@ -70,6 +71,13 @@ impl UserRepository for InMemUserRepository {
             .ok_or_else(|| Error::new("user", "not_found"))
     }
 
+    async fn find_by_role_id(&self, role_id: &RoleId) -> Result<Vec<User>> {
+        Ok(self
+            .cache
+            .filter(|(_, user)| user.role().base().id() == role_id)
+            .await)
+    }
+
     async fn save(&self, user: &mut User) -> Result<()> {
         self.cache.set(user.base().id().clone(), user.clone()).await
     }
@@ -97,8 +105,10 @@ mod tests {
     async fn find_by_id() {
         let repo = InMemUserRepository::new();
         let mut user = mocks::user1();
-        user.set_person(Person::new(Fullname::new("Name", "Lastname").unwrap()).unwrap())
-            .unwrap();
+        user.set_person(
+            Person::new(Fullname::new("Name", "Lastname").unwrap(), None, None).unwrap(),
+        )
+        .unwrap();
 
         repo.save(&mut user).await.unwrap();
         assert!(repo.find_by_id(&user.base().id()).await.is_ok());

@@ -43,6 +43,14 @@ impl From<&User> for UserDto {
 pub struct RoleDto {
     pub id: String,
     pub name: String,
+    pub users: Option<Vec<UserDto>>,
+}
+
+impl RoleDto {
+    pub fn users(mut self, users: Vec<UserDto>) -> Self {
+        self.users = Some(users);
+        self
+    }
 }
 
 impl From<&Role> for RoleDto {
@@ -50,6 +58,7 @@ impl From<&Role> for RoleDto {
         RoleDto {
             id: role.base().id().to_string(),
             name: role.name().to_string(),
+            users: None,
         }
     }
 }

@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
 use common::error::Error;
@@ -5,12 +6,14 @@ use common::event::EventPublisher;
 use common::result::Result;
 
 use crate::application::dtos::CommandResponse;
-use crate::domain::user::{Fullname, Person, UserId, UserRepository};
+use crate::domain::user::{Fullname, Gender, Person, UserId, UserRepository};
 
 #[derive(Deserialize)]
 pub struct UpdateCommand {
     pub name: String,
     pub lastname: String,
+    pub birthdate: Option<String>,
+    pub gender: Option<String>,
 }
 
 pub struct Update<'a> {
@@ -42,7 +45,18 @@ impl<'a> Update<'a> {
 
         let mut user = self.user_repo.find_by_id(&UserId::new(user_id)?).await?;
 
-        let person = Person::new(Fullname::new(cmd.name, cmd.lastname)?)?;
+        let birthdate = cmd
+            .birthdate
+            .map(|birthdate| {
+                DateTime::parse_from_rfc3339(&birthdate)
+                    .map(|datetime| DateTime::<Utc>::from(datetime))
+                    .map_err(|err| Error::bad_format("birthdate").wrap_raw(err))
+            })
+            .transpose()?;
+
+        let gender = cmd.gender.map(|gender| Gender::from(&gender)).transpose()?;
+
+        let person = Person::new(Fullname::new(cmd.name, cmd.lastname)?, birthdate, gender)?;
         user.set_person(person)?;
 
         self.user_repo.save(&mut user).await?;
@@ -58,6 +72,7 @@ mod tests {
     use super::*;
 
     use crate::mocks;
+    use chrono::Datelike;
 
     #[tokio::test]
     async fn non_existing_user() {
@@ -73,6 +88,8 @@ mod tests {
                 UpdateCommand {
                     name: "Name".to_owned(),
                     lastname: "Lastname".to_owned(),
+                    birthdate: None,
+                    gender: None,
                 }
             )
             .await
@@ -94,6 +111,64 @@ mod tests {
                 UpdateCommand {
                     name: "N".to_owned(),
                     lastname: "L".to_owned(),
+                    birthdate: None,
+                    gender: None,
+                }
+            )
+            .await
+            .is_err());
+
+        assert!(uc
+            .exec(
+                user.base().id().to_string(),
+                user.base().id().to_string(),
+                UpdateCommand {
+                    name: "Name".to_owned(),
+                    lastname: "Lastname".to_owned(),
+                    birthdate: Some("invalid-date".to_owned()),
+                    gender: None,
+                }
+            )
+            .await
+            .is_err());
+
+        assert!(uc
+            .exec(
+                user.base().id().to_string(),
+                user.base().id().to_string(),
+                UpdateCommand {
+                    name: "Name".to_owned(),
+                    lastname: "Lastname".to_owned(),
+                    birthdate: Some("1996-12-32T24:39:57-08:00".to_owned()),
+                    gender: None,
+                }
+            )
+            .await
+            .is_err());
+
+        assert!(uc
+            .exec(
+                user.base().id().to_string(),
+                user.base().id().to_string(),
+                UpdateCommand {
+                    name: "Name".to_owned(),
+                    lastname: "Lastname".to_owned(),
+                    birthdate: None,
+                    gender: Some("malee".to_owned()),
+                }
+            )
+            .await
+            .is_err());
+
+        assert!(uc
+            .exec(
+                user.base().id().to_string(),
+                user.base().id().to_string(),
+                UpdateCommand {
+                    name: "Name".to_owned(),
+                    lastname: "Lastname".to_owned(),
+                    birthdate: None,
+                    gender: Some("female2".to_owned()),
                 }
             )
             .await
@@ -115,17 +190,26 @@ mod tests {
                 UpdateCommand {
                     name: "Name".to_owned(),
                     lastname: "Lastname".to_owned(),
+                    birthdate: Some("1996-12-19T23:39:57-03:00".to_owned()),
+                    gender: Some("male".to_owned()),
                 }
             )
             .await
             .is_ok());
 
         let saved_user = c.user_repo().find_by_id(&user.base().id()).await.unwrap();
-        assert_eq!(saved_user.person().unwrap().fullname().name(), "Name");
-        assert_eq!(
-            saved_user.person().unwrap().fullname().lastname(),
-            "Lastname"
-        );
+        let person = saved_user.person().unwrap();
+        assert_eq!(person.fullname().name(), "Name");
+        assert_eq!(person.fullname().lastname(), "Lastname");
+        assert!(person.birthdate().is_some());
+        assert!(person.gender().is_some());
+
+        let birthdate = person.birthdate().unwrap();
+        assert_eq!(birthdate.to_rfc3339(), "1996-12-20T02:39:57+00:00");
+        assert_eq!(birthdate.year(), 1996);
+        assert_eq!(birthdate.month(), 12);
+        assert_eq!(birthdate.day(), 20);
+        assert!(matches!(person.gender().unwrap(), Gender::Male));
 
         assert_eq!(c.event_pub().events().await.len(), 1);
     }

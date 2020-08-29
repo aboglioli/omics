@@ -28,7 +28,7 @@ impl Subscription {
             plan,
             date: Utc::now(),
             payments: Vec::new(),
-            status_history: StatusHistory::new(Status::Open),
+            status_history: StatusHistory::new(Status::Active),
         })
     }
 

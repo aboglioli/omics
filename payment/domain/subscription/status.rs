@@ -3,6 +3,7 @@ use common::result::Result;
 
 #[derive(Debug, Clone)]
 pub enum Status {
+    WaitingPayment,
     Active,
     Inactive,
 }
@@ -10,6 +11,7 @@ pub enum Status {
 impl ToString for Status {
     fn to_string(&self) -> String {
         match self {
+            Status::WaitingPayment => "waiting-payment".to_owned(),
             Status::Active => "active".to_owned(),
             Status::Inactive => "inactive".to_owned(),
         }
