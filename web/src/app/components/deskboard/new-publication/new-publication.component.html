@@ -255,13 +255,35 @@
 
               <!-- Cabecera -->
               <div class="title-and-error" >
+
                 <p class="field-name">
-                  Páginas
+                  <fa-icon [icon]="faBoookOpen" style="margin-right: 1em;"></fa-icon>
+                  Páginas( {{ pagesTotal }} )
                 </p>
               </div>
 
               <!-- Paginas box -->
-              <div class="page-box">
+              <div class="page-box border-pink-glow" formArrayName="pagesList">
+
+                <!--  Add a page -->
+                <div  class="add-page page"
+                      (click)="addPage()">
+                  <fa-icon [icon]="faPlus" size="3x"></fa-icon>
+                </div>
+
+                <!-- Page list -->
+                <div  *ngFor="let page of pagesList.controls; let i = index"
+                      class="page-added page">
+
+                  <div class="page-header">
+                    <h2>{{ page.value.number }}</h2>
+                    <fa-icon  [icon]="faCloseCircle" size="2x"
+                              (click)="removePage(i)"></fa-icon>
+                  </div>
+
+                  <img  [src]="page.value.thumbailImage" alt="Page image">
+
+                </div>
 
               </div>
 

@@ -183,6 +183,91 @@ div.deskboard-body {
 
       }
 
+      div.page-box {
+
+        background-color: $omics-background-flat;
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: flex-start;
+
+        margin-top: 1em;
+        max-height: 300px;
+        overflow-y: auto;
+
+        border-style: solid;
+        border-color: white;
+        border-width: thin;
+        border-radius: 6px;
+
+        .page {
+
+          height: 184px;
+          width: 130px;
+
+          margin: 0.5em 0.5em;
+
+        }
+
+        .add-page {
+
+          background-color: $omics-aqua-button;
+          cursor: pointer;
+
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          &:hover {
+            border-style: solid;
+            border-color: white;
+            border-width: thin;
+          }
+
+        }
+
+        .page-added {
+
+          background-color: gray;
+          position: relative;
+
+          img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+          }
+
+          div.page-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: rgba(32,29,46,0.50);
+
+            width: 100%;
+
+            padding: 0em 0.25em;
+            position: absolute;
+
+            h2 {
+              margin: 0px;
+            }
+
+            fa-icon {
+              color: $omics-error;
+
+              display: flex;
+              align-items: center;
+
+              cursor: pointer;
+
+            }
+
+          }
+
+        }
+
+      }
+
     }
 
 

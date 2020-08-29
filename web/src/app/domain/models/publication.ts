@@ -9,7 +9,7 @@ export interface IImage {
 
 export interface IPage {
   number: number;
-  images: string[];
+  images: FileReader;
 }
 
 export interface ITag {
@@ -21,7 +21,7 @@ export interface IPublication {
   id: string;
   author_id?: string;
   author?: IAuthor;
-  cover: string;
+  cover: FileReader;
   name: string;
   collection: string;
   synopsis: string;
