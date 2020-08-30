@@ -2,13 +2,13 @@
 
 ## Identity
 - [ ] GET /roles
-- [ ] GET /roles/:id?include=users
+- [ ] GET /roles/:id
 - [ ] GET /roles/:id/users
 
 - [ ] POST /register
 - [ ] POST /login
 - [ ] POST /recover-password
-- [ ] GET /users
+- [ ] GET /users?include=role
 - [ ] GET,PUT,DELETE /users/:id
 - [ ] PUT /users/:id/password
 - [ ] GET /users/:id/validate/:code
@@ -17,37 +17,28 @@
 - [ ] POST /users/callback
 
 ## Publishing
-- [ ] GET /authors?include=publications,collections,followers,publications.category,collections.category
-- [ ] GET /authors/:id
-- [ ] GET /authors/:id/publications
-- [ ] GET /authors/:id/collections
-- [ ] GET /authors/:id/followers
+- [ ] GET /authors?include=publications,collections,followers,publications.category,collections.category&name=...
+- [ ] GET /authors/:id?include=publications,collections,followers,publications.category,collections.category
 - [ ] POST /authors/:id/follow
 
-- [ ] GET /readers?include=following,favorites
-- [ ] GET /readers/:id
-- [ ] GET /readers/:id/following
-- [ ] GET /readers/:id/favorites
+- [ ] GET /readers/:id?include=following,favorites
 
-- [ ] GET /collections?include=author,category,publications,publications.author,publications.category
-- [ ] GET /collections/:id
-- [ ] GET /collections/:id/publications
+- [ ] GET /collections?include=author,category,publications,publications.author,publications.category&author_id=...&publication_id=...
+- [ ] GET /collections/:id?include=author,category,publications,publications.author,publications.category
 - [ ] POST /collections
 - [ ] PUT,DELETE /collections/:id
 - [ ] POST,DELETE /collections/:id/publication/:publicationId
 
-- [ ] GET /categories?include=publications,collections
+- [ ] GET /categories?include=publications,collections,publications.author,collections.author
+- [ ] GET /categories/:id?include=publications,collections,publications.author,collections.author
 - [ ] POST /categories
-- [ ] GET /categories/:id
 - [ ] PUT /categories/:id
-- [ ] GET /categories/:id/publications
-- [ ] GET /categories/:id/collections
 
-- [ ] GET,POST /publications
+- [ ] GET /publications?include=author,category&author_id=...&category_id=...&collection_id=...&status=...&name=...
 - [ ] GET /publications/:id?include=author,category
+- [ ] POST /publications
 - [ ] PUT /publications/:id
-- [ ] GET /publications/:id/author
-- [ ] GET /publications/:id/category
+
 - [ ] GET /publications/:id/read
 - [ ] POST /publications/:id/publish
 - [ ] POST /publications/:id/approve
