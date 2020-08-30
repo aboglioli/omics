@@ -4,8 +4,20 @@ use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct IncludeParams {
-    include: Option<String>,
+    pub include: Option<String>,
 }
+
+impl From<IncludeParams> for Option<String> {
+    fn from(params: IncludeParams) -> Self {
+        params.include
+    }
+}
+
+// impl IncludeParams {
+//     pub fn into(self) -> Option<String> {
+//         self.include
+//     }
+// }
 
 pub struct Include {
     fields: HashMap<String, bool>,

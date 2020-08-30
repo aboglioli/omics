@@ -22,7 +22,16 @@ pub struct UserDto {
     pub name: Option<String>,
     pub lastname: Option<String>,
     pub validated: bool,
-    pub role: String,
+    pub role_id: Option<String>,
+    pub role: Option<RoleDto>,
+}
+
+impl UserDto {
+    pub fn role(mut self, role: RoleDto) -> Self {
+        self.role_id = None;
+        self.role = Some(role);
+        self
+    }
 }
 
 impl From<&User> for UserDto {
@@ -34,7 +43,8 @@ impl From<&User> for UserDto {
             name: user.person().map(|p| p.fullname().name().to_string()),
             lastname: user.person().map(|p| p.fullname().lastname().to_string()),
             validated: user.is_validated(),
-            role: user.role().base().id().to_string(),
+            role_id: Some(user.role().base().id().to_string()),
+            role: None,
         }
     }
 }
@@ -43,14 +53,6 @@ impl From<&User> for UserDto {
 pub struct RoleDto {
     pub id: String,
     pub name: String,
-    pub users: Option<Vec<UserDto>>,
-}
-
-impl RoleDto {
-    pub fn users(mut self, users: Vec<UserDto>) -> Self {
-        self.users = Some(users);
-        self
-    }
 }
 
 impl From<&Role> for RoleDto {
@@ -58,7 +60,6 @@ impl From<&Role> for RoleDto {
         RoleDto {
             id: role.base().id().to_string(),
             name: role.name().to_string(),
-            users: None,
         }
     }
 }

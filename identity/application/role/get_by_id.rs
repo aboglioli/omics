@@ -1,8 +1,8 @@
 use common::error::Error;
-use common::request::Include;
+
 use common::result::Result;
 
-use crate::application::dtos::{RoleDto, UserDto};
+use crate::application::dtos::RoleDto;
 use crate::domain::role::{RoleId, RoleRepository};
 use crate::domain::user::{UserId, UserRepository};
 
@@ -19,26 +19,14 @@ impl<'a> GetById<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, id: String, include: Include) -> Result<RoleDto> {
+    pub async fn exec(&self, auth_id: String, id: String) -> Result<RoleDto> {
         let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
         if !user.role().is("admin") {
             return Err(Error::unauthorized());
         }
 
         let role = self.role_repo.find_by_id(&RoleId::new(id)?).await?;
-        let mut role_dto = RoleDto::from(&role);
 
-        if include.has("users") {
-            role_dto = role_dto.users(
-                self.user_repo
-                    .find_by_role_id(role.base().id())
-                    .await?
-                    .iter()
-                    .map(UserDto::from)
-                    .collect(),
-            );
-        }
-
-        Ok(role_dto)
+        Ok(RoleDto::from(&role))
     }
 }

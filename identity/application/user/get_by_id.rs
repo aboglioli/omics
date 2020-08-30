@@ -1,7 +1,8 @@
 use common::error::Error;
+use common::request::Include;
 use common::result::Result;
 
-use crate::application::dtos::UserDto;
+use crate::application::dtos::{RoleDto, UserDto};
 use crate::domain::user::{UserId, UserRepository};
 
 pub struct GetById<'a> {
@@ -13,7 +14,12 @@ impl<'a> GetById<'a> {
         GetById { user_repo }
     }
 
-    pub async fn exec(&self, auth_id: String, user_id: String) -> Result<UserDto> {
+    pub async fn exec(
+        &self,
+        auth_id: String,
+        user_id: String,
+        include: Include,
+    ) -> Result<UserDto> {
         if auth_id != user_id {
             let auth_user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
             if !auth_user.role().is("admin") {
@@ -22,8 +28,13 @@ impl<'a> GetById<'a> {
         }
 
         let user = self.user_repo.find_by_id(&UserId::new(user_id)?).await?;
+        let mut user_dto = UserDto::from(&user);
 
-        Ok(UserDto::from(&user))
+        if include.has("role") {
+            user_dto = user_dto.role(RoleDto::from(user.role()));
+        }
+
+        Ok(user_dto)
     }
 }
 
@@ -42,7 +53,7 @@ mod tests {
         c.user_repo().save(&mut user).await.unwrap();
 
         let id = user.base().id().to_string();
-        let res = uc.exec(id.clone(), id).await.unwrap();
+        let res = uc.exec(id.clone(), id, Include::default()).await.unwrap();
 
         assert_eq!(res.id, user.base().id().value());
     }
@@ -57,7 +68,11 @@ mod tests {
 
         let id = user.base().id().to_string();
         assert!(uc
-            .exec(mocks::user2().base().id().to_string(), id)
+            .exec(
+                mocks::user2().base().id().to_string(),
+                id,
+                Include::default()
+            )
             .await
             .is_err());
     }
@@ -73,7 +88,11 @@ mod tests {
         c.user_repo().save(&mut admin).await.unwrap();
 
         assert!(uc
-            .exec(admin.base().id().to_string(), user.base().id().to_string())
+            .exec(
+                admin.base().id().to_string(),
+                user.base().id().to_string(),
+                Include::default()
+            )
             .await
             .is_ok());
     }
@@ -87,7 +106,7 @@ mod tests {
         c.user_repo().save(&mut user).await.unwrap();
 
         let id = user.base().id().to_string();
-        let res = uc.exec(id.clone(), id).await.unwrap();
+        let res = uc.exec(id.clone(), id, Include::default()).await.unwrap();
         assert_eq!(res.username, user.identity().username().value());
         assert!(res.name.is_none());
         assert!(res.lastname.is_none());
@@ -103,7 +122,7 @@ mod tests {
         c.user_repo().save(&mut user).await.unwrap();
 
         let id = user.base().id().to_string();
-        let res = uc.exec(id.clone(), id).await.unwrap();
+        let res = uc.exec(id.clone(), id, Include::default()).await.unwrap();
         assert_eq!(res.id, user.base().id().value());
         assert_eq!(res.username, user.identity().username().value());
         assert_eq!(res.name.unwrap(), user.person().unwrap().fullname().name());

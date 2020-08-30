@@ -1,5 +1,6 @@
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
 
+use common::request::IncludeParams;
 use identity::application::user::{
     ChangePassword, ChangePasswordCommand, ChangeRole, ChangeRoleCommand, Delete, GetById, Login,
     LoginCommand, RecoverPassword, RecoverPasswordCommand, Register, RegisterCommand, Search,
@@ -51,32 +52,14 @@ async fn recover_password(
 // GET /users?role_id=...
 async fn search(
     req: HttpRequest,
-    cmd: web::Json<SearchCommand>,
+    cmd: web::Query<SearchCommand>,
+    include: web::Query<IncludeParams>,
     c: web::Data<Container>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
     Search::new(c.identity.user_repo())
-        .exec(auth_id, cmd.into_inner())
-        .await
-        .map(|res| HttpResponse::Ok().json(res))
-        .map_err(PublicError::from)
-}
-
-async fn get_by_role_id(
-    req: HttpRequest,
-    path: web::Path<String>,
-    c: web::Data<Container>,
-) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
-
-    Search::new(c.identity.user_repo())
-        .exec(
-            auth_id,
-            SearchCommand {
-                role_id: Some(path.into_inner()),
-            },
-        )
+        .exec(auth_id, cmd.into_inner(), include.into_inner().into())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -86,12 +69,13 @@ async fn get_by_role_id(
 async fn get_by_id(
     req: HttpRequest,
     path: web::Path<String>,
+    include: web::Query<IncludeParams>,
     c: web::Data<Container>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
     GetById::new(c.identity.user_repo())
-        .exec(auth_id, path.into_inner())
+        .exec(auth_id, path.into_inner(), include.into_inner().into())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -128,17 +112,15 @@ async fn delete(
         .map_err(PublicError::from)
 }
 
-// PUT /users/password
+// PUT /users/:id/password
 async fn change_password(
-    req: HttpRequest,
+    _req: HttpRequest,
     path: web::Path<String>,
     cmd: web::Json<ChangePasswordCommand>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
-
-    ChangePassword::new(c.identity.user_repo(), c.identity.user_serv())
-        .exec(auth_id, path.into_inner(), cmd.into_inner())
+    ChangePassword::new(c.identity.user_serv())
+        .exec(path.into_inner(), cmd.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -174,7 +156,6 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.route("/register", web::post().to(register))
         .route("/login", web::post().to(login))
         .route("/recover-password", web::post().to(recover_password))
-        .route("/roles/{role_id}/users", web::get().to(get_by_role_id))
         .service(
             web::scope("/users")
                 .route("", web::get().to(search))

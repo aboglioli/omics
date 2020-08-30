@@ -154,7 +154,7 @@ impl User {
         };
 
         if !self.is_validated() {
-            return Err(Error::new("user", "not_validated"));
+            return Err(Error::new("user", "invalid_code"));
         }
 
         self.base.record_event(UserEvent::Validated {
