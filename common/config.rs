@@ -3,6 +3,7 @@ use std::env;
 pub struct Config {
     port: u16,
     env: String,
+    pagination_limit: usize,
 }
 
 impl Config {
@@ -16,6 +17,7 @@ impl Config {
                 _ => 80,
             },
             env: env::var("ENV").unwrap_or_else(|_| "development".to_owned()),
+            pagination_limit: 1000,
         }
     }
 
@@ -25,5 +27,9 @@ impl Config {
 
     pub fn env(&self) -> &str {
         &self.env
+    }
+
+    pub fn pagination_limit(&self) -> usize {
+        self.pagination_limit
     }
 }

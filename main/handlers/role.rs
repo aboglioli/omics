@@ -1,7 +1,7 @@
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
 
 use common::request::IncludeParams;
-use identity::application::role::{GetAll, GetById};
+use identity::application::role::{GetAll, GetById, GetUsers};
 
 use crate::authorization::auth;
 use crate::container::Container;
@@ -32,10 +32,25 @@ async fn get_by_id(
         .map_err(PublicError::from)
 }
 
+async fn get_users(
+    req: HttpRequest,
+    path: web::Path<String>,
+    c: web::Data<Container>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    GetUsers::new(c.identity.user_repo())
+        .exec(auth_id, path.into_inner())
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
+}
+
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/roles")
             .route("", web::get().to(get_all))
-            .route("/{role_id}", web::get().to(get_by_id)),
+            .route("/{role_id}", web::get().to(get_by_id))
+            .route("/{role_id}/users", web::get().to(get_users)),
     );
 }

@@ -1,9 +1,9 @@
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
 
 use identity::application::user::{
-    ChangePassword, ChangePasswordCommand, ChangeRole, ChangeRoleCommand, Delete, GetAll, GetById,
-    Login, LoginCommand, RecoverPassword, RecoverPasswordCommand, Register, RegisterCommand,
-    Update, UpdateCommand, Validate,
+    ChangePassword, ChangePasswordCommand, ChangeRole, ChangeRoleCommand, Delete, GetById, Login,
+    LoginCommand, RecoverPassword, RecoverPasswordCommand, Register, RegisterCommand, Search,
+    SearchCommand, Update, UpdateCommand, Validate,
 };
 
 use crate::authorization::auth;
@@ -48,12 +48,35 @@ async fn recover_password(
     .map_err(PublicError::from)
 }
 
-// GET /users
-async fn get_all(req: HttpRequest, c: web::Data<Container>) -> impl Responder {
+// GET /users?role_id=...
+async fn search(
+    req: HttpRequest,
+    cmd: web::Json<SearchCommand>,
+    c: web::Data<Container>,
+) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
-    GetAll::new(c.identity.user_repo())
-        .exec(auth_id)
+    Search::new(c.identity.user_repo())
+        .exec(auth_id, cmd.into_inner())
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
+}
+
+async fn get_by_role_id(
+    req: HttpRequest,
+    path: web::Path<String>,
+    c: web::Data<Container>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    Search::new(c.identity.user_repo())
+        .exec(
+            auth_id,
+            SearchCommand {
+                role_id: Some(path.into_inner()),
+            },
+        )
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -151,9 +174,10 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.route("/register", web::post().to(register))
         .route("/login", web::post().to(login))
         .route("/recover-password", web::post().to(recover_password))
+        .route("/roles/{role_id}/users", web::get().to(get_by_role_id))
         .service(
             web::scope("/users")
-                .route("", web::get().to(get_all))
+                .route("", web::get().to(search))
                 .route("/{user_id}", web::get().to(get_by_id))
                 .route("/{user_id}", web::put().to(update))
                 .route("/{user_id}", web::delete().to(delete))
