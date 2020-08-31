@@ -7,6 +7,7 @@ use common::result::Result;
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto, ReaderInteractionDto};
 use crate::domain::author::AuthorRepository;
 use crate::domain::category::CategoryRepository;
+use crate::domain::content_manager::{ContentManagerId, ContentManagerRepository};
 use crate::domain::interaction::InteractionService;
 use crate::domain::publication::{PublicationId, PublicationRepository, StatisticsService};
 use crate::domain::reader::{ReaderId, ReaderRepository};
@@ -22,6 +23,7 @@ pub struct GetById<'a> {
 
     author_repo: &'a dyn AuthorRepository,
     category_repo: &'a dyn CategoryRepository,
+    content_manager_repo: &'a dyn ContentManagerRepository,
     publication_repo: &'a dyn PublicationRepository,
     reader_repo: &'a dyn ReaderRepository,
 
@@ -34,6 +36,7 @@ impl<'a> GetById<'a> {
         event_pub: &'a dyn EventPublisher,
         author_repo: &'a dyn AuthorRepository,
         category_repo: &'a dyn CategoryRepository,
+        content_manager_repo: &'a dyn ContentManagerRepository,
         publication_repo: &'a dyn PublicationRepository,
         reader_repo: &'a dyn ReaderRepository,
         interaction_serv: &'a InteractionService,
@@ -43,6 +46,7 @@ impl<'a> GetById<'a> {
             event_pub,
             author_repo,
             category_repo,
+            content_manager_repo,
             publication_repo,
             reader_repo,
             interaction_serv,
@@ -59,6 +63,15 @@ impl<'a> GetById<'a> {
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
+        let is_content_manager = if let Some(auth_id) = &auth_id {
+            self.content_manager_repo
+                .find_by_id(&ContentManagerId::new(auth_id)?)
+                .await
+                .is_ok()
+        } else {
+            false
+        };
+
         let (mut publication_dto, reader_interaction_dto) = if let Some(auth_id) = auth_id {
             let is_reader_author = publication.author_id().value() == auth_id;
 
@@ -67,6 +80,11 @@ impl<'a> GetById<'a> {
                     PublicationDto::from(&publication)
                         .status(&publication)
                         .pages(&publication),
+                    None,
+                )
+            } else if is_content_manager {
+                (
+                    PublicationDto::from(&publication).status(&publication),
                     None,
                 )
             } else {
@@ -135,6 +153,7 @@ mod tests {
             c.event_pub(),
             c.author_repo(),
             c.category_repo(),
+            c.content_manager_repo(),
             c.publication_repo(),
             c.reader_repo(),
             c.interaction_serv(),
@@ -182,6 +201,7 @@ mod tests {
             c.event_pub(),
             c.author_repo(),
             c.category_repo(),
+            c.content_manager_repo(),
             c.publication_repo(),
             c.reader_repo(),
             c.interaction_serv(),
@@ -214,6 +234,7 @@ mod tests {
             c.event_pub(),
             c.author_repo(),
             c.category_repo(),
+            c.content_manager_repo(),
             c.publication_repo(),
             c.reader_repo(),
             c.interaction_serv(),
@@ -255,6 +276,7 @@ mod tests {
             c.event_pub(),
             c.author_repo(),
             c.category_repo(),
+            c.content_manager_repo(),
             c.publication_repo(),
             c.reader_repo(),
             c.interaction_serv(),
@@ -287,6 +309,7 @@ mod tests {
             c.event_pub(),
             c.author_repo(),
             c.category_repo(),
+            c.content_manager_repo(),
             c.publication_repo(),
             c.reader_repo(),
             c.interaction_serv(),

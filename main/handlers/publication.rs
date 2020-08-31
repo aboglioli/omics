@@ -65,6 +65,7 @@ async fn get_by_id(
         c.publishing.event_pub(),
         c.publishing.author_repo(),
         c.publishing.category_repo(),
+        c.publishing.content_manager_repo(),
         c.publishing.publication_repo(),
         c.publishing.reader_repo(),
         c.publishing.interaction_serv(),

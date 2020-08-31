@@ -98,6 +98,12 @@ impl Collection {
             return Err(Error::new("collection", "publication_is_not_published"));
         }
 
+        for item in self.items() {
+            if item.publication_id() == publication.base().id() {
+                return Err(Error::new("collection", "publication_exists"));
+            }
+        }
+
         let item = Item::new(publication.base().id().clone())?;
         self.items.push(item);
 

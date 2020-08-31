@@ -104,6 +104,16 @@ impl<'a> Search<'a> {
                 publication_dto = publication_dto.category(CategoryDto::from(&category));
             }
 
+            if let Some(auth_id) = &auth_id {
+                if publication.author_id().value() == auth_id {
+                    publication_dto = publication_dto.status(&publication).pages(&publication)
+                }
+            }
+
+            if is_content_manager {
+                publication_dto = publication_dto.status(&publication)
+            }
+
             publication_dtos.push(publication_dto);
         }
 
