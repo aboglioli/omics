@@ -3,14 +3,13 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ConfigService } from './config';
-import { ICollection } from '../models';
-import { ITag } from '../models/publication';
+import { ICollection, IPublication } from '../models';
 
 export interface ISearchCommand {
   author_id?: string;
   category_id?: string;
-  status?: string;
-  text?: string;
+  publication_id?: string;
+  name?: string;
 }
 
 export interface ISearchResponse {
@@ -21,7 +20,7 @@ export interface ICreateCommand {
   name: string;
   synopsis: string;
   category_id: string;
-  tags: ITag[];
+  tags: string[];
   cover: string;
 }
 
@@ -33,8 +32,12 @@ export interface IUpdateCommand {
   name: string;
   synopsis: string;
   category_id: string;
-  tags: ITag[];
+  tags: string[];
   cover: string;
+}
+
+export interface IGetPublicationsResponse {
+  publications: IPublication[];
 }
 
 @Injectable()
@@ -45,11 +48,26 @@ export class CollectionService {
     this.baseUrl = `${configServ.baseUrl()}/collections`;
   }
 
-  public getById(id: string): Observable<ICollection> {
-    return this.http.get<ICollection>(`${this.baseUrl}/${id}`);
+  public getById(id: string, include: string = ''): Observable<ICollection> {
+    let params = new HttpParams();
+
+    if (include) {
+      params = params.append('include', include);
+    }
+
+    return this.http.get<ICollection>(`${this.baseUrl}/${id}`, { params });
   }
 
-  public search(cmd: ISearchCommand): Observable<ISearchResponse> {
+  public getPublications(id: string, include: string = ''): Observable<IGetPublicationsResponse> {
+    let params = new HttpParams();
+
+    if (include) {
+      params = params.append('include', include);
+    }
+    return this.http.get<IGetPublicationsResponse>(`${this.baseUrl}/${id}/publications`, { params });
+  }
+
+  public search(cmd: ISearchCommand, include: string = ''): Observable<ISearchResponse> {
     let params = new HttpParams();
 
     if (cmd.author_id) {
@@ -60,12 +78,16 @@ export class CollectionService {
       params = params.append('category_id', cmd.category_id);
     }
 
-    if (cmd.status) {
-      params = params.append('status', cmd.status);
+    if (cmd.publication_id) {
+      params = params.append('publication_id', cmd.publication_id);
     }
 
-    if (cmd.text) {
-      params = params.append('text', cmd.text);
+    if (cmd.name) {
+      params = params.append('name', cmd.name);
+    }
+
+    if (include) {
+      params = params.append('include', include);
     }
 
     return this.http.get<ISearchResponse>(`${this.baseUrl}`, { params });

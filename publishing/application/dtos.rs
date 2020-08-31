@@ -212,7 +212,7 @@ pub struct ReviewDto {
 impl From<&Review> for ReviewDto {
     fn from(review: &Review) -> Self {
         ReviewDto {
-            reader_id: None,
+            reader_id: Some(review.base().reader_id().to_string()),
             reader: None,
             publication_id: review.base().publication_id().to_string(),
             stars: review.stars().value(),
@@ -222,12 +222,8 @@ impl From<&Review> for ReviewDto {
 }
 
 impl ReviewDto {
-    pub fn reader_id(mut self, review: &Review) -> Self {
-        self.reader_id = Some(review.base().reader_id().to_string());
-        self
-    }
-
     pub fn reader(mut self, review: ReaderDto) -> Self {
+        self.reader_id = None;
         self.reader = Some(review);
         self
     }

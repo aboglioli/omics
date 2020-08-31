@@ -2,19 +2,13 @@ import { IAuthor } from './author';
 import { ICategory } from './category';
 import { IStatistics } from './statistics';
 
-
 export interface IImage {
   url: string;
 }
 
 export interface IPage {
-  number: number;
-  images: FileReader;
-}
-
-export interface ITag {
-  id: string;
-  name: string;
+  number: number; // TODO: not used
+  images: FileReader; // TODO: change to string?
 }
 
 export interface IPublication {
@@ -27,7 +21,7 @@ export interface IPublication {
   synopsis: string;
   category_id?: string;
   category?: ICategory;
-  tags: ITag[];
+  tags: string[];
   statistics?: IStatistics;
   status?: string;
   pages?: IPage[];

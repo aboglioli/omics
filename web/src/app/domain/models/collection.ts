@@ -1,4 +1,3 @@
-import { IPublication, ITag } from './publication';
 import { ICategory } from './category';
 
 export interface ICollection {
@@ -9,6 +8,5 @@ export interface ICollection {
   synopsis: string;
   category_id?: string;
   category?: ICategory;
-  tags: ITag[];
-  publication: IPublication[];
+  tags: string[];
 }

@@ -3,13 +3,13 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ConfigService } from './config';
-import { IPublication, IReview, ITag } from '../models';
+import { IPublication, IReview, IPage } from '../models';
 
 export interface ISearchCommand {
   author_id?: string;
   category_id?: string;
   status?: string;
-  text?: string;
+  name?: string;
 }
 
 export interface ISearchResponse {
@@ -20,7 +20,7 @@ export interface ICreateCommand {
   name: string;
   synopsis: string;
   category_id: string;
-  tags: ITag[];
+  tags: string[];
   cover: string;
 }
 
@@ -32,12 +32,8 @@ export interface IUpdateCommand {
   name: string;
   synopsis: string;
   category_id: string;
-  tags: ITag[];
+  tags: string[];
   cover: string;
-}
-
-export interface IPage {
-  images: string[];
 }
 
 export interface IUpdatePagesCommand {
@@ -55,6 +51,11 @@ export interface IGetReviewsResponse {
   reviews: IReview[];
 }
 
+export interface IReadResponse {
+  id: string;
+  pages: IPage[];
+}
+
 @Injectable()
 export class PublicationService {
   private baseUrl: string;
@@ -63,11 +64,17 @@ export class PublicationService {
     this.baseUrl = `${configServ.baseUrl()}/publications`;
   }
 
-  public getById(id: string): Observable<IPublication> {
-    return this.http.get<IPublication>(`${this.baseUrl}/${id}`);
+  public getById(id: string, include: string = ''): Observable<IPublication> {
+    let params = new HttpParams();
+
+    if (include) {
+      params = params.append('include', include);
+    }
+
+    return this.http.get<IPublication>(`${this.baseUrl}/${id}`, { params });
   }
 
-  public search(cmd: ISearchCommand): Observable<ISearchResponse> {
+  public search(cmd: ISearchCommand, include: string = ''): Observable<ISearchResponse> {
     let params = new HttpParams();
 
     if (cmd.author_id) {
@@ -82,8 +89,12 @@ export class PublicationService {
       params = params.append('status', cmd.status);
     }
 
-    if (cmd.text) {
-      params = params.append('text', cmd.text);
+    if (cmd.name) {
+      params = params.append('name', cmd.name);
+    }
+
+    if (include) {
+      params = params.append('include', include);
     }
 
     return this.http.get<ISearchResponse>(`${this.baseUrl}`, { params });
@@ -117,8 +128,8 @@ export class PublicationService {
     return this.http.post(`${this.baseUrl}/${id}/reject`, {});
   }
 
-  public read(id: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${id}/read`, {});
+  public read(id: string): Observable<IReadResponse> {
+    return this.http.get<IReadResponse>(`${this.baseUrl}/${id}/read`);
   }
 
   public like(id: string): Observable<any> {
@@ -129,11 +140,11 @@ export class PublicationService {
     return this.http.post(`${this.baseUrl}/${id}/unlike`, {});
   }
 
-  public add_review(id: string, cmd: IAddReviewCommand): Observable<any> {
+  public addReview(id: string, cmd: IAddReviewCommand): Observable<any> {
     return this.http.post(`${this.baseUrl}/${id}/review`, cmd);
   }
 
-  public delete_review(id: string): Observable<any> {
+  public deleteReview(id: string): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${id}/review`);
   }
 

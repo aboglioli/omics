@@ -1,9 +1,17 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ConfigService } from './config';
 import { IUser } from '../models';
+
+export interface ISearchCommand {
+  role_id?: string;
+}
+
+export interface ISearchResponse {
+  users: IUser[];
+}
 
 export interface IRegisterCommand {
   username: string;
@@ -29,6 +37,9 @@ export interface ILoginResponse {
 export interface IUpdateCommand {
   name: string;
   lastname: string;
+  birthdate?: string; // RFC 3339
+  gender?: string; // male, female
+  profile_image?: string;
 }
 
 export interface IChangePasswordCommand {
@@ -44,8 +55,28 @@ export class IdentityService {
     this.baseUrl = `${configServ.baseUrl()}/users`;
   }
 
-  public getById(id: string): Observable<IUser> {
-    return this.http.get<IUser>(`${this.baseUrl}/${id}`);
+  public getById(id: string, include: string = ''): Observable<IUser> {
+    let params = new HttpParams();
+
+    if (include) {
+      params = params.append('include', include);
+    }
+
+    return this.http.get<IUser>(`${this.baseUrl}/${id}`, { params });
+  }
+
+  public search(cmd: ISearchCommand, include: string = ''): Observable<ISearchResponse> {
+    let params = new HttpParams();
+
+    if (cmd.role_id) {
+      params = params.append('role_id', cmd.role_id);
+    }
+
+    if (include) {
+      params = params.append('include', include);
+    }
+
+    return this.http.get<ISearchResponse>(`${this.baseUrl}`, { params });
   }
 
   public register(cmd: IRegisterCommand): Observable<IRegisterResponse> {

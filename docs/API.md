@@ -20,36 +20,37 @@
 - [ ] POST /users/callback
 
 ## Publishing
-- [ ] GET /authors?name=... ([]Author)
-- [ ] GET /authors/:id (Author)
-- [ ] GET /authors/:id/publications?include=category ([]Publication)
-- [ ] GET /authors/:id/collections?include=category ([]Collection)
-- [ ] GET /authors/:id/followers ([]Reader) // to implement
-- [ ] POST /authors/:id/follow
+- [x] GET /authors?name=... ([]Author)
+- [x] GET /authors/:id (Author)
+- [x] GET /authors/:id/publications?include=category ([]Publication)
+- [x] GET /authors/:id/collections?include=category ([]Collection)
+- [ ] GET /authors/:id/followers ([]Reader)
+- [x] POST /authors/:id/follow
 
 - [ ] GET /readers/:id (Reader)
 - [ ] GET /readers/:id/following ([]Author)
 - [ ] GET /readers/:id/favorites ([]Publication)
 
-- [ ] GET /collections?name=...&include=author,category ([]Collection)
-- [ ] GET /collections/:id?include=author,category (Collection)
-- [ ] GET /collections/:id/publications?include=author,category ([]Publication)
-- [ ] POST /collections
-- [ ] PUT,DELETE /collections/:id
-- [ ] POST,DELETE /collections/:id/publication/:publicationId
+- [x] GET /collections?name=...&include=author,category ([]Collection)
+- [x] GET /collections/:id?include=author,category (Collection)
+- [x] GET /collections/:id/publications?include=author,category ([]Publication)
+- [x] POST /collections
+- [x] PUT /collections/:id
+- [x] DELETE /collections/:id
+- [x] POST,DELETE /collections/:id/publication/:publicationId
 
-- [ ] GET /categories ([]Category)
-- [ ] GET /categories/:id (Category)
-- [ ] GET /categories/:id/publications?include=author ([]Publication)
-- [ ] GET /categories/:id/collections?include=author ([]Collection)
-- [ ] POST /categories
-- [ ] PUT /categories/:id
+- [x] GET /categories ([]Category)
+- [x] GET /categories/:id (Category)
+- [x] GET /categories/:id/publications?include=author ([]Publication)
+- [x] GET /categories/:id/collections?include=author ([]Collection)
+- [x] POST /categories
+- [x] PUT /categories/:id
 
-- [ ] GET /publications?status=...&name=...&include=author,category ([]Publication)
-- [ ] GET /publications/:id?include=author,category (Publication)
-- [ ] GET /publications/:id/collections?include=author,category ([]Collection)
-- [ ] POST /publications
-- [ ] PUT /publications/:id
+- [x] GET /publications?status=...&name=...&include=author,category ([]Publication)
+- [x] GET /publications/:id?include=author,category (Publication)
+- [x] GET /publications/:id/collections?include=author,category ([]Collection)
+- [x] POST /publications
+- [x] PUT /publications/:id
 
 - [ ] GET /publications/:id/read
 - [ ] POST /publications/:id/publish
