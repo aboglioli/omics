@@ -3,7 +3,7 @@ use actix_web::{web, HttpRequest, HttpResponse, Responder};
 use common::request::IncludeParams;
 use publishing::application::publication::{
     AddReview, AddReviewCommand, Approve, Create, CreateCommand, Delete, DeleteReview, GetById,
-    Like, Publish, Read, Reject, GetReviews, Search, SearchCommand, Unlike, Update, UpdateCommand,
+    GetReviews, Like, Publish, Read, Reject, Search, SearchCommand, Unlike, Update, UpdateCommand,
     UpdatePages, UpdatePagesCommand,
 };
 
