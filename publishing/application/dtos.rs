@@ -53,7 +53,6 @@ impl From<&Author> for AuthorDto {
 pub struct CategoryDto {
     pub id: String,
     pub name: String,
-    pub publications: Option<Vec<PublicationDto>>,
 }
 
 impl From<&Category> for CategoryDto {
@@ -61,15 +60,7 @@ impl From<&Category> for CategoryDto {
         CategoryDto {
             id: category.base().id().to_string(),
             name: category.name().to_string(),
-            publications: None,
         }
-    }
-}
-
-impl CategoryDto {
-    pub fn publications(mut self, publications: Vec<PublicationDto>) -> Self {
-        self.publications = Some(publications);
-        self
     }
 }
 

@@ -3,7 +3,7 @@ use actix_web::{web, HttpRequest, HttpResponse, Responder};
 use common::request::IncludeParams;
 use publishing::application::publication::{
     AddReview, AddReviewCommand, Approve, Create, CreateCommand, Delete, DeleteReview, GetById,
-    Like, Publish, Read, Reject, Reviews, Search, SearchCommand, Unlike, Update, UpdateCommand,
+    Like, Publish, Read, Reject, GetReviews, Search, SearchCommand, Unlike, Update, UpdateCommand,
     UpdatePages, UpdatePagesCommand,
 };
 
@@ -287,14 +287,14 @@ async fn delete_review(
 }
 
 // GET /publications/:id/reviews
-async fn reviews(
+async fn get_reviews(
     req: HttpRequest,
     path: web::Path<String>,
     c: web::Data<Container>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
-    Reviews::new(c.publishing.interaction_repo(), c.publishing.reader_repo())
+    GetReviews::new(c.publishing.interaction_repo(), c.publishing.reader_repo())
         .exec(auth_id, path.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
@@ -318,6 +318,6 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .route("/{publicaton_id}/unlike", web::post().to(unlike))
             .route("/{publicaton_id}/review", web::post().to(review))
             .route("/{publicaton_id}/review", web::delete().to(delete_review))
-            .route("/{publicaton_id}/reviews", web::get().to(reviews)),
+            .route("/{publicaton_id}/reviews", web::get().to(get_reviews)),
     );
 }
