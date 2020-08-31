@@ -1,22 +1,76 @@
-use futures::{Stream, StreamExt};
+use std::io::Write;
+
 use actix_multipart::Multipart;
 use actix_web::{web, Error, HttpRequest, HttpResponse, Responder};
+use bytes::Bytes;
+use futures::StreamExt;
 
 use common::request::CommandResponse;
 
-// POST /upload
-async fn upload(mut payload: Multipart) -> Result<HttpResponse, Error> {
-    while let Some(item) = payload.next().await {
-        let mut field = item?;
+#[derive(Debug, Clone)]
+pub struct File {
+    name: String,
+    path: String,
+}
 
-        println!("{}", field.content_disposition().unwrap().get_name().unwrap());
+impl File {
+    pub fn new<S: Into<String>>(name: S) -> Self {
+        let name = name.into();
 
-        while let Some(chunk) = field.next().await {
-            println!("-- CHUNK: \n{:?}", std::str::from_utf8(&chunk?));
+        File {
+            name: name.clone(),
+            path: format!("./tmp/{}", name),
         }
     }
 
-    Ok(HttpResponse::Ok().into())
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn path(&self) -> &str {
+        &self.path
+    }
+}
+
+// POST /upload
+async fn upload(mut payload: Multipart) -> Result<HttpResponse, Error> {
+    let mut files: Vec<File> = Vec::new();
+    let mut data = Bytes::new();
+
+    while let Some(item) = payload.next().await {
+        let mut field = item?;
+        let content_type = field.content_disposition().unwrap();
+        let name = content_type.get_name().unwrap();
+
+        if name == "data" {
+            while let Some(chunk) = field.next().await {
+                data = chunk?;
+            }
+        } else {
+            match content_type.get_filename() {
+                Some(filename) => {
+                    let file = File::new(sanitize_filename::sanitize(&filename));
+                    let path = file.path().to_owned();
+                    let mut f = web::block(move || std::fs::File::create(path)).await?;
+
+                    while let Some(chunk) = field.next().await {
+                        let data = chunk?;
+                        f = web::block(move || f.write_all(&data).map(|_| f)).await?;
+                    }
+
+                    files.push(file.clone());
+                }
+                None => {
+                    println!("No file");
+                }
+            }
+        }
+    }
+
+    println!("bytes = {:#?}", data);
+    println!("files = {:#?}", files);
+
+    Ok(HttpResponse::Ok().json(CommandResponse::default()))
 }
 
 // GET /upload
@@ -63,6 +117,8 @@ fn index() -> HttpResponse {
 }
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
+    std::fs::create_dir_all("./tmp").unwrap();
+
     cfg.service(
         web::scope("/upload")
             .route("", web::get().to(index))
