@@ -18,77 +18,84 @@
 <!-- Body -->
 <mat-dialog-content class="mat-typography body">
 
-  <mat-tab-group color="primary" (selectedTabChange)="changeLoginShow($event.index)">
+  <mat-tab-group color="primary" (selectedTabChange)="changeLoginShow($event.index)" style="height: 100%;">
 
     <!-- LOGUEARSE -->
     <mat-tab label="LOGIN">
 
-      <form autocomplete="off" [formGroup]="formLogin">
+      <div class="panel">
 
-        <!-- Correo o Usuario -->
-        <div class="form-group row">
-          <div class="col">
+        <form autocomplete="off" [formGroup]="formLogin">
 
-            <div class="top-field">
+          <!-- Correo o Usuario -->
+          <div class="form-group row">
+            <div class="col">
 
-              <small class="form-text text-top">
-                Correo ó Usuario
-              </small>
+              <div class="top-field">
 
-              <!-- mensaje de error -->
-              <small  *ngIf="correoUsuarioLoginNovalido"
-                      class="form-text text-danger">
-                Ingrese un correo o usuario válido
-              </small>
+                <small class="form-text text-top">
+                  Correo ó Usuario
+                </small>
+
+                <!-- mensaje de error -->
+                <small  *ngIf="correoUsuarioLoginNovalido"
+                        class="form-text text-danger">
+                  Ingrese un correo o usuario válido
+                </small>
+
+              </div>
+
+              <input class="form-control"
+                    type="text"
+                    placeholder="Correo / Usuario"
+                    formControlName="correoUsuario"
+                    [class.is-invalid]="correoUsuarioLoginNovalido">
 
             </div>
-
-            <input class="form-control"
-                   type="text"
-                   placeholder="Correo / Usuario"
-                   formControlName="correoUsuario"
-                   [class.is-invalid]="correoUsuarioLoginNovalido">
-
           </div>
-        </div>
 
-        <!-- Contraseña -->
-        <div class="form-group row">
-          <div class="col">
+          <!-- Contraseña -->
+          <div class="form-group row">
+            <div class="col">
 
-            <div class="top-field">
+              <div class="top-field">
 
-              <small class="form-text text-top">
-                Contraseña
-              </small>
+                <small class="form-text text-top">
+                  Contraseña
+                </small>
 
-              <!-- mensaje de error -->
-              <small  *ngIf="passwordLoginNoValido"
-                      class="form-text text-danger">
-                  Contraseña no válida
-              </small>
+                <!-- mensaje de error -->
+                <small  *ngIf="passwordLoginNoValido"
+                        class="form-text text-danger">
+                    Contraseña no válida
+                </small>
+
+              </div>
+
+              <div class="input-with-icon">
+                <input  class="form-control"
+                        [type]="passwordListType.login.type"
+                        placeholder="Contraseña"
+                        formControlName="password"
+                        [class.is-invalid]="passwordLoginNoValido">
+
+                <fa-icon  class="button"
+                          (click)="showPasswordLogin( 'login', passwordListType.login.visible )"
+                          [icon]="(passwordListType.login.visible)  ? faEyeSlash : faEyeOpen"
+                          size="1x">
+                </fa-icon>
+
+              </div>
 
             </div>
-
-            <div class="input-with-icon">
-              <input  class="form-control"
-                      [type]="passwordListType.login.type"
-                      placeholder="Contraseña"
-                      formControlName="password"
-                      [class.is-invalid]="passwordLoginNoValido">
-
-              <fa-icon  class="button"
-                        (click)="showPasswordLogin( 'login', passwordListType.login.visible )"
-                        [icon]="(passwordListType.login.visible)  ? faEyeSlash : faEyeOpen"
-                        size="1x">
-              </fa-icon>
-
-            </div>
-
           </div>
-        </div>
 
-      </form>
+        </form>
+
+        <hr>
+        <a [routerLink]="">¿No recuerdas la contraseña?</a>
+
+      </div>
 
     </mat-tab>
 
