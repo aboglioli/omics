@@ -5,11 +5,11 @@ div.deskboard-body {
   flex-direction: row;
 
   @media screen and (min-width: $break-small) {
-    height: calc(100vh - 4.6em);
+    min-height: calc(100vh - 4.6em);
   }
 
   @media screen and (max-width: $break-small) {
-    height: calc(100vh - 4.0em);
+    min-height: 100vh;
   }
 
 
@@ -28,6 +28,7 @@ div.deskboard-body {
   div.center {
 
     flex: 4;
+    width: 100%;
 
     display: flex;
     flex-direction: column;
@@ -127,21 +128,17 @@ div.deskboard-body {
         flex-direction: column;
         width: 100%;
 
-        padding-right: 2em;
-        margin-top: 1em;
-        margin-left: 1em;
-
-        p.text-danger {
-          text-align: end;
-          font-weight: bold;
-          font-size: medium;
-          margin: 0;
-        }
-
-        div.tile-and-field {
+        div.title-and-error {
 
           display: flex;
-          flex-direction: row;
+          justify-content: space-between;
+
+          p.text-danger {
+            text-align: end;
+            font-weight: 500;
+            font-size: medium;
+            margin: 0;
+          }
 
           p.field-name {
             display: flex;
@@ -156,9 +153,120 @@ div.deskboard-body {
 
         }
 
+      }
+
+      .text-area {
+        margin-top: 0.5em;
+
+        ::ng-deep div.mat-form-field-flex {
+          background-color: white;
+          color: black;
+          border-radius: 6px;
+        }
+      }
+
+      div.tag-list {
+
+        ::ng-deep div.mat-form-field-flex {
+          margin-top: 0.5em;
+          background-color: white;
+          color: black;
+          padding-left: 0.5em;
+          padding-right: 0.5em;
+          border-radius: 6px;
+
+          ::ng-deep div.mat-form-field-infix{
+            border-top-width: 18px;
+          }
+
+        }
 
       }
 
+      div.page-box {
+
+        background-color: $omics-background-flat;
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: flex-start;
+
+        margin-top: 1em;
+        max-height: 300px;
+        overflow-y: auto;
+
+        border-style: solid;
+        border-color: white;
+        border-width: thin;
+        border-radius: 6px;
+
+        .page {
+
+          height: 184px;
+          width: 130px;
+
+          margin: 0.5em 0.5em;
+
+        }
+
+        .add-page {
+
+          background-color: $omics-aqua-button;
+          cursor: pointer;
+
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          &:hover {
+            border-style: solid;
+            border-color: white;
+            border-width: thin;
+          }
+
+        }
+
+        .page-added {
+
+          background-color: gray;
+          position: relative;
+
+          img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+          }
+
+          div.page-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: rgba(32,29,46,0.50);
+
+            width: 100%;
+
+            padding: 0em 0.25em;
+            position: absolute;
+
+            h2 {
+              margin: 0px;
+            }
+
+            fa-icon {
+              color: $omics-error;
+
+              display: flex;
+              align-items: center;
+
+              cursor: pointer;
+
+            }
+
+          }
+
+        }
+
+      }
 
     }
 
@@ -192,9 +300,7 @@ div.align-center {
 
 }
 
-
-
-.dropdown {
+.dropdown, .dropup {
 
   width: 100%;
 
@@ -221,5 +327,21 @@ div.align-center {
       margin-bottom: 0px;
     }
   }
+
+}
+
+::ng-deep .mat-form-field-ripple {
+  background-color: $omics-neon-pink !important;
+}
+
+::ng-deep .mat-form-field-underline {
+  background-color: $omics-background-flat !important;
+  height: 2px !important;
+}
+
+
+.row {
+
+  margin: 0px;
 
 }

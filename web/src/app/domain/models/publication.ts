@@ -9,20 +9,25 @@ export interface IImage {
 
 export interface IPage {
   number: number;
-  images: string[];
+  images: FileReader;
+}
+
+export interface ITag {
+  id: string;
+  name: string;
 }
 
 export interface IPublication {
   id: string;
   author_id?: string;
   author?: IAuthor;
-  cover: string;
+  cover: FileReader;
   name: string;
   collection: string;
   synopsis: string;
   category_id?: string;
   category?: ICategory;
-  tags: string[];
+  tags: ITag[];
   statistics?: IStatistics;
   status?: string;
   pages?: IPage[];

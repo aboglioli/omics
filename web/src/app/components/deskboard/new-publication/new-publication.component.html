@@ -29,7 +29,7 @@
       <form autocomplete="off" [formGroup]="formPublication">
 
         <!-- Block: Portada publicación, campo nombre y colección -->
-        <div class="row">
+        <div class="row" style="width: 100%;">
 
           <!-- Portada -->
           <div class="image-field" style="flex: 1">
@@ -48,82 +48,79 @@
           </div>
 
           <!-- Block campo nombre y colección -->
-          <div class="align-center" style="padding: 0px; flex: 3">
+          <div class="align-center" style="padding: 0px; flex: 3; width: 100%; margin: 0em 1em">
 
             <!-- Block: campo nombre -->
             <div class="input-field-row">
 
-              <!-- mensaje de error -->
-              <p  *ngIf="nombreNovalido"
-                  class="form-text text-danger">
-                  Ingrese un título válido
-              </p>
-
-              <!-- Input text -->
-              <div class="tile-and-field">
-
+              <div class="title-and-error">
                 <p class="field-name">Título: </p>
 
-                <input class="form-control"
-                        type="text"
-                        placeholder="Título"
-                        formControlName="name"
-                        [class.is-invalid]="nombreNovalido">
-
+                <!-- mensaje de error -->
+                <p  *ngIf="nombreNovalido"
+                    class="form-text text-danger">
+                    Ingrese un título válido
+                </p>
               </div>
 
+              <!-- Input text -->
+              <input class="form-control"
+                      type="text"
+                      placeholder="Título"
+                      formControlName="name"
+                      [class.is-invalid]="nombreNovalido">
+
+
             </div>
+
+            <br>
 
             <!-- Block: colección -->
             <div class="input-field-row">
 
-              <!-- Input text -->
-              <div class="tile-and-field">
+              <div class="title-and-error" >
+              <p class="field-name">Colección: </p>
+              </div>
 
-                <p class="field-name">Colección: </p>
+              <div  class="d-inline-block"
+                    ngbDropdown
+                    #dropdownColection="ngbDropdown">
 
-                <div  class="d-inline-block"
-                      ngbDropdown
-                      #dropdownColection="ngbDropdown">
+                <button class="btn button-white-borders hover-white mr-2"
+                        id="dropdown-colection" ngbDropdownAnchor
+                        (focus)="dropdownColection.open();">
+                          Lista de colecciones disponibles
+                </button>
 
-                  <button class="btn button-white-borders hover-white mr-2"
-                          id="dropdown-colection" ngbDropdownAnchor
-                          (focus)="dropdownColection.open();">
-                            Lista de colecciones disponibles
-                  </button>
+                <div ngbDropdownMenu aria-labelledby="dropdown-colection">
 
-                  <div ngbDropdownMenu aria-labelledby="dropdown-colection">
+                  <ul>
+                    <!-- Sin colección (deseleccionar los checkbox) -->
+                    <li style="width: 100%; padding-left: 1em;">
 
-                    <ul >
+                      <mat-radio-button color="primary"
+                                        [checked]="isNotCheckedAllCollection()"
+                                        (change)="onRadioChangeCollection()">
+                        Sin colección asignada
+                      </mat-radio-button>
+                      <hr>
 
-                      <!-- Sin colección (deseleccionar los checkbox) -->
-                      <li style="width: 100%; padding-left: 1em;">
+                    </li>
 
-                        <mat-radio-button color="primary"
-                                          [checked]="isNotCheckedAllCollection()"
-                                          (change)="onRadioChangeCollection()">
-                          Sin colección asignada
-                        </mat-radio-button>
-                        <hr>
+                    <!-- Opciones múltiples -->
+                    <li style="width: 100%; padding-left: 1em;"
+                        *ngFor="let collection of collectionList">
 
-                      </li>
+                      <mat-checkbox color="primary"
+                                    [value]="collection.valueId"
+                                    [checked]="isCheckedCollectionItem(collection)"
+                                    (click)="$event.stopPropagation()"
+                                    (change)="onCheckboxChangeCollection($event.source);">
+                        {{ collection.name }}
+                      </mat-checkbox>
 
-                      <!-- Opciones múltiples -->
-                      <li style="width: 100%; padding-left: 1em;"
-                          *ngFor="let collection of collectionList">
-
-                        <mat-checkbox color="primary"
-                                      [value]="collection.valueId"
-                                      [checked]="isCheckedCollectionItem(collection)"
-                                      (click)="$event.stopPropagation()"
-                                      (change)="onCheckboxChangeCollection($event.source);">
-                          {{ collection.name }}
-                        </mat-checkbox>
-
-                      </li>
-                    </ul>
-
-                  </div>
+                    </li>
+                  </ul>
 
                 </div>
 
@@ -135,25 +132,165 @@
 
         </div >
 
-        <!-- Block: Categoria -->
+        <!-- Block: Categoria y tags-->
         <br>
         <div class="row">
 
-          <div class="col">Block:  Categoria </div>
+          <!-- Categoria -->
+          <div class="col-md-12 col-lg-6" style="margin-bottom: 1em">
+
+            <div class="input-field-row">
+
+              <div class="title-and-error" >
+                <p class="field-name">Categoría: </p>
+              </div>
+
+              <div  class="d-inline-block"
+                    ngbDropdown
+                    #dropdownCategory="ngbDropdown">
+
+                <button class="btn button-white-borders hover-white mr-2"
+                        id="dropdown-category" ngbDropdownAnchor
+                        (focus)="dropdownCategory.open();">
+                          Lista de categorías disponibles
+                </button>
+
+                <div ngbDropdownMenu aria-labelledby="dropdown-category">
+
+                  <!-- Opciones únicas -->
+                  <mat-radio-group formControlName="category_id">
+                  <ul>
+                    <li style="width: 100%; padding-left: 1em;"
+                        *ngFor="let category of categoryList">
+
+                      <mat-radio-button color="primary"
+                                    [value]="category.valueId">
+                        {{ category.name }}
+                      </mat-radio-button>
+
+                    </li>
+                  </ul>
+                </mat-radio-group>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Tags -->
+          <div class="col-md-12 col-lg-6 tag-list"  style="margin-bottom: 1em">
+
+            <div class="input-field-row">
+
+              <div class="title-and-error" >
+                <p class="field-name">Etiquetas: </p>
+              </div>
+
+              <mat-form-field style="width: 100%">
+
+                <mat-chip-list #chipTagList aria-label="Tag selection">
+
+                  <mat-chip *ngFor="let tag of tagsList"
+                            [selectable]="true"
+                            [removable]="true"
+                            (removed)="removeTag(tag)">
+                    {{tag.name}}
+                    <mat-icon matChipRemove>cancel</mat-icon>
+                  </mat-chip>
+
+                  <input  placeholder="Lista de Etiquetas..."
+                          [matChipInputFor]="chipTagList"
+                          [matChipInputAddOnBlur]="true"
+                          [matChipInputSeparatorKeyCodes]="chipTagsKeysCodes"
+                          (matChipInputTokenEnd)="addTag($event)">
+
+                </mat-chip-list>
+
+              </mat-form-field>
+
+            </div>
+
+          </div>
 
         </div>
 
         <!-- Block: Descripción -->
         <div class="row">
 
-          <div class="col">Block: Descripción</div>
+          <div class="col-12">
+            <div class="input-field-row">
 
+              <div class="title-and-error" >
+                <p class="field-name">Descripción: </p>
+
+                <!-- mensaje de error -->
+                <p  *ngIf="synopsisNovalido"
+                    class="form-text text-danger">
+                  <mat-error>Requiere que sea más de 5 caracteres o menos de 512</mat-error>
+                </p>
+
+              </div>
+
+              <mat-form-field appearance="fill" class="text-area">
+                <mat-label>{{ synopsisLenght }} / 512</mat-label>
+                <textarea matInput
+                          formControlName="synopsis"></textarea>
+              </mat-form-field>
+
+            </div>
+
+          </div>
         </div>
+
+        <br>
 
         <!-- Block: Subir páginas -->
         <div class="row">
 
-          <div class="col">Block: Subir páginas</div>
+          <div class="col-12">
+            <div class="input-field-row">
+
+              <!-- Cabecera -->
+              <div class="title-and-error" >
+
+                <p class="field-name">
+                  <fa-icon [icon]="faBoookOpen" style="margin-right: 1em;"></fa-icon>
+                  Páginas( {{ pagesTotal }} )
+                </p>
+              </div>
+
+              <!-- Paginas box -->
+              <div class="page-box border-pink-glow" formArrayName="pagesList">
+
+                <!--  Add a page -->
+                <div  class="add-page page"
+                      (click)="addPage()">
+                  <fa-icon [icon]="faPlus" size="3x"></fa-icon>
+                </div>
+
+                <!-- Page list -->
+                <div  *ngFor="let page of pagesList.controls; let i = index"
+                      class="page-added page">
+
+                  <div class="page-header">
+                    <h2>{{ page.value.number }}</h2>
+                    <fa-icon  [icon]="faCloseCircle" size="2x"
+                              (click)="removePage(i)"></fa-icon>
+                  </div>
+
+                  <img  [src]="page.value.thumbailImage" alt="Page image">
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+          </div>
 
         </div>
 
@@ -166,3 +303,19 @@
   <div class="side"></div>
 
 </div>
+
+
+<swal #formDataInvalid
+  title="Datos incompletos o erroneos"
+  text="Complete correctamente los datos necesarios"
+  icon="error"
+  [focusConfirm]="true">
+</swal>
+
+<swal #formDataValid
+  title="Publicación realizada"
+  text="¡Se ha subido correctamente!"
+  icon="success"
+  [focusConfirm]="true"
+  (confirm)="backToDeskboard()">
+</swal>

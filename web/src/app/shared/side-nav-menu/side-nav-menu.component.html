@@ -8,7 +8,8 @@
     </button>
 
     <!-- Menu cabecera -->
-    <button mat-stroked-button class="button-white-borders"
+    <button *ngIf="!isAccessUserLogIn"
+            mat-stroked-button class="button-white-borders"
             (click)="openRegisterLoginDialog()">
       ¡Comienza a ser parte de Omics!
     </button>

@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ConfigService } from './config';
-import { IPublication, IReview } from '../models';
+import { IPublication, IReview, ITag } from '../models';
 
 export interface ISearchCommand {
   author_id?: string;
@@ -20,7 +20,7 @@ export interface ICreateCommand {
   name: string;
   synopsis: string;
   category_id: string;
-  tags: string[];
+  tags: ITag[];
   cover: string;
 }
 
@@ -32,7 +32,7 @@ export interface IUpdateCommand {
   name: string;
   synopsis: string;
   category_id: string;
-  tags: string[];
+  tags: ITag[];
   cover: string;
 }
 

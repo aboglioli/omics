@@ -14,6 +14,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { ChartsModule } from 'ng2-charts';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 // Modulos auxiliares
 import { MaterialModule } from './auxiliar-modules/material.module';
@@ -84,19 +85,20 @@ import { DomainModule } from './domain/module';
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    MaterialModule,
-    FormsModule, // Si se usa por template
     ReactiveFormsModule, // si se usa reactivos
-    AngularBootstrapModule,
+    FormsModule, // Si se usa por template
     HttpClientModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     ChartsModule,
     ToastrModule.forRoot(),
     FontAwesomeModule,
     NgxSpinnerModule,
+    SweetAlert2Module.forRoot(),
 
     // Custom modules
     DomainModule,
+    MaterialModule,
+    AngularBootstrapModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
