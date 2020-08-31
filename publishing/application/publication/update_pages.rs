@@ -90,18 +90,18 @@ mod tests {
                 pages: vec![
                     PageDto {
                         images: vec![
-                            "domain.com/image1".to_owned(),
-                            "domain.com/image2".to_owned(),
+                            "domain.com/image.jpg".to_owned(),
+                            "domain.com/image2.jpg".to_owned(),
                         ],
                     },
                     PageDto {
                         images: vec![
-                            "domain.com/image3".to_owned(),
-                            "domain.com/image4".to_owned(),
+                            "domain.com/image3.jpg".to_owned(),
+                            "domain.com/image4.jpg".to_owned(),
                         ],
                     },
                     PageDto {
-                        images: vec!["domain.com/image5".to_owned()],
+                        images: vec!["domain.com/image5.jpg".to_owned()],
                     },
                 ],
             },
@@ -134,18 +134,18 @@ mod tests {
                     pages: vec![
                         PageDto {
                             images: vec![
-                                "domain.com/image1".to_owned(),
-                                "domain.com/image2".to_owned()
+                                "domain.com/image.jpg".to_owned(),
+                                "domain.com/image2.jpg".to_owned()
                             ],
                         },
                         PageDto {
                             images: vec![
-                                "domain.com/image3".to_owned(),
-                                "domain.com/image4".to_owned()
+                                "domain.com/image3.jpg".to_owned(),
+                                "domain.com/image4.jpg".to_owned()
                             ],
                         },
                         PageDto {
-                            images: vec!["domain.com/image5".to_owned()],
+                            images: vec!["domain.com/image5.jpg".to_owned()],
                         },
                     ],
                 },

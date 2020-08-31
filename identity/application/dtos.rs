@@ -10,6 +10,9 @@ pub struct UserDto {
     pub email: String,
     pub name: Option<String>,
     pub lastname: Option<String>,
+    pub birthdate: Option<String>,
+    pub gender: Option<String>,
+    pub profile_image: Option<String>,
     pub validated: bool,
     pub role_id: Option<String>,
     pub role: Option<RoleDto>,
@@ -31,6 +34,18 @@ impl From<&User> for UserDto {
             email: user.identity().email().to_string(),
             name: user.person().map(|p| p.fullname().name().to_string()),
             lastname: user.person().map(|p| p.fullname().lastname().to_string()),
+            birthdate: user
+                .person()
+                .map(|p| p.birthdate().map(|b| b.date().to_string()))
+                .flatten(),
+            gender: user
+                .person()
+                .map(|p| p.gender().map(|g| g.to_string()))
+                .flatten(),
+            profile_image: user
+                .person()
+                .map(|p| p.profile_image().map(|i| i.to_string()))
+                .flatten(),
             validated: user.is_validated(),
             role_id: Some(user.role().base().id().to_string()),
             role: None,

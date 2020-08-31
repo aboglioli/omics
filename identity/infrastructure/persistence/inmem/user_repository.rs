@@ -94,7 +94,7 @@ mod tests {
         let repo = InMemUserRepository::new();
         let mut user = mocks::user1();
         user.set_person(
-            Person::new(Fullname::new("Name", "Lastname").unwrap(), None, None).unwrap(),
+            Person::new(Fullname::new("Name", "Lastname").unwrap(), None, None, None).unwrap(),
         )
         .unwrap();
 
