@@ -1,5 +1,5 @@
 [package]
-name = "common"
+name = "file"
 version = "0.1.0"
 authors = ["Alan Boglioli <alan.boglioli@gmail.com>"]
 edition = "2018"
@@ -8,10 +8,15 @@ edition = "2018"
 path = "lib.rs"
 
 [dependencies]
+common = { path = "../common" }
+
+actix-multipart="0.2.0"
+actix-web = "2.0"
 async-trait = "0.1.36"
-chrono = "0.4"
-dotenv = "0.15.0"
-regex = "1"
+bytes = { version = "0.5", features = ["serde"] }
+futures = "0.3.1"
+rusoto_core = "0.45.0"
+rusoto_s3 = "0.45.0"
+sanitize-filename = "0.2"
 serde = { version = "1.0", features = ["derive"] }
-tokio = { version = "0.2", features = ["full"] }
 uuid = { version = "0.8.1", features = ["serde", "v4"] }

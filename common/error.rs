@@ -146,6 +146,20 @@ impl Error {
         self
     }
 
+    pub fn wrap_str<S: ToString>(mut self, s: S) -> Self {
+        let err = Error {
+            kind: ErrorKind::Internal,
+            path: "".to_owned(),
+            code: "raw".to_owned(),
+            status: None,
+            message: Some(s.to_string()),
+            context: HashMap::new(),
+            cause: None,
+        };
+        self.cause = Some(Box::new(err));
+        self
+    }
+
     pub fn merge(mut self, err: Error) -> Self {
         self = self.add_context(err.path(), err.code());
         self.context.extend(err.context);

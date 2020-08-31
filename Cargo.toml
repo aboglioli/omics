@@ -1,10 +1,11 @@
 [workspace]
 members = [
   "common",
-  "shared",
+  "file",
   "identity",
   "main",
   "notification",
   "payment",
   "publishing",
+  "shared",
 ]
