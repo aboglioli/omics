@@ -16,8 +16,10 @@
 - [ ] Use Include in use cases returning nested data.
 - [ ] User should not include Role. It must include RoleId.
 - [ ] Add Search use case when necessary.
-- [] ChangePassword should not validate logged in user to allow change a
-  temporal password (RecoverPassword)
+- [ ] ChangePassword should not validate logged in user to allow change a
+  temporal password (RecoverPassword).
+- [ ] Add methods to get events from date in EventRepository.
+- [ ] Add Option<String> for auth_id in use cases where user does not need to be logged in.
 
 # Progress
 

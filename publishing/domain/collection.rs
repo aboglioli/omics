@@ -65,7 +65,11 @@ impl Collection {
         &self.items
     }
 
-    pub fn set_header(&mut self, header: Header) -> Result<()> {
+    pub fn set_header(&mut self, header: Header, author_id: &AuthorId) -> Result<()> {
+        if self.author_id() != author_id {
+            return Err(Error::new("collection", "not_owner"));
+        }
+
         self.header = header;
 
         self.base.record_event(CollectionEvent::HeaderUpdated {
@@ -85,7 +89,11 @@ impl Collection {
         Ok(())
     }
 
-    pub fn add_item(&mut self, publication: &Publication) -> Result<()> {
+    pub fn add_item(&mut self, publication: &Publication, author_id: &AuthorId) -> Result<()> {
+        if self.author_id() != author_id {
+            return Err(Error::new("collection", "not_owner"));
+        }
+
         if !publication.is_published() {
             return Err(Error::new("collection", "publication_is_not_published"));
         }
@@ -101,7 +109,15 @@ impl Collection {
         Ok(())
     }
 
-    pub fn remove_item(&mut self, publication_id: &PublicationId) -> Result<()> {
+    pub fn remove_item(
+        &mut self,
+        publication_id: &PublicationId,
+        author_id: &AuthorId,
+    ) -> Result<()> {
+        if self.author_id() != author_id {
+            return Err(Error::new("collection", "not_owner"));
+        }
+
         self.items
             .retain(|item| item.publication_id() != publication_id);
 
@@ -113,7 +129,11 @@ impl Collection {
         Ok(())
     }
 
-    pub fn delete(&mut self) -> Result<()> {
+    pub fn delete(&mut self, author_id: &AuthorId) -> Result<()> {
+        if self.author_id() != author_id {
+            return Err(Error::new("collection", "not_owner"));
+        }
+
         self.base.delete();
 
         self.base.record_event(CollectionEvent::Deleted {

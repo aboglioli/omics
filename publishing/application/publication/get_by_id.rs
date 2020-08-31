@@ -1,6 +1,7 @@
 use serde::Serialize;
 
 use common::event::EventPublisher;
+use common::request::Include;
 use common::result::Result;
 
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto, ReaderInteractionDto};
@@ -13,7 +14,7 @@ use crate::domain::reader::{ReaderId, ReaderRepository};
 #[derive(Serialize)]
 pub struct GetByIdResponse {
     pub publication: PublicationDto,
-    pub reader: ReaderInteractionDto,
+    pub reader: Option<ReaderInteractionDto>,
 }
 
 pub struct GetById<'a> {
@@ -49,52 +50,70 @@ impl<'a> GetById<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<GetByIdResponse> {
+    pub async fn exec(
+        &self,
+        auth_id: Option<String>,
+        publication_id: String,
+        include: Include,
+    ) -> Result<GetByIdResponse> {
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        let reader_id = ReaderId::new(auth_id)?;
-        let reader = self.reader_repo.find_by_id(&reader_id).await?;
+        let (mut publication_dto, reader_interaction_dto) = if let Some(auth_id) = auth_id {
+            let is_reader_author = publication.author_id().value() == auth_id;
 
-        let author = self.author_repo.find_by_id(publication.author_id()).await?;
-        let category = self
-            .category_repo
-            .find_by_id(publication.header().category_id())
-            .await?;
+            if is_reader_author {
+                (
+                    PublicationDto::from(&publication)
+                        .status(&publication)
+                        .pages(&publication),
+                    None,
+                )
+            } else {
+                let reader_id = ReaderId::new(auth_id)?;
+                let reader = self.reader_repo.find_by_id(&reader_id).await?;
 
-        let is_reader_author = publication.author_id() == &reader_id;
+                self.interaction_serv
+                    .add_view(&reader, &mut publication)
+                    .await?;
 
-        if !is_reader_author {
-            self.interaction_serv
-                .add_view(&reader, &mut publication)
-                .await?;
+                self.publication_repo.save(&mut publication).await?;
 
-            self.publication_repo.save(&mut publication).await?;
+                self.event_pub
+                    .publish_all(publication.base().events()?)
+                    .await?;
 
-            self.event_pub
-                .publish_all(publication.base().events()?)
-                .await?;
+                let reader_statistics = self
+                    .statistics_serv
+                    .get_history(Some(&reader_id), Some(&publication_id), None, None)
+                    .await?;
+
+                (
+                    PublicationDto::from(&publication),
+                    Some(ReaderInteractionDto::new(
+                        reader_statistics.views() > 0,
+                        reader_statistics.readings() > 0,
+                        reader_statistics.likes() > 0,
+                        reader_statistics.reviews() > 0,
+                    )),
+                )
+            }
+        } else {
+            (PublicationDto::from(&publication), None)
+        };
+
+        if include.has("author") {
+            let author = self.author_repo.find_by_id(publication.author_id()).await?;
+            publication_dto = publication_dto.author(AuthorDto::from(&author));
         }
 
-        let mut publication_dto = PublicationDto::from(&publication)
-            .author(AuthorDto::from(&author))
-            .category(CategoryDto::from(&category));
-
-        if is_reader_author {
-            publication_dto = publication_dto.status(&publication).pages(&publication);
+        if include.has("category") {
+            let category = self
+                .category_repo
+                .find_by_id(publication.header().category_id())
+                .await?;
+            publication_dto = publication_dto.category(CategoryDto::from(&category));
         }
-
-        let reader_statistics = self
-            .statistics_serv
-            .get_history(Some(&reader_id), Some(&publication_id), None, None)
-            .await?;
-
-        let reader_interaction_dto = ReaderInteractionDto::new(
-            reader_statistics.views() > 0,
-            reader_statistics.readings() > 0,
-            reader_statistics.likes() > 0,
-            reader_statistics.reviews() > 0,
-        );
 
         Ok(GetByIdResponse {
             publication: publication_dto,
@@ -133,8 +152,9 @@ mod tests {
 
         let res = uc
             .exec(
-                reader.base().id().to_string(),
+                Some(reader.base().id().to_string()),
                 publication.base().id().to_string(),
+                Include::default().add("author").add("category"),
             )
             .await
             .unwrap();
@@ -179,8 +199,9 @@ mod tests {
 
         assert!(uc
             .exec(
-                reader.base().id().to_string(),
+                Some(reader.base().id().to_string()),
                 publication.base().id().to_string(),
+                Include::default(),
             )
             .await
             .is_err());
@@ -210,8 +231,9 @@ mod tests {
 
         let res = uc
             .exec(
-                reader.base().id().to_string(),
+                Some(reader.base().id().to_string()),
                 publication.base().id().to_string(),
+                Include::default().add("author").add("category"),
             )
             .await
             .unwrap();
@@ -249,7 +271,11 @@ mod tests {
         c.category_repo().save(&mut category).await.unwrap();
 
         assert!(uc
-            .exec(reader.base().id().to_string(), "#invalid".to_owned(),)
+            .exec(
+                Some(reader.base().id().to_string()),
+                "#invalid".to_owned(),
+                Include::default()
+            )
             .await
             .is_err());
     }
@@ -283,12 +309,13 @@ mod tests {
 
         let res = uc
             .exec(
-                reader.base().id().to_string(),
+                Some(reader.base().id().to_string()),
                 publication.base().id().to_string(),
+                Include::default(),
             )
             .await
             .unwrap();
-        let res = res.reader;
+        let res = res.reader.unwrap();
         assert!(res.viewed);
         assert!(res.liked);
         assert!(!res.read);

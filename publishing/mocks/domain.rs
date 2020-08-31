@@ -8,9 +8,11 @@ use crate::domain::publication::{
 use crate::domain::reader::{Reader, ReaderId};
 
 pub fn publication1() -> Publication {
+    let author_id = author1().base().id().clone();
+
     let mut publication = Publication::new(
         PublicationId::new("#publication01").unwrap(),
-        author1().base().id().clone(),
+        author_id.clone(),
         Header::new(
             Name::new("Publication 01").unwrap(),
             Synopsis::new("Synopsis...").unwrap(),
@@ -36,7 +38,9 @@ pub fn publication1() -> Publication {
             Image::new("domain.com/p2_image2.jpg").unwrap(),
         ])
         .unwrap();
-    publication.set_pages(vec![page_1, page_2]).unwrap();
+    publication
+        .set_pages(vec![page_1, page_2], &author_id)
+        .unwrap();
 
     publication
 }
@@ -61,7 +65,10 @@ pub fn published_publication1() -> Publication {
         ])
         .unwrap();
 
-    publication.set_pages(vec![page1, page2]).unwrap();
+    let author_id = publication.author_id().clone();
+    publication
+        .set_pages(vec![page1, page2], &author_id)
+        .unwrap();
 
     publication.publish(&author1()).unwrap();
     publication.approve(&content_manager1()).unwrap();

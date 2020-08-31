@@ -1,10 +1,10 @@
 use serde::Deserialize;
 
-use common::error::Error;
 use common::event::EventPublisher;
+use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::application::dtos::CommandResponse;
+use crate::domain::author::AuthorId;
 use crate::domain::category::{CategoryId, CategoryRepository};
 use crate::domain::collection::{CollectionId, CollectionRepository};
 use crate::domain::publication::{Header, Image, Name, Synopsis, Tag};
@@ -46,7 +46,7 @@ impl<'a> Update<'a> {
 
     pub async fn exec(
         &self,
-        author_id: String,
+        auth_id: String,
         collection_id: String,
         cmd: UpdateCommand,
     ) -> Result<CommandResponse> {
@@ -54,10 +54,6 @@ impl<'a> Update<'a> {
 
         let collection_id = CollectionId::new(collection_id)?;
         let mut collection = self.collection_repo.find_by_id(&collection_id).await?;
-
-        if collection.author_id().value() != author_id {
-            return Err(Error::new("collection", "unauthorized"));
-        }
 
         let name = Name::new(cmd.name)?;
         let synopsis = Synopsis::new(cmd.synopsis)?;
@@ -74,7 +70,7 @@ impl<'a> Update<'a> {
 
         let header = Header::new(name, synopsis, category_id, tags, cover)?;
 
-        collection.set_header(header)?;
+        collection.set_header(header, &AuthorId::new(auth_id)?)?;
 
         self.collection_repo.save(&mut collection).await?;
 

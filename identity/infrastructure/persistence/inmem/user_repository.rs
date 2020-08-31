@@ -8,7 +8,6 @@ use common::result::Result;
 
 use crate::domain::role::RoleId;
 use crate::domain::user::{Email, User, UserId, UserRepository, Username};
-use crate::mocks;
 
 pub struct InMemUserRepository {
     cache: InMemCache<UserId, User>,
@@ -19,17 +18,6 @@ impl InMemUserRepository {
         InMemUserRepository {
             cache: InMemCache::new(),
         }
-    }
-
-    pub async fn populated() -> Self {
-        let repo = Self::new();
-        repo.save(&mut mocks::user1()).await.unwrap();
-        repo.save(&mut mocks::user2()).await.unwrap();
-        repo.save(&mut mocks::validated_user1()).await.unwrap();
-        repo.save(&mut mocks::validated_user2()).await.unwrap();
-        repo.save(&mut mocks::admin1()).await.unwrap();
-
-        repo
     }
 }
 

@@ -1,5 +1,6 @@
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
 
+use common::request::IncludeParams;
 use publishing::application::publication::{
     AddReview, AddReviewCommand, Approve, Create, CreateCommand, Delete, DeleteReview, GetById,
     Like, Publish, Read, Reject, Reviews, Search, SearchCommand, Unlike, Update, UpdateCommand,
@@ -30,13 +31,14 @@ async fn create(
     .map_err(PublicError::from)
 }
 
-// GET /publications?q
+// GET /publications
 async fn search(
     req: HttpRequest,
     cmd: web::Query<SearchCommand>,
+    include: web::Query<IncludeParams>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await.ok();
 
     Search::new(
         c.publishing.author_repo(),
@@ -44,7 +46,7 @@ async fn search(
         c.publishing.content_manager_repo(),
         c.publishing.publication_repo(),
     )
-    .exec(auth_id, cmd.into_inner())
+    .exec(auth_id, cmd.into_inner(), include.into_inner().into())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -54,9 +56,10 @@ async fn search(
 async fn get_by_id(
     req: HttpRequest,
     path: web::Path<String>,
+    include: web::Query<IncludeParams>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await.ok();
 
     GetById::new(
         c.publishing.event_pub(),
@@ -67,7 +70,7 @@ async fn get_by_id(
         c.publishing.interaction_serv(),
         c.publishing.statistics_serv(),
     )
-    .exec(auth_id, path.into_inner())
+    .exec(auth_id, path.into_inner(), include.into_inner().into())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -181,7 +184,7 @@ async fn reject(
     .map_err(PublicError::from)
 }
 
-// POST /publications/:id/read
+// GET /publications/:id/read
 async fn read(
     req: HttpRequest,
     path: web::Path<String>,
@@ -288,10 +291,10 @@ async fn reviews(
     path: web::Path<String>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let _user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await.ok();
 
     Reviews::new(c.publishing.interaction_repo(), c.publishing.reader_repo())
-        .exec(path.into_inner())
+        .exec(auth_id, path.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)

@@ -2,9 +2,9 @@ use serde::Deserialize;
 use uuid::Uuid;
 
 use common::event::EventPublisher;
+use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::application::dtos::CommandResponse;
 use crate::domain::user::{Email, Password, UserRepository, UserService};
 
 #[derive(Deserialize)]

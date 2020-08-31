@@ -135,7 +135,11 @@ impl Publication {
             && matches!(self.status_history().current(), Status::Published { .. })
     }
 
-    pub fn set_header(&mut self, header: Header) -> Result<()> {
+    pub fn set_header(&mut self, header: Header, author_id: &AuthorId) -> Result<()> {
+        if self.author_id() != author_id {
+            return Err(Error::new("publication", "not_owner"));
+        }
+
         self.header = header;
 
         self.make_draft()?;
@@ -157,7 +161,11 @@ impl Publication {
         Ok(())
     }
 
-    pub fn set_pages(&mut self, pages: Vec<Page>) -> Result<()> {
+    pub fn set_pages(&mut self, pages: Vec<Page>, author_id: &AuthorId) -> Result<()> {
+        if self.author_id() != author_id {
+            return Err(Error::new("publication", "not_owner"));
+        }
+
         self.pages = pages;
 
         self.make_draft()?;
@@ -470,7 +478,11 @@ impl Publication {
         Ok(())
     }
 
-    pub fn delete(&mut self) -> Result<()> {
+    pub fn delete(&mut self, author_id: &AuthorId) -> Result<()> {
+        if self.author_id() != author_id {
+            return Err(Error::new("publication", "not_owner"));
+        }
+
         self.base.delete();
 
         self.base.record_event(PublicationEvent::Deleted {

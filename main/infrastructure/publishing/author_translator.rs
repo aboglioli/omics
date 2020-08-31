@@ -59,7 +59,7 @@ impl AuthorRepository for AuthorTranslator {
         )?)
     }
 
-    async fn search(&self, _text: &str) -> Result<Vec<Author>> {
+    async fn search(&self, _name: Option<&String>) -> Result<Vec<Author>> {
         Ok(Vec::new())
     }
 

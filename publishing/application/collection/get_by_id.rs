@@ -1,5 +1,6 @@
 use serde::Serialize;
 
+use common::request::Include;
 use common::result::Result;
 
 use crate::application::dtos::{AuthorDto, CategoryDto, CollectionDto, PublicationDto};
@@ -23,7 +24,6 @@ pub struct GetById<'a> {
     author_repo: &'a dyn AuthorRepository,
     category_repo: &'a dyn CategoryRepository,
     collection_repo: &'a dyn CollectionRepository,
-    publication_repo: &'a dyn PublicationRepository,
 }
 
 impl<'a> GetById<'a> {
@@ -31,49 +31,39 @@ impl<'a> GetById<'a> {
         author_repo: &'a dyn AuthorRepository,
         category_repo: &'a dyn CategoryRepository,
         collection_repo: &'a dyn CollectionRepository,
-        publication_repo: &'a dyn PublicationRepository,
     ) -> Self {
         GetById {
             author_repo,
             category_repo,
             collection_repo,
-            publication_repo,
         }
     }
 
-    pub async fn exec(&self, collection_id: String) -> Result<CollectionDto> {
-        let collection_id = CollectionId::new(collection_id)?;
-        let collection = self.collection_repo.find_by_id(&collection_id).await?;
-
-        let author = self.author_repo.find_by_id(collection.author_id()).await?;
-        let category = self
-            .category_repo
-            .find_by_id(collection.header().category_id())
+    pub async fn exec(
+        &self,
+        _auth_id: Option<String>,
+        collection_id: String,
+        include: Include,
+    ) -> Result<CollectionDto> {
+        let collection = self
+            .collection_repo
+            .find_by_id(&CollectionId::new(collection_id)?)
             .await?;
+        let mut collection_dto = CollectionDto::from(&collection);
 
-        let mut publications = Vec::new();
-        for item in collection.items().iter() {
-            let publication = self
-                .publication_repo
-                .find_by_id(item.publication_id())
-                .await?;
-            let author = self.author_repo.find_by_id(publication.author_id()).await?;
-            let category = self
-                .category_repo
-                .find_by_id(publication.header().category_id())
-                .await?;
-
-            publications.push(
-                PublicationDto::from(&publication)
-                    .author(AuthorDto::from(&author))
-                    .category(CategoryDto::from(&category))
-                    .status(&publication),
-            )
+        if include.has("author") {
+            let author = self.author_repo.find_by_id(collection.author_id()).await?;
+            collection_dto = collection_dto.author(AuthorDto::from(&author));
         }
 
-        Ok(CollectionDto::from(&collection)
-            .author(AuthorDto::from(&author))
-            .category(CategoryDto::from(&category))
-            .publications(publications))
+        if include.has("category") {
+            let category = self
+                .category_repo
+                .find_by_id(collection.header().category_id())
+                .await?;
+            collection_dto = collection_dto.category(CategoryDto::from(&category));
+        }
+
+        Ok(collection_dto)
     }
 }

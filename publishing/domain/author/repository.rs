@@ -10,7 +10,7 @@ pub trait AuthorRepository: Sync + Send {
 
     async fn find_all(&self) -> Result<Vec<Author>>;
     async fn find_by_id(&self, id: &AuthorId) -> Result<Author>;
-    async fn search(&self, text: &str) -> Result<Vec<Author>>;
+    async fn search(&self, name: Option<&String>) -> Result<Vec<Author>>;
 
     async fn save(&self, author: &mut Author) -> Result<()>;
 }

@@ -1,6 +1,6 @@
-mod get_all;
+mod follow;
 mod get_by_id;
-mod get_publications;
-pub use get_all::*;
+mod search;
+pub use follow::*;
 pub use get_by_id::*;
-pub use get_publications::*;
+pub use search::*;

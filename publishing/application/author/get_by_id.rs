@@ -1,45 +1,21 @@
 use common::result::Result;
 
-use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};
+use crate::application::dtos::AuthorDto;
 use crate::domain::author::{AuthorId, AuthorRepository};
-use crate::domain::category::CategoryRepository;
-use crate::domain::publication::PublicationRepository;
 
 pub struct GetById<'a> {
     author_repo: &'a dyn AuthorRepository,
-    category_repo: &'a dyn CategoryRepository,
-    publication_repo: &'a dyn PublicationRepository,
 }
 
 impl<'a> GetById<'a> {
-    pub fn new(
-        author_repo: &'a dyn AuthorRepository,
-        category_repo: &'a dyn CategoryRepository,
-        publication_repo: &'a dyn PublicationRepository,
-    ) -> Self {
-        GetById {
-            author_repo,
-            category_repo,
-            publication_repo,
-        }
+    pub fn new(author_repo: &'a dyn AuthorRepository) -> Self {
+        GetById { author_repo }
     }
 
-    pub async fn exec(&self, author_id: String) -> Result<AuthorDto> {
+    pub async fn exec(&self, _auth_id: Option<String>, author_id: String) -> Result<AuthorDto> {
         let author_id = AuthorId::new(author_id)?;
         let author = self.author_repo.find_by_id(&author_id).await?;
 
-        let publications = self.publication_repo.find_by_author_id(&author_id).await?;
-
-        let mut publication_dtos = Vec::new();
-        for publication in publications.iter() {
-            let category = self
-                .category_repo
-                .find_by_id(publication.header().category_id())
-                .await?;
-            publication_dtos
-                .push(PublicationDto::from(publication).category(CategoryDto::from(&category)));
-        }
-
-        Ok(AuthorDto::from(&author).publications(publication_dtos))
+        Ok(AuthorDto::from(&author))
     }
 }

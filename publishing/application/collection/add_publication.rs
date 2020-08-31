@@ -1,7 +1,8 @@
 use common::event::EventPublisher;
+use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::application::dtos::CommandResponse;
+use crate::domain::author::AuthorId;
 use crate::domain::collection::{CollectionId, CollectionRepository};
 use crate::domain::publication::{PublicationId, PublicationRepository};
 
@@ -27,6 +28,7 @@ impl<'a> AddPublication<'a> {
 
     pub async fn exec(
         &self,
+        auth_id: String,
         collection_id: String,
         publication_id: String,
     ) -> Result<CommandResponse> {
@@ -36,7 +38,7 @@ impl<'a> AddPublication<'a> {
         let publication_id = PublicationId::new(publication_id)?;
         let publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        collection.add_item(&publication)?;
+        collection.add_item(&publication, &AuthorId::new(auth_id)?)?;
 
         self.collection_repo.save(&mut collection).await?;
 

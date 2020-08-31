@@ -5,6 +5,7 @@ use common::result::Result;
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
 use crate::domain::collection::{Collection, CollectionId};
+use crate::domain::publication::PublicationId;
 
 #[async_trait]
 pub trait CollectionRepository: Sync + Send {
@@ -12,9 +13,13 @@ pub trait CollectionRepository: Sync + Send {
 
     async fn find_all(&self) -> Result<Vec<Collection>>;
     async fn find_by_id(&self, id: &CollectionId) -> Result<Collection>;
-    async fn find_by_author_id(&self, author_id: &AuthorId) -> Result<Vec<Collection>>;
-    async fn find_by_category_id(&self, category_id: &CategoryId) -> Result<Vec<Collection>>;
-    async fn search(&self, text: &str) -> Result<Vec<Collection>>;
+    async fn search(
+        &self,
+        author_id: Option<&AuthorId>,
+        category_id: Option<&CategoryId>,
+        publication_id: Option<&PublicationId>,
+        name: Option<&String>,
+    ) -> Result<Vec<Collection>>;
 
     async fn save(&self, collection: &mut Collection) -> Result<()>;
 }

@@ -51,7 +51,7 @@ impl<'a> Create<'a> {
         }
     }
 
-    pub async fn exec(&self, author_id: String, cmd: CreateCommand) -> Result<CreateResponse> {
+    pub async fn exec(&self, auth_id: String, cmd: CreateCommand) -> Result<CreateResponse> {
         cmd.validate()?;
 
         let name = Name::new(cmd.name)?;
@@ -69,7 +69,7 @@ impl<'a> Create<'a> {
 
         let header = Header::new(name, synopsis, category_id, tags, cover)?;
 
-        let author_id = AuthorId::new(author_id)?;
+        let author_id = AuthorId::new(auth_id)?;
         self.author_repo.find_by_id(&author_id).await?;
 
         let mut collection =

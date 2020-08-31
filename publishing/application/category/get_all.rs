@@ -19,7 +19,7 @@ impl<'a> GetAll<'a> {
         GetAll { category_repo }
     }
 
-    pub async fn exec(&self) -> Result<GetAllResponse> {
+    pub async fn exec(&self, _auth_id: Option<String>) -> Result<GetAllResponse> {
         let categories = self.category_repo.find_all_categories().await?;
         Ok(GetAllResponse {
             categories: categories.iter().map(CategoryDto::from).collect(),

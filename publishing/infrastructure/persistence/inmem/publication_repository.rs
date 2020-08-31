@@ -9,7 +9,6 @@ use common::result::Result;
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
 use crate::domain::publication::{Publication, PublicationId, PublicationRepository};
-use crate::mocks;
 
 pub struct InMemPublicationRepository {
     cache: InMemCache<PublicationId, Publication>,
@@ -20,17 +19,6 @@ impl InMemPublicationRepository {
         InMemPublicationRepository {
             cache: InMemCache::new(),
         }
-    }
-
-    pub async fn populated() -> Self {
-        let repo = Self::new();
-
-        repo.save(&mut mocks::publication1()).await.unwrap();
-        repo.save(&mut mocks::published_publication1())
-            .await
-            .unwrap();
-
-        repo
     }
 }
 
@@ -58,34 +46,44 @@ impl PublicationRepository for InMemPublicationRepository {
             .ok_or_else(|| Error::not_found("publication"))
     }
 
-    async fn find_by_author_id(&self, author_id: &AuthorId) -> Result<Vec<Publication>> {
-        Ok(self
-            .cache
-            .filter(|&(_, publication)| publication.author_id() == author_id)
-            .await)
-    }
+    async fn search(
+        &self,
+        author_id: Option<&AuthorId>,
+        category_id: Option<&CategoryId>,
+        status: Option<&String>,
+        name: Option<&String>,
+    ) -> Result<Vec<Publication>> {
+        let mut publications = self.cache.all().await;
 
-    async fn find_by_category_id(&self, category_id: &CategoryId) -> Result<Vec<Publication>> {
-        Ok(self
-            .cache
-            .filter(|&(_, publication)| publication.header().category_id() == category_id)
-            .await)
-    }
+        if let Some(author_id) = author_id {
+            publications = publications
+                .into_iter()
+                .filter(|publication| publication.author_id() == author_id)
+                .collect();
+        }
 
-    async fn find_by_status(&self, status: &str) -> Result<Vec<Publication>> {
-        Ok(self
-            .cache
-            .filter(|&(_, publication)| {
-                publication.status_history().current().to_string() == status
-            })
-            .await)
-    }
+        if let Some(category_id) = category_id {
+            publications = publications
+                .into_iter()
+                .filter(|publication| publication.header().category_id() == category_id)
+                .collect();
+        }
 
-    async fn search(&self, text: &str) -> Result<Vec<Publication>> {
-        Ok(self
-            .cache
-            .filter(|&(_, publication)| publication.header().name().value().contains(text))
-            .await)
+        if let Some(status) = status {
+            publications = publications
+                .into_iter()
+                .filter(|publication| &publication.status_history().current().to_string() == status)
+                .collect();
+        }
+
+        if let Some(name) = name {
+            publications = publications
+                .into_iter()
+                .filter(|publication| publication.header().name().value().contains(name))
+                .collect();
+        }
+
+        Ok(publications)
     }
 
     async fn save(&self, publication: &mut Publication) -> Result<()> {

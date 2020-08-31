@@ -13,12 +13,6 @@ impl From<IncludeParams> for Option<String> {
     }
 }
 
-// impl IncludeParams {
-//     pub fn into(self) -> Option<String> {
-//         self.include
-//     }
-// }
-
 pub struct Include {
     fields: HashMap<String, bool>,
 }
@@ -42,6 +36,16 @@ impl Include {
 
     pub fn has(&self, field: &str) -> bool {
         self.fields.get(field).is_some()
+    }
+
+    pub fn add<S: Into<String>>(mut self, field: S) -> Self {
+        let field = field.into().trim().to_lowercase();
+
+        if !field.is_empty() {
+            self.fields.insert(field.into(), true);
+        }
+
+        self
     }
 }
 

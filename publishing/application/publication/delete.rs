@@ -1,8 +1,8 @@
-use common::error::Error;
 use common::event::EventPublisher;
+use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::application::dtos::CommandResponse;
+use crate::domain::author::AuthorId;
 use crate::domain::publication::{PublicationId, PublicationRepository};
 
 pub struct Delete<'a> {
@@ -22,15 +22,11 @@ impl<'a> Delete<'a> {
         }
     }
 
-    pub async fn exec(&self, author_id: String, publication_id: String) -> Result<CommandResponse> {
+    pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<CommandResponse> {
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        if publication.author_id().value() != author_id {
-            return Err(Error::new("publication", "unauthorized"));
-        }
-
-        publication.delete()?;
+        publication.delete(&AuthorId::new(auth_id)?)?;
 
         self.publication_repo.save(&mut publication).await?;
 

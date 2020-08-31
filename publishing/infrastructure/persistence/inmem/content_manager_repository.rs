@@ -7,7 +7,6 @@ use common::infrastructure::cache::InMemCache;
 use common::result::Result;
 
 use crate::domain::content_manager::{ContentManager, ContentManagerId, ContentManagerRepository};
-use crate::mocks;
 
 pub struct InMemContentManagerRepository {
     cache: InMemCache<ContentManagerId, ContentManager>,
@@ -18,14 +17,6 @@ impl InMemContentManagerRepository {
         InMemContentManagerRepository {
             cache: InMemCache::new(),
         }
-    }
-
-    pub async fn populated() -> Self {
-        let repo = Self::new();
-
-        repo.save(&mut mocks::content_manager1()).await.unwrap();
-
-        repo
     }
 }
 

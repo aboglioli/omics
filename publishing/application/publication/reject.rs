@@ -1,7 +1,7 @@
 use common::event::EventPublisher;
+use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::application::dtos::CommandResponse;
 use crate::domain::content_manager::{ContentManagerId, ContentManagerRepository};
 use crate::domain::publication::{PublicationId, PublicationRepository};
 
@@ -25,12 +25,8 @@ impl<'a> Reject<'a> {
         }
     }
 
-    pub async fn exec(
-        &self,
-        content_manager_id: String,
-        publication_id: String,
-    ) -> Result<CommandResponse> {
-        let content_manager_id = ContentManagerId::new(content_manager_id)?;
+    pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<CommandResponse> {
+        let content_manager_id = ContentManagerId::new(auth_id)?;
         let content_manager = self
             .content_manager_repo
             .find_by_id(&content_manager_id)

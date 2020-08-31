@@ -1,8 +1,9 @@
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
 
+use common::request::IncludeParams;
 use publishing::application::collection::{
-    AddPublication, Create, CreateCommand, Delete, GetAll, GetById, RemovePublication, Update,
-    UpdateCommand,
+    AddPublication, Create, CreateCommand, Delete, GetById, GetPublications, RemovePublication,
+    Search, SearchCommand, Update, UpdateCommand,
 };
 
 use crate::authorization::auth;
@@ -15,7 +16,7 @@ async fn create(
     cmd: web::Json<CreateCommand>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     Create::new(
         c.publishing.event_pub(),
@@ -23,23 +24,27 @@ async fn create(
         c.publishing.category_repo(),
         c.publishing.collection_repo(),
     )
-    .exec(user_id, cmd.into_inner())
+    .exec(auth_id, cmd.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
 }
 
 // GET /collections
-async fn get_all(req: HttpRequest, c: web::Data<Container>) -> impl Responder {
-    let _user_id = auth(&req, &c).await?;
+async fn search(
+    req: HttpRequest,
+    cmd: web::Query<SearchCommand>,
+    include: web::Query<IncludeParams>,
+    c: web::Data<Container>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await.ok();
 
-    GetAll::new(
+    Search::new(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
         c.publishing.collection_repo(),
-        c.publishing.publication_repo(),
     )
-    .exec()
+    .exec(auth_id, cmd.into_inner(), include.into_inner().into())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -49,17 +54,38 @@ async fn get_all(req: HttpRequest, c: web::Data<Container>) -> impl Responder {
 async fn get_by_id(
     req: HttpRequest,
     path: web::Path<String>,
+    include: web::Query<IncludeParams>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let _user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await.ok();
 
     GetById::new(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
         c.publishing.collection_repo(),
+    )
+    .exec(auth_id, path.into_inner(), include.into_inner().into())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
+}
+
+// GET /collections/:id/publications
+async fn get_publications(
+    req: HttpRequest,
+    path: web::Path<String>,
+    include: web::Query<IncludeParams>,
+    c: web::Data<Container>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await.ok();
+
+    GetPublications::new(
+        c.publishing.author_repo(),
+        c.publishing.category_repo(),
+        c.publishing.collection_repo(),
         c.publishing.publication_repo(),
     )
-    .exec(path.into_inner())
+    .exec(auth_id, path.into_inner(), include.into_inner().into())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -72,14 +98,14 @@ async fn update(
     cmd: web::Json<UpdateCommand>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     Update::new(
         c.publishing.event_pub(),
         c.publishing.category_repo(),
         c.publishing.collection_repo(),
     )
-    .exec(user_id, path.into_inner(), cmd.into_inner())
+    .exec(auth_id, path.into_inner(), cmd.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -91,10 +117,10 @@ async fn delete(
     path: web::Path<String>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     Delete::new(c.publishing.event_pub(), c.publishing.collection_repo())
-        .exec(user_id, path.into_inner())
+        .exec(auth_id, path.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -106,7 +132,7 @@ async fn add_publication(
     path: web::Path<(String, String)>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let _user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     let path = path.into_inner();
     AddPublication::new(
@@ -114,7 +140,7 @@ async fn add_publication(
         c.publishing.collection_repo(),
         c.publishing.publication_repo(),
     )
-    .exec(path.0, path.1)
+    .exec(auth_id, path.0, path.1)
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -126,11 +152,11 @@ async fn remove_publication(
     path: web::Path<(String, String)>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let _user_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await?;
 
     let path = path.into_inner();
     RemovePublication::new(c.publishing.event_pub(), c.publishing.collection_repo())
-        .exec(path.0, path.1)
+        .exec(auth_id, path.0, path.1)
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -140,8 +166,12 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/collections")
             .route("", web::post().to(create))
-            .route("", web::get().to(get_all))
+            .route("", web::get().to(search))
             .route("/{collection_id}", web::get().to(get_by_id))
+            .route(
+                "/{collection_id}/publications",
+                web::get().to(get_publications),
+            )
             .route("/{collection_id}", web::put().to(update))
             .route("/{collection_id}", web::delete().to(delete))
             .route(

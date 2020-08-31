@@ -201,6 +201,7 @@ impl InteractionService {
         Ok(())
     }
 
+    // TODO: where to emit an event?
     pub async fn add_follow(&self, reader: &Reader, author: &Author) -> Result<()> {
         let follows_res = self
             .interaction_repo

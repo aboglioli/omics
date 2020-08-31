@@ -28,7 +28,11 @@ impl<'a> Reviews<'a> {
         }
     }
 
-    pub async fn exec(&self, publication_id: String) -> Result<ReviewsResponse> {
+    pub async fn exec(
+        &self,
+        _auth_id: Option<String>,
+        publication_id: String,
+    ) -> Result<ReviewsResponse> {
         let reviews = self
             .interaction_repo
             .find_reviews(None, Some(&PublicationId::new(publication_id)?), None, None)

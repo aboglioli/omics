@@ -8,17 +8,6 @@ use crate::domain::publication::{Image, Page, Publication, Statistics};
 use crate::domain::reader::{Preferences, Reader};
 
 #[derive(Serialize)]
-pub struct CommandResponse {
-    ok: bool,
-}
-
-impl Default for CommandResponse {
-    fn default() -> Self {
-        CommandResponse { ok: true }
-    }
-}
-
-#[derive(Serialize)]
 pub struct StatisticsDto {
     pub views: u32,
     pub unique_views: u32,
@@ -47,9 +36,6 @@ pub struct AuthorDto {
     pub username: String,
     pub name: String,
     pub lastname: String,
-    pub publications: Option<Vec<PublicationDto>>,
-    pub publication_count: Option<usize>,
-    pub collection_count: Option<usize>,
 }
 
 impl From<&Author> for AuthorDto {
@@ -59,27 +45,7 @@ impl From<&Author> for AuthorDto {
             username: author.username().to_string(),
             name: author.name().to_string(),
             lastname: author.lastname().to_string(),
-            publications: None,
-            publication_count: None,
-            collection_count: None,
         }
-    }
-}
-
-impl AuthorDto {
-    pub fn publications(mut self, publications: Vec<PublicationDto>) -> Self {
-        self.publications = Some(publications);
-        self
-    }
-
-    pub fn publication_count(mut self, count: usize) -> Self {
-        self.publication_count = Some(count);
-        self
-    }
-
-    pub fn collection_count(mut self, count: usize) -> Self {
-        self.collection_count = Some(count);
-        self
     }
 }
 
@@ -154,11 +120,11 @@ impl From<&Publication> for PublicationDto {
     fn from(publication: &Publication) -> Self {
         PublicationDto {
             id: publication.base().id().to_string(),
-            author_id: None,
+            author_id: Some(publication.author_id().to_string()),
             author: None,
             name: publication.header().name().to_string(),
             synopsis: publication.header().synopsis().to_string(),
-            category_id: None,
+            category_id: Some(publication.header().category_id().to_string()),
             category: None,
             tags: publication
                 .header()
@@ -174,22 +140,14 @@ impl From<&Publication> for PublicationDto {
 }
 
 impl PublicationDto {
-    pub fn author_id(mut self, publication: &Publication) -> Self {
-        self.author_id = Some(publication.author_id().to_string());
-        self
-    }
-
     pub fn author(mut self, author: AuthorDto) -> Self {
+        self.author_id = None;
         self.author = Some(author);
         self
     }
 
-    pub fn category_id(mut self, publication: &Publication) -> Self {
-        self.category_id = Some(publication.header().category_id().to_string());
-        self
-    }
-
     pub fn category(mut self, category: CategoryDto) -> Self {
+        self.category_id = None;
         self.category = Some(category);
         self
     }
@@ -215,19 +173,17 @@ pub struct CollectionDto {
     pub category_id: Option<String>,
     pub category: Option<CategoryDto>,
     pub tags: Vec<String>,
-    pub publication_count: Option<usize>,
-    pub publications: Option<Vec<PublicationDto>>,
 }
 
 impl From<&Collection> for CollectionDto {
     fn from(collection: &Collection) -> Self {
         CollectionDto {
             id: collection.base().id().to_string(),
-            author_id: None,
+            author_id: Some(collection.author_id().to_string()),
             author: None,
             name: collection.header().name().to_string(),
             synopsis: collection.header().synopsis().to_string(),
-            category_id: None,
+            category_id: Some(collection.header().category_id().to_string()),
             category: None,
             tags: collection
                 .header()
@@ -235,40 +191,20 @@ impl From<&Collection> for CollectionDto {
                 .iter()
                 .map(|tag| tag.name().to_string())
                 .collect(),
-            publication_count: None,
-            publications: None,
         }
     }
 }
 
 impl CollectionDto {
-    pub fn author_id(mut self, collection: &Collection) -> Self {
-        self.author_id = Some(collection.author_id().to_string());
-        self
-    }
-
     pub fn author(mut self, author: AuthorDto) -> Self {
+        self.author_id = None;
         self.author = Some(author);
         self
     }
 
-    pub fn category_id(mut self, collection: &Collection) -> Self {
-        self.category_id = Some(collection.header().category_id().to_string());
-        self
-    }
-
     pub fn category(mut self, category: CategoryDto) -> Self {
+        self.category_id = None;
         self.category = Some(category);
-        self
-    }
-
-    pub fn publication_count(mut self, count: usize) -> Self {
-        self.publication_count = Some(count);
-        self
-    }
-
-    pub fn publications(mut self, publications: Vec<PublicationDto>) -> Self {
-        self.publications = Some(publications);
         self
     }
 }

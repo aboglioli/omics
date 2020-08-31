@@ -1,10 +1,10 @@
 use serde::Deserialize;
 
-use common::error::Error;
 use common::event::EventPublisher;
+use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::application::dtos::CommandResponse;
+use crate::domain::author::AuthorId;
 use crate::domain::category::{CategoryId, CategoryRepository};
 use crate::domain::publication::{
     Header, Image, Name, PublicationId, PublicationRepository, Synopsis, Tag,
@@ -17,12 +17,6 @@ pub struct UpdateCommand {
     category_id: String,
     tags: Vec<String>,
     cover: String,
-}
-
-impl UpdateCommand {
-    pub fn validate(&self) -> Result<()> {
-        Ok(())
-    }
 }
 
 pub struct Update<'a> {
@@ -51,14 +45,8 @@ impl<'a> Update<'a> {
         publication_id: String,
         cmd: UpdateCommand,
     ) -> Result<CommandResponse> {
-        cmd.validate()?;
-
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
-
-        if publication.author_id().value() != auth_id {
-            return Err(Error::unauthorized());
-        }
 
         let name = Name::new(cmd.name)?;
         let synopsis = Synopsis::new(cmd.synopsis)?;
@@ -75,7 +63,7 @@ impl<'a> Update<'a> {
 
         let header = Header::new(name, synopsis, category_id, tags, cover)?;
 
-        publication.set_header(header)?;
+        publication.set_header(header, &AuthorId::new(auth_id)?)?;
 
         self.publication_repo.save(&mut publication).await?;
 

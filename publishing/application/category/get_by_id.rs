@@ -12,7 +12,7 @@ impl<'a> GetById<'a> {
         GetById { category_repo }
     }
 
-    pub async fn exec(&self, category_id: String) -> Result<CategoryDto> {
+    pub async fn exec(&self, _auth_id: Option<String>, category_id: String) -> Result<CategoryDto> {
         let category_id = CategoryId::new(category_id)?;
         let category = self.category_repo.find_by_id(&category_id).await?;
 

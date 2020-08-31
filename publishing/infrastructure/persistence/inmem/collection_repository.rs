@@ -9,7 +9,7 @@ use common::result::Result;
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
 use crate::domain::collection::{Collection, CollectionId, CollectionRepository};
-use crate::mocks;
+use crate::domain::publication::PublicationId;
 
 pub struct InMemCollectionRepository {
     cache: InMemCache<CollectionId, Collection>,
@@ -20,14 +20,6 @@ impl InMemCollectionRepository {
         InMemCollectionRepository {
             cache: InMemCache::new(),
         }
-    }
-
-    pub async fn populated() -> Self {
-        let repo = Self::new();
-
-        repo.save(&mut mocks::empty_collection1()).await.unwrap();
-
-        repo
     }
 }
 
@@ -55,25 +47,52 @@ impl CollectionRepository for InMemCollectionRepository {
             .ok_or_else(|| Error::not_found("collection"))
     }
 
-    async fn find_by_author_id(&self, author_id: &AuthorId) -> Result<Vec<Collection>> {
-        Ok(self
-            .cache
-            .filter(|&(_, collection)| collection.author_id() == author_id)
-            .await)
-    }
+    async fn search(
+        &self,
+        author_id: Option<&AuthorId>,
+        category_id: Option<&CategoryId>,
+        publication_id: Option<&PublicationId>,
+        name: Option<&String>,
+    ) -> Result<Vec<Collection>> {
+        let mut collections = self.cache.all().await;
 
-    async fn find_by_category_id(&self, category_id: &CategoryId) -> Result<Vec<Collection>> {
-        Ok(self
-            .cache
-            .filter(|&(_, collection)| collection.header().category_id() == category_id)
-            .await)
-    }
+        if let Some(author_id) = author_id {
+            collections = collections
+                .into_iter()
+                .filter(|collection| collection.author_id() == author_id)
+                .collect();
+        }
 
-    async fn search(&self, text: &str) -> Result<Vec<Collection>> {
-        Ok(self
-            .cache
-            .filter(|&(_, collection)| collection.header().name().value().contains(text))
-            .await)
+        if let Some(category_id) = category_id {
+            collections = collections
+                .into_iter()
+                .filter(|collection| collection.header().category_id() == category_id)
+                .collect();
+        }
+
+        if let Some(publication_id) = publication_id {
+            collections = collections
+                .into_iter()
+                .filter(|collection| {
+                    for item in collection.items() {
+                        if item.publication_id() == publication_id {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                })
+                .collect();
+        }
+
+        if let Some(name) = name {
+            collections = collections
+                .into_iter()
+                .filter(|collection| collection.header().name().to_string().contains(name))
+                .collect();
+        }
+
+        Ok(collections)
     }
 
     async fn save(&self, collection: &mut Collection) -> Result<()> {

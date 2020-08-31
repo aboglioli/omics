@@ -1,9 +1,9 @@
 use serde::Deserialize;
 
 use common::event::EventPublisher;
+use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::application::dtos::CommandResponse;
 use crate::domain::interaction::{Comment, InteractionService, Stars};
 use crate::domain::publication::{PublicationId, PublicationRepository};
 use crate::domain::reader::{ReaderId, ReaderRepository};
@@ -40,14 +40,14 @@ impl<'a> AddReview<'a> {
 
     pub async fn exec(
         &self,
-        reader_id: String,
+        auth_id: String,
         publication_id: String,
         cmd: AddReviewCommand,
     ) -> Result<CommandResponse> {
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        let reader_id = ReaderId::new(reader_id)?;
+        let reader_id = ReaderId::new(auth_id)?;
         let reader = self.reader_repo.find_by_id(&reader_id).await?;
 
         let stars = Stars::new(cmd.stars)?;

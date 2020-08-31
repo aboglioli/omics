@@ -24,7 +24,7 @@
 - [ ] GET /authors/:id (Author)
 - [ ] GET /authors/:id/publications?include=category ([]Publication)
 - [ ] GET /authors/:id/collections?include=category ([]Collection)
-- [ ] GET /authors/:id/followers ([]Reader)
+- [ ] GET /authors/:id/followers ([]Reader) // to implement
 - [ ] POST /authors/:id/follow
 
 - [ ] GET /readers/:id (Reader)

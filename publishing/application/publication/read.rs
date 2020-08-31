@@ -38,11 +38,11 @@ impl<'a> Read<'a> {
         }
     }
 
-    pub async fn exec(&self, reader_id: String, publication_id: String) -> Result<ReadResponse> {
+    pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<ReadResponse> {
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        let reader_id = ReaderId::new(reader_id)?;
+        let reader_id = ReaderId::new(auth_id)?;
         let reader = self.reader_repo.find_by_id(&reader_id).await?;
 
         if publication.author_id() != &reader_id {

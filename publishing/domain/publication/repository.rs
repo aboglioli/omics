@@ -12,10 +12,13 @@ pub trait PublicationRepository: Sync + Send {
 
     async fn find_all(&self) -> Result<Vec<Publication>>;
     async fn find_by_id(&self, id: &PublicationId) -> Result<Publication>;
-    async fn find_by_author_id(&self, author_id: &AuthorId) -> Result<Vec<Publication>>;
-    async fn find_by_category_id(&self, category_id: &CategoryId) -> Result<Vec<Publication>>;
-    async fn find_by_status(&self, status: &str) -> Result<Vec<Publication>>;
-    async fn search(&self, text: &str) -> Result<Vec<Publication>>;
+    async fn search(
+        &self,
+        author_id: Option<&AuthorId>,
+        category_id: Option<&CategoryId>,
+        status: Option<&String>,
+        name: Option<&String>,
+    ) -> Result<Vec<Publication>>;
 
     async fn save(&self, publication: &mut Publication) -> Result<()>;
 }
