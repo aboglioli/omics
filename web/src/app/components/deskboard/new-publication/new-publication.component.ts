@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
@@ -14,6 +14,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { IPublication, ITag, IPage } from '../../../domain/models/publication';
 import { IDropdownItem } from '../../../models/dropdown-item.interface';
 import { MatChipInputEvent } from '@angular/material/chips';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 
 
 @Component({
@@ -22,6 +23,9 @@ import { MatChipInputEvent } from '@angular/material/chips';
   styleUrls: ['./new-publication.component.scss']
 })
 export class NewPublicationComponent implements OnInit {
+
+  @ViewChild('formDataInvalid') private swalFormDataInvalid: SwalComponent;
+  @ViewChild('formDataValid') private swalFormDataValid: SwalComponent;
 
   // FontAwesome Icon
   public faPlus = faPlusCircle;
@@ -35,6 +39,7 @@ export class NewPublicationComponent implements OnInit {
   public portadaImage: string;
   public categoryList: IDropdownItem[];
   public tagsList: ITag[] = [];
+
 
   // Otros
   public ripplePortadaEnable = true;
@@ -163,6 +168,8 @@ export class NewPublicationComponent implements OnInit {
 
     if ( this.formPublication.invalid ) {
 
+      this.swalFormDataInvalid.fire();
+
       return Object.values( this.formPublication.controls ).forEach( control => {
 
         // Si es un objeto
@@ -180,13 +187,15 @@ export class NewPublicationComponent implements OnInit {
 
     } else {
 
-      console.log('TEST > Enviando publicación para almacenar');
 
+      // Lo necesario para enviarse
       this.pagesList.controls.forEach(element => {
         element.get('thumbailImage').disable();
       });
 
-      console.log('TEST > PUBLICADO ');
+      // TODO: Realizar el enviado y lectura correcta de datos
+      this.swalFormDataValid.fire();
+
 
       // Activar luego para visualizar TODO: ¿Debe mantenerse así o se puede enviar y que se ignore en el back?
       this.pagesList.controls.forEach(element => {

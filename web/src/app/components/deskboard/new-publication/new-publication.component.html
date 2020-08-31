@@ -150,12 +150,12 @@
                     #dropdownCategory="ngbDropdown">
 
                 <button class="btn button-white-borders hover-white mr-2"
-                        id="dropdown-colection" ngbDropdownAnchor
+                        id="dropdown-category" ngbDropdownAnchor
                         (focus)="dropdownCategory.open();">
                           Lista de categorías disponibles
                 </button>
 
-                <div ngbDropdownMenu aria-labelledby="dropdown-colection">
+                <div ngbDropdownMenu aria-labelledby="dropdown-category">
 
                   <!-- Opciones únicas -->
                   <mat-radio-group formControlName="category_id">
@@ -303,3 +303,19 @@
   <div class="side"></div>
 
 </div>
+
+
+<swal #formDataInvalid
+  title="Datos incompletos o erroneos"
+  text="Complete correctamente los datos necesarios"
+  icon="error"
+  [focusConfirm]="true">
+</swal>
+
+<swal #formDataValid
+  title="Publicación realizada"
+  text="¡Se ha subido correctamente!"
+  icon="success"
+  [focusConfirm]="true"
+  (confirm)="backToDeskboard()">
+</swal>
