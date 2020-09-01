@@ -20,9 +20,9 @@ impl Config {
             port: match env::var("PORT") {
                 Ok(port) => match port.parse() {
                     Ok(port) => port,
-                    _ => 80,
+                    _ => 3000,
                 },
-                _ => 80,
+                _ => 3000,
             },
             env: env::var("ENV").unwrap_or_else(|_| "development".to_owned()),
             pagination_limit: 1000,

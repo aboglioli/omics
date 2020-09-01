@@ -90,7 +90,7 @@ dependencies = [
  "serde_urlencoded",
  "sha1",
  "slab",
- "time 0.1.43",
+ "time 0.1.44",
 ]
 
 [[package]]
@@ -118,7 +118,7 @@ dependencies = [
  "httparse",
  "log",
  "mime",
- "time 0.1.43",
+ "time 0.1.44",
  "twoway",
 ]
 
@@ -275,7 +275,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_urlencoded",
- "time 0.1.43",
+ "time 0.1.44",
  "url",
 ]
 
@@ -334,9 +334,9 @@ checksum = "cff77d8686867eceff3105329d4698d96c2391c176d5d03adc90c7389162b5b8"
 
 [[package]]
 name = "async-trait"
-version = "0.1.38"
+version = "0.1.40"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e1a4a2f97ce50c9d0282c1468816208588441492b40d813b2e0419c22c05e7f"
+checksum = "687c230d85c0a52504709705fc8a53e4a692b83a2184f03dae73e38e1e93a783"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -544,7 +544,7 @@ dependencies = [
  "num-integer",
  "num-traits",
  "serde",
- "time 0.1.43",
+ "time 0.1.44",
 ]
 
 [[package]]
@@ -948,7 +948,7 @@ checksum = "7abc8dd8451921606d809ba32e95b6111925cd2906060d2dcc29c070220503eb"
 dependencies = [
  "cfg-if",
  "libc",
- "wasi",
+ "wasi 0.9.0+wasi-snapshot-preview1",
 ]
 
 [[package]]
@@ -1083,7 +1083,7 @@ dependencies = [
  "itoa",
  "pin-project",
  "socket2",
- "time 0.1.43",
+ "time 0.1.44",
  "tokio",
  "tower-service",
  "tracing",
@@ -2222,11 +2222,12 @@ dependencies = [
 
 [[package]]
 name = "time"
-version = "0.1.43"
+version = "0.1.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ca8a50ef2360fbd1eeb0ecd46795a87a19024eb4b53c5dc916ca1fd95fe62438"
+checksum = "6db9e6914ab8b1ae1c260a4ae7a49b6c5611b40328a735b21862567685e73255"
 dependencies = [
  "libc",
+ "wasi 0.10.0+wasi-snapshot-preview1",
  "winapi 0.3.9",
 ]
 
@@ -2524,6 +2525,12 @@ name = "wasi"
 version = "0.9.0+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cccddf32554fecc6acb585f82a32a72e28b48f8c4c1883ddfeeeaa96f7d8e519"
+
+[[package]]
+name = "wasi"
+version = "0.10.0+wasi-snapshot-preview1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1a143597ca7c7793eff794def352d41792a93c481eb1042423ff7ff72ba2c31f"
 
 [[package]]
 name = "wasm-bindgen"
