@@ -5,3 +5,10 @@ export interface IReader {
   lastname: string;
   subscribed: boolean;
 }
+
+export interface IReaderInteraction {
+  viewed: boolean;
+  read: boolean;
+  liked: boolean;
+  reviewed: boolean;
+}

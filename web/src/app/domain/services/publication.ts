@@ -3,7 +3,13 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ConfigService } from './config';
-import { IPublication, IReview, IPage } from '../models';
+import { IPublication, IReview, IPage, IReaderInteraction } from '../models';
+
+
+export interface IGetByIdResponse {
+  publication: IPublication;
+  reader?: IReaderInteraction;
+}
 
 export interface ISearchCommand {
   author_id?: string;
@@ -64,14 +70,14 @@ export class PublicationService {
     this.baseUrl = `${configServ.baseUrl()}/publications`;
   }
 
-  public getById(id: string, include: string = ''): Observable<IPublication> {
+  public getById(id: string, include: string = ''): Observable<IGetByIdResponse> {
     let params = new HttpParams();
 
     if (include) {
       params = params.append('include', include);
     }
 
-    return this.http.get<IPublication>(`${this.baseUrl}/${id}`, { params });
+    return this.http.get<IGetByIdResponse>(`${this.baseUrl}/${id}`, { params });
   }
 
   public search(cmd: ISearchCommand, include: string = ''): Observable<ISearchResponse> {
