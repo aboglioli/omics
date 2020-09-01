@@ -21,6 +21,7 @@
 - [ ] Add methods to get events from date in EventRepository.
 - [ ] Add Option<String> for auth_id in use cases where user does not need to be logged in.
 - [ ] Make User birthday as value object. Check date ranges.
+- [ ] API for add new categories.
 
 # Progress
 

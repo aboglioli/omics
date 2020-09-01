@@ -82,7 +82,7 @@ export class AuthInterceptor implements HttpInterceptor {
         setHeaders: {
           'Accept': 'application/json',
           'Authorization': `Bearer ${this.authServ.getToken()}`,
-          'Content-Type': 'application/json; charset=utf-8',
+          // 'Content-Type': 'application/json; charset=utf-8',
         },
       });
     }

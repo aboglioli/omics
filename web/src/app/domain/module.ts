@@ -9,6 +9,7 @@ import { CollectionService } from './services/collection';
 import { ConfigService } from './services/config';
 import { IdentityService } from './services/identity.service';
 import { PublicationService } from './services/publication';
+import { FileService } from './services/file';
 
 @NgModule({
   imports: [
@@ -23,6 +24,7 @@ import { PublicationService } from './services/publication';
     ConfigService,
     IdentityService,
     PublicationService,
+    FileService,
 
     // Auth interceptor
     {
