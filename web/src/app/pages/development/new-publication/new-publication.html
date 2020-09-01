@@ -1,0 +1,45 @@
+<div class="container">
+  <h1>Crear publicación</h1>
+
+  <div *ngIf="error" class="error">
+    {{error}}
+  </div>
+
+  <div *ngIf="success" class="success">
+    {{success}}
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div *ngIf="coverUrl" class="block center">
+      <img [src]="coverUrl" style="width: 250px; height: 250px;"/>
+    </div>
+
+    <div class="block">
+      <label for="cover">Portada</label>
+      <input type="file" (change)="onCoverSelect($event)" />
+    </div>
+
+    <div class="block">
+      <label for="name">Nombre</label>
+      <input type="text" formControlName="name" />
+    </div>
+
+    <div class="block">
+      <label for="name">Synopsis</label>
+      <textarea formControlName="synopsis"></textarea>
+    </div>
+
+    <div class="block">
+      <label for="category">Categoría</label>
+      <select formControlName="categoryId">
+        <option *ngFor="let category of categories" [value]="category.id">
+        {{category.name}}
+        </option>
+      </select>
+    </div>
+
+    <div class="block right">
+      <button type="submit" [disabled]="!form.valid || !coverUrl">Crear</button>
+    </div>
+  </form>
+</div>

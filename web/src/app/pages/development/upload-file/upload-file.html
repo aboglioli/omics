@@ -1,0 +1,17 @@
+<div class="container">
+  <h1>Upload</h1>
+  <div>
+    <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+      <div>
+        <input type="file" name="image" (change)="onFileSelect($event)" />
+      </div>
+      <div>
+        <button type="submit">Upload</button>
+      </div>
+    </form>
+
+    <div *ngIf="uploadedImage">
+      <img [src]="uploadedImage" />
+    </div>
+  </div>
+</div>

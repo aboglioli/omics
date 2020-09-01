@@ -8,6 +8,7 @@ import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import { faPlusCircle, faTimesCircle, faBookOpen } from '@fortawesome/free-solid-svg-icons';
 
 import { AuthService } from '../../../domain/services/auth';
+import { FileService } from '../../../domain/services/file';
 import { DropdownDataObrasService } from '../../../services/dropdown-data-obras.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 
@@ -52,6 +53,7 @@ export class NewPublicationComponent implements OnInit {
     private fb: FormBuilder,
     private spinnerService: NgxSpinnerService,
     private dropdownDataObrasService: DropdownDataObrasService,
+    private fileServ: FileService,
   ) { }
 
   ngOnInit(): void {
@@ -135,16 +137,15 @@ export class NewPublicationComponent implements OnInit {
 
       //#endregion
 
-      // #region Generar un nombre para enviar el archivo
-      let imageName =  imagePortada.lastModified + imagePortada.name;
-      imageName = imageName.replace(/\s+/g, '-').toLowerCase();
-      imageName = imageName.substr(0, imageName.lastIndexOf('.'));
-      // #endregion
-
-      fdImage.append('image', imagePortada, imageName);
+      fdImage.append('image', imagePortada, imagePortada.name);
       this.formPublication.get('cover').setValue(fdImage);
-      // console.log('TEST > ', imagePortada );
-      // console.log('TEST > ', fdImage.getAll('image') );
+      console.log('TEST > ', imagePortada );
+      console.log('TEST > ', fdImage.getAll('image') );
+
+      this.fileServ.upload(fdImage).subscribe(
+        req => console.log(req),
+        err => console.log(err),
+      );
 
     };
 

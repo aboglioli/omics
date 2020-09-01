@@ -1,0 +1,96 @@
+.menu {
+  padding: 1rem;
+
+  button {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.8);
+    border: none;
+    color: #aaa;
+    margin: 0.3rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+.container {
+  border: 1px solid #134260;
+  border-radius: 3px;
+  color: #eee;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  width: 800px;
+
+  .block {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    margin: 0.5rem 0;
+    padding: 1rem;
+  }
+}
+
+.left {
+  align-items: flex-start;
+}
+
+.right {
+  align-items: flex-end;
+}
+
+.center {
+  align-items: center;
+}
+
+.error {
+  padding: 0.3rem;
+  background-color: #c33b23;
+  border: 1px solid black;
+  border-radius: 5px;
+}
+
+.success {
+  padding: 0.3rem;
+  background-color: #92d899;
+  border: 1px solid black;
+  border-radius: 5px;
+}
+
+form {
+  label {
+    font-size: 1.2rem;
+    margin-right: 1rem;
+  }
+
+  input[type="text"], textarea {
+    background-color: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    padding: 0.5rem 1rem;
+  }
+
+  select {
+    background-color: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    padding: 0.5rem 1rem;
+  }
+
+  button {
+    background-color: #134260;
+    color: #fff;
+    border: 3px solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    font-size: 1.1rem;
+    padding: 0.5rem 1rem;
+    width: 30%;
+
+    &:disabled {
+      background-color: rgba(19, 66, 96, 0.2);
+      color: rgba(255, 255, 255, 0.2);
+      // border: 3px solid rgba(0, 0, 0, 0.2);
+    }
+  }
+}

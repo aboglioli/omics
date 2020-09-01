@@ -48,6 +48,8 @@ import { NewPublicationComponent } from './components/deskboard/new-publication/
 
 // Development
 import { DevelopmentComponent } from './pages/development/development.component';
+import { DevUploadFileComponent } from './pages/development/upload-file/upload-file';
+import { DevNewPublicationComponent } from './pages/development/new-publication/new-publication';
 
 // Domain
 import { DomainModule } from './domain/module';
@@ -78,12 +80,15 @@ import { PasswordRewriteComponent } from './components/password-recovery/passwor
     NavBarComponent,
     SideNavMenuComponent,
     AutoresComponent,
-    DevelopmentComponent,
     UnderConstructionComponent,
     DeskboardMisComicsComponent,
     NewPublicationComponent,
     PasswordForgotComponent,
     PasswordRewriteComponent,
+
+    DevelopmentComponent,
+    DevUploadFileComponent,
+    DevNewPublicationComponent
   ],
   imports: [
     BrowserModule,
