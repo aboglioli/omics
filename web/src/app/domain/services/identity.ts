@@ -84,11 +84,11 @@ export class IdentityService {
   }
 
   public register(cmd: IRegisterCommand): Observable<IRegisterResponse> {
-    return this.http.post<IRegisterResponse>(`/register`, cmd);
+    return this.http.post<IRegisterResponse>(`${this.configServ.baseUrl()}/register`, cmd);
   }
 
   public login(cmd: ILoginCommand): Observable<ILoginResponse> {
-    return this.http.post<ILoginResponse>(`/login`, cmd);
+    return this.http.post<ILoginResponse>(`${this.configServ.baseUrl()}/login`, cmd);
   }
 
   public update(id: string, cmd: IUpdateCommand): Observable<any> {
@@ -104,6 +104,6 @@ export class IdentityService {
   }
 
   public recoverPassword(cmd: IRecoverPasswordCommand): Observable<any> {
-    return this.http.post('/recover-password', cmd);
+    return this.http.post(`${this.configServ.baseUrl()}/recover-password`, cmd);
   }
 }
