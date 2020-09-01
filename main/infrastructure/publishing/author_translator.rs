@@ -60,7 +60,25 @@ impl AuthorRepository for AuthorTranslator {
     }
 
     async fn search(&self, _name: Option<&String>) -> Result<Vec<Author>> {
-        Ok(Vec::new())
+        let mut authors = Vec::new();
+
+        for user in self.user_repo.find_all().await? {
+            println!("{:?}", user);
+            if user.person().is_none() {
+                continue;
+            }
+
+            authors.push(
+                Author::new(
+                    user.base().id().clone(),
+                    user.identity().username().value(),
+                    user.person().unwrap().fullname().name(),
+                    user.person().unwrap().fullname().lastname(),
+                )?
+            );
+        }
+
+        Ok(authors)
     }
 
     async fn save(&self, _author: &mut Author) -> Result<()> {

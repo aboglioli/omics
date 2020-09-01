@@ -37,7 +37,7 @@ async fn get_following(
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/reader")
+        web::scope("/readers")
             .route("/{reader_id}", web::get().to(get_by_id))
             .route("/{reader_id}/following", web::get().to(get_following)),
     );

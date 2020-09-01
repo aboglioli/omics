@@ -13,6 +13,7 @@ use publishing::infrastructure::persistence::inmem::{
     InMemCategoryRepository, InMemCollectionRepository, InMemInteractionRepository,
     InMemPublicationRepository,
 };
+use publishing::application::reader::InteractionHandler;
 
 use crate::development::EventLogger;
 use crate::infrastructure::publishing::{
@@ -81,6 +82,12 @@ impl Container {
     pub async fn subscribe(&self) -> Result<()> {
         let event_logger = EventLogger::new(self.event_repo.clone());
         self.event_bus.subscribe(Box::new(event_logger)).await?;
+
+        let reader_handler = InteractionHandler::new(
+            self.publishing.reader_repo_clone(),
+            self.publishing.publication_repo_clone(),
+        );
+        self.event_bus.subscribe(Box::new(reader_handler)).await?;
 
         Ok(())
     }

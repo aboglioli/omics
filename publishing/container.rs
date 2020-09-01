@@ -107,4 +107,13 @@ where
     pub fn interaction_serv(&self) -> &InteractionService {
         &self.interaction_serv
     }
+
+    // Cloning
+    pub fn reader_repo_clone(&self) -> Arc<dyn ReaderRepository> {
+        self.reader_repo.clone()
+    }
+
+    pub fn publication_repo_clone(&self) -> Arc<dyn PublicationRepository> {
+        self.publication_repo.clone()
+    }
 }
