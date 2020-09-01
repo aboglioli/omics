@@ -22,7 +22,7 @@ export class NavBarComponent implements OnInit {
 
   constructor(  private router: Router,
                 private authService: AuthService,
-                public dialog: MatDialog ) {
+                private dialog: MatDialog ) {
 
 
     this.subscribeAuthService();

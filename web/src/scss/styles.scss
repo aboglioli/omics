@@ -24,6 +24,9 @@ body {
   }
 
   //#endregion
+  .myapp-no-padding-dialog {
+    padding: 0px !important;
+  }
 
   .mat-dialog-container {
     background-color: $omics-background-menu;
@@ -34,5 +37,15 @@ body {
 
   }
 
+  .break-word {
 
+    word-break: break-word;
+
+  }
+
+}
+
+// Extra custom mat-dialog
+.no-padding-dialog .mat-dialog-container {
+  padding: 0;
 }
