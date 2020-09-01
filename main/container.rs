@@ -8,12 +8,12 @@ use identity::infrastructure::persistence::inmem::{
     InMemRoleRepository, InMemTokenRepository, InMemUserRepository,
 };
 use identity::infrastructure::service::{BcryptHasher, JWTEncoder};
+use publishing::application::reader::InteractionHandler;
 use publishing::container::Container as PublishingContainer;
 use publishing::infrastructure::persistence::inmem::{
     InMemCategoryRepository, InMemCollectionRepository, InMemInteractionRepository,
     InMemPublicationRepository,
 };
-use publishing::application::reader::InteractionHandler;
 
 use crate::development::EventLogger;
 use crate::infrastructure::publishing::{

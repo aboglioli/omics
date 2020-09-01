@@ -53,8 +53,6 @@ impl EventHandler for InteractionHandler {
 
             reader.preferences_mut().add_publication(&publication)?;
 
-            println!("{:?}", reader);
-
             self.reader_repo.save(&mut reader).await?;
 
             return Ok(true);

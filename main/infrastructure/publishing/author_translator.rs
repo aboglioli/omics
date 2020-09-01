@@ -63,19 +63,16 @@ impl AuthorRepository for AuthorTranslator {
         let mut authors = Vec::new();
 
         for user in self.user_repo.find_all().await? {
-            println!("{:?}", user);
             if user.person().is_none() {
                 continue;
             }
 
-            authors.push(
-                Author::new(
-                    user.base().id().clone(),
-                    user.identity().username().value(),
-                    user.person().unwrap().fullname().name(),
-                    user.person().unwrap().fullname().lastname(),
-                )?
-            );
+            authors.push(Author::new(
+                user.base().id().clone(),
+                user.identity().username().value(),
+                user.person().unwrap().fullname().name(),
+                user.person().unwrap().fullname().lastname(),
+            )?);
         }
 
         Ok(authors)

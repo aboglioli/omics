@@ -122,13 +122,10 @@ pub async fn populate(c: &Container) -> Result<()> {
         PublicationImage::new("https://via.placeholder.com/768x1024.jpg")?,
     ])?;
     let mut page_2 = Page::new(1)?;
-    page_2.set_images(vec![
-        PublicationImage::new("https://via.placeholder.com/768x1024.jpg")?,
-    ])?;
-    publication_1.set_pages(
-        vec![page_1, page_2],
-        author.base().id(),
-    )?;
+    page_2.set_images(vec![PublicationImage::new(
+        "https://via.placeholder.com/768x1024.jpg",
+    )?])?;
+    publication_1.set_pages(vec![page_1, page_2], author.base().id())?;
     publication_1.publish(&author)?;
     publication_1.approve(&content_manager)?;
     c.publishing
