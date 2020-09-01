@@ -1,7 +1,7 @@
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 
-import { IdentityService, IRegisterCommand, } from '../../domain/services/identity';
+import { IdentityService, IRegisterCommand, } from '../../domain/services/identity.service';
 import { FileService, IUploadResponse } from '../../domain/services/file';
 
 @Component({
@@ -9,8 +9,8 @@ import { FileService, IUploadResponse } from '../../domain/services/file';
   templateUrl: './development.component.html',
 })
 export class DevelopmentComponent implements OnInit {
-  private uploadForm: FormGroup;
-  private uploadedImage: string;
+  public uploadForm: FormGroup;
+  public uploadedImage: string;
 
   constructor(
     private formBuilder: FormBuilder,
