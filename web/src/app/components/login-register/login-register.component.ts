@@ -1,12 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { faTimesCircle, faChevronCircleRight, faChevronCircleDown, faEnvelopeSquare, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { ValidadoresCustomService } from '../../services/validadores-custom.service';
 import { Router } from '@angular/router';
-import { IdentityService, IRegisterCommand, IRegisterResponse, ILoginCommand, ILoginResponse } from '../../domain/services/identity.service';
+import {  IdentityService, IRegisterCommand, IRegisterResponse,
+          ILoginCommand, ILoginResponse } from '../../domain/services/identity.service';
 import { AuthService } from 'src/app/domain/services/auth';
 import { PasswordForgotComponent } from '../password-recovery/password-forgot/password-forgot.component';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login-register',
@@ -14,6 +18,9 @@ import { PasswordForgotComponent } from '../password-recovery/password-forgot/pa
   styleUrls: ['./login-register.component.scss']
 })
 export class LoginRegisterComponent implements OnInit {
+
+  @ViewChild('formLoginInvalid') private swalFormLoginInvalid: SwalComponent;
+  @ViewChild('formSignUpValid') private swalFormSignUpValid: SwalComponent;
 
   // Font Awseome icons
   public faClose = faTimesCircle;
@@ -59,7 +66,8 @@ export class LoginRegisterComponent implements OnInit {
                 private router: Router,
                 private identityService: IdentityService,
                 private authService: AuthService,
-                private dialog: MatDialog) {
+                private dialog: MatDialog,
+                private spinnerService: NgxSpinnerService) {
 
     dialogRef.disableClose = true;
 
@@ -124,6 +132,11 @@ export class LoginRegisterComponent implements OnInit {
 
     } else {
 
+      this.spinnerService.show();
+      setTimeout(() => {
+        this.spinnerService.hide();
+      }, 10000);
+
       const loginCommand: ILoginCommand = {
 
         username: this.formLogin.get('correoUsuario').value,
@@ -136,13 +149,20 @@ export class LoginRegisterComponent implements OnInit {
         (res: ILoginResponse) => {
 
           console.log('TEST > Registro realizado con éxito', res);
+
           this.authService.setToken( res.auth_token, res.user_id );
           this.router.navigate(['/home']);
+
           this.closeMatDialog();
+          this.spinnerService.hide();
 
         },
         (error: any) => {
           console.error( 'ERROR !!!', error );
+
+          this.swalFormLoginInvalid.fire();
+          this.spinnerService.hide();
+
         }
       );
 
@@ -173,6 +193,12 @@ export class LoginRegisterComponent implements OnInit {
     } else {
 
 
+      this.spinnerService.show();
+      setTimeout(() => {
+        this.spinnerService.hide();
+      }, 10000);
+
+
       const registerCommand: IRegisterCommand = {
 
         username: this.formSignUp.get('usuario').value,
@@ -180,18 +206,48 @@ export class LoginRegisterComponent implements OnInit {
         password: this.formSignUp.get('password1').value
 
       };
+
+
       this.identityService.register( registerCommand ).subscribe(
 
         (result: IRegisterResponse) => {
 
+          // TODO: En vez de señalar que se esconda luego el popup, habria que hacer se que cambie a la pestaña de Login
           console.log('TEST > Registro realizado con éxito', result);
 
           this.router.navigate(['/home']);
-          this.closeMatDialog();
+
+          this.swalFormSignUpValid.fire();
+          this.spinnerService.hide();
+
         },
         (error: any ) => {
 
           console.error( 'ERROR !!!', error );
+
+          const errorContext = error.error.context;
+
+          /* Se comprueba que campos de contexto hay del error, se muestra el mas prioritario
+          (buena práctica no colocar todo lo que esta erroneo) */
+          let msgAux: string;
+
+          if ( errorContext.email ) {
+            msgAux = 'correo';
+          } else {
+
+            if ( errorContext.username ) {
+              msgAux = 'usuario';
+            }
+
+          }
+
+          Swal.fire({
+            icon: 'error',
+            title: 'Error al registrarse',
+            text: `El ${ msgAux } no está disponible`
+          });
+
+          this.spinnerService.hide();
 
         }
       );

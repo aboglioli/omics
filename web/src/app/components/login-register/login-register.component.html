@@ -40,7 +40,7 @@
                 <!-- mensaje de error -->
                 <small  *ngIf="correoUsuarioLoginNovalido"
                         class="form-text text-danger">
-                  Ingrese un correo o usuario válido
+                  No válido (mínimo 5 carácteres)
                 </small>
 
               </div>
@@ -67,7 +67,7 @@
                 <!-- mensaje de error -->
                 <small  *ngIf="passwordLoginNoValido"
                         class="form-text text-danger">
-                    Contraseña no válida
+                    No válida (mínimo 8 carácteres)
                 </small>
 
               </div>
@@ -142,7 +142,7 @@
               <!-- mensaje de error -->
               <small  *ngIf="usuarioNoValido"
                       class="form-text text-danger">
-                  Ingrese un usuario válido
+                  Usuario no válido (mínimo 5 carácteres)
               </small>
 
             </div>
@@ -154,7 +154,6 @@
                    [class.is-invalid]="usuarioNoValido">
 
 
-
           </div>
         </div>
 
@@ -162,9 +161,19 @@
         <div class="form-group row">
           <div class="col">
 
-            <small class="form-text text-top">
-              Contraseña
-            </small>
+            <div class="top-field">
+
+              <small class="form-text text-top">
+                Contraseña
+              </small>
+
+              <!-- mensaje de error -->
+              <small  *ngIf="password1SignUpNoValido"
+                      class="form-text text-danger">
+                No válido (mínimo 8 carácteres)
+              </small>
+
+            </div>
 
             <div class="input-with-icon">
 
@@ -189,9 +198,19 @@
         <div class="form-group row">
           <div class="col">
 
-            <small class="form-text text-top">
-              Repetir Contraseña
-            </small>
+            <div class="top-field">
+
+              <small class="form-text text-top">
+                Repetir Contraseña
+              </small>
+
+              <!-- mensaje de error -->
+              <small  *ngIf="password2SignUpNoValido"
+                      class="form-text text-danger">
+                Contraseña no válida
+              </small>
+
+            </div>
 
             <div class="input-with-icon">
 
@@ -227,3 +246,20 @@
   </button>
 
 </mat-dialog-actions>
+
+<!-- Sweet Alert Message -->
+<swal #formLoginInvalid
+  title="LogIn incorrecto"
+  text="El correo/usario y/o la contraseña introducida no son válidos."
+  icon="error"
+  [focusConfirm]="true">
+</swal>
+
+<swal #formSignUpValid
+  title="Registro exitoso"
+  text="Revisa tu correo para confirmar tu cuenta y comenzar a usar la plataforma Omics."
+  icon="success"
+  [focusConfirm]="true"
+  (confirm)="closeMatDialog()">
+</swal>
+
