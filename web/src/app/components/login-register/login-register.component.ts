@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { faTimesCircle, faChevronCircleRight, faChevronCircleDown, faEnvelopeSquare, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { ValidadoresCustomService } from '../../services/validadores-custom.service';
 import { Router } from '@angular/router';
 import { IdentityService, IRegisterCommand, IRegisterResponse, ILoginCommand, ILoginResponse } from '../../domain/services/identity';
 import { AuthService } from 'src/app/domain/services/auth';
+import { PasswordForgotComponent } from '../password-recovery/password-forgot/password-forgot.component';
 
 @Component({
   selector: 'app-login-register',
@@ -57,7 +58,8 @@ export class LoginRegisterComponent implements OnInit {
                 private validadoresCustom: ValidadoresCustomService,
                 private router: Router,
                 private identityService: IdentityService,
-                private authService: AuthService) {
+                private authService: AuthService,
+                private dialog: MatDialog) {
 
     dialogRef.disableClose = true;
 
@@ -220,13 +222,21 @@ export class LoginRegisterComponent implements OnInit {
 
   }
 
-  // Show password
+
+
+  // Extra password
   public showPasswordLogin( passwordType: string, show: boolean ): void {
 
     const newValueVisible = !show;
 
     this.passwordListType[passwordType].visible = newValueVisible;
     this.passwordListType[passwordType].type = ( newValueVisible ) ? 'text' : 'password';
+
+  }
+
+  public openForgetPassword(): void {
+
+    const dialogRef = this.dialog.open(PasswordForgotComponent, {panelClass: 'no-padding-dialog'} );
 
   }
 

@@ -25,7 +25,7 @@
 
       <div class="panel">
 
-        <form autocomplete="off" [formGroup]="formLogin">
+        <form autocomplete="on" [formGroup]="formLogin">
 
           <!-- Correo o Usuario -->
           <div class="form-group row">
@@ -93,7 +93,7 @@
         </form>
 
         <hr>
-        <a [routerLink]="">¿No recuerdas la contraseña?</a>
+        <a [routerLink]="" (click)="openForgetPassword()">¿No recuerdas la contraseña?</a>
 
       </div>
 

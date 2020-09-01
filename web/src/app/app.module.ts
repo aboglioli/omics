@@ -51,6 +51,8 @@ import { DevelopmentComponent } from './pages/development/development.component'
 
 // Domain
 import { DomainModule } from './domain/module';
+import { PasswordForgotComponent } from './components/password-recovery/password-forgot/password-forgot.component';
+import { PasswordRewriteComponent } from './components/password-recovery/password-rewrite/password-rewrite.component';
 
 
 @NgModule({
@@ -80,6 +82,8 @@ import { DomainModule } from './domain/module';
     UnderConstructionComponent,
     DeskboardMisComicsComponent,
     NewPublicationComponent,
+    PasswordForgotComponent,
+    PasswordRewriteComponent,
   ],
   imports: [
     BrowserModule,
