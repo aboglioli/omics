@@ -11,7 +11,7 @@ import { AuthService } from '../../../domain/services/auth';
 import { DropdownDataObrasService } from '../../../services/dropdown-data-obras.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 
-import { IPublication, ITag, IPage } from '../../../domain/models/publication';
+import { IPublication } from '../../../domain/models/publication';
 import { IDropdownItem } from '../../../models/dropdown-item.interface';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
@@ -38,7 +38,7 @@ export class NewPublicationComponent implements OnInit {
   public collectionList: IDropdownItem[];
   public portadaImage: string;
   public categoryList: IDropdownItem[];
-  public tagsList: ITag[] = [];
+  public tagsList: string[] = [];
 
 
   // Otros
@@ -266,10 +266,7 @@ export class NewPublicationComponent implements OnInit {
 
     if ((value || '')) {
 
-      this.tagsList.push({
-        id: value.replace(/\s+/g, '-').toLowerCase(),
-        name: value
-      });
+      this.tagsList.push(value);
 
     }
 
@@ -279,7 +276,7 @@ export class NewPublicationComponent implements OnInit {
     }
   }
 
-  public removeTag( tag: ITag ): void {
+  public removeTag( tag: string ): void {
 
     const index = this.tagsList.indexOf(tag);
 
