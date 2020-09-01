@@ -1,8 +1,10 @@
 use common::model::AggregateRoot;
 use common::result::Result;
 use identity::domain::role::*;
-use identity::domain::user::*;
+use identity::domain::user::{Image as UserImage, * };
 use publishing::domain::category::{Name as CategoryName, *};
+use publishing::domain::publication::{Name as PublicationName, Image as PublicationImage, *};
+use publishing::domain::collection::*;
 
 use crate::container::Container;
 
@@ -76,13 +78,27 @@ pub async fn populate(c: &Container) -> Result<()> {
     c.identity.user_repo().save(&mut user).await?;
 
     // Publishing
-    let mut category_1 = Category::new(CategoryId::new("category-1")?, Name::new("Category 01")?)?;
+    let mut category_1 = Category::new(CategoryId::new("category-1")?, CategoryName::new("Category 01")?)?;
     let mut category_2 = Category::new(
         CategoryId::new("category-2")?,
         CategoryName::new("Category 02")?,
     )?;
     c.publishing.category_repo().save(&mut category_1).await?;
     c.publishing.category_repo().save(&mut category_2).await?;
+
+    let mut publication = Publication::new(
+        PublicationId::new("publication-1")?,
+        user.base().id().clone(),
+        Header::new(
+            PublicationName::new("Spiderman vs Superman")?,
+            Synopsis::new("Buena historia")?,
+            category_2.base().id().clone(),
+            vec![Tag::new("Spiderman")?, Tag::new("Superman")?, Tag::new("Lucha")?],
+            PublicationImage::new("https://via.placeholder.com/768x1024")?,
+        )?
+    )?;
+    c.publishing.publication_repo().save(&mut publication).await?;
+
 
     Ok(())
 }

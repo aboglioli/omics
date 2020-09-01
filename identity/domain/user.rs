@@ -63,7 +63,7 @@ impl User {
         user.base.record_event(UserEvent::Registered {
             id: user.base().id().to_string(),
             username: user.identity().username().to_string(),
-            email: user.identity().username().to_string(),
+            email: user.identity().email().to_string(),
             validation_code: user.validation().unwrap().code().to_string(),
         });
 

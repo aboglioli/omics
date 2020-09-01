@@ -143,7 +143,9 @@ export class NewPublicationComponent implements OnInit {
       console.log('TEST > ', fdImage.getAll('image') );
 
       this.fileServ.upload(fdImage).subscribe(
-        req => console.log(req),
+        req => {
+          this.formPublication.get('cover').setValue(req.files[0].url);
+        },
         err => console.log(err),
       );
 
@@ -152,9 +154,16 @@ export class NewPublicationComponent implements OnInit {
   }
 
   public guardarBorrador(): void {
+    if (!this.formPublication.valid) {
+      this.swalFormDataInvalid.fire();
+      return;
+    }
+
+    console.log(this.formPublication.controls);
 
     console.log('TEST > Guardar en borrador');
 
+    this.swalFormDataValid.fire();
   }
 
   public submitPublication(): void {

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { IDropdownItem } from '../models/dropdown-item.interface';
 import { Observable, of } from 'rxjs';
 import { CategoryService } from '../domain/services/category';
+import { CollectionService, ISearchCommand } from '../domain/services/collection';
 import { map } from 'rxjs/operators';
 
 @Injectable({
@@ -39,14 +40,24 @@ export class DropdownDataObrasService {
   //#endregion
 
   constructor(
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private collectionService: CollectionService,
   ) { }
 
   // TODO: Cuando este el servicio en collection.ts el método para conseguir todas las colecciones de un autor, agregar parámetro
   public getAllCollectionDropdownDataById(): Observable<IDropdownItem[]> {
+    // return of( this.mockCollectionDropdownData );
 
-    return of( this.mockCollectionDropdownData );
-
+    return this.collectionService.search({}, 'author,category').pipe(
+      map(data => {
+        return data.collections.map(collection => {
+          return {
+            valueId: collection.id,
+            name: collection.name,
+          };
+        });
+      })
+    );
   }
 
   public getAllCategoryDropdown():  Observable<IDropdownItem[]> {
