@@ -37,7 +37,10 @@ export class NewPublicationComponent implements OnInit {
   public formPublication: FormGroup;
   public publicationNewObject: IPublication;
   public collectionList: IDropdownItem[];
-  public portadaImage: string;
+  public portadaImage = {
+    thumbail: null,
+    url: null
+  };
   public categoryList: IDropdownItem[];
   public tagsList: string[] = [];
 
@@ -129,7 +132,7 @@ export class NewPublicationComponent implements OnInit {
       const reader = new FileReader();
       reader.onload = (eventReader: any ) => {
 
-        this.portadaImage = eventReader.target.result;
+        this.portadaImage.thumbail = eventReader.target.result;
 
       };
 
@@ -138,13 +141,21 @@ export class NewPublicationComponent implements OnInit {
       //#endregion
 
       fdImage.append('image', imagePortada, imagePortada.name);
-      this.formPublication.get('cover').setValue(fdImage);
-      console.log('TEST > ', imagePortada );
-      console.log('TEST > ', fdImage.getAll('image') );
+      // this.formPublication.get('cover').setValue(fdImage); // TODO: Agregar el url en form
+      // console.log('TEST > ', imagePortada );
+      // console.log('TEST > ', fdImage.getAll('image') );
 
       this.fileServ.upload(fdImage).subscribe(
-        req => console.log(req),
-        err => console.log(err),
+        (req: any) => {
+
+          console.log(req);
+
+        }, (err: Error) => {
+
+          // TODO: Manejar error por si se cae S3
+          console.error(err);
+
+        }
       );
 
     };
@@ -358,7 +369,8 @@ export class NewPublicationComponent implements OnInit {
 
       number: this.pagesList.length + 1,
       image: [new FileReader(), Validators.required  ],
-      thumbailImage: ''
+      thumbailImage: '',
+      url: ''
 
     });
   }
