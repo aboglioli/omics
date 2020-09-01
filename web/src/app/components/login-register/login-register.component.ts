@@ -4,7 +4,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { ValidadoresCustomService } from '../../services/validadores-custom.service';
 import { Router } from '@angular/router';
-import { IdentityService, IRegisterCommand, IRegisterResponse, ILoginCommand, ILoginResponse } from '../../domain/services/identity';
+import { IdentityService, IRegisterCommand, IRegisterResponse, ILoginCommand, ILoginResponse } from '../../domain/services/identity.service';
 import { AuthService } from 'src/app/domain/services/auth';
 import { PasswordForgotComponent } from '../password-recovery/password-forgot/password-forgot.component';
 
