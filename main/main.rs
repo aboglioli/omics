@@ -36,7 +36,7 @@ async fn main() -> std::io::Result<()> {
         }
     }
 
-    println!("Listening on {}", config.port());
+    println!("Listening on {} ({})", config.port(), config.env());
 
     HttpServer::new(move || {
         App::new()
