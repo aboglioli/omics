@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
 import { MatCheckbox } from '@angular/material/checkbox';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
@@ -16,6 +16,8 @@ import { IPublication } from '../../../domain/models/publication';
 import { IDropdownItem } from '../../../models/dropdown-item.interface';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { PublicationService, IUpdatePagesCommand } from '../../../domain/services/publication';
+import { ICreateCommand } from '../../../domain/services/collection';
 
 
 @Component({
@@ -47,6 +49,7 @@ export class NewPublicationComponent implements OnInit {
 
   // Otros
   public ripplePortadaEnable = true;
+  pageList: IUpdatePagesCommand;
 
   public chipTagsKeysCodes: number[] = [ENTER, COMMA]; // Usado para los tags
 
@@ -57,6 +60,7 @@ export class NewPublicationComponent implements OnInit {
     private spinnerService: NgxSpinnerService,
     private dropdownDataObrasService: DropdownDataObrasService,
     private fileServ: FileService,
+    private publicationService: PublicationService
   ) { }
 
   ngOnInit(): void {
@@ -77,8 +81,8 @@ export class NewPublicationComponent implements OnInit {
 
     this.formPublication = this.fb.group({
 
-      cover: ['', Validators.required ],
       name: ['', [ Validators.required, Validators.minLength(5) ] ],
+      cover: ['', Validators.required ],
       collectionArray: this.fb.array([]),
       synopsis: [ '', [ Validators.required, Validators.minLength(5),  Validators.maxLength(512) ] ],
       category_id: [ '', Validators.required ],
@@ -88,7 +92,6 @@ export class NewPublicationComponent implements OnInit {
     });
 
   }
-
 
   public setSubscriptionData(): void {
 
@@ -124,15 +127,19 @@ export class NewPublicationComponent implements OnInit {
     // Definir la función del llamado al hacer click (cuando realiza un cambio)
     inputFileElement.onchange = ( event: any ) => {
 
+
       const fdImage: FormData = new FormData();
       const imagePortada  = event.target.files[0];
+
+      this.spinnerService.show();
 
       // #region Cargar para previsualizar en pantalla
 
       const reader = new FileReader();
+      let tempCoverThumbail;
       reader.onload = (eventReader: any ) => {
 
-        this.portadaImage.thumbail = eventReader.target.result;
+        tempCoverThumbail = eventReader.target.result;
 
       };
 
@@ -141,19 +148,22 @@ export class NewPublicationComponent implements OnInit {
       //#endregion
 
       fdImage.append('image', imagePortada, imagePortada.name);
-      this.formPublication.get('cover').setValue(fdImage);
-      console.log('TEST > ', imagePortada );
-      console.log('TEST > ', fdImage.getAll('image') );
 
       this.fileServ.upload(fdImage).subscribe(
-        (req: any) => {
+        (res: any) => {
 
-          console.log(req);
+          console.log(res);
+          this.portadaImage.thumbail = tempCoverThumbail;
+          this.portadaImage.url = res.files[0].url;
+          this.formPublication.get('cover').setValue(this.portadaImage.url);
+
+          this.spinnerService.hide();
 
         }, (err: Error) => {
 
           // TODO: Manejar error por si se cae S3
           console.error(err);
+          this.spinnerService.hide();
 
         }
       );
@@ -175,7 +185,8 @@ export class NewPublicationComponent implements OnInit {
     this.swalFormDataValid.fire();
   }
 
-  public submitPublication(): void {
+  public async submitPublication(): Promise<void> {
+
 
     this.formPublication.get('tags').setValue(this.tagsList);
 
@@ -206,25 +217,86 @@ export class NewPublicationComponent implements OnInit {
 
     } else {
 
+      this.spinnerService.show();
 
-      // Lo necesario para enviarse
-      this.pagesList.controls.forEach(element => {
-        element.get('thumbailImage').disable();
+      const arrayPageObervables: Observable<any>[] = [];
+      // #region Recorrer arreglo de paginas para setear sus url
+      this.pagesList.controls.forEach( (pageForm: FormGroup) => {
+
+        const page = pageForm.get('image').value;
+        arrayPageObervables.push( this.fileServ.upload( page )  );
+
       });
+
+      forkJoin( arrayPageObervables ).subscribe( ( dataPage ) => {
+
+
+        this.uploadPublication();
+
+      }, (error: Error) => {
+
+        console.error(error);
+        this.spinnerService.hide();
+
+      } );
+
+
+
+      // #endregion
 
       // TODO: Realizar el enviado y lectura correcta de datos
-      this.swalFormDataValid.fire();
-
-
-      // Activar luego para visualizar TODO: ¿Debe mantenerse así o se puede enviar y que se ignore en el back?
-      this.pagesList.controls.forEach(element => {
-        element.get('thumbailImage').enable();
-      });
+      // this.swalFormDataValid.fire();
 
     }
 
   }
 
+  private uploadPublication(): void {
+
+    const createSketch: ICreateCommand = {
+
+      name: this.formPublication.get('name').value,
+      cover: this.formPublication.get('cover').value,
+      synopsis: this.formPublication.get('synopsis').value,
+      category_id: this.formPublication.get('category_id').value,
+      tags: this.formPublication.get('tags').value,
+
+    };
+
+    this.publicationService.create( createSketch ).subscribe(
+      (resSketch: any) => {
+
+        console.log('ID PUB: ', resSketch);
+
+        // this.publicationService.updatePages( resSketch.id,   )
+        this.publicationService.publish( resSketch.id ).subscribe(
+
+          (resPublish: any) => {
+
+            console.log(resPublish);
+            this.swalFormDataValid.fire();
+
+            this.spinnerService.hide();
+
+          },
+          (error: any) => {
+
+            // console.error(error);
+            this.swalFormDataValid.fire();
+            this.spinnerService.hide();
+
+          });
+
+      },
+      (error: Error) => {
+
+        console.error(error);
+        this.spinnerService.hide();
+
+      }
+    );
+
+  }
 
   // #region Dropdown Checkbox Collection
 
@@ -338,13 +410,7 @@ export class NewPublicationComponent implements OnInit {
 
         //#endregion
 
-        // #region Generar un nombre para enviar el archivo
-        let imageName =  pageImage.lastModified + pageImage.name;
-        imageName = imageName.replace(/\s+/g, '-').toLowerCase();
-        imageName = imageName.substr(0, imageName.lastIndexOf('.'));
-        // #endregion
-
-        fdImage.append('image', pageImage, imageName);
+        fdImage.append('image', pageImage, pageImage.name);
         newPage.get('image').setValue(fdImage);
 
         this.pagesList.push( newPage );
