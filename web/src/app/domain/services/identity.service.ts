@@ -99,8 +99,8 @@ export class IdentityService {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
 
-  public changePassword(cmd: IChangePasswordCommand): Observable<any> {
-    return this.http.put(this.baseUrl, cmd);
+  public changePassword(id: string, cmd: IChangePasswordCommand): Observable<any> {
+    return this.http.put(`${this.baseUrl}/${id}/password`, cmd);
   }
 
   public recoverPassword(cmd: IRecoverPasswordCommand): Observable<any> {
