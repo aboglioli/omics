@@ -47,6 +47,10 @@ export interface IChangePasswordCommand {
   new_password: string;
 }
 
+export interface IRecoverPasswordCommand {
+  email: string;
+}
+
 @Injectable()
 export class IdentityService {
   private baseUrl: string;
@@ -80,11 +84,11 @@ export class IdentityService {
   }
 
   public register(cmd: IRegisterCommand): Observable<IRegisterResponse> {
-    return this.http.post<IRegisterResponse>(`${this.configServ.baseUrl()}/register`, cmd);
+    return this.http.post<IRegisterResponse>(`/register`, cmd);
   }
 
   public login(cmd: ILoginCommand): Observable<ILoginResponse> {
-    return this.http.post<ILoginResponse>(`${this.configServ.baseUrl()}/login`, cmd);
+    return this.http.post<ILoginResponse>(`/login`, cmd);
   }
 
   public update(id: string, cmd: IUpdateCommand): Observable<any> {
@@ -99,7 +103,7 @@ export class IdentityService {
     return this.http.put(this.baseUrl, cmd);
   }
 
-  public recoverPassword(email: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/${email}`);
+  public recoverPassword(cmd: IRecoverPasswordCommand): Observable<any> {
+    return this.http.post('/recover-password', cmd);
   }
 }
