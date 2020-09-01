@@ -3,6 +3,8 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { faTimesCircle, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { IdentityService, IRecoverPasswordCommand } from '../../../domain/services/identity.service';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-password-forgot',
@@ -12,6 +14,7 @@ import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 export class PasswordForgotComponent implements OnInit {
 
   @ViewChild('forgotPasswordValid') private swalFormValid: SwalComponent;
+  @ViewChild('forgotErrorUser') private swalForgotErrorUser: SwalComponent;
 
   // Font Awseome icons
   public faClose = faTimesCircle;
@@ -21,7 +24,9 @@ export class PasswordForgotComponent implements OnInit {
   formPasswordForgot: FormGroup;
 
   constructor(  private dialogRef: MatDialogRef<PasswordForgotComponent>,
-                private fb: FormBuilder) {
+                private fb: FormBuilder,
+                private identityService: IdentityService,
+                private spinnerService: NgxSpinnerService) {
 
     dialogRef.disableClose = true;
 
@@ -31,7 +36,7 @@ export class PasswordForgotComponent implements OnInit {
 
     this.formPasswordForgot = this.fb.group({
 
-      correo     : ['', [ Validators.required, Validators.pattern( '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$' )] ]
+      email     : ['', [ Validators.required, Validators.pattern( '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$' )] ]
 
     });
 
@@ -64,17 +69,43 @@ export class PasswordForgotComponent implements OnInit {
 
     } else {
 
+
+      this.spinnerService.show();
+      setTimeout(() => {
+        this.spinnerService.hide();
+      }, 5000);
+
+      const params: IRecoverPasswordCommand = this.formPasswordForgot.value;
+
+      this.identityService.recoverPassword( params ).subscribe(
+
+        (res: any) => {
+
+          console.log('TEST > ', res);
+          this.spinnerService.hide();
+          this.swalFormValid.fire();
+
+        },
+        (error: Error ) => {
+
+          console.error('ERROR: Correo de usuario inexistente');
+          console.error(error);
+          this.spinnerService.hide();
+          this.swalForgotErrorUser.fire();
+
+        });
+
       // TODO: Registrar si sale todo bien para verificar el mail.
       // De estar todo bien, se muestra un mensaje de confirmación y se cierra la ventana.
-      this.swalFormValid.fire();
+      // this.swalFormValid.fire();
 
     }
   }
 
 
   // getters
-  get correoNovalido(): boolean {
-    return ( this.formPasswordForgot.get('correo').invalid && this.formPasswordForgot.get('correo').touched );
+  get emailNovalido(): boolean {
+    return ( this.formPasswordForgot.get('email').invalid && this.formPasswordForgot.get('email').touched );
   }
 
 

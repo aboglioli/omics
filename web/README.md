@@ -26,6 +26,10 @@ Ejecutar `ng e2e` para ejecutar pruebas end-to-end con [Protractor](http://www.p
 
 Para mayor ayuda de Angular CLI usar `ng help` o ir al [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
 
+# Información de la API
+
+Ver el archivo: docs/API.md
+
 ## Librerias principales usadas
 * [Angular Material](https://material.angular.io/).
 * [PWA](https://angular.io/guide/service-worker-intro).

@@ -7,7 +7,7 @@ import { AuthService, AuthInterceptor } from './services/auth';
 import { CategoryService } from './services/category';
 import { CollectionService } from './services/collection';
 import { ConfigService } from './services/config';
-import { IdentityService } from './services/identity';
+import { IdentityService } from './services/identity.service';
 import { PublicationService } from './services/publication';
 import { FileService } from './services/file';
 
