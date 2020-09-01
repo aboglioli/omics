@@ -15,6 +15,7 @@ import { DashboardGestionAdminComponent } from './pages/dashboard-gestion-admin/
 import { DevelopmentComponent } from './pages/development/development.component';
 import { VisorComicComponent } from './pages/visor-comic/visor-comic.component';
 import { NewPublicationComponent } from './components/deskboard/new-publication/new-publication.component';
+import { AuthNotLoginGuard } from './guard/auth-not-login.guard';
 
 
 
@@ -22,7 +23,7 @@ const routes: Routes = [
 
   { path: 'development', component: DevelopmentComponent },
   { path: 'home', component: HomeComponent },
-  { path: 'home/:id/recover-password/:temporal_password', component: HomeComponent },
+  { path: 'home/:id/recover-password/:temporal_password', component: HomeComponent, canActivate: [AuthNotLoginGuard] },
   { path: 'favorites', component: FavoritosComponent },
   { path: 'catalogue', component: CatalogoComponent },
   { path: 'authors', component:  AutoresComponent},
