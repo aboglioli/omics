@@ -141,11 +141,17 @@ export class NewPublicationComponent implements OnInit {
       //#endregion
 
       fdImage.append('image', imagePortada, imagePortada.name);
-      this.formPublication.get('cover').setValue(fdImage);
-      console.log('TEST > ', imagePortada );
-      console.log('TEST > ', fdImage.getAll('image') );
+      // this.formPublication.get('cover').setValue(fdImage); // TODO: Agregar el url en form
+      // console.log('TEST > ', imagePortada );
+      // console.log('TEST > ', fdImage.getAll('image') );
 
       this.fileServ.upload(fdImage).subscribe(
+<<<<<<< HEAD
+        req => {
+          this.formPublication.get('cover').setValue(req.files[0].url);
+        },
+        err => console.log(err),
+=======
         (req: any) => {
 
           console.log(req);
@@ -156,6 +162,7 @@ export class NewPublicationComponent implements OnInit {
           console.error(err);
 
         }
+>>>>>>> frontend-momfus
       );
 
     };
