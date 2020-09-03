@@ -278,8 +278,6 @@ export class LoginRegisterComponent implements OnInit {
 
   }
 
-
-
   // Extra password
   public showPasswordLogin( passwordType: string, show: boolean ): void {
 
@@ -296,7 +294,7 @@ export class LoginRegisterComponent implements OnInit {
 
   }
 
-  // getters
+  // #region getters
   get correoUsuarioLoginNovalido(): boolean {
     return ( this.formLogin.get('correoUsuario').invalid && this.formLogin.get('correoUsuario').touched );
   }
@@ -325,5 +323,6 @@ export class LoginRegisterComponent implements OnInit {
     return ( pass1 === pass2 ) ? false : true;
 
   }
+  // #endregion
 
 }
