@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { ConfigService } from './config';
+import { ConfigService } from './config.service';
 import { ICategory, IPublication, ICollection } from '../models';
 
 export interface IGetAllResponse {

@@ -1,9 +1,9 @@
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 
-import { PublicationService } from '../../../domain/services/publication';
-import { CategoryService } from '../../../domain/services/category';
-import { FileService } from '../../../domain/services/file';
+import { PublicationService } from '../../../domain/services/publication.service';
+import { CategoryService } from '../../../domain/services/category.service';
+import { FileService } from '../../../domain/services/file.service';
 import { ICategory } from '../../../domain/models';
 
 @Component({

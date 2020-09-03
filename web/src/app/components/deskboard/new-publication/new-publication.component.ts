@@ -7,8 +7,8 @@ import {COMMA, ENTER} from '@angular/cdk/keycodes';
 
 import { faPlusCircle, faTimesCircle, faBookOpen } from '@fortawesome/free-solid-svg-icons';
 
-import { AuthService } from '../../../domain/services/auth';
-import { FileService } from '../../../domain/services/file';
+import { AuthService } from '../../../domain/services/auth.service';
+import { FileService } from '../../../domain/services/file.service';
 import { DropdownDataObrasService } from '../../../services/dropdown-data-obras.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 
@@ -16,8 +16,8 @@ import { IPublication } from '../../../domain/models/publication';
 import { IDropdownItem } from '../../../models/dropdown-item.interface';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
-import { PublicationService, IUpdatePagesCommand } from '../../../domain/services/publication';
-import { ICreateCommand } from '../../../domain/services/collection';
+import { PublicationService, IUpdatePagesCommand } from '../../../domain/services/publication.service';
+import { ICreateCommand } from '../../../domain/services/collection.service';
 
 
 @Component({
@@ -185,7 +185,7 @@ export class NewPublicationComponent implements OnInit {
     this.swalFormDataValid.fire();
   }
 
-  public async submitPublication(): Promise<void> {
+  public async submitPublicationForm(): Promise<void> {
 
 
     this.formPublication.get('tags').setValue(this.tagsList);
@@ -217,37 +217,37 @@ export class NewPublicationComponent implements OnInit {
 
     } else {
 
-      this.spinnerService.show();
-
-      const arrayPageObervables: Observable<any>[] = [];
-      // #region Recorrer arreglo de paginas para setear sus url
-      this.pagesList.controls.forEach( (pageForm: FormGroup) => {
-
-        const page = pageForm.get('image').value;
-        arrayPageObervables.push( this.fileServ.upload( page )  );
-
-      });
-
-      forkJoin( arrayPageObervables ).subscribe( ( dataPage ) => {
-
-
-        this.uploadPublication();
-
-      }, (error: Error) => {
-
-        console.error(error);
-        this.spinnerService.hide();
-
-      } );
-
-
-
-      // #endregion
-
-      // TODO: Realizar el enviado y lectura correcta de datos
-      // this.swalFormDataValid.fire();
+      this.newPublication();
 
     }
+
+  }
+
+  private newPublication(): void {
+
+    this.spinnerService.show();
+    const arrayPageObervables: Observable<any>[] = [];
+
+    this.pagesList.controls.forEach( (pageForm: FormGroup) => {
+
+      const page = pageForm.get('image').value;
+      arrayPageObervables.push( this.fileServ.upload( page )  );
+
+    });
+
+    forkJoin( arrayPageObervables ).subscribe( ( dataPage ) => {
+
+
+      this.uploadPublication();
+
+    }, (error: Error) => {
+
+      console.error(error);
+      this.spinnerService.hide();
+
+    } );
+
+
 
   }
 
@@ -264,12 +264,19 @@ export class NewPublicationComponent implements OnInit {
     };
 
     this.publicationService.create( createSketch ).subscribe(
+
+      // Se crea primero el borrador - TODO: Llamar a la función de creador borrador con una condición si luego publicar
       (resSketch: any) => {
+
+        const idSketch = resSketch.id;
 
         console.log('ID PUB: ', resSketch);
 
+        // Subir las paginas
         // this.publicationService.updatePages( resSketch.id,   )
-        this.publicationService.publish( resSketch.id ).subscribe(
+
+        // Realizar la publicación en sí con todos los datos necesarios.
+        this.publicationService.publish( idSketch ).subscribe(
 
           (resPublish: any) => {
 
@@ -281,8 +288,7 @@ export class NewPublicationComponent implements OnInit {
           },
           (error: any) => {
 
-            // console.error(error);
-            this.swalFormDataValid.fire();
+            console.error(error);
             this.spinnerService.hide();
 
           });
@@ -294,6 +300,7 @@ export class NewPublicationComponent implements OnInit {
         this.spinnerService.hide();
 
       }
+
     );
 
   }

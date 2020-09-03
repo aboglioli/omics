@@ -6,7 +6,7 @@ import { ValidadoresCustomService } from '../../services/validadores-custom.serv
 import { Router } from '@angular/router';
 import {  IdentityService, IRegisterCommand, IRegisterResponse,
           ILoginCommand, ILoginResponse } from '../../domain/services/identity.service';
-import { AuthService } from 'src/app/domain/services/auth';
+import { AuthService } from 'src/app/domain/services/auth.service';
 import { PasswordForgotComponent } from '../password-recovery/password-forgot/password-forgot.component';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';

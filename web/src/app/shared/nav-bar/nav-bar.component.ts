@@ -3,7 +3,7 @@ import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { LoginRegisterComponent } from '../../components/login-register/login-register.component';
-import { AuthService } from 'src/app/domain/services/auth';
+import { AuthService } from 'src/app/domain/services/auth.service';
 
 @Component({
   selector: 'app-nav-bar',

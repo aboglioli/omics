@@ -2,14 +2,14 @@ import { BrowserModule } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 
-import { AuthorService } from './services/author';
-import { AuthService, AuthInterceptor } from './services/auth';
-import { CategoryService } from './services/category';
-import { CollectionService } from './services/collection';
-import { ConfigService } from './services/config';
+import { AuthorService } from './services/author.service';
+import { AuthService, AuthInterceptor } from './services/auth.service';
+import { CategoryService } from './services/category.service';
+import { CollectionService } from './services/collection.service';
+import { ConfigService } from './services/config.service';
 import { IdentityService } from './services/identity.service';
-import { PublicationService } from './services/publication';
-import { FileService } from './services/file';
+import { PublicationService } from './services/publication.service';
+import { FileService } from './services/file.service';
 
 @NgModule({
   imports: [
