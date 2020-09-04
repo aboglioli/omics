@@ -66,6 +66,8 @@ export interface IReadResponse {
 export class PublicationService {
   private baseUrl: string;
 
+
+
   constructor(private http: HttpClient, configServ: ConfigService) {
     this.baseUrl = `${configServ.baseUrl()}/publications`;
   }
@@ -157,4 +159,5 @@ export class PublicationService {
   public getReviews(id: string): Observable<IGetReviewsResponse> {
     return this.http.get<IGetReviewsResponse>(`${this.baseUrl}/${id}/reviews`);
   }
+
 }

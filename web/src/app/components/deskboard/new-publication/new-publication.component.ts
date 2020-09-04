@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, Observable, concat } from 'rxjs';
 import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
 import { MatCheckbox } from '@angular/material/checkbox';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
@@ -152,7 +152,6 @@ export class NewPublicationComponent implements OnInit {
       this.fileServ.upload(fdImage).subscribe(
         (res: any) => {
 
-          console.log(res);
           this.portadaImage.thumbail = tempCoverThumbail;
           this.portadaImage.url = res.files[0].url;
           this.formPublication.get('cover').setValue(this.portadaImage.url);
@@ -185,7 +184,8 @@ export class NewPublicationComponent implements OnInit {
     this.swalFormDataValid.fire();
   }
 
-  public async submitPublicationForm(): Promise<void> {
+  //#region Realizar publicación
+  public  submitPublicationForm(): void {
 
 
     this.formPublication.get('tags').setValue(this.tagsList);
@@ -237,8 +237,8 @@ export class NewPublicationComponent implements OnInit {
 
     forkJoin( arrayPageObervables ).subscribe( ( dataPage ) => {
 
-
-      this.uploadPublication();
+      const pagesUrl: IUpdatePagesCommand = this.getUrlFromFileService(dataPage);
+      this.uploadPublicationPages(pagesUrl);
 
     }, (error: Error) => {
 
@@ -251,7 +251,7 @@ export class NewPublicationComponent implements OnInit {
 
   }
 
-  private uploadPublication(): void {
+  private uploadPublicationPages( pagesUrlToUpload: IUpdatePagesCommand ): void {
 
     const createSketch: ICreateCommand = {
 
@@ -273,25 +273,19 @@ export class NewPublicationComponent implements OnInit {
         console.log('ID PUB: ', resSketch);
 
         // Subir las paginas
-        // this.publicationService.updatePages( resSketch.id,   )
+        this.publicationService.updatePages( resSketch.id, pagesUrlToUpload  ).subscribe(
+          (resPagesUpload: any) => {
 
-        // Realizar la publicación en sí con todos los datos necesarios.
-        this.publicationService.publish( idSketch ).subscribe(
-
-          (resPublish: any) => {
-
-            console.log(resPublish);
-            this.swalFormDataValid.fire();
-
-            this.spinnerService.hide();
+            this.uploadPublicationFinish(resSketch.id);
 
           },
-          (error: any) => {
+          (error: Error) => {
 
             console.error(error);
             this.spinnerService.hide();
 
-          });
+          }
+        );
 
       },
       (error: Error) => {
@@ -304,6 +298,29 @@ export class NewPublicationComponent implements OnInit {
     );
 
   }
+
+  private uploadPublicationFinish( idPublication: string ): void {
+
+    // Realizar la publicación en sí con todos los datos necesarios.
+    this.publicationService.publish( idPublication ).subscribe(
+      (resPublish: any) => {
+
+        this.swalFormDataValid.fire();
+        this.spinnerService.hide();
+
+      },
+      (error: any) => {
+
+        console.error(error);
+        this.spinnerService.hide();
+
+      }
+    );
+
+  }
+
+  //#endregion
+
 
   // #region Dropdown Checkbox Collection
 
@@ -386,7 +403,7 @@ export class NewPublicationComponent implements OnInit {
 
   // #endregion
 
-  //#region
+  //#region Pages
 
   public addPage(): void {
 
@@ -453,6 +470,24 @@ export class NewPublicationComponent implements OnInit {
       url: ''
 
     });
+  }
+
+  public getUrlFromFileService( dataFilePageUploaded: any[] ): IUpdatePagesCommand {
+
+    const auxStringUrlPage: IUpdatePagesCommand = {
+      pages: [] = []
+    };
+
+    dataFilePageUploaded.forEach( pageUploaded => {
+
+      auxStringUrlPage.pages.push( {
+        images: [pageUploaded.files[0].url]
+      });
+
+    });
+
+    return auxStringUrlPage;
+
   }
 
   //#endregion
