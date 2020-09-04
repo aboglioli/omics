@@ -2,7 +2,7 @@ import { Component, OnInit, EventEmitter, Output, OnDestroy } from '@angular/cor
 import { faChevronCircleLeft } from '@fortawesome/free-solid-svg-icons';
 import { Router, NavigationStart, Event as NavigationEvent  } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { AuthService } from 'src/app/domain/services/auth';
+import { AuthService } from 'src/app/domain/services/auth.service';
 
 @Component({
   selector: 'app-side-nav-menu',

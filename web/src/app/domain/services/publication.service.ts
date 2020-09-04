@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { ConfigService } from './config';
+import { ConfigService } from './config.service';
 import { IPublication, IReview, IPage, IReaderInteraction } from '../models';
 
 
@@ -65,6 +65,8 @@ export interface IReadResponse {
 @Injectable()
 export class PublicationService {
   private baseUrl: string;
+
+
 
   constructor(private http: HttpClient, configServ: ConfigService) {
     this.baseUrl = `${configServ.baseUrl()}/publications`;
@@ -157,4 +159,5 @@ export class PublicationService {
   public getReviews(id: string): Observable<IGetReviewsResponse> {
     return this.http.get<IGetReviewsResponse>(`${this.baseUrl}/${id}/reviews`);
   }
+
 }

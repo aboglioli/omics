@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { ConfigService } from './config';
+import { ConfigService } from './config.service';
 import { ICollection, IPublication } from '../models';
 
 export interface ISearchCommand {

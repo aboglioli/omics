@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from 'src/app/domain/services/auth';
+import { AuthService } from 'src/app/domain/services/auth.service';
 
 @Component({
   selector: 'app-deskboard-general',

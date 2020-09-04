@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { IDropdownItem } from '../models/dropdown-item.interface';
 import { Observable, of } from 'rxjs';
-import { CategoryService } from '../domain/services/category';
-import { CollectionService, ISearchCommand } from '../domain/services/collection';
+import { CategoryService } from '../domain/services/category.service';
+import { CollectionService, ISearchCommand } from '../domain/services/collection.service';
 import { map } from 'rxjs/operators';
 
 @Injectable({

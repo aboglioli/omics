@@ -2,7 +2,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 
 import { IdentityService, IRegisterCommand, } from '../../../domain/services/identity.service';
-import { FileService, IUploadResponse } from '../../../domain/services/file';
+import { FileService, IUploadResponse } from '../../../domain/services/file.service';
 
 @Component({
   selector: 'dev-upload-file',

@@ -1,14 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, Observable, concat } from 'rxjs';
 import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
 import { MatCheckbox } from '@angular/material/checkbox';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 
 import { faPlusCircle, faTimesCircle, faBookOpen } from '@fortawesome/free-solid-svg-icons';
 
-import { AuthService } from '../../../domain/services/auth';
-import { FileService } from '../../../domain/services/file';
+import { AuthService } from '../../../domain/services/auth.service';
+import { FileService } from '../../../domain/services/file.service';
 import { DropdownDataObrasService } from '../../../services/dropdown-data-obras.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 
@@ -16,8 +16,8 @@ import { IPublication } from '../../../domain/models/publication';
 import { IDropdownItem } from '../../../models/dropdown-item.interface';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
-import { PublicationService, IUpdatePagesCommand } from '../../../domain/services/publication';
-import { ICreateCommand } from '../../../domain/services/collection';
+import { PublicationService, IUpdatePagesCommand } from '../../../domain/services/publication.service';
+import { ICreateCommand } from '../../../domain/services/collection.service';
 
 
 @Component({
@@ -152,7 +152,6 @@ export class NewPublicationComponent implements OnInit {
       this.fileServ.upload(fdImage).subscribe(
         (res: any) => {
 
-          console.log(res);
           this.portadaImage.thumbail = tempCoverThumbail;
           this.portadaImage.url = res.files[0].url;
           this.formPublication.get('cover').setValue(this.portadaImage.url);
@@ -172,6 +171,8 @@ export class NewPublicationComponent implements OnInit {
 
   }
 
+  //#region Realizar borrador
+
   public guardarBorrador(): void {
     if (!this.formPublication.valid) {
       this.swalFormDataInvalid.fire();
@@ -185,7 +186,10 @@ export class NewPublicationComponent implements OnInit {
     this.swalFormDataValid.fire();
   }
 
-  public async submitPublication(): Promise<void> {
+  //#endregion
+
+  //#region Realizar publicación
+  public  submitPublicationForm(): void {
 
 
     this.formPublication.get('tags').setValue(this.tagsList);
@@ -217,41 +221,41 @@ export class NewPublicationComponent implements OnInit {
 
     } else {
 
-      this.spinnerService.show();
-
-      const arrayPageObervables: Observable<any>[] = [];
-      // #region Recorrer arreglo de paginas para setear sus url
-      this.pagesList.controls.forEach( (pageForm: FormGroup) => {
-
-        const page = pageForm.get('image').value;
-        arrayPageObervables.push( this.fileServ.upload( page )  );
-
-      });
-
-      forkJoin( arrayPageObervables ).subscribe( ( dataPage ) => {
-
-
-        this.uploadPublication();
-
-      }, (error: Error) => {
-
-        console.error(error);
-        this.spinnerService.hide();
-
-      } );
-
-
-
-      // #endregion
-
-      // TODO: Realizar el enviado y lectura correcta de datos
-      // this.swalFormDataValid.fire();
+      this.newPublication();
 
     }
 
   }
 
-  private uploadPublication(): void {
+  private newPublication(): void {
+
+    this.spinnerService.show();
+    const arrayPageObervables: Observable<any>[] = [];
+
+    this.pagesList.controls.forEach( (pageForm: FormGroup) => {
+
+      const page = pageForm.get('image').value;
+      arrayPageObervables.push( this.fileServ.upload( page )  );
+
+    });
+
+    forkJoin( arrayPageObervables ).subscribe( ( dataPage ) => {
+
+      const pagesUrl: IUpdatePagesCommand = this.getUrlFromFileService(dataPage);
+      this.uploadPublicationPages(pagesUrl);
+
+    }, (error: Error) => {
+
+      console.error(error);
+      this.spinnerService.hide();
+
+    } );
+
+
+
+  }
+
+  private uploadPublicationPages( pagesUrlToUpload: IUpdatePagesCommand ): void {
 
     const createSketch: ICreateCommand = {
 
@@ -264,28 +268,28 @@ export class NewPublicationComponent implements OnInit {
     };
 
     this.publicationService.create( createSketch ).subscribe(
+
+      // Se crea primero el borrador - TODO: Llamar a la función de creador borrador con una condición si luego publicar
       (resSketch: any) => {
+
+        const idSketch = resSketch.id;
 
         console.log('ID PUB: ', resSketch);
 
-        // this.publicationService.updatePages( resSketch.id,   )
-        this.publicationService.publish( resSketch.id ).subscribe(
+        // Subir las paginas
+        this.publicationService.updatePages( resSketch.id, pagesUrlToUpload  ).subscribe(
+          (resPagesUpload: any) => {
 
-          (resPublish: any) => {
-
-            console.log(resPublish);
-            this.swalFormDataValid.fire();
-
-            this.spinnerService.hide();
+            this.uploadPublicationFinish(resSketch.id);
 
           },
-          (error: any) => {
+          (error: Error) => {
 
-            // console.error(error);
-            this.swalFormDataValid.fire();
+            console.error(error);
             this.spinnerService.hide();
 
-          });
+          }
+        );
 
       },
       (error: Error) => {
@@ -294,9 +298,33 @@ export class NewPublicationComponent implements OnInit {
         this.spinnerService.hide();
 
       }
+
     );
 
   }
+
+  private uploadPublicationFinish( idPublication: string ): void {
+
+    // Realizar la publicación en sí con todos los datos necesarios.
+    this.publicationService.publish( idPublication ).subscribe(
+      (resPublish: any) => {
+
+        this.swalFormDataValid.fire();
+        this.spinnerService.hide();
+
+      },
+      (error: any) => {
+
+        console.error(error);
+        this.spinnerService.hide();
+
+      }
+    );
+
+  }
+
+  //#endregion
+
 
   // #region Dropdown Checkbox Collection
 
@@ -379,7 +407,7 @@ export class NewPublicationComponent implements OnInit {
 
   // #endregion
 
-  //#region
+  //#region Pages
 
   public addPage(): void {
 
@@ -446,6 +474,24 @@ export class NewPublicationComponent implements OnInit {
       url: ''
 
     });
+  }
+
+  public getUrlFromFileService( dataFilePageUploaded: any[] ): IUpdatePagesCommand {
+
+    const auxStringUrlPage: IUpdatePagesCommand = {
+      pages: [] = []
+    };
+
+    dataFilePageUploaded.forEach( pageUploaded => {
+
+      auxStringUrlPage.pages.push( {
+        images: [pageUploaded.files[0].url]
+      });
+
+    });
+
+    return auxStringUrlPage;
+
   }
 
   //#endregion
