@@ -171,6 +171,8 @@ export class NewPublicationComponent implements OnInit {
 
   }
 
+  //#region Realizar borrador
+
   public guardarBorrador(): void {
     if (!this.formPublication.valid) {
       this.swalFormDataInvalid.fire();
@@ -183,6 +185,8 @@ export class NewPublicationComponent implements OnInit {
 
     this.swalFormDataValid.fire();
   }
+
+  //#endregion
 
   //#region Realizar publicación
   public  submitPublicationForm(): void {
