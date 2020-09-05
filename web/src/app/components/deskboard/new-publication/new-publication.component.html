@@ -79,18 +79,28 @@
             <div class="input-field-row">
 
               <div class="title-and-error" >
-              <p class="field-name">Colección: </p>
+                <p class="field-name">Colección: </p>
               </div>
 
               <div  class="d-inline-block"
                     ngbDropdown
                     #dropdownColection="ngbDropdown">
 
-                <button class="btn button-white-borders hover-white mr-2"
-                        id="dropdown-colection" ngbDropdownAnchor
-                        (focus)="dropdownColection.open();">
-                          Lista de colecciones disponibles
-                </button>
+                <div class="dropdown-with-chips" >
+                  <button class="btn button-white-borders hover-white mr-2"
+                          id="dropdown-colection" ngbDropdownAnchor
+                          (focus)="dropdownColection.open();">
+
+                          Lista de colecciones
+
+                  </button>
+
+                  <!-- Mostrar cantidad seleccionada -->
+                  <div *ngIf="collectionArrayCheck.length > 0" class="chip-rigth" >
+                    <mat-chip color="accent" selected [disableRipple]="true">{{ collectionArrayCheck.length }}</mat-chip>
+                  </div>
+
+                </div>
 
                 <div ngbDropdownMenu aria-labelledby="dropdown-colection">
 
@@ -143,6 +153,15 @@
 
               <div class="title-and-error" >
                 <p class="field-name">Categoría: </p>
+
+                <!-- mensaje de error -->
+                <p  *ngIf="categoryNoValido"
+                    class="form-text text-danger">
+
+                    Seleccione una categoría.
+
+                </p>
+
               </div>
 
               <div  class="d-inline-block"
@@ -152,7 +171,14 @@
                 <button class="btn button-white-borders hover-white mr-2"
                         id="dropdown-category" ngbDropdownAnchor
                         (focus)="dropdownCategory.open();">
-                          Lista de categorías disponibles
+
+                          <span *ngIf="!categoryFormValueId">
+                            Lista de categorías disponibles
+                          </span>
+
+                          <span *ngIf="categoryFormValueId">
+                            {{ categoryValueName }}
+                          </span>
                 </button>
 
                 <div ngbDropdownMenu aria-labelledby="dropdown-category">

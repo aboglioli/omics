@@ -523,6 +523,25 @@ export class NewPublicationComponent implements OnInit {
     return this.formPublication.get('collectionArray') as FormArray;
   }
 
+  get categoryNoValido(): boolean {
+    return ( this.formPublication.get('category_id').invalid && this.formPublication.get('category_id').touched );
+  }
+  get categoryFormValueId(): string {
+
+    return this.formPublication.get('category_id').value;
+
+  }
+
+  get categoryValueName(): string {
+
+    return this.categoryList.filter( element => {
+
+      return (element.valueId === this.categoryFormValueId);
+
+    } )[0].name;
+  }
+
+
   //#endregion
 
 }
