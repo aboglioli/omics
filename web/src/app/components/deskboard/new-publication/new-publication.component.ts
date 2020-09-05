@@ -98,11 +98,12 @@ export class NewPublicationComponent implements OnInit {
     this.spinnerService.show();
     setTimeout(() => {
       this.spinnerService.hide();
-    }, 5000);
+    }, 20000); // 20 segundos de espera máxima TODO: Agregar mensaje de error de pasar mucho tiempo
 
-    const observableList =  [ this.dropdownDataObrasService.getAllCollectionDropdownDataById(),
-                              this.dropdownDataObrasService.getAllCategoryDropdown()
-                            ];
+    const observableList =  [
+        this.dropdownDataObrasService.getAllCollectionDropdownDataById(),
+        this.dropdownDataObrasService.getAllCategoryDropdown()
+    ];
 
     forkJoin( observableList).subscribe(([ dataCollection, dataCategory ]) => {
 

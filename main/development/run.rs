@@ -165,7 +165,7 @@ pub async fn populate(c: &Container) -> Result<()> {
         .save(&mut publication_3)
         .await?;
 
-    let mut collection = Collection::new(
+    let mut collection_1 = Collection::new(
         CollectionId::new("collection-1")?,
         user.base().id().clone(),
         Header::new(
@@ -176,8 +176,24 @@ pub async fn populate(c: &Container) -> Result<()> {
             PublicationImage::new("https://via.placeholder.com/768x1024.jpg")?,
         )?,
     )?;
-    collection.add_item(&publication_1, author.base().id())?;
-    c.publishing.collection_repo().save(&mut collection).await?;
+
+    collection_1.add_item(&publication_1, author.base().id())?;
+    c.publishing.collection_repo().save(&mut collection_1).await?;
+
+    let mut collection_2 = Collection::new(
+        CollectionId::new("collection-2")?,
+        user.base().id().clone(),
+        Header::new(
+            PublicationName::new("Colección 2")?,
+            Synopsis::new("Segunda colección.")?,
+            category_1.base().id().clone(),
+            vec![Tag::new("Saga")?, Tag::new("Proyecto")?],
+            PublicationImage::new("https://via.placeholder.com/768x1024.jpg")?,
+        )?,
+    )?;
+
+    collection_2.add_item(&publication_1, author.base().id())?;
+    c.publishing.collection_repo().save(&mut collection_2).await?;
 
     Ok(())
 }
