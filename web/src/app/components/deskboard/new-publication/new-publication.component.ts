@@ -17,7 +17,8 @@ import { IDropdownItem } from '../../../models/dropdown-item.interface';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { PublicationService, IUpdatePagesCommand } from '../../../domain/services/publication.service';
-import { ICreateCommand } from '../../../domain/services/collection.service';
+import { ICreateCommand, CollectionService } from '../../../domain/services/collection.service';
+import { SweetAlertGenericMessageService } from '../../../services/sweet-alert-generic-message.service';
 
 
 @Component({
@@ -60,7 +61,9 @@ export class NewPublicationComponent implements OnInit {
     private spinnerService: NgxSpinnerService,
     private dropdownDataObrasService: DropdownDataObrasService,
     private fileServ: FileService,
-    private publicationService: PublicationService
+    private publicationService: PublicationService,
+    private collectionService: CollectionService,
+    private sweetAlertGeneric: SweetAlertGenericMessageService
   ) { }
 
   ngOnInit(): void {
@@ -101,7 +104,7 @@ export class NewPublicationComponent implements OnInit {
     }, 20000); // 20 segundos de espera máxima TODO: Agregar mensaje de error de pasar mucho tiempo
 
     const observableList =  [
-        this.dropdownDataObrasService.getAllCollectionDropdownDataById(),
+        this.dropdownDataObrasService.getAllCollectionDropdownDataById( this.authService.getIdUser() ),
         this.dropdownDataObrasService.getAllCategoryDropdown()
     ];
 
@@ -222,7 +225,8 @@ export class NewPublicationComponent implements OnInit {
 
     } else {
 
-      this.newPublication();
+      ( this.pagesTotal > 0  ) ?
+        this.newPublication() : this.sweetAlertGeneric.showAlertError( 'No hay páginas cargadas a la colección.' );
 
     }
 
@@ -253,8 +257,8 @@ export class NewPublicationComponent implements OnInit {
     } );
 
 
-
   }
+
 
   private uploadPublicationPages( pagesUrlToUpload: IUpdatePagesCommand ): void {
 
@@ -278,10 +282,11 @@ export class NewPublicationComponent implements OnInit {
         console.log('ID PUB: ', resSketch);
 
         // Subir las paginas
-        this.publicationService.updatePages( resSketch.id, pagesUrlToUpload  ).subscribe(
+        this.publicationService.updatePages( idSketch, pagesUrlToUpload  ).subscribe(
           (resPagesUpload: any) => {
 
-            this.uploadPublicationFinish(resSketch.id);
+            ( this.collectionArrayCheck.controls.length > 0  ) ?
+                this.assignCollectionToPublication(idSketch) : this.uploadPublicationFinish(idSketch);
 
           },
           (error: Error) => {
@@ -301,6 +306,33 @@ export class NewPublicationComponent implements OnInit {
       }
 
     );
+
+  }
+
+  private assignCollectionToPublication( idPublication: string ): void {
+
+    // Primero se crea una lista con todas los observables a usar para añadir la collección a la publicación creada
+    const categorySubscriptionsList: any[] = [];
+
+    this.collectionArrayCheck.controls.forEach( (collection: FormControl) => {
+
+      categorySubscriptionsList.push( this.collectionService.addPublication( collection.value , idPublication ) );
+
+    } );
+
+    // Se realiza la subscripción de todas las colección al Id de publicación y si está correcto, se publica finalmente
+    forkJoin(  categorySubscriptionsList ).subscribe(
+      (data: any) => {
+        this.uploadPublicationFinish(idPublication);
+      },
+      (error: Error) => {
+
+        console.error(error);
+        this.spinnerService.hide();
+
+      }
+    );
+
 
   }
 
@@ -496,6 +528,8 @@ export class NewPublicationComponent implements OnInit {
   }
 
   //#endregion
+
+
 
   // #region Getters
 

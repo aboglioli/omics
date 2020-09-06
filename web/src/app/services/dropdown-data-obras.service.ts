@@ -15,9 +15,9 @@ export class DropdownDataObrasService {
     private collectionService: CollectionService,
   ) { }
 
-  public getAllCollectionDropdownDataById(): Observable<IDropdownItem[]> {
+  public getAllCollectionDropdownDataById(idUser: string): Observable<IDropdownItem[]> {
 
-    return this.collectionService.search({}, 'author,category').pipe(
+    return this.collectionService.search({ author_id: idUser }, '').pipe(
       map(data => {
         return data.collections.map(collection => {
           return {
@@ -29,7 +29,7 @@ export class DropdownDataObrasService {
     );
   }
 
-  public getAllCategoryDropdown():  Observable<IDropdownItem[]> {
+  public getAllCategoryDropdown(): Observable<IDropdownItem[]> {
 
     return this.categoryService.getAll().pipe(
       map( data => {

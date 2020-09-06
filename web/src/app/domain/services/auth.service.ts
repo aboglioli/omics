@@ -38,6 +38,12 @@ export class AuthService {
 
   }
 
+  public getIdUser(): string {
+
+    return localStorage.getItem('id_user');
+
+  }
+
   public logout(): void {
 
     this.updateStateSession(false);
