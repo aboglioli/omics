@@ -18,4 +18,14 @@ export class SweetAlertGenericMessageService {
 
   }
 
+  public showUnderConstrucction(): void {
+
+    Swal.fire({
+      icon: 'info',
+      title: 'En construcción',
+      text: 'Esta funcionalidad esta en desarrollo :)'
+    });
+
+  }
+
 }

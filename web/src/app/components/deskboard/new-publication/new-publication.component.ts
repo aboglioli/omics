@@ -63,7 +63,7 @@ export class NewPublicationComponent implements OnInit {
     private fileServ: FileService,
     private publicationService: PublicationService,
     private collectionService: CollectionService,
-    private sweetAlertGeneric: SweetAlertGenericMessageService
+    private sweetAlertGenericService: SweetAlertGenericMessageService
   ) { }
 
   ngOnInit(): void {
@@ -178,16 +178,7 @@ export class NewPublicationComponent implements OnInit {
   //#region Realizar borrador
 
   public guardarBorrador(): void {
-    if (!this.formPublication.valid) {
-      this.swalFormDataInvalid.fire();
-      return;
-    }
-
-    console.log(this.formPublication.controls);
-
-    console.log('TEST > Guardar en borrador');
-
-    this.swalFormDataValid.fire();
+    this.sweetAlertGenericService.showUnderConstrucction();
   }
 
   //#endregion
@@ -226,7 +217,7 @@ export class NewPublicationComponent implements OnInit {
     } else {
 
       ( this.pagesTotal > 0  ) ?
-        this.newPublication() : this.sweetAlertGeneric.showAlertError( 'No hay páginas cargadas a la colección.' );
+        this.newPublication() : this.sweetAlertGenericService.showAlertError( 'No hay páginas cargadas a la colección.' );
 
     }
 
