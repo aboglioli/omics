@@ -6,8 +6,13 @@ use common::result::Result;
 use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::category::{CategoryId, CategoryRepository};
 use crate::domain::publication::{
-    Header, Image, Name, Publication, PublicationRepository, Synopsis, Tag,
+    Header, Image, Name, Page, Publication, PublicationRepository, Synopsis, Tag,
 };
+
+#[derive(Deserialize)]
+pub struct PageDto {
+    pub images: Vec<String>,
+}
 
 #[derive(Deserialize)]
 pub struct CreateCommand {
@@ -16,6 +21,7 @@ pub struct CreateCommand {
     pub category_id: String,
     pub tags: Vec<String>,
     pub cover: String,
+    pub pages: Option<Vec<PageDto>>,
 }
 
 #[derive(Serialize)]
@@ -65,8 +71,29 @@ impl<'a> Create<'a> {
         let author_id = AuthorId::new(auth_id)?;
         self.author_repo.find_by_id(&author_id).await?;
 
-        let mut publication =
-            Publication::new(self.publication_repo.next_id().await?, author_id, header)?;
+        let mut publication = Publication::new(
+            self.publication_repo.next_id().await?,
+            author_id.clone(),
+            header,
+        )?;
+
+        // Add pages
+        if let Some(page_dtos) = cmd.pages {
+            let mut pages = Vec::new();
+            for (page_n, page) in page_dtos.into_iter().enumerate() {
+                let mut images = Vec::new();
+                for image in page.images.into_iter() {
+                    images.push(Image::new(image)?);
+                }
+
+                let mut page = Page::new(page_n as u32)?;
+                page.set_images(images)?;
+
+                pages.push(page);
+            }
+
+            publication.set_pages(pages, &author_id)?;
+        }
 
         self.publication_repo.save(&mut publication).await?;
 
@@ -111,6 +138,20 @@ mod tests {
                     category_id: category.base().id().to_string(),
                     tags: vec!["Tag 1".to_owned()],
                     cover: "cover.com/cover.jpg".to_owned(),
+                    pages: Some(vec![
+                        PageDto {
+                            images: vec![
+                                "http://domain.com/image1.jpg".to_owned(),
+                                "http://domain.com/image2.jpg".to_owned(),
+                            ],
+                        },
+                        PageDto {
+                            images: vec![
+                                "http://domain.com/image3.jpg".to_owned(),
+                                "http://domain.com/image4.jpg".to_owned(),
+                            ],
+                        },
+                    ]),
                 },
             )
             .await
@@ -124,9 +165,9 @@ mod tests {
         assert_eq!(publication.base().id().value(), res.id);
         assert_eq!(publication.header().name().value(), "Publication 1");
         assert_eq!(publication.header().synopsis().value(), "Synopsis...");
-        assert_eq!(publication.pages().len(), 0);
+        assert_eq!(publication.pages().len(), 2);
 
-        assert_eq!(c.event_pub().events().await.len(), 1);
+        assert!(c.event_pub().events().await.len() > 0);
     }
 
     #[tokio::test]
@@ -153,6 +194,7 @@ mod tests {
                     category_id: category.base().id().to_string(),
                     tags: vec!["Tag 1".to_owned()],
                     cover: "cover.com/cover.jpg".to_owned(),
+                    pages: None,
                 }
             )
             .await
@@ -167,6 +209,7 @@ mod tests {
                     category_id: category.base().id().to_string(),
                     tags: vec!["Tag 1".to_owned()],
                     cover: "cover.com/cover.jpg".to_owned(),
+                    pages: None,
                 }
             )
             .await
@@ -196,6 +239,7 @@ mod tests {
                     category_id: category.base().id().to_string(),
                     tags: vec!["Tag 1".to_owned()],
                     cover: "cover.com/cover.jpg".to_owned(),
+                    pages: None,
                 },
             )
             .await

@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 
-use common::infrastructure::cache::InMemCache;
 use common::cache::Cache;
+use common::infrastructure::cache::InMemCache;
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
 use publishing::domain::reader::{Preferences, Reader, ReaderId, ReaderRepository};
@@ -48,7 +48,8 @@ impl ReaderRepository for ReaderTranslator {
     async fn save(&self, reader: &mut Reader) -> Result<()> {
         let preferences = reader.preferences().clone();
         self.preferences_cache
-            .set(reader.base().id().clone(), preferences).await?;
+            .set(reader.base().id().clone(), preferences)
+            .await?;
 
         Ok(())
     }

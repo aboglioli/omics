@@ -9,12 +9,12 @@ use crate::domain::publication::{Image, Page, PublicationId, PublicationReposito
 
 #[derive(Deserialize)]
 pub struct PageDto {
-    images: Vec<String>,
+    pub images: Vec<String>,
 }
 
 #[derive(Deserialize)]
 pub struct UpdatePagesCommand {
-    pages: Vec<PageDto>,
+    pub pages: Vec<PageDto>,
 }
 
 pub struct UpdatePages<'a> {

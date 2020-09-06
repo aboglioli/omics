@@ -7,16 +7,22 @@ use common::result::Result;
 use crate::domain::author::AuthorId;
 use crate::domain::category::{CategoryId, CategoryRepository};
 use crate::domain::publication::{
-    Header, Image, Name, PublicationId, PublicationRepository, Synopsis, Tag,
+    Header, Image, Name, Page, PublicationId, PublicationRepository, Synopsis, Tag,
 };
 
 #[derive(Deserialize)]
+pub struct PageDto {
+    images: Vec<String>,
+}
+
+#[derive(Deserialize)]
 pub struct UpdateCommand {
-    name: String,
-    synopsis: String,
-    category_id: String,
-    tags: Vec<String>,
-    cover: String,
+    pub name: String,
+    pub synopsis: String,
+    pub category_id: String,
+    pub tags: Vec<String>,
+    pub cover: String,
+    pub pages: Option<Vec<PageDto>>,
 }
 
 pub struct Update<'a> {
@@ -62,8 +68,27 @@ impl<'a> Update<'a> {
         self.category_repo.find_by_id(&category_id).await?;
 
         let header = Header::new(name, synopsis, category_id, tags, cover)?;
+        let author_id = AuthorId::new(auth_id)?;
 
-        publication.set_header(header, &AuthorId::new(auth_id)?)?;
+        publication.set_header(header, &author_id)?;
+
+        // Add pages
+        if let Some(page_dtos) = cmd.pages {
+            let mut pages = Vec::new();
+            for (page_n, page) in page_dtos.into_iter().enumerate() {
+                let mut images = Vec::new();
+                for image in page.images.into_iter() {
+                    images.push(Image::new(image)?);
+                }
+
+                let mut page = Page::new(page_n as u32)?;
+                page.set_images(images)?;
+
+                pages.push(page);
+            }
+
+            publication.set_pages(pages, &author_id)?;
+        }
 
         self.publication_repo.save(&mut publication).await?;
 
@@ -102,6 +127,20 @@ mod tests {
                 category_id: category.base().id().to_string(),
                 tags: vec!["New tag".to_owned()],
                 cover: "domain.com/new-cover.jpg".to_owned(),
+                pages: Some(vec![
+                    PageDto {
+                        images: vec![
+                            "http://domain.com/image1.jpg".to_owned(),
+                            "http://domain.com/image2.jpg".to_owned(),
+                        ],
+                    },
+                    PageDto {
+                        images: vec![
+                            "http://domain.com/image3.jpg".to_owned(),
+                            "http://domain.com/image4.jpg".to_owned(),
+                        ],
+                    },
+                ]),
             },
         )
         .await
@@ -119,8 +158,9 @@ mod tests {
             publication.status_history().current(),
             Status::Draft
         ));
+        assert_eq!(publication.pages().len(), 2);
 
-        assert_eq!(c.event_pub().events().await.len(), 1);
+        assert!(c.event_pub().events().await.len() > 0);
     }
 
     #[tokio::test]
@@ -143,6 +183,7 @@ mod tests {
                 category_id: category.base().id().to_string(),
                 tags: vec!["New tag".to_owned()],
                 cover: "domain.com/new-cover.jpg".to_owned(),
+                pages: None,
             },
         )
         .await
@@ -180,6 +221,7 @@ mod tests {
                     category_id: category.base().id().to_string(),
                     tags: vec!["New tag".to_owned()],
                     cover: "domain.com/new-cover.jpg".to_owned(),
+                    pages: None,
                 },
             )
             .await
@@ -206,6 +248,7 @@ mod tests {
                     category_id: category.base().id().to_string(),
                     tags: vec!["New tag".to_owned()],
                     cover: "domain.com/new-cover.jpg".to_owned(),
+                    pages: None,
                 },
             )
             .await

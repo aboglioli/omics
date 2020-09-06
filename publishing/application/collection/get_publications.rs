@@ -38,7 +38,7 @@ impl<'a> GetPublications<'a> {
 
     pub async fn exec(
         &self,
-        _auth_id: Option<String>,
+        auth_id: Option<String>,
         collection_id: String,
         include: Include,
     ) -> Result<GetPublicationsResponse> {
@@ -47,6 +47,12 @@ impl<'a> GetPublications<'a> {
             .find_by_id(&CollectionId::new(collection_id)?)
             .await?;
 
+        let is_owner = if let Some(auth_id) = auth_id {
+            collection.author_id().value() == auth_id
+        } else {
+            false
+        };
+
         let mut publication_dtos = Vec::new();
 
         for item in collection.items() {
@@ -54,6 +60,11 @@ impl<'a> GetPublications<'a> {
                 .publication_repo
                 .find_by_id(item.publication_id())
                 .await?;
+
+            if !publication.is_published() && !is_owner {
+                continue;
+            }
+
             let mut publication_dto = PublicationDto::from(&publication);
 
             if include.has("author") {
