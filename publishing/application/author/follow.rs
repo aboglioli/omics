@@ -36,12 +36,16 @@ impl<'a> Follow<'a> {
             .reader_repo
             .find_by_id(&ReaderId::new(auth_id)?)
             .await?;
-        let author = self
+        let mut author = self
             .author_repo
             .find_by_id(&AuthorId::new(author_id)?)
             .await?;
 
-        self.interaction_serv.add_follow(&reader, &author).await?;
+        self.interaction_serv
+            .add_follow(&reader, &mut author)
+            .await?;
+
+        self.event_pub.publish_all(author.base().events()?).await?;
 
         Ok(CommandResponse::default())
     }

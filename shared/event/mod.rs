@@ -1,7 +1,9 @@
+mod author;
 mod collection;
 mod contract;
 mod publication;
 mod user;
+pub use author::*;
 pub use collection::*;
 pub use contract::*;
 pub use publication::*;

@@ -1,15 +1,17 @@
 mod repository;
 pub use repository::*;
 
-use common::event::Event;
 use common::model::{AggregateRoot, StringId};
 use common::result::Result;
+use shared::event::AuthorEvent;
+
+use crate::domain::reader::Reader;
 
 pub type AuthorId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct Author {
-    base: AggregateRoot<AuthorId, Event>,
+    base: AggregateRoot<AuthorId, AuthorEvent>,
     username: String,
     name: String,
     lastname: String,
@@ -25,7 +27,7 @@ impl Author {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<AuthorId, Event> {
+    pub fn base(&self) -> &AggregateRoot<AuthorId, AuthorEvent> {
         &self.base
     }
 
@@ -39,5 +41,14 @@ impl Author {
 
     pub fn lastname(&self) -> &str {
         &self.lastname
+    }
+
+    pub fn follow(&mut self, reader: &Reader) -> Result<()> {
+        self.base.record_event(AuthorEvent::Followed {
+            author_id: self.base().id().to_string(),
+            reader_id: reader.base().id().to_string(),
+        });
+
+        Ok(())
     }
 }

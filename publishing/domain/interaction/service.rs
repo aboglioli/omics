@@ -202,7 +202,7 @@ impl InteractionService {
     }
 
     // TODO: where to emit an event?
-    pub async fn add_follow(&self, reader: &Reader, author: &Author) -> Result<()> {
+    pub async fn add_follow(&self, reader: &Reader, author: &mut Author) -> Result<()> {
         let follows_res = self
             .interaction_repo
             .find_follows(
@@ -218,6 +218,8 @@ impl InteractionService {
                 return Err(Error::new("follow", "already_exists"));
             }
         }
+
+        author.follow(reader)?;
 
         let mut follow = Follow::new(reader.base().id().clone(), author.base().id().clone())?;
 
