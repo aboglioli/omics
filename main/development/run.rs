@@ -60,7 +60,7 @@ pub async fn populate(c: &Container) -> Result<()> {
         AggregateRoot::new(UserId::new("user-1")?),
         Identity::new(
             Provider::Local,
-            Username::new("user")?,
+            Username::new("user-1")?,
             Email::new("user@omics.com")?,
             Some(Password::new(hashed_password.clone())?),
         )?,

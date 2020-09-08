@@ -1,9 +1,10 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faBell } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { LoginRegisterComponent } from '../../components/login-register/login-register.component';
 import { AuthService } from 'src/app/domain/services/auth.service';
+import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 
 @Component({
   selector: 'app-nav-bar',
@@ -12,17 +13,20 @@ import { AuthService } from 'src/app/domain/services/auth.service';
 })
 export class NavBarComponent implements OnInit {
 
-  @Output() clickSideNavToggle = new EventEmitter();
+  @Output() clickSideNavMainToggle = new EventEmitter();
+  @Output() clickSideNavUserToggle = new EventEmitter();
 
   // Font Awseome icons
   public faBars = faBars;
+  public faBell = faBell;
 
   // Propios
   isAccessUserLogIn: boolean;  // Para habilitar algunas acciones según si esta el usuario logueado
 
   constructor(  private router: Router,
                 private authService: AuthService,
-                private dialog: MatDialog ) {
+                private dialog: MatDialog,
+                private sweetAlertGenericService: SweetAlertGenericMessageService ) {
 
 
     this.subscribeAuthService();
@@ -35,9 +39,9 @@ export class NavBarComponent implements OnInit {
 
   }
 
-  public toggleSideNavMenu(): void {
+  public toggleSideNavMainMenu(): void {
 
-    this.clickSideNavToggle.emit();
+    this.clickSideNavMainToggle.emit();
 
   }
 
@@ -53,7 +57,25 @@ export class NavBarComponent implements OnInit {
 
   }
 
-  // Auth User
+
+  //#region User Actions
+  public showNotifications(): void {
+
+    // TODO: Agregar sistema de notificaciones como otro componente interno
+    this.sweetAlertGenericService.showUnderConstrucction();
+
+  }
+
+
+  public toggleSideNavUserMenu(): void {
+
+    this.clickSideNavUserToggle.emit();
+
+  }
+
+  //#endregion
+
+  //#region  Auth User
   private subscribeAuthService(): void {
 
     // Para comprobar en tiempo real si tiene o no acceso el usuario
@@ -75,13 +97,14 @@ export class NavBarComponent implements OnInit {
 
   }
 
-
   public logout(): void {
 
     this.authService.logout();
     this.router.navigate(['/home']);
 
   }
+
+  //#endregion
 
 
 }

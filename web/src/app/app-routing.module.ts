@@ -16,6 +16,7 @@ import { DevelopmentComponent } from './pages/development/development.component'
 import { VisorComicComponent } from './pages/visor-comic/visor-comic.component';
 import { NewPublicationComponent } from './components/deskboard/new-publication/new-publication.component';
 import { AuthNotLoginGuard } from './guard/auth-not-login.guard';
+import { PerfilComponent } from './pages/perfil/perfil.component';
 
 
 
@@ -29,6 +30,8 @@ const routes: Routes = [
   { path: 'authors', component:  AutoresComponent},
   { path: 'deskboard', component:  DeskboardGeneralComponent},
   { path: 'deskboard/publication/new', component:  NewPublicationComponent},
+  { path: 'profile/:id', component: PerfilComponent},
+  { path: 'profile/:id/editUser', component: PerfilComponent},
   { path: 'about', component: AboutComponent },
   { path: 'read/:id', component: VisorComicComponent },
   { path: 'dashboard-reportes', component: DashboardReportesComponent },

@@ -39,7 +39,7 @@ import { RealizarAnalisisComponent } from './components/realizar-analisis/realiz
 import { ColeccionInfoComponent } from './pages/coleccion-info/coleccion-info.component';
 import { ComicInfoComponent } from './components/comic-info/comic-info.component';
 import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
-import { SideNavMenuComponent } from './shared/side-nav-menu/side-nav-menu.component';
+import { SideNavMenuMainComponent } from './shared/side-nav-menu-main/side-nav-menu-main.component';
 import { AutoresComponent } from './pages/autores/autores.component';
 import { UnderConstructionComponent } from './shared/under-construction/under-construction.component';
 import { DeskboardMisComicsComponent } from './components/deskboard/deskboard-mis-comics/deskboard-mis-comics.component';
@@ -55,6 +55,7 @@ import { DevNewPublicationComponent } from './pages/development/new-publication/
 import { DomainModule } from './domain/module';
 import { PasswordForgotComponent } from './components/password-recovery/password-forgot/password-forgot.component';
 import { PasswordRewriteComponent } from './components/password-recovery/password-rewrite/password-rewrite.component';
+import { SideNavMenuUserComponent } from './shared/side-nav-menu-user/side-nav-menu-user.component';
 
 
 @NgModule({
@@ -78,7 +79,7 @@ import { PasswordRewriteComponent } from './components/password-recovery/passwor
     ColeccionInfoComponent,
     ComicInfoComponent,
     NavBarComponent,
-    SideNavMenuComponent,
+    SideNavMenuMainComponent,
     AutoresComponent,
     UnderConstructionComponent,
     DeskboardMisComicsComponent,
@@ -88,7 +89,8 @@ import { PasswordRewriteComponent } from './components/password-recovery/passwor
 
     DevelopmentComponent,
     DevUploadFileComponent,
-    DevNewPublicationComponent
+    DevNewPublicationComponent,
+    SideNavMenuUserComponent
   ],
   imports: [
     BrowserModule,

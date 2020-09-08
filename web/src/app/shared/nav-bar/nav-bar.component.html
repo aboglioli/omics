@@ -2,33 +2,60 @@
 <mat-toolbar color="primary">
 
   <!-- Burguer menu -->
-  <button mat-icon-button class="button-no-borders"
-          (click)="toggleSideNavMenu()">
-      <fa-icon [icon]="faBars" size="2x"></fa-icon>
-  </button>
+  <div class="left">
+
+    <button mat-icon-button class="button-no-borders"
+            (click)="toggleSideNavMainMenu()">
+        <fa-icon [icon]="faBars" size="2x"></fa-icon>
+    </button>
+
+  </div>
 
   <!-- Title -->
-  <div class="image-box">
+  <div class="image-box center">
+
     <button mat-button (click)="goToPage('home')">
-    <img src="assets/images/omics-logo-sin-subtitulo.png" alt="omics-logo">
-  </button>
+      <img src="assets/images/omics-logo-sin-subtitulo.png" alt="omics-logo">
+    </button>
+
   </div>
 
   <!-- User menu buttons -->
+  <div class="rigth">
 
-  <!-- Ingresar -->
-  <button *ngIf="!isAccessUserLogIn"
-          mat-stroked-button class="button-white-borders"
-          (click)="openLoginRegisterDialog()">
-    Ingresar / Registrarse
-  </button>
+    <!-- Sin acceso -->
+    <span *ngIf="!isAccessUserLogIn">
 
-  <!--- Salir -->
-  <button *ngIf="isAccessUserLogIn"
-          mat-stroked-button class="button-white-borders"
-          (click)="logout()">
-      Log Out
-  </button>
+      <!-- Ingresar -->
+      <button mat-stroked-button class="button-white-borders"
+              (click)="openLoginRegisterDialog()">
+        Ingresar / Registrarse
+      </button>
+
+    </span>
+
+    <!-- Con acceso -->
+    <span *ngIf="isAccessUserLogIn" style="display: flex;">
+
+      <!-- Notificaciones -->
+      <button mat-icon-button class="button-no-borders"
+              (click)="showNotifications()">
+        <fa-icon [icon]="faBell" size="2x"></fa-icon>
+      </button>
+
+      <!-- Botón perfil usuario -->
+      <button mat-icon-button
+              (click)="toggleSideNavUserMenu()">
+
+        <img  src="assets/images/generic/avatar196x196.jpg"
+              alt="avatar-image"
+              class="avatar">
+
+      </button>
+
+    </span>
+
+  </div>
 
 
 </mat-toolbar>

@@ -1,0 +1,103 @@
+@import "../../../scss/vars";
+
+div.menu-box {
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  @media screen and (max-width: $break-small) {
+    width: 100vw;
+  }
+
+  .header {
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+
+    min-height: 40px;
+
+    background-color: $omics-background-flat;
+
+    h2 {
+
+      font-weight: bold;
+      color: white;
+
+      margin: 0em 1em;
+
+    }
+
+    button {
+
+      color: white;
+      height: 75%;
+      margin: 0em 0.5em;
+
+    }
+
+  }
+
+  .body {
+
+    display: flex;
+    flex-direction: column;
+    flex: 10;
+    background-color: $omics-background-menu;
+
+    min-width: 300px;
+
+    button {
+
+      height: 50px;
+      margin: 0.5em 1em;
+
+      &.admin-button {
+
+        background-color: $omics-background-flat;
+
+        &.active {
+          background-color: $omics-background-flat-active;
+        }
+
+      }
+
+      &.user-button {
+
+        &.active {
+          background-color: $omics-background-button;
+        }
+
+      }
+
+
+
+    }
+
+  }
+
+}
+
+// Generales
+button.button-white-borders {
+
+  color: white;
+  border-color: white;
+
+}
+
+button {
+
+  fa-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}

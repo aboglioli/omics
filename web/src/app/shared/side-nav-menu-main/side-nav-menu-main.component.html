@@ -14,6 +14,15 @@
       ¡Comienza a ser parte de Omics!
     </button>
 
+    <!-- Rol de usuario -->
+    <span *ngIf="isAccessUserLogIn && userData">
+
+      <h2 *ngIf="userData.role_id === 'admin' ">
+        [ {{ userData.role_id | uppercase }} ]
+      </h2>
+
+    </span>
+
   </div>
 
   <!-- Lista menu opciones -->
