@@ -178,7 +178,10 @@ pub async fn populate(c: &Container) -> Result<()> {
     )?;
 
     collection_1.add_item(&publication_1, author.base().id())?;
-    c.publishing.collection_repo().save(&mut collection_1).await?;
+    c.publishing
+        .collection_repo()
+        .save(&mut collection_1)
+        .await?;
 
     let mut collection_2 = Collection::new(
         CollectionId::new("collection-2")?,
@@ -193,7 +196,10 @@ pub async fn populate(c: &Container) -> Result<()> {
     )?;
 
     collection_2.add_item(&publication_1, author.base().id())?;
-    c.publishing.collection_repo().save(&mut collection_2).await?;
+    c.publishing
+        .collection_repo()
+        .save(&mut collection_2)
+        .await?;
 
     Ok(())
 }

@@ -1,3 +1,6 @@
+mod repository;
+pub use repository::*;
+
 use common::error::Error;
 use common::event::Event;
 use common::model::{AggregateRoot, StringId};

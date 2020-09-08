@@ -1,9 +1,11 @@
 mod days;
 mod discount;
 mod price;
+mod repository;
 pub use days::*;
 pub use discount::*;
 pub use price::*;
+pub use repository::*;
 
 use common::event::Event;
 use common::model::{AggregateRoot, StringId};
@@ -15,17 +17,13 @@ pub type PlanId = StringId;
 pub struct Plan {
     base: AggregateRoot<PlanId, Event>,
     price: Price,
-    days: Days,
-    discount: Option<Discount>,
 }
 
 impl Plan {
-    pub fn new(id: PlanId, price: Price, days: Days) -> Result<Self> {
+    pub fn new(id: PlanId, price: Price) -> Result<Self> {
         Ok(Plan {
             base: AggregateRoot::new(id),
             price,
-            days,
-            discount: None,
         })
     }
 
@@ -35,17 +33,5 @@ impl Plan {
 
     pub fn price(&self) -> &Price {
         &self.price
-    }
-
-    pub fn days(&self) -> &Days {
-        &self.days
-    }
-
-    pub fn discount(&self) -> Option<&Discount> {
-        self.discount.as_ref()
-    }
-
-    pub fn set_discount(&mut self, discount: Discount) {
-        self.discount = Some(discount);
     }
 }

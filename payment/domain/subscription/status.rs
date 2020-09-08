@@ -19,6 +19,20 @@ impl ToString for Status {
 }
 
 impl Status {
+    pub fn prepare_for_payment(&self) -> Result<Self> {
+        match self {
+            Status::Active => Ok(Status::WaitingPayment),
+            _ => Err(Error::new("subscription", "not_active")),
+        }
+    }
+
+    pub fn pay(&self) -> Result<Self> {
+        match self {
+            Status::WaitingPayment => Ok(Status::Active),
+            _ => Err(Error::new("subscription", "not_waiting_payment")),
+        }
+    }
+
     pub fn close(&self) -> Result<Self> {
         match self {
             Status::Active => Ok(Status::Inactive),
