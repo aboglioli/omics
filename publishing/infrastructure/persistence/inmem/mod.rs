@@ -1,3 +1,4 @@
+mod admin_repository;
 mod author_repository;
 mod category_repository;
 mod collection_repository;
@@ -5,6 +6,7 @@ mod content_manager_repository;
 mod interaction_repository;
 mod publication_repository;
 mod reader_repository;
+pub use admin_repository::*;
 pub use author_repository::*;
 pub use category_repository::*;
 pub use collection_repository::*;

@@ -11,8 +11,8 @@ use identity::infrastructure::service::{BcryptHasher, JWTEncoder};
 use publishing::application::reader::InteractionHandler;
 use publishing::container::Container as PublishingContainer;
 use publishing::infrastructure::persistence::inmem::{
-    InMemCategoryRepository, InMemCollectionRepository, InMemInteractionRepository,
-    InMemPublicationRepository,
+    InMemAdminRepository, InMemCategoryRepository, InMemCollectionRepository,
+    InMemInteractionRepository, InMemPublicationRepository,
 };
 
 use crate::development::EventLogger;
@@ -41,6 +41,8 @@ impl Container {
         let token_enc = Arc::new(JWTEncoder::new());
 
         // Publishing
+        let admin_repo = Arc::new(InMemAdminRepository::new());
+
         let category_repo = Arc::new(InMemCategoryRepository::new());
         let collection_repo = Arc::new(InMemCollectionRepository::new());
         let interaction_repo = Arc::new(InMemInteractionRepository::new());
@@ -62,6 +64,7 @@ impl Container {
 
         let publishing = PublishingContainer::new(
             event_bus.clone(),
+            admin_repo,
             author_repo,
             category_repo,
             collection_repo,

@@ -27,6 +27,9 @@
 - [ ] Add favorite interactions for publications and collections.
 - [ ] Refactor interactions and events.
 - [ ] Search by tags for publications and collections.
+- [ ] Add datetimes in DTOs.
+- [ ] Add Author followers.
+- [ ] Call base.update() and base.delete() in each AggregateRoot.
 
 # Progress
 

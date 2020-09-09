@@ -30,4 +30,15 @@ impl Category {
     pub fn name(&self) -> &Name {
         &self.name
     }
+
+    pub fn set_name(&mut self, name: Name) -> Result<()> {
+        self.name = name;
+        self.base.update();
+        Ok(())
+    }
+
+    pub fn delete(&mut self) -> Result<()> {
+        self.base.delete();
+        Ok(())
+    }
 }

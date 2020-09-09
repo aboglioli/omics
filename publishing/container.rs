@@ -3,6 +3,7 @@ use std::sync::Arc;
 use common::event::{EventPublisher, EventSubscriber};
 use common::result::Result;
 
+use crate::domain::admin::AdminRepository;
 use crate::domain::author::AuthorRepository;
 use crate::domain::category::CategoryRepository;
 use crate::domain::collection::CollectionRepository;
@@ -14,6 +15,7 @@ use crate::domain::reader::ReaderRepository;
 pub struct Container<EPub> {
     event_pub: Arc<EPub>,
 
+    admin_repo: Arc<dyn AdminRepository>,
     author_repo: Arc<dyn AuthorRepository>,
     category_repo: Arc<dyn CategoryRepository>,
     collection_repo: Arc<dyn CollectionRepository>,
@@ -33,6 +35,7 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         event_pub: Arc<EPub>,
+        admin_repo: Arc<dyn AdminRepository>,
         author_repo: Arc<dyn AuthorRepository>,
         category_repo: Arc<dyn CategoryRepository>,
         collection_repo: Arc<dyn CollectionRepository>,
@@ -47,6 +50,7 @@ where
         Container {
             event_pub,
 
+            admin_repo,
             author_repo,
             category_repo,
             collection_repo,
@@ -69,6 +73,10 @@ where
 
     pub fn event_pub(&self) -> &EPub {
         &self.event_pub
+    }
+
+    pub fn admin_repo(&self) -> &dyn AdminRepository {
+        self.admin_repo.as_ref()
     }
 
     pub fn author_repo(&self) -> &dyn AuthorRepository {

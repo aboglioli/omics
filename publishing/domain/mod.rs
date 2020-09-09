@@ -1,3 +1,4 @@
+pub mod admin;
 pub mod author;
 pub mod category;
 pub mod collection;
