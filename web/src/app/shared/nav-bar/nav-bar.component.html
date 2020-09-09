@@ -45,11 +45,21 @@
 
       <!-- Botón perfil usuario -->
       <button mat-icon-button
-              (click)="toggleSideNavUserMenu()">
+            (click)="toggleSideNavUserMenu()">
 
-        <img  src="assets/images/generic/avatar196x196.jpg"
-              alt="avatar-image"
-              class="avatar">
+        <!-- Con imagen de avatar -->
+        <span *ngIf="!userAvatar">
+          <img  src="assets/images/generic/avatar196x196.jpg"
+                alt="omics-avatar-profile"
+                class="avatar">
+        </span>
+
+        <!-- Sin imagen de avatar -->
+        <span *ngIf="userAvatar">
+          <img  [src]="userAvatar"
+                alt="omics-avatar-profile"
+                class="avatar">
+        </span>
 
       </button>
 

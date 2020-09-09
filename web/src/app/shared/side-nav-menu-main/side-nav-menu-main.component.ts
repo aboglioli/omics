@@ -39,8 +39,6 @@ export class SideNavMenuMainComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
-    this.userId = this.authService.getIdUser();
-
     // Suscribirse para obtener los cambios en las rutas
     this.eventRoute$ = this.router.events.subscribe( (event: NavigationEvent)  => {
 
@@ -50,9 +48,14 @@ export class SideNavMenuMainComponent implements OnInit, OnDestroy {
 
     });
 
-    this.getUserDataFromService(this.userId);
-
     this.isAccessUserLogIn = this.authService.isLoggedIn();
+
+    if ( this.isAccessUserLogIn  ) {
+
+      this.userId = this.authService.getIdUser();
+      this.getUserDataFromService(this.userId);
+
+    }
 
   }
 

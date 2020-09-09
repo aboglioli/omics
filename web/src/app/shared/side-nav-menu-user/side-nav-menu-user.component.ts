@@ -32,6 +32,7 @@ export class SideNavMenuUserComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
     this.userId = this.authService.getIdUser();
     this.setSubscribe();
 

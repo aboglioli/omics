@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { IdentityService } from '../../domain/services/identity.service';
 
 @Component({
   selector: 'app-perfil',
@@ -7,7 +8,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PerfilComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private identifyService: IdentityService
+  ) { }
 
   ngOnInit(): void {
   }

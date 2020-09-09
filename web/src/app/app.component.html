@@ -25,7 +25,8 @@
   <!-- Sidenav menu user (right)-->
   <mat-drawer #sidenav_user  mode="over" position="end">
 
-    <app-side-nav-menu-user (clickSideNavUserToggle)="sidenav_user.toggle()"
+    <app-side-nav-menu-user *ngIf="isAccessUserLogIn"
+                            (clickSideNavUserToggle)="sidenav_user.toggle()"
                             (clickLogout)="header_menu.logout()">
     </app-side-nav-menu-user>
 
