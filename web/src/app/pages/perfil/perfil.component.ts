@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { IdentityService } from '../../domain/services/identity.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { IUser } from '../../domain/models/user';
 import { faUsers } from '@fortawesome/free-solid-svg-icons';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 import { AuthService } from '../../domain/services/auth.service';
 import Swal from 'sweetalert2';
+import { AuthorService } from '../../domain/services/author.service';
+import { IAuthor } from '../../domain/models/author';
 
 @Component({
   selector: 'app-perfil',
@@ -15,7 +16,7 @@ import Swal from 'sweetalert2';
 })
 export class PerfilComponent implements OnInit {
 
-  public profileData: IUser;
+  public profileData: IAuthor;
   public profileAvatar: string;
   public profileFollowers = 0;
   public memberSince: Date;
@@ -26,7 +27,7 @@ export class PerfilComponent implements OnInit {
 
 
   constructor(
-    private identifyService: IdentityService,
+    private authorService: AuthorService,
     private route: ActivatedRoute,
     private router: Router,
     private spinnerService: NgxSpinnerService,
@@ -50,9 +51,9 @@ export class PerfilComponent implements OnInit {
 
     this.route.params.subscribe( params => {
 
-      this.identifyService.getById(params.id).subscribe(
+      this.authorService.getById(params.id).subscribe(
 
-        (data: IUser) => {
+        (data: IAuthor) => {
 
           console.log(data);
           this.profileData = data;
@@ -91,7 +92,7 @@ export class PerfilComponent implements OnInit {
 
   }
 
-  private assignProfileAvatar( pData: IUser ): void {
+  private assignProfileAvatar( pData: IAuthor ): void {
 
 
     if ( pData.profile_image ) {
