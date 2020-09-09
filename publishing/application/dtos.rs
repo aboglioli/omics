@@ -36,6 +36,7 @@ pub struct AuthorDto {
     pub username: String,
     pub name: String,
     pub lastname: String,
+    pub followers: u32,
 }
 
 impl From<&Author> for AuthorDto {
@@ -45,6 +46,7 @@ impl From<&Author> for AuthorDto {
             username: author.username().to_string(),
             name: author.name().to_string(),
             lastname: author.lastname().to_string(),
+            followers: author.followers(),
         }
     }
 }

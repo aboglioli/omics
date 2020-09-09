@@ -201,7 +201,6 @@ impl InteractionService {
         Ok(())
     }
 
-    // TODO: where to emit an event?
     pub async fn add_follow(&self, reader: &Reader, author: &mut Author) -> Result<()> {
         let follows_res = self
             .interaction_repo
@@ -228,7 +227,7 @@ impl InteractionService {
         Ok(())
     }
 
-    pub async fn delete_follow(&self, reader: &Reader, author: &Author) -> Result<()> {
+    pub async fn delete_follow(&self, reader: &Reader, author: &mut Author) -> Result<()> {
         let follows = self
             .interaction_repo
             .find_follows(
@@ -242,6 +241,8 @@ impl InteractionService {
         if follows.is_empty() {
             return Err(Error::new("follow", "does_not_exist"));
         }
+
+        author.unfollow(reader)?;
 
         self.interaction_repo
             .delete_follow(reader.base().id(), author.base().id())

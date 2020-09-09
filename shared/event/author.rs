@@ -11,12 +11,17 @@ pub enum AuthorEvent {
         author_id: String,
         reader_id: String,
     },
+    Unfollowed {
+        author_id: String,
+        reader_id: String,
+    },
 }
 
 impl ToString for AuthorEvent {
     fn to_string(&self) -> String {
         match self {
             AuthorEvent::Followed { .. } => "followed".to_owned(),
+            AuthorEvent::Unfollowed { .. } => "unfollowed".to_owned(),
         }
     }
 }

@@ -1,7 +1,7 @@
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
 
 use common::request::IncludeParams;
-use publishing::application::author::{Follow, GetById, Search, SearchCommand};
+use publishing::application::author::{Follow, GetById, Search, SearchCommand, Unfollow};
 use publishing::application::collection::{
     Search as SearchCollection, SearchCommand as SearchCollectionCommand,
 };
@@ -143,6 +143,26 @@ async fn follow(
     .map_err(PublicError::from)
 }
 
+// POST /authors/:id/unfollow
+async fn unfollow(
+    req: HttpRequest,
+    path: web::Path<String>,
+    c: web::Data<Container>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    Unfollow::new(
+        c.publishing.event_pub(),
+        c.publishing.author_repo(),
+        c.publishing.reader_repo(),
+        c.publishing.interaction_serv(),
+    )
+    .exec(auth_id, path.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
+}
+
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/authors")
@@ -150,6 +170,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .route("/{author_id}", web::get().to(get_by_id))
             .route("/{author_id}/publications", web::get().to(get_publications))
             .route("/{author_id}/collections", web::get().to(get_collections))
-            .route("/{author_id}/follow", web::post().to(follow)),
+            .route("/{author_id}/follow", web::post().to(follow))
+            .route("/{author_id}/unfollow", web::post().to(unfollow)),
     );
 }
