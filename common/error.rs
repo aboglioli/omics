@@ -67,6 +67,10 @@ impl Error {
         Error::new(field.into(), "bad_format".to_owned()).set_status(400)
     }
 
+    pub fn not_owner<S: Into<String>>(entity: S) -> Self {
+        Error::new(entity.into(), "not_owner".to_owned()).set_status(401)
+    }
+
     pub fn kind(&self) -> &ErrorKind {
         &self.kind
     }

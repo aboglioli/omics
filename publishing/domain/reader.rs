@@ -12,20 +12,14 @@ pub type ReaderId = StringId;
 #[derive(Debug, Clone)]
 pub struct Reader {
     base: AggregateRoot<ReaderId, Event>,
-    username: String,
-    name: String,
-    lastname: String,
     subscribed: bool,
     preferences: Preferences,
 }
 
 impl Reader {
-    pub fn new<S: Into<String>>(id: ReaderId, username: S, name: S, lastname: S) -> Result<Self> {
+    pub fn new(id: ReaderId) -> Result<Self> {
         Ok(Reader {
             base: AggregateRoot::new(id),
-            username: username.into(),
-            name: name.into(),
-            lastname: lastname.into(),
             subscribed: false,
             preferences: Preferences::default(),
         })
@@ -33,18 +27,6 @@ impl Reader {
 
     pub fn base(&self) -> &AggregateRoot<ReaderId, Event> {
         &self.base
-    }
-
-    pub fn username(&self) -> &str {
-        &self.username
-    }
-
-    pub fn name(&self) -> &str {
-        &self.name
-    }
-
-    pub fn lastname(&self) -> &str {
-        &self.lastname
     }
 
     pub fn is_subscribed(&self) -> bool {
@@ -56,21 +38,31 @@ impl Reader {
     }
 
     pub fn preferences_mut(&mut self) -> &mut Preferences {
+        // TODO: improve this
+        self.base.update();
         &mut self.preferences
     }
 
     pub fn subscribe(&mut self) -> Result<()> {
         self.subscribed = true;
+        self.base.update();
         Ok(())
     }
 
     pub fn unsubscribe(&mut self) -> Result<()> {
         self.subscribed = false;
+        self.base.update();
         Ok(())
     }
 
     pub fn set_preferences(&mut self, preferences: Preferences) -> Result<()> {
         self.preferences = preferences;
+        self.base.update();
+        Ok(())
+    }
+
+    pub fn delete(&mut self) -> Result<()> {
+        self.base.delete();
         Ok(())
     }
 }

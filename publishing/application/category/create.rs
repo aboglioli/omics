@@ -1,9 +1,10 @@
 use serde::{Deserialize, Serialize};
 
+use common::error::Error;
 use common::result::Result;
 
-use crate::domain::admin::{AdminId, AdminRepository};
 use crate::domain::category::{Category, CategoryId, CategoryRepository, Name};
+use crate::domain::user::{UserId, UserRepository};
 
 #[derive(Serialize)]
 pub struct CreateResponse {
@@ -17,24 +18,27 @@ pub struct CreateCommand {
 }
 
 pub struct Create<'a> {
-    admin_repo: &'a dyn AdminRepository,
     category_repo: &'a dyn CategoryRepository,
+    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Create<'a> {
     pub fn new(
-        admin_repo: &'a dyn AdminRepository,
         category_repo: &'a dyn CategoryRepository,
+        user_repo: &'a dyn UserRepository,
     ) -> Self {
         Create {
-            admin_repo,
             category_repo,
+            user_repo,
         }
     }
 
     // TODO: events
     pub async fn exec(&self, auth_id: String, cmd: CreateCommand) -> Result<CreateResponse> {
-        self.admin_repo.find_by_id(&AdminId::new(auth_id)?).await?;
+        let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
+        if !user.is_admin() {
+            return Err(Error::unauthorized());
+        }
 
         let mut category = Category::new(CategoryId::new(cmd.id)?, Name::new(cmd.name)?)?;
 

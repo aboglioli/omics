@@ -7,10 +7,10 @@ use common::result::Result;
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto, ReaderInteractionDto};
 use crate::domain::author::AuthorRepository;
 use crate::domain::category::CategoryRepository;
-use crate::domain::content_manager::{ContentManagerId, ContentManagerRepository};
 use crate::domain::interaction::InteractionService;
 use crate::domain::publication::{PublicationId, PublicationRepository, StatisticsService};
 use crate::domain::reader::{ReaderId, ReaderRepository};
+use crate::domain::user::{UserId, UserRepository};
 
 #[derive(Serialize)]
 pub struct GetByIdResponse {
@@ -23,9 +23,9 @@ pub struct GetById<'a> {
 
     author_repo: &'a dyn AuthorRepository,
     category_repo: &'a dyn CategoryRepository,
-    content_manager_repo: &'a dyn ContentManagerRepository,
     publication_repo: &'a dyn PublicationRepository,
     reader_repo: &'a dyn ReaderRepository,
+    user_repo: &'a dyn UserRepository,
 
     interaction_serv: &'a InteractionService,
     statistics_serv: &'a StatisticsService,
@@ -36,9 +36,9 @@ impl<'a> GetById<'a> {
         event_pub: &'a dyn EventPublisher,
         author_repo: &'a dyn AuthorRepository,
         category_repo: &'a dyn CategoryRepository,
-        content_manager_repo: &'a dyn ContentManagerRepository,
         publication_repo: &'a dyn PublicationRepository,
         reader_repo: &'a dyn ReaderRepository,
+        user_repo: &'a dyn UserRepository,
         interaction_serv: &'a InteractionService,
         statistics_serv: &'a StatisticsService,
     ) -> Self {
@@ -46,9 +46,9 @@ impl<'a> GetById<'a> {
             event_pub,
             author_repo,
             category_repo,
-            content_manager_repo,
             publication_repo,
             reader_repo,
+            user_repo,
             interaction_serv,
             statistics_serv,
         }
@@ -64,10 +64,8 @@ impl<'a> GetById<'a> {
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
         let is_content_manager = if let Some(auth_id) = &auth_id {
-            self.content_manager_repo
-                .find_by_id(&ContentManagerId::new(auth_id)?)
-                .await
-                .is_ok()
+            let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
+            user.is_content_manager()
         } else {
             false
         };
@@ -121,8 +119,9 @@ impl<'a> GetById<'a> {
         };
 
         if include.has("author") {
+            let user = self.user_repo.find_by_id(publication.author_id()).await?;
             let author = self.author_repo.find_by_id(publication.author_id()).await?;
-            publication_dto = publication_dto.author(AuthorDto::from(&author));
+            publication_dto = publication_dto.author(AuthorDto::from(&user, &author));
         }
 
         if include.has("category") {
@@ -153,25 +152,32 @@ mod tests {
             c.event_pub(),
             c.author_repo(),
             c.category_repo(),
-            c.content_manager_repo(),
             c.publication_repo(),
             c.reader_repo(),
+            c.user_repo(),
             c.interaction_serv(),
             c.statistics_serv(),
         );
 
-        let mut reader = mocks::author_as_reader1();
-        c.reader_repo().save(&mut reader).await.unwrap();
-        let mut publication = mocks::publication1();
-        c.publication_repo().save(&mut publication).await.unwrap();
-        let mut author = mocks::author1();
-        c.author_repo().save(&mut author).await.unwrap();
+        let (mut user1, mut author1, mut reader1) = mocks::user1();
+        c.user_repo().save(&mut user1).await.unwrap();
+        c.author_repo().save(&mut author1).await.unwrap();
+        c.reader_repo().save(&mut reader1).await.unwrap();
+
+        let (mut user2, mut author2, mut reader2) = mocks::user2();
+        c.user_repo().save(&mut user2).await.unwrap();
+        c.author_repo().save(&mut author2).await.unwrap();
+        c.reader_repo().save(&mut reader2).await.unwrap();
+
         let mut category = mocks::category1();
         c.category_repo().save(&mut category).await.unwrap();
 
+        let mut publication = mocks::publication1();
+        c.publication_repo().save(&mut publication).await.unwrap();
+
         let res = uc
             .exec(
-                Some(reader.base().id().to_string()),
+                Some(reader1.base().id().to_string()),
                 publication.base().id().to_string(),
                 Include::default().add("author").add("category"),
             )
@@ -179,7 +185,7 @@ mod tests {
             .unwrap();
         let res = res.publication;
         assert_eq!(res.id, publication.base().id().value());
-        assert_eq!(res.author.unwrap().id, author.base().id().value());
+        assert_eq!(res.author.unwrap().id, author1.base().id().value());
         assert_eq!(res.name, publication.header().name().value());
         assert_eq!(
             res.category.unwrap().id,
@@ -201,25 +207,32 @@ mod tests {
             c.event_pub(),
             c.author_repo(),
             c.category_repo(),
-            c.content_manager_repo(),
             c.publication_repo(),
             c.reader_repo(),
+            c.user_repo(),
             c.interaction_serv(),
             c.statistics_serv(),
         );
 
-        let mut reader = mocks::reader1();
-        c.reader_repo().save(&mut reader).await.unwrap();
-        let mut publication = mocks::publication1();
-        c.publication_repo().save(&mut publication).await.unwrap();
-        let mut author = mocks::author1();
-        c.author_repo().save(&mut author).await.unwrap();
+        let (mut user1, mut author1, mut reader1) = mocks::user1();
+        c.user_repo().save(&mut user1).await.unwrap();
+        c.author_repo().save(&mut author1).await.unwrap();
+        c.reader_repo().save(&mut reader1).await.unwrap();
+
+        let (mut user2, mut author2, mut reader2) = mocks::user2();
+        c.user_repo().save(&mut user2).await.unwrap();
+        c.author_repo().save(&mut author2).await.unwrap();
+        c.reader_repo().save(&mut reader2).await.unwrap();
+
         let mut category = mocks::category1();
         c.category_repo().save(&mut category).await.unwrap();
 
+        let mut publication = mocks::publication1();
+        c.publication_repo().save(&mut publication).await.unwrap();
+
         assert!(uc
             .exec(
-                Some(reader.base().id().to_string()),
+                Some(reader2.base().id().to_string()),
                 publication.base().id().to_string(),
                 Include::default(),
             )
@@ -234,25 +247,32 @@ mod tests {
             c.event_pub(),
             c.author_repo(),
             c.category_repo(),
-            c.content_manager_repo(),
             c.publication_repo(),
             c.reader_repo(),
+            c.user_repo(),
             c.interaction_serv(),
             c.statistics_serv(),
         );
 
-        let mut reader = mocks::reader1();
-        c.reader_repo().save(&mut reader).await.unwrap();
-        let mut publication = mocks::published_publication1();
-        c.publication_repo().save(&mut publication).await.unwrap();
-        let mut author = mocks::author1();
-        c.author_repo().save(&mut author).await.unwrap();
+        let (mut user1, mut author1, mut reader1) = mocks::user1();
+        c.user_repo().save(&mut user1).await.unwrap();
+        c.author_repo().save(&mut author1).await.unwrap();
+        c.reader_repo().save(&mut reader1).await.unwrap();
+
+        let (mut user2, mut author2, mut reader2) = mocks::user2();
+        c.user_repo().save(&mut user2).await.unwrap();
+        c.author_repo().save(&mut author2).await.unwrap();
+        c.reader_repo().save(&mut reader2).await.unwrap();
+
         let mut category = mocks::category1();
         c.category_repo().save(&mut category).await.unwrap();
 
+        let mut publication = mocks::published_publication1();
+        c.publication_repo().save(&mut publication).await.unwrap();
+
         let res = uc
             .exec(
-                Some(reader.base().id().to_string()),
+                Some(reader2.base().id().to_string()),
                 publication.base().id().to_string(),
                 Include::default().add("author").add("category"),
             )
@@ -276,27 +296,34 @@ mod tests {
             c.event_pub(),
             c.author_repo(),
             c.category_repo(),
-            c.content_manager_repo(),
             c.publication_repo(),
             c.reader_repo(),
+            c.user_repo(),
             c.interaction_serv(),
             c.statistics_serv(),
         );
 
-        let mut reader = mocks::reader1();
-        c.reader_repo().save(&mut reader).await.unwrap();
-        let mut publication = mocks::published_publication1();
-        c.publication_repo().save(&mut publication).await.unwrap();
-        let mut author = mocks::author1();
-        c.author_repo().save(&mut author).await.unwrap();
+        let (mut user1, mut author1, mut reader1) = mocks::user1();
+        c.user_repo().save(&mut user1).await.unwrap();
+        c.author_repo().save(&mut author1).await.unwrap();
+        c.reader_repo().save(&mut reader1).await.unwrap();
+
+        let (mut user2, mut author2, mut reader2) = mocks::user2();
+        c.user_repo().save(&mut user2).await.unwrap();
+        c.author_repo().save(&mut author2).await.unwrap();
+        c.reader_repo().save(&mut reader2).await.unwrap();
+
         let mut category = mocks::category1();
         c.category_repo().save(&mut category).await.unwrap();
 
+        let mut publication = mocks::published_publication1();
+        c.publication_repo().save(&mut publication).await.unwrap();
+
         assert!(uc
             .exec(
-                Some(reader.base().id().to_string()),
+                Some(reader1.base().id().to_string()),
                 "#invalid".to_owned(),
-                Include::default()
+                Include::default(),
             )
             .await
             .is_err());
@@ -309,30 +336,37 @@ mod tests {
             c.event_pub(),
             c.author_repo(),
             c.category_repo(),
-            c.content_manager_repo(),
             c.publication_repo(),
             c.reader_repo(),
+            c.user_repo(),
             c.interaction_serv(),
             c.statistics_serv(),
         );
 
-        let mut reader = mocks::reader1();
-        c.reader_repo().save(&mut reader).await.unwrap();
-        let mut publication = mocks::published_publication1();
-        c.publication_repo().save(&mut publication).await.unwrap();
-        let mut author = mocks::author1();
-        c.author_repo().save(&mut author).await.unwrap();
+        let (mut user1, mut author1, mut reader1) = mocks::user1();
+        c.user_repo().save(&mut user1).await.unwrap();
+        c.author_repo().save(&mut author1).await.unwrap();
+        c.reader_repo().save(&mut reader1).await.unwrap();
+
+        let (mut user2, mut author2, mut reader2) = mocks::user2();
+        c.user_repo().save(&mut user2).await.unwrap();
+        c.author_repo().save(&mut author2).await.unwrap();
+        c.reader_repo().save(&mut reader2).await.unwrap();
+
         let mut category = mocks::category1();
         c.category_repo().save(&mut category).await.unwrap();
 
+        let mut publication = mocks::published_publication1();
+        c.publication_repo().save(&mut publication).await.unwrap();
+
         c.interaction_serv()
-            .add_like(&reader, &mut publication)
+            .add_like(&reader2, &mut publication)
             .await
             .unwrap();
 
         let res = uc
             .exec(
-                Some(reader.base().id().to_string()),
+                Some(reader2.base().id().to_string()),
                 publication.base().id().to_string(),
                 Include::default(),
             )

@@ -1,5 +1,4 @@
 use async_trait::async_trait;
-use uuid::Uuid;
 
 use common::cache::Cache;
 use common::error::Error;
@@ -31,11 +30,6 @@ impl Default for InMemCollectionRepository {
 
 #[async_trait]
 impl CollectionRepository for InMemCollectionRepository {
-    async fn next_id(&self) -> Result<CollectionId> {
-        let id = Uuid::new_v4();
-        CollectionId::new(id.to_string())
-    }
-
     async fn find_all(&self) -> Result<Vec<Collection>> {
         Ok(self.cache.all().await)
     }

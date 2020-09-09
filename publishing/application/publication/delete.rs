@@ -1,8 +1,8 @@
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::domain::author::AuthorId;
 use crate::domain::publication::{PublicationId, PublicationRepository};
 
 pub struct Delete<'a> {
@@ -26,7 +26,11 @@ impl<'a> Delete<'a> {
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        publication.delete(&AuthorId::new(auth_id)?)?;
+        if publication.author_id().value() != auth_id {
+            return Err(Error::not_owner("publication"));
+        }
+
+        publication.delete()?;
 
         self.publication_repo.save(&mut publication).await?;
 
@@ -49,7 +53,7 @@ mod tests {
         let c = mocks::container();
         let uc = Delete::new(c.event_pub(), c.publication_repo());
 
-        let author = mocks::author1();
+        let author = mocks::user1().1;
         let mut publication = mocks::publication1();
         c.publication_repo().save(&mut publication).await.unwrap();
 
@@ -74,7 +78,7 @@ mod tests {
         let c = mocks::container();
         let uc = Delete::new(c.event_pub(), c.publication_repo());
 
-        let author = mocks::author1();
+        let author = mocks::user1().1;
         let mut publication = mocks::publication1();
         c.publication_repo().save(&mut publication).await.unwrap();
 

@@ -1,5 +1,6 @@
 mod authentication_service;
 mod authorization_service;
+mod biography;
 mod birthdate;
 mod email;
 mod fullname;
@@ -17,6 +18,7 @@ mod validation;
 pub use self::identity::*;
 pub use authentication_service::*;
 pub use authorization_service::*;
+pub use biography::*;
 pub use birthdate::*;
 pub use email::*;
 pub use fullname::*;
@@ -36,7 +38,7 @@ use common::model::{AggregateRoot, StringId};
 use common::result::Result;
 use shared::event::UserEvent;
 
-use crate::domain::role::Role;
+use crate::domain::role::RoleId;
 use crate::domain::token::Token;
 
 pub type UserId = StringId;
@@ -46,17 +48,17 @@ pub struct User {
     base: AggregateRoot<UserId, UserEvent>,
     identity: Identity,
     person: Option<Person>,
-    role: Role,
+    role_id: RoleId,
     validation: Option<Validation>,
 }
 
 impl User {
-    pub fn new(id: UserId, identity: Identity, role: Role) -> Result<Self> {
+    pub fn new(id: UserId, identity: Identity, role_id: RoleId) -> Result<Self> {
         let mut user = User {
             base: AggregateRoot::new(id),
             identity,
             person: None,
-            role,
+            role_id,
             validation: Some(Validation::new()),
         };
 
@@ -74,14 +76,14 @@ impl User {
         base: AggregateRoot<UserId, UserEvent>,
         identity: Identity,
         person: Option<Person>,
-        role: Role,
+        role_id: RoleId,
         validation: Option<Validation>,
     ) -> Self {
         User {
             base,
             identity,
             person,
-            role,
+            role_id,
             validation,
         }
     }
@@ -98,8 +100,8 @@ impl User {
         self.person.as_ref()
     }
 
-    pub fn role(&self) -> &Role {
-        &self.role
+    pub fn role_id(&self) -> &RoleId {
+        &self.role_id
     }
 
     pub fn validation(&self) -> Option<&Validation> {
@@ -128,18 +130,39 @@ impl User {
             id: self.base().id().to_string(),
             name: self.person().unwrap().fullname().name().to_string(),
             lastname: self.person().unwrap().fullname().lastname().to_string(),
+            birthdate: self
+                .person()
+                .unwrap()
+                .birthdate()
+                .map(|birthdate| birthdate.date().to_rfc3339()),
+            gender: self
+                .person()
+                .unwrap()
+                .gender()
+                .map(|gender| gender.to_string()),
+            biography: self
+                .person()
+                .unwrap()
+                .biography()
+                .map(|biography| biography.to_string()),
+            profile_image: self
+                .person()
+                .unwrap()
+                .profile_image()
+                .map(|profile_image| profile_image.to_string()),
         });
 
         Ok(())
     }
 
-    pub fn change_role(&mut self, role: Role, admin: &User) -> Result<()> {
-        if !admin.role().is("admin") {
-            return Err(Error::unauthorized());
-        }
-
-        self.role = role;
+    pub fn change_role(&mut self, role_id: RoleId) -> Result<()> {
+        self.role_id = role_id;
         self.base.update();
+
+        self.base.record_event(UserEvent::RoleChanged {
+            id: self.base().id().to_string(),
+            role_id: self.role_id().to_string(),
+        });
 
         Ok(())
     }
@@ -190,12 +213,12 @@ impl User {
         Ok(())
     }
 
-    pub fn recover_password(&mut self, password: Password, temp_password: &str) -> Result<()> {
+    pub fn recover_password(&mut self, password: Password, temp_password: String) -> Result<()> {
         self.identity.set_password(password)?;
         self.base
             .record_event(UserEvent::PasswordRecoveryRequested {
                 id: self.base().id().to_string(),
-                temp_password: temp_password.to_owned(),
+                temp_password,
                 email: self.identity().email().to_string(),
             });
 
@@ -235,7 +258,7 @@ mod tests {
                 Some(Password::new(&format!("{:X>50}", "2")).unwrap()),
             )
             .unwrap(),
-            Role::new(RoleId::new("user").unwrap(), "User").unwrap(),
+            RoleId::new("user").unwrap(),
         )
         .unwrap();
         assert_eq!(user.base().id().value(), "user123");
@@ -254,7 +277,7 @@ mod tests {
                 Some(Password::new(&format!("{:X>50}", "2")).unwrap()),
             )
             .unwrap(),
-            Role::new(RoleId::new("user").unwrap(), "User").unwrap(),
+            RoleId::new("user").unwrap(),
         )
         .unwrap();
 
@@ -284,7 +307,7 @@ mod tests {
                 Some(Password::new(&format!("{:X>50}", "2")).unwrap()),
             )
             .unwrap(),
-            Role::new(RoleId::new("user").unwrap(), "User").unwrap(),
+            RoleId::new("user").unwrap(),
         )
         .unwrap();
 

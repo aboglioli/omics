@@ -58,7 +58,7 @@ async fn search(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
-    Search::new(c.identity.user_repo())
+    Search::new(c.identity.role_repo(), c.identity.user_repo())
         .exec(auth_id, cmd.into_inner(), include.into_inner().into())
         .await
         .map(|res| HttpResponse::Ok().json(res))
@@ -81,7 +81,7 @@ async fn get_by_id(
         user_id
     };
 
-    GetById::new(c.identity.user_repo())
+    GetById::new(c.identity.role_repo(), c.identity.user_repo())
         .exec(auth_id, user_id, include.into_inner().into())
         .await
         .map(|res| HttpResponse::Ok().json(res))
@@ -149,11 +149,15 @@ async fn change_password(
         user_id
     };
 
-    ChangePassword::new(c.identity.user_serv())
-        .exec(user_id, cmd.into_inner())
-        .await
-        .map(|res| HttpResponse::Ok().json(res))
-        .map_err(PublicError::from)
+    ChangePassword::new(
+        c.identity.event_pub(),
+        c.identity.user_repo(),
+        c.identity.user_serv(),
+    )
+    .exec(user_id, cmd.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
 }
 
 // GET /users/:id/validate/:code

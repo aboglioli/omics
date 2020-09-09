@@ -5,7 +5,9 @@ use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::domain::user::{Birthdate, Fullname, Gender, Image, Person, UserId, UserRepository};
+use crate::domain::user::{
+    Biography, Birthdate, Fullname, Gender, Image, Person, UserId, UserRepository,
+};
 
 #[derive(Deserialize)]
 pub struct UpdateCommand {
@@ -13,6 +15,7 @@ pub struct UpdateCommand {
     pub lastname: String,
     pub birthdate: Option<String>,
     pub gender: Option<String>,
+    pub biography: Option<String>,
     pub profile_image: Option<String>,
 }
 
@@ -38,7 +41,7 @@ impl<'a> Update<'a> {
     ) -> Result<CommandResponse> {
         if auth_id != user_id {
             let auth_user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-            if !auth_user.role().is("admin") {
+            if auth_user.role_id().value() != "admin" {
                 return Err(Error::unauthorized());
             }
         }
@@ -52,6 +55,11 @@ impl<'a> Update<'a> {
 
         let gender = cmd.gender.map(|gender| Gender::from(&gender)).transpose()?;
 
+        let biography = cmd
+            .biography
+            .map(|biography| Biography::new(biography))
+            .transpose()?;
+
         let profile_image = cmd
             .profile_image
             .map(|image| Image::new(image))
@@ -61,6 +69,7 @@ impl<'a> Update<'a> {
             Fullname::new(cmd.name, cmd.lastname)?,
             birthdate,
             gender,
+            biography,
             profile_image,
         )?;
         user.set_person(person)?;
@@ -96,6 +105,7 @@ mod tests {
                     lastname: "Lastname".to_owned(),
                     birthdate: None,
                     gender: None,
+                    biography: None,
                     profile_image: None,
                 }
             )
@@ -120,6 +130,7 @@ mod tests {
                     lastname: "L".to_owned(),
                     birthdate: None,
                     gender: None,
+                    biography: None,
                     profile_image: None,
                 }
             )
@@ -135,6 +146,7 @@ mod tests {
                     lastname: "Lastname".to_owned(),
                     birthdate: Some("invalid-date".to_owned()),
                     gender: None,
+                    biography: None,
                     profile_image: None,
                 }
             )
@@ -150,6 +162,7 @@ mod tests {
                     lastname: "Lastname".to_owned(),
                     birthdate: Some("1996-12-32T24:39:57-08:00".to_owned()),
                     gender: None,
+                    biography: None,
                     profile_image: None,
                 }
             )
@@ -165,6 +178,7 @@ mod tests {
                     lastname: "Lastname".to_owned(),
                     birthdate: None,
                     gender: Some("malee".to_owned()),
+                    biography: None,
                     profile_image: None,
                 }
             )
@@ -180,6 +194,7 @@ mod tests {
                     lastname: "Lastname".to_owned(),
                     birthdate: None,
                     gender: Some("female2".to_owned()),
+                    biography: None,
                     profile_image: None,
                 }
             )
@@ -204,6 +219,7 @@ mod tests {
                     lastname: "Lastname".to_owned(),
                     birthdate: Some("1996-12-19T23:39:57-03:00".to_owned()),
                     gender: Some("male".to_owned()),
+                    biography: Some("My amazing biography".to_owned()),
                     profile_image: Some("http://profile.com/profile.jpg".to_owned()),
                 }
             )
@@ -222,6 +238,8 @@ mod tests {
         assert_eq!(person.fullname().lastname(), "Lastname");
         assert!(person.birthdate().is_some());
         assert!(person.gender().is_some());
+        assert!(person.biography().is_some());
+        assert!(person.profile_image().is_some());
 
         let birthdate = person.birthdate().unwrap().date();
         assert_eq!(birthdate.to_rfc3339(), "1996-12-20T02:39:57+00:00");

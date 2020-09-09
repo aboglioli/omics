@@ -67,7 +67,7 @@ mod tests {
             c.interaction_serv(),
         );
 
-        let mut reader = mocks::reader1();
+        let mut reader = mocks::user1().2;
         c.reader_repo().save(&mut reader).await.unwrap();
         let mut publication = mocks::published_publication1();
         c.publication_repo().save(&mut publication).await.unwrap();
@@ -98,7 +98,7 @@ mod tests {
             c.interaction_serv(),
         );
 
-        let mut reader = mocks::reader1();
+        let mut reader = mocks::user1().2;
         c.reader_repo().save(&mut reader).await.unwrap();
         let mut publication = mocks::publication1();
         c.publication_repo().save(&mut publication).await.unwrap();
@@ -122,7 +122,7 @@ mod tests {
             c.interaction_serv(),
         );
 
-        let mut reader = mocks::reader1();
+        let mut reader = mocks::user1().2;
         c.reader_repo().save(&mut reader).await.unwrap();
         let mut publication = mocks::published_publication1();
         c.publication_repo().save(&mut publication).await.unwrap();

@@ -5,7 +5,7 @@ use common::request::Include;
 use common::result::Result;
 
 use crate::application::dtos::{RoleDto, UserDto};
-use crate::domain::role::RoleId;
+use crate::domain::role::{RoleId, RoleRepository};
 use crate::domain::user::{UserId, UserRepository};
 
 #[derive(Deserialize)]
@@ -19,12 +19,16 @@ pub struct SearchResponse {
 }
 
 pub struct Search<'a> {
+    role_repo: &'a dyn RoleRepository,
     user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Search<'a> {
-    pub fn new(user_repo: &'a dyn UserRepository) -> Self {
-        Search { user_repo }
+    pub fn new(role_repo: &'a dyn RoleRepository, user_repo: &'a dyn UserRepository) -> Self {
+        Search {
+            role_repo,
+            user_repo,
+        }
     }
 
     pub async fn exec(
@@ -34,7 +38,7 @@ impl<'a> Search<'a> {
         include: Include,
     ) -> Result<SearchResponse> {
         let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-        if !user.role().is("admin") {
+        if user.role_id().value() != "admin" {
             return Err(Error::unauthorized());
         }
 
@@ -56,7 +60,8 @@ impl<'a> Search<'a> {
             let mut user_dto = UserDto::from(user);
 
             if include.has("role") {
-                user_dto = user_dto.role(RoleDto::from(user.role()));
+                let role = self.role_repo.find_by_id(user.role_id()).await?;
+                user_dto = user_dto.role(RoleDto::from(&role));
             }
 
             user_dtos.push(user_dto);

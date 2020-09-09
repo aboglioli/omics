@@ -1,12 +1,13 @@
 use common::result::Result;
 
-use crate::domain::user::{Birthdate, Fullname, Gender, Image};
+use crate::domain::user::{Biography, Birthdate, Fullname, Gender, Image};
 
 #[derive(Debug, Clone)]
 pub struct Person {
     fullname: Fullname,
     birthdate: Option<Birthdate>,
     gender: Option<Gender>,
+    biography: Option<Biography>,
     profile_image: Option<Image>,
 }
 
@@ -15,12 +16,14 @@ impl Person {
         fullname: Fullname,
         birthdate: Option<Birthdate>,
         gender: Option<Gender>,
+        biography: Option<Biography>,
         profile_image: Option<Image>,
     ) -> Result<Self> {
         Ok(Person {
             fullname,
             birthdate,
             gender,
+            biography,
             profile_image,
         })
     }
@@ -35,6 +38,10 @@ impl Person {
 
     pub fn gender(&self) -> Option<&Gender> {
         self.gender.as_ref()
+    }
+
+    pub fn biography(&self) -> Option<&Biography> {
+        self.biography.as_ref()
     }
 
     pub fn profile_image(&self) -> Option<&Image> {

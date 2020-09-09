@@ -1,5 +1,4 @@
 use async_trait::async_trait;
-use uuid::Uuid;
 
 use common::cache::Cache;
 use common::error::Error;
@@ -28,9 +27,8 @@ impl Default for InMemCategoryRepository {
 
 #[async_trait]
 impl CategoryRepository for InMemCategoryRepository {
-    async fn next_id(&self) -> Result<CategoryId> {
-        let id = Uuid::new_v4();
-        CategoryId::new(id.to_string())
+    async fn find_all(&self) -> Result<Vec<Category>> {
+        Ok(self.cache.filter(|_| true).await)
     }
 
     async fn find_by_id(&self, id: &CategoryId) -> Result<Category> {
@@ -38,10 +36,6 @@ impl CategoryRepository for InMemCategoryRepository {
             .get(id)
             .await
             .ok_or_else(|| Error::not_found("category"))
-    }
-
-    async fn find_all_categories(&self) -> Result<Vec<Category>> {
-        Ok(self.cache.filter(|_| true).await)
     }
 
     async fn save(&self, category: &mut Category) -> Result<()> {

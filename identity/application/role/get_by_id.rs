@@ -21,7 +21,7 @@ impl<'a> GetById<'a> {
 
     pub async fn exec(&self, auth_id: String, id: String) -> Result<RoleDto> {
         let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-        if !user.role().is("admin") {
+        if user.role_id().value() != "admin" {
             return Err(Error::unauthorized());
         }
 

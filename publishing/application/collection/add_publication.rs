@@ -1,8 +1,8 @@
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::domain::author::AuthorId;
 use crate::domain::collection::{CollectionId, CollectionRepository};
 use crate::domain::publication::{PublicationId, PublicationRepository};
 
@@ -35,10 +35,18 @@ impl<'a> AddPublication<'a> {
         let collection_id = CollectionId::new(collection_id)?;
         let mut collection = self.collection_repo.find_by_id(&collection_id).await?;
 
+        if collection.author_id().value() != auth_id {
+            return Err(Error::not_owner("collection"));
+        }
+
         let publication_id = PublicationId::new(publication_id)?;
         let publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        collection.add_item(&publication, &AuthorId::new(auth_id)?)?;
+        if publication.author_id().value() != auth_id {
+            return Err(Error::not_owner("publication"));
+        }
+
+        collection.add_item(&publication)?;
 
         self.collection_repo.save(&mut collection).await?;
 

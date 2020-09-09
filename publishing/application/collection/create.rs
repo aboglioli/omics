@@ -17,12 +17,6 @@ pub struct CreateCommand {
     pub cover: String,
 }
 
-impl CreateCommand {
-    fn validate(&self) -> Result<()> {
-        Ok(())
-    }
-}
-
 #[derive(Serialize)]
 pub struct CreateResponse {
     id: String,
@@ -52,8 +46,6 @@ impl<'a> Create<'a> {
     }
 
     pub async fn exec(&self, auth_id: String, cmd: CreateCommand) -> Result<CreateResponse> {
-        cmd.validate()?;
-
         let name = Name::new(cmd.name)?;
         let synopsis = Synopsis::new(cmd.synopsis)?;
 

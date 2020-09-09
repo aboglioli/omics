@@ -6,6 +6,7 @@ use crate::application::dtos::{ReaderDto, ReviewDto};
 use crate::domain::interaction::InteractionRepository;
 use crate::domain::publication::PublicationId;
 use crate::domain::reader::ReaderRepository;
+use crate::domain::user::UserRepository;
 
 #[derive(Serialize)]
 pub struct GetReviewsResponse {
@@ -15,16 +16,19 @@ pub struct GetReviewsResponse {
 pub struct GetReviews<'a> {
     interaction_repo: &'a dyn InteractionRepository,
     reader_repo: &'a dyn ReaderRepository,
+    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> GetReviews<'a> {
     pub fn new(
         interaction_repo: &'a dyn InteractionRepository,
         reader_repo: &'a dyn ReaderRepository,
+        user_repo: &'a dyn UserRepository,
     ) -> Self {
         GetReviews {
             interaction_repo,
             reader_repo,
+            user_repo,
         }
     }
 
@@ -44,7 +48,8 @@ impl<'a> GetReviews<'a> {
                 .reader_repo
                 .find_by_id(review.base().reader_id())
                 .await?;
-            review_dtos.push(ReviewDto::from(review).reader(ReaderDto::from(&reader)));
+            let user = self.user_repo.find_by_id(reader.base().id()).await?;
+            review_dtos.push(ReviewDto::from(review).reader(ReaderDto::from(&user, &reader)));
         }
 
         Ok(GetReviewsResponse {

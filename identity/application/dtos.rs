@@ -47,7 +47,7 @@ impl From<&User> for UserDto {
                 .map(|p| p.profile_image().map(|i| i.to_string()))
                 .flatten(),
             validated: user.is_validated(),
-            role_id: Some(user.role().base().id().to_string()),
+            role_id: Some(user.role_id().to_string()),
             role: None,
         }
     }

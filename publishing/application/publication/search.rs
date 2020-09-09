@@ -6,8 +6,8 @@ use common::result::Result;
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};
 use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::category::CategoryRepository;
-use crate::domain::content_manager::{ContentManagerId, ContentManagerRepository};
 use crate::domain::publication::{PublicationRepository, Status};
+use crate::domain::user::{UserId, UserRepository};
 
 #[derive(Deserialize)]
 pub struct SearchCommand {
@@ -25,22 +25,22 @@ pub struct SearchResponse {
 pub struct Search<'a> {
     author_repo: &'a dyn AuthorRepository,
     category_repo: &'a dyn CategoryRepository,
-    content_manager_repo: &'a dyn ContentManagerRepository,
     publication_repo: &'a dyn PublicationRepository,
+    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Search<'a> {
     pub fn new(
         author_repo: &'a dyn AuthorRepository,
         category_repo: &'a dyn CategoryRepository,
-        content_manager_repo: &'a dyn ContentManagerRepository,
         publication_repo: &'a dyn PublicationRepository,
+        user_repo: &'a dyn UserRepository,
     ) -> Self {
         Search {
             author_repo,
             category_repo,
-            content_manager_repo,
             publication_repo,
+            user_repo,
         }
     }
 
@@ -51,10 +51,8 @@ impl<'a> Search<'a> {
         include: Include,
     ) -> Result<SearchResponse> {
         let is_content_manager = if let Some(auth_id) = &auth_id {
-            self.content_manager_repo
-                .find_by_id(&ContentManagerId::new(auth_id)?)
-                .await
-                .is_ok()
+            let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
+            user.is_content_manager()
         } else {
             false
         };
@@ -93,7 +91,8 @@ impl<'a> Search<'a> {
 
             if include.has("author") {
                 let author = self.author_repo.find_by_id(publication.author_id()).await?;
-                publication_dto = publication_dto.author(AuthorDto::from(&author));
+                let user = self.user_repo.find_by_id(author.base().id()).await?;
+                publication_dto = publication_dto.author(AuthorDto::from(&user, &author));
             }
 
             if include.has("author") {

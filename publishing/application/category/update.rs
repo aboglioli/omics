@@ -1,10 +1,11 @@
 use serde::Deserialize;
 
+use common::error::Error;
 use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::domain::admin::{AdminId, AdminRepository};
 use crate::domain::category::{CategoryId, CategoryRepository, Name};
+use crate::domain::user::{UserId, UserRepository};
 
 #[derive(Deserialize)]
 pub struct UpdateCommand {
@@ -12,18 +13,18 @@ pub struct UpdateCommand {
 }
 
 pub struct Update<'a> {
-    admin_repo: &'a dyn AdminRepository,
     category_repo: &'a dyn CategoryRepository,
+    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Update<'a> {
     pub fn new(
-        admin_repo: &'a dyn AdminRepository,
         category_repo: &'a dyn CategoryRepository,
+        user_repo: &'a dyn UserRepository,
     ) -> Self {
         Update {
-            admin_repo,
             category_repo,
+            user_repo,
         }
     }
 
@@ -34,7 +35,10 @@ impl<'a> Update<'a> {
         category_id: String,
         cmd: UpdateCommand,
     ) -> Result<CommandResponse> {
-        self.admin_repo.find_by_id(&AdminId::new(auth_id)?).await?;
+        let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
+        if !user.is_admin() {
+            return Err(Error::unauthorized());
+        }
 
         let mut category = self
             .category_repo

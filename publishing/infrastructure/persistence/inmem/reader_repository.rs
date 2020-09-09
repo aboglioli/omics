@@ -1,5 +1,4 @@
 use async_trait::async_trait;
-use uuid::Uuid;
 
 use common::cache::Cache;
 use common::error::Error;
@@ -7,7 +6,6 @@ use common::infrastructure::cache::InMemCache;
 use common::result::Result;
 
 use crate::domain::reader::{Reader, ReaderId, ReaderRepository};
-use crate::mocks;
 
 pub struct InMemReaderRepository {
     cache: InMemCache<ReaderId, Reader>,
@@ -19,15 +17,6 @@ impl InMemReaderRepository {
             cache: InMemCache::new(),
         }
     }
-
-    pub async fn reader() -> Self {
-        let repo = Self::new();
-
-        repo.save(&mut mocks::reader1()).await.unwrap();
-        repo.save(&mut mocks::author_as_reader1()).await.unwrap();
-
-        repo
-    }
 }
 
 impl Default for InMemReaderRepository {
@@ -38,11 +27,6 @@ impl Default for InMemReaderRepository {
 
 #[async_trait]
 impl ReaderRepository for InMemReaderRepository {
-    async fn next_id(&self) -> Result<ReaderId> {
-        let id = Uuid::new_v4();
-        ReaderId::new(id.to_string())
-    }
-
     async fn find_by_id(&self, id: &ReaderId) -> Result<Reader> {
         self.cache
             .get(id)

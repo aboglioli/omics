@@ -1,8 +1,8 @@
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::domain::author::AuthorId;
 use crate::domain::collection::{CollectionId, CollectionRepository};
 use crate::domain::publication::PublicationId;
 
@@ -32,10 +32,11 @@ impl<'a> RemovePublication<'a> {
         let collection_id = CollectionId::new(collection_id)?;
         let mut collection = self.collection_repo.find_by_id(&collection_id).await?;
 
-        collection.remove_item(
-            &PublicationId::new(publication_id)?,
-            &AuthorId::new(auth_id)?,
-        )?;
+        if collection.author_id().value() != auth_id {
+            return Err(Error::not_owner("collection"));
+        }
+
+        collection.remove_item(&PublicationId::new(publication_id)?)?;
 
         self.collection_repo.save(&mut collection).await?;
 

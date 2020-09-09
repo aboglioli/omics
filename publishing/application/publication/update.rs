@@ -1,5 +1,6 @@
 use serde::Deserialize;
 
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
@@ -54,6 +55,10 @@ impl<'a> Update<'a> {
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
+        if publication.author_id().value() != auth_id {
+            return Err(Error::not_owner("publication"));
+        }
+
         let name = Name::new(cmd.name)?;
         let synopsis = Synopsis::new(cmd.synopsis)?;
 
@@ -68,9 +73,9 @@ impl<'a> Update<'a> {
         self.category_repo.find_by_id(&category_id).await?;
 
         let header = Header::new(name, synopsis, category_id, tags, cover)?;
-        let author_id = AuthorId::new(auth_id)?;
+        let _author_id = AuthorId::new(auth_id)?;
 
-        publication.set_header(header, &author_id)?;
+        publication.set_header(header)?;
 
         // Add pages
         if let Some(page_dtos) = cmd.pages {
@@ -87,7 +92,7 @@ impl<'a> Update<'a> {
                 pages.push(page);
             }
 
-            publication.set_pages(pages, &author_id)?;
+            publication.set_pages(pages)?;
         }
 
         self.publication_repo.save(&mut publication).await?;
@@ -112,7 +117,7 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.category_repo(), c.publication_repo());
 
-        let author = mocks::author1();
+        let author = mocks::user1().1;
         let mut publication = mocks::publication1();
         c.publication_repo().save(&mut publication).await.unwrap();
         let mut category = mocks::category2();
@@ -168,7 +173,7 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.category_repo(), c.publication_repo());
 
-        let author = mocks::author1();
+        let author = mocks::user1().1;
         let mut publication = mocks::published_publication1();
         c.publication_repo().save(&mut publication).await.unwrap();
         let mut category = mocks::category2();
@@ -205,7 +210,7 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.category_repo(), c.publication_repo());
 
-        let author = mocks::author2();
+        let author = mocks::user2().1;
         let mut publication = mocks::publication1();
         c.publication_repo().save(&mut publication).await.unwrap();
         let mut category = mocks::category2();
@@ -233,7 +238,7 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.category_repo(), c.publication_repo());
 
-        let author = mocks::author1();
+        let author = mocks::user1().1;
         let mut publication = mocks::publication1();
         c.publication_repo().save(&mut publication).await.unwrap();
         let category = mocks::category2();

@@ -7,6 +7,7 @@ use crate::application::dtos::AuthorDto;
 use crate::domain::author::AuthorRepository;
 use crate::domain::interaction::InteractionRepository;
 use crate::domain::reader::ReaderId;
+use crate::domain::user::UserRepository;
 
 #[derive(Serialize)]
 pub struct GetFollowingResponse {
@@ -16,16 +17,19 @@ pub struct GetFollowingResponse {
 pub struct GetFollowing<'a> {
     author_repo: &'a dyn AuthorRepository,
     interaction_repo: &'a dyn InteractionRepository,
+    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> GetFollowing<'a> {
     pub fn new(
         author_repo: &'a dyn AuthorRepository,
         interaction_repo: &'a dyn InteractionRepository,
+        user_repo: &'a dyn UserRepository,
     ) -> Self {
         GetFollowing {
             author_repo,
             interaction_repo,
+            user_repo,
         }
     }
 
@@ -43,7 +47,8 @@ impl<'a> GetFollowing<'a> {
 
         for follow in follows.iter() {
             let author = self.author_repo.find_by_id(follow.author_id()).await?;
-            author_dtos.push(AuthorDto::from(&author));
+            let user = self.user_repo.find_by_id(follow.author_id()).await?;
+            author_dtos.push(AuthorDto::from(&user, &author));
         }
 
         Ok(GetFollowingResponse {

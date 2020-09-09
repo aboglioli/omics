@@ -2,9 +2,11 @@ use common::model::AggregateRoot;
 use common::result::Result;
 use identity::domain::role::*;
 use identity::domain::user::{Image as UserImage, *};
+use publishing::domain::author::Author;
 use publishing::domain::category::{Name as CategoryName, *};
 use publishing::domain::collection::*;
 use publishing::domain::publication::{Image as PublicationImage, Name as PublicationName, *};
+use publishing::domain::reader::Reader;
 
 use crate::container::Container;
 
@@ -35,10 +37,21 @@ pub async fn populate(c: &Container) -> Result<()> {
             None,
             None,
             None,
+            None,
         )?),
-        admin_role.clone(),
+        admin_role.base().id().clone(),
         None,
     );
+    c.identity.user_repo().save(&mut admin).await?;
+    c.publishing
+        .author_repo()
+        .save(&mut Author::new(admin.base().id().clone())?)
+        .await?;
+    c.publishing
+        .reader_repo()
+        .save(&mut Reader::new(admin.base().id().clone())?)
+        .await?;
+
     let mut content_manager = User::build(
         AggregateRoot::new(UserId::new("content_manager-1")?),
         Identity::new(
@@ -52,10 +65,21 @@ pub async fn populate(c: &Container) -> Result<()> {
             None,
             None,
             None,
+            None,
         )?),
-        content_manager_role.clone(),
+        content_manager_role.base().id().clone(),
         None,
     );
+    c.identity.user_repo().save(&mut content_manager).await?;
+    c.publishing
+        .author_repo()
+        .save(&mut Author::new(content_manager.base().id().clone())?)
+        .await?;
+    c.publishing
+        .reader_repo()
+        .save(&mut Reader::new(content_manager.base().id().clone())?)
+        .await?;
+
     let mut user = User::build(
         AggregateRoot::new(UserId::new("user-1")?),
         Identity::new(
@@ -68,14 +92,21 @@ pub async fn populate(c: &Container) -> Result<()> {
             Fullname::new("TheFirst", "User")?,
             Some(Birthdate::from_str("1994-08-05T15:39:57+00:00")?),
             Some(Gender::Male),
+            Some(Biography::new("My amazing biography...")?),
             Some(UserImage::new("https://via.placeholder.com/128x128.jpg")?),
         )?),
-        user_role.clone(),
+        user_role.base().id().clone(),
         None,
     );
-    c.identity.user_repo().save(&mut admin).await?;
-    c.identity.user_repo().save(&mut content_manager).await?;
     c.identity.user_repo().save(&mut user).await?;
+    c.publishing
+        .author_repo()
+        .save(&mut Author::new(user.base().id().clone())?)
+        .await?;
+    c.publishing
+        .reader_repo()
+        .save(&mut Reader::new(user.base().id().clone())?)
+        .await?;
 
     // Publishing
     let mut category_1 = Category::new(
@@ -88,17 +119,6 @@ pub async fn populate(c: &Container) -> Result<()> {
     )?;
     c.publishing.category_repo().save(&mut category_1).await?;
     c.publishing.category_repo().save(&mut category_2).await?;
-
-    let author = c
-        .publishing
-        .author_repo()
-        .find_by_id(user.base().id())
-        .await?;
-    let content_manager = c
-        .publishing
-        .content_manager_repo()
-        .find_by_id(content_manager.base().id())
-        .await?;
 
     let mut publication_1 = Publication::new(
         PublicationId::new("publication-1")?,
@@ -125,9 +145,9 @@ pub async fn populate(c: &Container) -> Result<()> {
     page_2.set_images(vec![PublicationImage::new(
         "https://via.placeholder.com/768x1024.jpg",
     )?])?;
-    publication_1.set_pages(vec![page_1, page_2], author.base().id())?;
-    publication_1.publish(&author)?;
-    publication_1.approve(&content_manager)?;
+    publication_1.set_pages(vec![page_1, page_2])?;
+    publication_1.publish()?;
+    publication_1.approve(content_manager.base().id().clone())?;
     c.publishing
         .publication_repo()
         .save(&mut publication_1)
@@ -176,8 +196,7 @@ pub async fn populate(c: &Container) -> Result<()> {
             PublicationImage::new("https://via.placeholder.com/768x1024.jpg")?,
         )?,
     )?;
-
-    collection_1.add_item(&publication_1, author.base().id())?;
+    collection_1.add_item(&publication_1)?;
     c.publishing
         .collection_repo()
         .save(&mut collection_1)
@@ -194,8 +213,7 @@ pub async fn populate(c: &Container) -> Result<()> {
             PublicationImage::new("https://via.placeholder.com/768x1024.jpg")?,
         )?,
     )?;
-
-    collection_2.add_item(&publication_1, author.base().id())?;
+    collection_2.add_item(&publication_1)?;
     c.publishing
         .collection_repo()
         .save(&mut collection_2)

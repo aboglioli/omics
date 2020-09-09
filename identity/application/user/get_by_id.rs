@@ -3,15 +3,20 @@ use common::request::Include;
 use common::result::Result;
 
 use crate::application::dtos::{RoleDto, UserDto};
+use crate::domain::role::RoleRepository;
 use crate::domain::user::{UserId, UserRepository};
 
 pub struct GetById<'a> {
+    role_repo: &'a dyn RoleRepository,
     user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> GetById<'a> {
-    pub fn new(user_repo: &'a dyn UserRepository) -> Self {
-        GetById { user_repo }
+    pub fn new(role_repo: &'a dyn RoleRepository, user_repo: &'a dyn UserRepository) -> Self {
+        GetById {
+            role_repo,
+            user_repo,
+        }
     }
 
     pub async fn exec(
@@ -22,7 +27,7 @@ impl<'a> GetById<'a> {
     ) -> Result<UserDto> {
         if auth_id != user_id {
             let auth_user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-            if !auth_user.role().is("admin") {
+            if auth_user.role_id().value() != "admin" {
                 return Err(Error::unauthorized());
             }
         }
@@ -31,7 +36,8 @@ impl<'a> GetById<'a> {
         let mut user_dto = UserDto::from(&user);
 
         if include.has("role") {
-            user_dto = user_dto.role(RoleDto::from(user.role()));
+            let role = self.role_repo.find_by_id(user.role_id()).await?;
+            user_dto = user_dto.role(RoleDto::from(&role));
         }
 
         Ok(user_dto)
@@ -47,7 +53,7 @@ mod tests {
     #[tokio::test]
     async fn owner() {
         let c = mocks::container();
-        let uc = GetById::new(c.user_repo());
+        let uc = GetById::new(c.role_repo(), c.user_repo());
 
         let mut user = mocks::user1();
         c.user_repo().save(&mut user).await.unwrap();
@@ -61,7 +67,7 @@ mod tests {
     #[tokio::test]
     async fn not_owner() {
         let c = mocks::container();
-        let uc = GetById::new(c.user_repo());
+        let uc = GetById::new(c.role_repo(), c.user_repo());
 
         let mut user = mocks::user1();
         c.user_repo().save(&mut user).await.unwrap();
@@ -80,7 +86,7 @@ mod tests {
     #[tokio::test]
     async fn admin_not_owner() {
         let c = mocks::container();
-        let uc = GetById::new(c.user_repo());
+        let uc = GetById::new(c.role_repo(), c.user_repo());
 
         let mut user = mocks::user1();
         c.user_repo().save(&mut user).await.unwrap();
@@ -100,7 +106,7 @@ mod tests {
     #[tokio::test]
     async fn without_fullname() {
         let c = mocks::container();
-        let uc = GetById::new(c.user_repo());
+        let uc = GetById::new(c.role_repo(), c.user_repo());
 
         let mut user = mocks::user1();
         c.user_repo().save(&mut user).await.unwrap();
@@ -115,7 +121,7 @@ mod tests {
     #[tokio::test]
     async fn with_fullname() {
         let c = mocks::container();
-        let uc = GetById::new(c.user_repo());
+        let uc = GetById::new(c.role_repo(), c.user_repo());
 
         let mut user = mocks::user1();
         user.set_person(mocks::person1()).unwrap();

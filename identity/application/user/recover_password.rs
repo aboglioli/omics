@@ -41,7 +41,7 @@ impl<'a> RecoverPassword<'a> {
         let hashed_password = self.user_serv.generate_password(&tmp_password)?;
         let password = Password::new(hashed_password)?;
 
-        user.recover_password(password, &tmp_password)?;
+        user.recover_password(password, tmp_password)?;
 
         self.user_repo.save(&mut user).await?;
 

@@ -1,41 +1,43 @@
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::domain::content_manager::{ContentManagerId, ContentManagerRepository};
 use crate::domain::publication::{PublicationId, PublicationRepository};
+use crate::domain::user::{UserId, UserRepository};
 
 pub struct Reject<'a> {
     event_pub: &'a dyn EventPublisher,
 
-    content_manager_repo: &'a dyn ContentManagerRepository,
     publication_repo: &'a dyn PublicationRepository,
+    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Reject<'a> {
     pub fn new(
         event_pub: &'a dyn EventPublisher,
-        content_manager_repo: &'a dyn ContentManagerRepository,
         publication_repo: &'a dyn PublicationRepository,
+        user_repo: &'a dyn UserRepository,
     ) -> Self {
         Reject {
             event_pub,
-            content_manager_repo,
             publication_repo,
+            user_repo,
         }
     }
 
     pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<CommandResponse> {
-        let content_manager_id = ContentManagerId::new(auth_id)?;
-        let content_manager = self
-            .content_manager_repo
-            .find_by_id(&content_manager_id)
-            .await?;
+        let user_id = UserId::new(auth_id)?;
+        let user = self.user_repo.find_by_id(&user_id).await?;
+
+        if !user.is_content_manager() {
+            return Err(Error::unauthorized());
+        }
 
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        publication.reject(&content_manager)?;
+        publication.reject(user_id)?;
 
         self.publication_repo.save(&mut publication).await?;
 
@@ -57,17 +59,18 @@ mod tests {
     #[tokio::test]
     async fn reject() {
         let c = mocks::container();
-        let uc = Reject::new(
-            c.event_pub(),
-            c.content_manager_repo(),
-            c.publication_repo(),
-        );
+        let uc = Reject::new(c.event_pub(), c.publication_repo(), c.user_repo());
 
-        let author = mocks::author1();
-        let mut cm = mocks::content_manager1();
-        c.content_manager_repo().save(&mut cm).await.unwrap();
+        let (mut user1, mut author1, mut reader1) = mocks::user1();
+        c.user_repo().save(&mut user1).await.unwrap();
+        c.author_repo().save(&mut author1).await.unwrap();
+        c.reader_repo().save(&mut reader1).await.unwrap();
+
+        let (mut cm, _, _) = mocks::content_manager1();
+        c.user_repo().save(&mut cm).await.unwrap();
+
         let mut publication = mocks::publication1();
-        publication.publish(&author).unwrap();
+        publication.publish().unwrap();
         c.publication_repo().save(&mut publication).await.unwrap();
 
         uc.exec(

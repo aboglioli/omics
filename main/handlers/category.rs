@@ -52,8 +52,8 @@ async fn get_publications(
     SearchPublication::new(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
-        c.publishing.content_manager_repo(),
         c.publishing.publication_repo(),
+        c.publishing.user_repo(),
     )
     .exec(
         auth_id,
@@ -82,6 +82,7 @@ async fn get_collections(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
         c.publishing.collection_repo(),
+        c.publishing.user_repo(),
     )
     .exec(
         auth_id,
@@ -105,7 +106,7 @@ async fn create(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
-    Create::new(c.publishing.admin_repo(), c.publishing.category_repo())
+    Create::new(c.publishing.category_repo(), c.publishing.user_repo())
         .exec(auth_id, cmd.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
@@ -120,7 +121,7 @@ async fn update(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
-    Update::new(c.publishing.admin_repo(), c.publishing.category_repo())
+    Update::new(c.publishing.category_repo(), c.publishing.user_repo())
         .exec(auth_id, path.into_inner(), cmd.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
@@ -134,7 +135,7 @@ async fn delete(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
-    Delete::new(c.publishing.admin_repo(), c.publishing.category_repo())
+    Delete::new(c.publishing.category_repo(), c.publishing.user_repo())
         .exec(auth_id, path.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))

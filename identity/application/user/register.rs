@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::domain::role::{Role, RoleId};
+use crate::domain::role::RoleId;
 
 use crate::domain::user::{
     Email, Identity, Password, Provider, User, UserRepository, UserService, Username,
@@ -56,7 +56,7 @@ impl<'a> Register<'a> {
                 Email::new(cmd.email)?,
                 Some(Password::new(hashed_password)?),
             )?,
-            Role::new(RoleId::new("user")?, "User")?,
+            RoleId::new("user")?,
         )?;
 
         self.user_repo.save(&mut user).await?;

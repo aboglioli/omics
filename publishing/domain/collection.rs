@@ -65,12 +65,9 @@ impl Collection {
         &self.items
     }
 
-    pub fn set_header(&mut self, header: Header, author_id: &AuthorId) -> Result<()> {
-        if self.author_id() != author_id {
-            return Err(Error::new("collection", "not_owner"));
-        }
-
+    pub fn set_header(&mut self, header: Header) -> Result<()> {
         self.header = header;
+        self.base.update();
 
         self.base.record_event(CollectionEvent::HeaderUpdated {
             id: self.base().id().to_string(),
@@ -89,15 +86,7 @@ impl Collection {
         Ok(())
     }
 
-    pub fn add_item(&mut self, publication: &Publication, author_id: &AuthorId) -> Result<()> {
-        if self.author_id() != author_id {
-            return Err(Error::new("collection", "not_owner"));
-        }
-
-        // if !publication.is_published() {
-        //     return Err(Error::new("collection", "publication_is_not_published"));
-        // }
-
+    pub fn add_item(&mut self, publication: &Publication) -> Result<()> {
         for item in self.items() {
             if item.publication_id() == publication.base().id() {
                 return Err(Error::new("collection", "publication_exists"));
@@ -106,6 +95,7 @@ impl Collection {
 
         let item = Item::new(publication.base().id().clone())?;
         self.items.push(item);
+        self.base.update();
 
         self.base.record_event(CollectionEvent::PublicationAdded {
             id: self.base().id().to_string(),
@@ -115,17 +105,10 @@ impl Collection {
         Ok(())
     }
 
-    pub fn remove_item(
-        &mut self,
-        publication_id: &PublicationId,
-        author_id: &AuthorId,
-    ) -> Result<()> {
-        if self.author_id() != author_id {
-            return Err(Error::new("collection", "not_owner"));
-        }
-
+    pub fn remove_item(&mut self, publication_id: &PublicationId) -> Result<()> {
         self.items
             .retain(|item| item.publication_id() != publication_id);
+        self.base.update();
 
         self.base.record_event(CollectionEvent::PublicationRemoved {
             id: self.base().id().to_string(),
@@ -135,11 +118,7 @@ impl Collection {
         Ok(())
     }
 
-    pub fn delete(&mut self, author_id: &AuthorId) -> Result<()> {
-        if self.author_id() != author_id {
-            return Err(Error::new("collection", "not_owner"));
-        }
-
+    pub fn delete(&mut self) -> Result<()> {
         self.base.delete();
 
         self.base.record_event(CollectionEvent::Deleted {

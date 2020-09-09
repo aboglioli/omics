@@ -26,10 +26,10 @@ use common::model::{AggregateRoot, StatusHistory, StringId};
 use common::result::Result;
 use shared::event::PublicationEvent;
 
-use crate::domain::author::{Author, AuthorId};
-use crate::domain::content_manager::ContentManager;
+use crate::domain::author::AuthorId;
 use crate::domain::interaction::{Comment, Like, Reading, Review, Stars, View};
 use crate::domain::reader::Reader;
+use crate::domain::user::UserId;
 
 pub type PublicationId = StringId;
 
@@ -135,14 +135,10 @@ impl Publication {
             && matches!(self.status_history().current(), Status::Published { .. })
     }
 
-    pub fn set_header(&mut self, header: Header, author_id: &AuthorId) -> Result<()> {
-        if self.author_id() != author_id {
-            return Err(Error::new("publication", "not_owner"));
-        }
-
+    pub fn set_header(&mut self, header: Header) -> Result<()> {
         self.header = header;
-
         self.make_draft()?;
+        self.base.update();
 
         self.base.record_event(PublicationEvent::HeaderUpdated {
             id: self.base().id().to_string(),
@@ -161,14 +157,10 @@ impl Publication {
         Ok(())
     }
 
-    pub fn set_pages(&mut self, pages: Vec<Page>, author_id: &AuthorId) -> Result<()> {
-        if self.author_id() != author_id {
-            return Err(Error::new("publication", "not_owner"));
-        }
-
+    pub fn set_pages(&mut self, pages: Vec<Page>) -> Result<()> {
         self.pages = pages;
-
         self.make_draft()?;
+        self.base.update();
 
         self.base.record_event(PublicationEvent::PagesUpdated {
             id: self.base().id().to_string(),
@@ -376,6 +368,7 @@ impl Publication {
         }
 
         self.contract = true;
+        self.base.update();
 
         self.base.record_event(PublicationEvent::ContractAdded {
             id: self.base().id().to_string(),
@@ -390,6 +383,7 @@ impl Publication {
         }
 
         self.contract = false;
+        self.base.update();
 
         self.base.record_event(PublicationEvent::ContractAdded {
             id: self.base().id().to_string(),
@@ -402,6 +396,7 @@ impl Publication {
         if !matches!(self.status_history().current(), Status::Draft) {
             let draft = self.status_history.current().draft()?;
             self.status_history.add_status(draft);
+            self.base.update();
 
             self.base.record_event(PublicationEvent::ChangedToDraft {
                 id: self.base().id().to_string(),
@@ -411,11 +406,7 @@ impl Publication {
         Ok(())
     }
 
-    pub fn publish(&mut self, author: &Author) -> Result<()> {
-        if author.base().id() != self.author_id() {
-            return Err(Error::new("publication", "invalid_author"));
-        }
-
+    pub fn publish(&mut self) -> Result<()> {
         let waiting_approval = self.status_history.current().publish()?;
 
         if self.pages.is_empty() {
@@ -430,6 +421,7 @@ impl Publication {
         }
 
         self.status_history.add_status(waiting_approval);
+        self.base.update();
 
         self.base.record_event(PublicationEvent::ApprovalWaited {
             id: self.base().id().to_string(),
@@ -438,12 +430,10 @@ impl Publication {
         Ok(())
     }
 
-    pub fn approve(&mut self, content_manager: &ContentManager) -> Result<()> {
-        let published = self
-            .status_history
-            .current()
-            .approve(content_manager.base().id().clone())?;
+    pub fn approve(&mut self, user_id: UserId) -> Result<()> {
+        let published = self.status_history.current().approve(user_id)?;
         self.status_history.add_status(published);
+        self.base.update();
 
         self.base.record_event(PublicationEvent::Published {
             id: self.base().id().to_string(),
@@ -464,12 +454,10 @@ impl Publication {
         Ok(())
     }
 
-    pub fn reject(&mut self, content_manager: &ContentManager) -> Result<()> {
-        let rejected = self
-            .status_history()
-            .current()
-            .reject(content_manager.base().id().clone())?;
+    pub fn reject(&mut self, user_id: UserId) -> Result<()> {
+        let rejected = self.status_history().current().reject(user_id)?;
         self.status_history.add_status(rejected);
+        self.base.update();
 
         self.base.record_event(PublicationEvent::Rejected {
             id: self.base().id().to_string(),
@@ -478,11 +466,7 @@ impl Publication {
         Ok(())
     }
 
-    pub fn delete(&mut self, author_id: &AuthorId) -> Result<()> {
-        if self.author_id() != author_id {
-            return Err(Error::new("publication", "not_owner"));
-        }
-
+    pub fn delete(&mut self) -> Result<()> {
         self.base.delete();
 
         self.base.record_event(PublicationEvent::Deleted {
@@ -518,35 +502,34 @@ mod tests {
     #[test]
     fn status() {
         let mut publication = mocks::publication1();
-        let cm1 = mocks::content_manager1();
-        let author = mocks::author1();
+        let cm1 = mocks::content_manager1().0;
 
         assert!(publication.make_draft().is_ok());
         assert!(publication.make_draft().is_ok());
 
-        assert!(publication.approve(&cm1).is_err());
-        assert!(publication.reject(&cm1).is_err());
+        assert!(publication.approve(cm1.base().id().clone()).is_err());
+        assert!(publication.reject(cm1.base().id().clone()).is_err());
 
-        assert!(publication.publish(&author).is_ok());
+        assert!(publication.publish().is_ok());
         assert!(matches!(
             publication.status_history().current(),
             Status::WaitingApproval
         ));
 
-        assert!(publication.approve(&cm1).is_ok());
+        assert!(publication.approve(cm1.base().id().clone()).is_ok());
         assert!(matches!(publication.status_history().current(), Status::Published { .. }));
-        assert!(publication.publish(&author).is_err());
+        assert!(publication.publish().is_err());
 
         assert!(publication.make_draft().is_ok());
         assert!(matches!(
             publication.status_history().current(),
             Status::Draft
         ));
-        assert!(publication.publish(&author).is_ok());
+        assert!(publication.publish().is_ok());
 
-        assert!(publication.reject(&cm1).is_ok());
+        assert!(publication.reject(cm1.base().id().clone()).is_ok());
         assert!(matches!(publication.status_history().current(), Status::Rejected { .. }));
-        assert!(publication.publish(&author).is_err());
+        assert!(publication.publish().is_err());
 
         assert!(publication.make_draft().is_ok());
         assert!(matches!(
@@ -558,7 +541,8 @@ mod tests {
     #[test]
     fn interaction_with_draft_publication() {
         let mut publication = mocks::publication1();
-        let reader = mocks::reader1();
+        let reader = mocks::user1().2;
+
         let comment = Comment::new("comment").unwrap();
         let stars = Stars::new(5).unwrap();
 
@@ -574,7 +558,7 @@ mod tests {
     #[test]
     fn interaction_with_published_publication() {
         let mut publication = mocks::published_publication1();
-        let reader = mocks::reader1();
+        let reader = mocks::user1().2;
         let comment = Comment::new("comment").unwrap();
         let stars = Stars::new(5).unwrap();
 

@@ -1,8 +1,8 @@
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::domain::author::AuthorId;
 use crate::domain::collection::{CollectionId, CollectionRepository};
 
 pub struct Delete<'a> {
@@ -26,7 +26,11 @@ impl<'a> Delete<'a> {
         let collection_id = CollectionId::new(collection_id)?;
         let mut collection = self.collection_repo.find_by_id(&collection_id).await?;
 
-        collection.delete(&AuthorId::new(auth_id)?)?;
+        if collection.author_id().value() != auth_id {
+            return Err(Error::not_owner("collection"));
+        }
+
+        collection.delete()?;
 
         self.collection_repo.save(&mut collection).await?;
 
@@ -49,7 +53,7 @@ mod tests {
         let c = mocks::container();
         let uc = Delete::new(c.event_pub(), c.collection_repo());
 
-        let author = mocks::author1();
+        let author = mocks::user1().1;
         let mut collection = mocks::empty_collection1();
         c.collection_repo().save(&mut collection).await.unwrap();
 
@@ -74,7 +78,7 @@ mod tests {
         let c = mocks::container();
         let uc = Delete::new(c.event_pub(), c.collection_repo());
 
-        let author = mocks::author1();
+        let author = mocks::user1().1;
         let mut collection = mocks::empty_collection1();
         c.collection_repo().save(&mut collection).await.unwrap();
 

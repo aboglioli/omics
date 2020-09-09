@@ -1,10 +1,10 @@
 use serde::Deserialize;
 
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::domain::author::AuthorId;
 use crate::domain::category::{CategoryId, CategoryRepository};
 use crate::domain::collection::{CollectionId, CollectionRepository};
 use crate::domain::publication::{Header, Image, Name, Synopsis, Tag};
@@ -16,12 +16,6 @@ pub struct UpdateCommand {
     pub category_id: String,
     pub tags: Vec<String>,
     pub cover: String,
-}
-
-impl UpdateCommand {
-    pub fn validate(&self) -> Result<()> {
-        Ok(())
-    }
 }
 
 pub struct Update<'a> {
@@ -50,10 +44,12 @@ impl<'a> Update<'a> {
         collection_id: String,
         cmd: UpdateCommand,
     ) -> Result<CommandResponse> {
-        cmd.validate()?;
-
         let collection_id = CollectionId::new(collection_id)?;
         let mut collection = self.collection_repo.find_by_id(&collection_id).await?;
+
+        if collection.author_id().value() != auth_id {
+            return Err(Error::not_owner("collection"));
+        }
 
         let name = Name::new(cmd.name)?;
         let synopsis = Synopsis::new(cmd.synopsis)?;
@@ -70,7 +66,7 @@ impl<'a> Update<'a> {
 
         let header = Header::new(name, synopsis, category_id, tags, cover)?;
 
-        collection.set_header(header, &AuthorId::new(auth_id)?)?;
+        collection.set_header(header)?;
 
         self.collection_repo.save(&mut collection).await?;
 
@@ -93,7 +89,7 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.category_repo(), c.collection_repo());
 
-        let author = mocks::author1();
+        let author = mocks::user1().1;
         let mut collection = mocks::empty_collection1();
         c.collection_repo().save(&mut collection).await.unwrap();
         let mut category = mocks::category2();
@@ -130,7 +126,7 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.category_repo(), c.collection_repo());
 
-        let author = mocks::author1();
+        let author = mocks::user1().1;
         let mut collection = mocks::empty_collection1();
         c.collection_repo().save(&mut collection).await.unwrap();
         let mut category = mocks::category2();
@@ -162,7 +158,7 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.category_repo(), c.collection_repo());
 
-        let author = mocks::author2();
+        let author = mocks::user2().1;
         let mut collection = mocks::empty_collection1();
         c.collection_repo().save(&mut collection).await.unwrap();
         let mut category = mocks::category2();
@@ -189,7 +185,7 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.category_repo(), c.collection_repo());
 
-        let author = mocks::author1();
+        let author = mocks::user1().1;
         let mut collection = mocks::empty_collection1();
         c.collection_repo().save(&mut collection).await.unwrap();
         let category = mocks::category2();

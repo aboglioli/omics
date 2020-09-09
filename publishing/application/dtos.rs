@@ -6,6 +6,7 @@ use crate::domain::collection::Collection;
 use crate::domain::interaction::Review;
 use crate::domain::publication::{Image, Page, Publication, Statistics};
 use crate::domain::reader::{Preferences, Reader};
+use crate::domain::user::User;
 
 #[derive(Serialize)]
 pub struct StatisticsDto {
@@ -34,18 +35,24 @@ impl From<&Statistics> for StatisticsDto {
 pub struct AuthorDto {
     pub id: String,
     pub username: String,
-    pub name: String,
-    pub lastname: String,
+    pub name: Option<String>,
+    pub lastname: Option<String>,
+    pub biography: Option<String>,
+    pub profile_image: Option<String>,
     pub followers: u32,
 }
 
-impl From<&Author> for AuthorDto {
-    fn from(author: &Author) -> Self {
+impl AuthorDto {
+    pub fn from(user: &User, author: &Author) -> Self {
         AuthorDto {
             id: author.base().id().to_string(),
-            username: author.username().to_string(),
-            name: author.name().to_string(),
-            lastname: author.lastname().to_string(),
+            username: user.username().to_string(),
+            name: user.name().map(|name| name.to_string()),
+            lastname: user.lastname().map(|lastname| lastname.to_string()),
+            biography: user.biography().map(|biography| biography.to_string()),
+            profile_image: user
+                .profile_image()
+                .map(|profile_image| profile_image.to_string()),
             followers: author.followers(),
         }
     }
@@ -258,19 +265,19 @@ impl From<&Preferences> for PreferencesDto {
 pub struct ReaderDto {
     pub id: String,
     pub username: String,
-    pub name: String,
-    pub lastname: String,
+    pub name: Option<String>,
+    pub lastname: Option<String>,
     pub subscribed: bool,
     pub preferences: Option<PreferencesDto>,
 }
 
-impl From<&Reader> for ReaderDto {
-    fn from(reader: &Reader) -> Self {
+impl ReaderDto {
+    pub fn from(user: &User, reader: &Reader) -> Self {
         ReaderDto {
             id: reader.base().id().to_string(),
-            username: reader.username().to_string(),
-            name: reader.name().to_string(),
-            lastname: reader.lastname().to_string(),
+            username: user.username().to_string(),
+            name: user.name().map(|name| name.to_string()),
+            lastname: user.name().map(|lastname| lastname.to_string()),
             subscribed: reader.is_subscribed(),
             preferences: None,
         }

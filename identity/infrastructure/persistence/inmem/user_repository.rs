@@ -1,5 +1,4 @@
 use async_trait::async_trait;
-use uuid::Uuid;
 
 use common::cache::Cache;
 use common::error::Error;
@@ -29,11 +28,6 @@ impl Default for InMemUserRepository {
 
 #[async_trait]
 impl UserRepository for InMemUserRepository {
-    async fn next_id(&self) -> Result<UserId> {
-        let uuid = Uuid::new_v4();
-        UserId::new(&uuid.to_string())
-    }
-
     async fn find_all(&self) -> Result<Vec<User>> {
         Ok(self.cache.all().await)
     }
@@ -62,7 +56,7 @@ impl UserRepository for InMemUserRepository {
     async fn find_by_role_id(&self, role_id: &RoleId) -> Result<Vec<User>> {
         Ok(self
             .cache
-            .filter(|(_, user)| user.role().base().id() == role_id)
+            .filter(|(_, user)| user.role_id() == role_id)
             .await)
     }
 
@@ -94,7 +88,14 @@ mod tests {
         let repo = InMemUserRepository::new();
         let mut user = mocks::user1();
         user.set_person(
-            Person::new(Fullname::new("Name", "Lastname").unwrap(), None, None, None).unwrap(),
+            Person::new(
+                Fullname::new("Name", "Lastname").unwrap(),
+                None,
+                None,
+                None,
+                None,
+            )
+            .unwrap(),
         )
         .unwrap();
 

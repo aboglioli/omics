@@ -1,3 +1,4 @@
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
@@ -28,12 +29,16 @@ impl<'a> Publish<'a> {
 
     pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<CommandResponse> {
         let author_id = AuthorId::new(auth_id)?;
-        let author = self.author_repo.find_by_id(&author_id).await?;
+        self.author_repo.find_by_id(&author_id).await?;
 
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        publication.publish(&author)?;
+        if publication.author_id() != &author_id {
+            return Err(Error::not_owner("publication"));
+        }
+
+        publication.publish()?;
 
         self.publication_repo.save(&mut publication).await?;
 
@@ -57,7 +62,7 @@ mod tests {
         let c = mocks::container();
         let uc = Publish::new(c.event_pub(), c.author_repo(), c.publication_repo());
 
-        let mut author = mocks::author1();
+        let mut author = mocks::user1().1;
         c.author_repo().save(&mut author).await.unwrap();
         let mut publication = mocks::publication1();
         c.publication_repo().save(&mut publication).await.unwrap();

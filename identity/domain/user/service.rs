@@ -3,7 +3,7 @@ use std::sync::Arc;
 use common::error::Error;
 use common::result::Result;
 
-use crate::domain::user::{Email, Password, PasswordHasher, UserId, UserRepository, Username};
+use crate::domain::user::{Email, Password, PasswordHasher, User, UserRepository, Username};
 
 pub struct UserService {
     user_repo: Arc<dyn UserRepository>,
@@ -50,18 +50,12 @@ impl UserService {
 
     pub async fn change_password(
         &self,
-        user_id: &UserId,
+        user: &mut User,
         old_password: &str,
         new_password: &str,
     ) -> Result<()> {
         if old_password == new_password {
             return Err(Error::new("passwords", "are_the_same"));
-        }
-
-        let mut user = self.user_repo.find_by_id(user_id).await?;
-
-        if user.base().id() != user_id {
-            return Err(Error::new("user", "unauthorized"));
         }
 
         let user_password = match user.identity().password() {
@@ -77,8 +71,6 @@ impl UserService {
 
         let password = Password::new(&hashed_password)?;
         user.set_password(password)?;
-
-        self.user_repo.save(&mut user).await?;
 
         Ok(())
     }
@@ -134,23 +126,19 @@ mod tests {
         c.user_repo().save(&mut user).await.unwrap();
 
         assert!(serv
-            .change_password(
-                &UserId::new("#invalid-id").unwrap(),
-                "P@asswd!",
-                "new-password"
-            )
+            .change_password(&mut user, "P@asswd!", "123")
             .await
             .is_err());
         assert!(serv
-            .change_password(&user.base().id(), "P@asswd!", "123")
+            .change_password(&mut user, "invalid-password", "New_P@asswd!")
             .await
             .is_err());
         assert!(serv
-            .change_password(&user.base().id(), "invalid-password", "New_P@asswd!")
+            .change_password(&mut user, "P@asswd!", "New_P@asswd!")
             .await
-            .is_err());
+            .is_ok());
         assert!(serv
-            .change_password(&user.base().id(), "P@asswd!", "New_P@asswd!")
+            .change_password(&mut user, "New_P@asswd!", "new-password")
             .await
             .is_ok());
     }

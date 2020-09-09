@@ -15,7 +15,7 @@ pub fn user1() -> User {
             Some(Password::new(&ph.hash("P@asswd!").unwrap()).unwrap()),
         )
         .unwrap(),
-        user_role(),
+        user_role().base().id().clone(),
     )
     .unwrap()
 }
@@ -31,7 +31,7 @@ pub fn user2() -> User {
             Some(Password::new(&ph.hash("P@asswd!").unwrap()).unwrap()),
         )
         .unwrap(),
-        user_role(),
+        user_role().base().id().clone(),
     )
     .unwrap()
 }
@@ -65,7 +65,7 @@ pub fn admin1() -> User {
             Some(Password::new(&ph.hash("P@asswd!").unwrap()).unwrap()),
         )
         .unwrap(),
-        admin_role(),
+        admin_role().base().id().clone(),
     )
     .unwrap()
 }
@@ -79,5 +79,12 @@ pub fn admin_role() -> Role {
 }
 
 pub fn person1() -> Person {
-    Person::new(Fullname::new("User", "One").unwrap(), None, None, None).unwrap()
+    Person::new(
+        Fullname::new("User", "One").unwrap(),
+        None,
+        None,
+        None,
+        None,
+    )
+    .unwrap()
 }

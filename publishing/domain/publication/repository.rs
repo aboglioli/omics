@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use uuid::Uuid;
 
 use common::result::Result;
 
@@ -8,7 +9,9 @@ use crate::domain::publication::{Publication, PublicationId};
 
 #[async_trait]
 pub trait PublicationRepository: Sync + Send {
-    async fn next_id(&self) -> Result<PublicationId>;
+    async fn next_id(&self) -> Result<PublicationId> {
+        PublicationId::new(Uuid::new_v4().to_string())
+    }
 
     async fn find_all(&self) -> Result<Vec<Publication>>;
     async fn find_by_id(&self, id: &PublicationId) -> Result<Publication>;

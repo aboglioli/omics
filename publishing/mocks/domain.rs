@@ -1,14 +1,14 @@
 use crate::domain::author::{Author, AuthorId};
 use crate::domain::category::{Category, CategoryId, Name as CategoryName};
 use crate::domain::collection::{Collection, CollectionId};
-use crate::domain::content_manager::{ContentManager, ContentManagerId};
 use crate::domain::publication::{
     Header, Image, Name, Page, Publication, PublicationId, Synopsis, Tag,
 };
 use crate::domain::reader::{Reader, ReaderId};
+use crate::domain::user::{User, UserId};
 
 pub fn publication1() -> Publication {
-    let author_id = author1().base().id().clone();
+    let author_id = user1().0.base().id().clone();
 
     let mut publication = Publication::new(
         PublicationId::new("#publication01").unwrap(),
@@ -38,9 +38,7 @@ pub fn publication1() -> Publication {
             Image::new("domain.com/p2_image2.jpg").unwrap(),
         ])
         .unwrap();
-    publication
-        .set_pages(vec![page_1, page_2], &author_id)
-        .unwrap();
+    publication.set_pages(vec![page_1, page_2]).unwrap();
 
     publication
 }
@@ -65,20 +63,20 @@ pub fn published_publication1() -> Publication {
         ])
         .unwrap();
 
-    let author_id = publication.author_id().clone();
-    publication
-        .set_pages(vec![page1, page2], &author_id)
-        .unwrap();
+    let _author_id = publication.author_id().clone();
+    publication.set_pages(vec![page1, page2]).unwrap();
 
-    publication.publish(&author1()).unwrap();
-    publication.approve(&content_manager1()).unwrap();
+    publication.publish().unwrap();
+    publication
+        .approve(content_manager1().0.base().id().clone())
+        .unwrap();
     publication
 }
 
 pub fn empty_collection1() -> Collection {
     Collection::new(
         CollectionId::new("#collection01").unwrap(),
-        author1().base().id().clone(),
+        user1().0.base().id().clone(),
         Header::new(
             Name::new("Collection 01").unwrap(),
             Synopsis::new("Synopsis...").unwrap(),
@@ -91,48 +89,33 @@ pub fn empty_collection1() -> Collection {
     .unwrap()
 }
 
-pub fn content_manager1() -> ContentManager {
-    ContentManager::new(ContentManagerId::new("#content-manager01").unwrap()).unwrap()
+pub fn content_manager1() -> (User, Author, Reader) {
+    (
+        User::new(
+            UserId::new("content-manager-1").unwrap(),
+            "content-manager-1",
+            "content-manager",
+        )
+        .unwrap(),
+        Author::new(AuthorId::new("content-manager-1").unwrap()).unwrap(),
+        Reader::new(ReaderId::new("content-manager-1").unwrap()).unwrap(),
+    )
 }
 
-pub fn reader1() -> Reader {
-    Reader::new(
-        ReaderId::new("#reader01").unwrap(),
-        "reader-01",
-        "Name 01",
-        "Lastname 01",
+pub fn user1() -> (User, Author, Reader) {
+    (
+        User::new(UserId::new("user-1").unwrap(), "user-1", "user").unwrap(),
+        Author::new(AuthorId::new("user-1").unwrap()).unwrap(),
+        Reader::new(ReaderId::new("user-1").unwrap()).unwrap(),
     )
-    .unwrap()
 }
 
-pub fn author1() -> Author {
-    Author::new(
-        AuthorId::new("#author01").unwrap(),
-        "author-01",
-        "Name 01",
-        "Lastname 01",
+pub fn user2() -> (User, Author, Reader) {
+    (
+        User::new(UserId::new("user-2").unwrap(), "user-2", "user").unwrap(),
+        Author::new(AuthorId::new("user-2").unwrap()).unwrap(),
+        Reader::new(ReaderId::new("user-2").unwrap()).unwrap(),
     )
-    .unwrap()
-}
-
-pub fn author_as_reader1() -> Reader {
-    Reader::new(
-        ReaderId::new("#author01").unwrap(),
-        "author-01",
-        "Name 01",
-        "Lastname 01",
-    )
-    .unwrap()
-}
-
-pub fn author2() -> Author {
-    Author::new(
-        AuthorId::new("#author02").unwrap(),
-        "author-02",
-        "Name 02",
-        "Lastname 02",
-    )
-    .unwrap()
 }
 
 pub fn category1() -> Category {

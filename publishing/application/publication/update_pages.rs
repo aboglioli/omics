@@ -1,10 +1,10 @@
 use serde::Deserialize;
 
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::domain::author::AuthorId;
 use crate::domain::publication::{Image, Page, PublicationId, PublicationRepository};
 
 #[derive(Deserialize)]
@@ -43,6 +43,10 @@ impl<'a> UpdatePages<'a> {
         let publication_id = PublicationId::new(&publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
+        if publication.author_id().value() != auth_id {
+            return Err(Error::not_owner("publication"));
+        }
+
         let mut pages = Vec::new();
         for (page_n, page) in cmd.pages.into_iter().enumerate() {
             let mut images = Vec::new();
@@ -56,7 +60,7 @@ impl<'a> UpdatePages<'a> {
             pages.push(page);
         }
 
-        publication.set_pages(pages, &AuthorId::new(auth_id)?)?;
+        publication.set_pages(pages)?;
 
         self.publication_repo.save(&mut publication).await?;
 
@@ -79,7 +83,7 @@ mod tests {
         let c = mocks::container();
         let uc = UpdatePages::new(c.event_pub(), c.publication_repo());
 
-        let author = mocks::author1();
+        let author = mocks::user1().1;
         let mut publication = mocks::publication1();
         c.publication_repo().save(&mut publication).await.unwrap();
 
@@ -124,7 +128,7 @@ mod tests {
         let c = mocks::container();
         let uc = UpdatePages::new(c.event_pub(), c.publication_repo());
 
-        let author = mocks::author1();
+        let author = mocks::user1().1;
 
         assert!(uc
             .exec(

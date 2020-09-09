@@ -8,6 +8,7 @@ use crate::domain::author::AuthorRepository;
 use crate::domain::category::CategoryRepository;
 use crate::domain::collection::{CollectionId, CollectionRepository};
 use crate::domain::publication::PublicationRepository;
+use crate::domain::user::UserRepository;
 
 #[derive(Serialize)]
 pub struct GetPublicationsResponse {
@@ -19,6 +20,7 @@ pub struct GetPublications<'a> {
     category_repo: &'a dyn CategoryRepository,
     collection_repo: &'a dyn CollectionRepository,
     publication_repo: &'a dyn PublicationRepository,
+    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> GetPublications<'a> {
@@ -27,12 +29,14 @@ impl<'a> GetPublications<'a> {
         category_repo: &'a dyn CategoryRepository,
         collection_repo: &'a dyn CollectionRepository,
         publication_repo: &'a dyn PublicationRepository,
+        user_repo: &'a dyn UserRepository,
     ) -> Self {
         GetPublications {
             author_repo,
             category_repo,
             collection_repo,
             publication_repo,
+            user_repo,
         }
     }
 
@@ -68,8 +72,9 @@ impl<'a> GetPublications<'a> {
             let mut publication_dto = PublicationDto::from(&publication);
 
             if include.has("author") {
+                let user = self.user_repo.find_by_id(publication.author_id()).await?;
                 let author = self.author_repo.find_by_id(publication.author_id()).await?;
-                publication_dto = publication_dto.author(AuthorDto::from(&author));
+                publication_dto = publication_dto.author(AuthorDto::from(&user, &author));
             }
 
             if include.has("category") {

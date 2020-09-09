@@ -1,9 +1,10 @@
 use serde::Deserialize;
 
+use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::domain::user::{UserId, UserService};
+use crate::domain::user::{UserId, UserRepository, UserService};
 
 #[derive(Deserialize)]
 pub struct ChangePasswordCommand {
@@ -12,12 +13,24 @@ pub struct ChangePasswordCommand {
 }
 
 pub struct ChangePassword<'a> {
+    event_pub: &'a dyn EventPublisher,
+
+    user_repo: &'a dyn UserRepository,
+
     user_serv: &'a UserService,
 }
 
 impl<'a> ChangePassword<'a> {
-    pub fn new(user_serv: &'a UserService) -> Self {
-        ChangePassword { user_serv }
+    pub fn new(
+        event_pub: &'a dyn EventPublisher,
+        user_repo: &'a dyn UserRepository,
+        user_serv: &'a UserService,
+    ) -> Self {
+        ChangePassword {
+            event_pub,
+            user_repo,
+            user_serv,
+        }
     }
 
     pub async fn exec(
@@ -25,9 +38,15 @@ impl<'a> ChangePassword<'a> {
         user_id: String,
         cmd: ChangePasswordCommand,
     ) -> Result<CommandResponse> {
+        let mut user = self.user_repo.find_by_id(&UserId::new(user_id)?).await?;
+
         self.user_serv
-            .change_password(&UserId::new(user_id)?, &cmd.old_password, &cmd.new_password)
+            .change_password(&mut user, &cmd.old_password, &cmd.new_password)
             .await?;
+
+        self.user_repo.save(&mut user).await?;
+
+        self.event_pub.publish_all(user.base().events()?).await?;
 
         Ok(CommandResponse::default())
     }
@@ -42,7 +61,7 @@ mod tests {
     #[tokio::test]
     async fn success() {
         let c = mocks::container();
-        let uc = ChangePassword::new(c.user_serv());
+        let uc = ChangePassword::new(c.event_pub(), c.user_repo(), c.user_serv());
 
         let mut user = mocks::user1();
         let old_password = user.identity().password().unwrap().to_string();
@@ -66,7 +85,7 @@ mod tests {
     #[tokio::test]
     async fn invalid_password() {
         let c = mocks::container();
-        let uc = ChangePassword::new(c.user_serv());
+        let uc = ChangePassword::new(c.event_pub(), c.user_repo(), c.user_serv());
 
         let mut user = mocks::user1();
         c.user_repo().save(&mut user).await.unwrap();

@@ -92,7 +92,7 @@ impl<'a> Create<'a> {
                 pages.push(page);
             }
 
-            publication.set_pages(pages, &author_id)?;
+            publication.set_pages(pages)?;
         }
 
         self.publication_repo.save(&mut publication).await?;
@@ -124,7 +124,7 @@ mod tests {
             c.publication_repo(),
         );
 
-        let mut author = mocks::author1();
+        let mut author = mocks::user1().1;
         c.author_repo().save(&mut author).await.unwrap();
         let mut category = mocks::category1();
         c.category_repo().save(&mut category).await.unwrap();
@@ -180,7 +180,7 @@ mod tests {
             c.publication_repo(),
         );
 
-        let mut author = mocks::author1();
+        let mut author = mocks::user1().1;
         c.author_repo().save(&mut author).await.unwrap();
         let mut category = mocks::category1();
         c.category_repo().save(&mut category).await.unwrap();
@@ -226,7 +226,7 @@ mod tests {
             c.publication_repo(),
         );
 
-        let mut author = mocks::author1();
+        let mut author = mocks::user1().1;
         c.author_repo().save(&mut author).await.unwrap();
         let category = mocks::category1();
 

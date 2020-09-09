@@ -21,7 +21,7 @@ async fn search(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
-    Search::new(c.publishing.author_repo())
+    Search::new(c.publishing.author_repo(), c.publishing.user_repo())
         .exec(auth_id, cmd.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
@@ -43,7 +43,7 @@ async fn get_by_id(
         user_id
     };
 
-    GetById::new(c.publishing.author_repo())
+    GetById::new(c.publishing.author_repo(), c.publishing.user_repo())
         .exec(auth_id, user_id)
         .await
         .map(|res| HttpResponse::Ok().json(res))
@@ -69,8 +69,8 @@ async fn get_publications(
     SearchPublication::new(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
-        c.publishing.content_manager_repo(),
         c.publishing.publication_repo(),
+        c.publishing.user_repo(),
     )
     .exec(
         auth_id,
@@ -107,6 +107,7 @@ async fn get_collections(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
         c.publishing.collection_repo(),
+        c.publishing.user_repo(),
     )
     .exec(
         auth_id,

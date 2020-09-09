@@ -11,14 +11,12 @@ use identity::infrastructure::service::{BcryptHasher, JWTEncoder};
 use publishing::application::reader::InteractionHandler;
 use publishing::container::Container as PublishingContainer;
 use publishing::infrastructure::persistence::inmem::{
-    InMemCategoryRepository, InMemCollectionRepository, InMemInteractionRepository,
-    InMemPublicationRepository,
+    InMemAuthorRepository, InMemCategoryRepository, InMemCollectionRepository,
+    InMemInteractionRepository, InMemPublicationRepository, InMemReaderRepository,
+    InMemUserRepository as PInMemUserRepository,
 };
 
 use crate::development::EventLogger;
-use crate::infrastructure::publishing::{
-    AdminTranslator, AuthorTranslator, ContentManagerTranslator, ReaderTranslator,
-};
 
 pub struct Container {
     pub event_bus: Arc<InMemEventBus>,
@@ -34,43 +32,40 @@ impl Container {
         let event_repo = Arc::new(InMemEventRepository::new());
 
         // Identity
-        let role_repo = Arc::new(InMemRoleRepository::new());
-        let token_repo = Arc::new(InMemTokenRepository::new());
-        let user_repo = Arc::new(InMemUserRepository::new());
-        let password_hasher = Arc::new(BcryptHasher::new());
-        let token_enc = Arc::new(JWTEncoder::new());
+        let i_role_repo = Arc::new(InMemRoleRepository::new());
+        let i_token_repo = Arc::new(InMemTokenRepository::new());
+        let i_user_repo = Arc::new(InMemUserRepository::new());
+        let i_password_hasher = Arc::new(BcryptHasher::new());
+        let i_token_enc = Arc::new(JWTEncoder::new());
 
         // Publishing
-        let category_repo = Arc::new(InMemCategoryRepository::new());
-        let collection_repo = Arc::new(InMemCollectionRepository::new());
-        let interaction_repo = Arc::new(InMemInteractionRepository::new());
-        let publication_repo = Arc::new(InMemPublicationRepository::new());
-
-        let admin_repo = Arc::new(AdminTranslator::new(user_repo.clone()));
-        let author_repo = Arc::new(AuthorTranslator::new(user_repo.clone()));
-        let content_manager_repo = Arc::new(ContentManagerTranslator::new(user_repo.clone()));
-        let reader_repo = Arc::new(ReaderTranslator::new(user_repo.clone()));
+        let p_author_repo = Arc::new(InMemAuthorRepository::new());
+        let p_category_repo = Arc::new(InMemCategoryRepository::new());
+        let p_collection_repo = Arc::new(InMemCollectionRepository::new());
+        let p_interaction_repo = Arc::new(InMemInteractionRepository::new());
+        let p_publication_repo = Arc::new(InMemPublicationRepository::new());
+        let p_reader_repo = Arc::new(InMemReaderRepository::new());
+        let p_user_repo = Arc::new(PInMemUserRepository::new());
 
         // Containers
         let identity = IdentityContainer::new(
             event_bus.clone(),
-            role_repo,
-            token_repo,
-            user_repo,
-            password_hasher,
-            token_enc,
+            i_role_repo,
+            i_token_repo,
+            i_user_repo,
+            i_password_hasher,
+            i_token_enc,
         );
 
         let publishing = PublishingContainer::new(
             event_bus.clone(),
-            admin_repo,
-            author_repo,
-            category_repo,
-            collection_repo,
-            content_manager_repo,
-            interaction_repo,
-            publication_repo,
-            reader_repo,
+            p_author_repo,
+            p_category_repo,
+            p_collection_repo,
+            p_interaction_repo,
+            p_publication_repo,
+            p_reader_repo,
+            p_user_repo,
         );
 
         Container {

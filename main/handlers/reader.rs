@@ -21,7 +21,7 @@ async fn get_by_id(
         user_id
     };
 
-    GetById::new(c.publishing.reader_repo())
+    GetById::new(c.publishing.reader_repo(), c.publishing.user_repo())
         .exec(auth_id, user_id)
         .await
         .map(|res| HttpResponse::Ok().json(res))
@@ -43,11 +43,15 @@ async fn get_following(
         user_id
     };
 
-    GetFollowing::new(c.publishing.author_repo(), c.publishing.interaction_repo())
-        .exec(auth_id, user_id)
-        .await
-        .map(|res| HttpResponse::Ok().json(res))
-        .map_err(PublicError::from)
+    GetFollowing::new(
+        c.publishing.author_repo(),
+        c.publishing.interaction_repo(),
+        c.publishing.user_repo(),
+    )
+    .exec(auth_id, user_id)
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
 }
 
 pub fn routes(cfg: &mut web::ServiceConfig) {

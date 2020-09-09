@@ -44,7 +44,7 @@ async fn get_users(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
-    SearchUser::new(c.identity.user_repo())
+    SearchUser::new(c.identity.role_repo(), c.identity.user_repo())
         .exec(
             auth_id,
             SearchUserCommand {

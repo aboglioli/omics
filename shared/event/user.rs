@@ -21,6 +21,10 @@ pub enum UserEvent {
         id: String,
         name: String,
         lastname: String,
+        birthdate: Option<String>,
+        gender: Option<String>,
+        biography: Option<String>,
+        profile_image: Option<String>,
     },
     Validated {
         id: String,
@@ -29,6 +33,10 @@ pub enum UserEvent {
         id: String,
         temp_password: String,
         email: String,
+    },
+    RoleChanged {
+        id: String,
+        role_id: String,
     },
     Deleted {
         id: String,
@@ -43,6 +51,7 @@ impl ToString for UserEvent {
             UserEvent::Updated { .. } => "updated".to_owned(),
             UserEvent::Validated { .. } => "validated".to_owned(),
             UserEvent::PasswordRecoveryRequested { .. } => "password-recovery-requested".to_owned(),
+            UserEvent::RoleChanged { .. } => "role-changed".to_owned(),
             UserEvent::Deleted { .. } => "deleted".to_owned(),
         }
     }
