@@ -74,8 +74,15 @@ async fn get_by_id(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
+    let mut user_id = path.into_inner();
+    user_id = if user_id == "me" {
+        auth_id.clone()
+    } else {
+        user_id
+    };
+
     GetById::new(c.identity.user_repo())
-        .exec(auth_id, path.into_inner(), include.into_inner().into())
+        .exec(auth_id, user_id, include.into_inner().into())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -90,8 +97,15 @@ async fn update(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
+    let mut user_id = path.into_inner();
+    user_id = if user_id == "me" {
+        auth_id.clone()
+    } else {
+        user_id
+    };
+
     Update::new(c.identity.event_pub(), c.identity.user_repo())
-        .exec(auth_id, path.into_inner(), cmd.into_inner())
+        .exec(auth_id, user_id, cmd.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -105,8 +119,15 @@ async fn delete(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
+    let mut user_id = path.into_inner();
+    user_id = if user_id == "me" {
+        auth_id.clone()
+    } else {
+        user_id
+    };
+
     Delete::new(c.identity.event_pub(), c.identity.user_repo())
-        .exec(auth_id, path.into_inner())
+        .exec(auth_id, user_id)
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -114,13 +135,22 @@ async fn delete(
 
 // PUT /users/:id/password
 async fn change_password(
-    _req: HttpRequest,
+    req: HttpRequest,
     path: web::Path<String>,
     cmd: web::Json<ChangePasswordCommand>,
     c: web::Data<Container>,
 ) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    let mut user_id = path.into_inner();
+    user_id = if user_id == "me" {
+        auth_id.clone()
+    } else {
+        user_id
+    };
+
     ChangePassword::new(c.identity.user_serv())
-        .exec(path.into_inner(), cmd.into_inner())
+        .exec(user_id, cmd.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -129,6 +159,7 @@ async fn change_password(
 // GET /users/:id/validate/:code
 async fn validate(path: web::Path<(String, String)>, c: web::Data<Container>) -> impl Responder {
     let path = path.into_inner();
+
     Validate::new(c.identity.event_pub(), c.identity.user_repo())
         .exec(path.0, path.1)
         .await
@@ -145,8 +176,15 @@ async fn change_role(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
+    let mut user_id = path.into_inner();
+    user_id = if user_id == "me" {
+        auth_id.clone()
+    } else {
+        user_id
+    };
+
     ChangeRole::new(c.identity.role_repo(), c.identity.user_repo())
-        .exec(auth_id, path.into_inner(), cmd.into_inner())
+        .exec(auth_id, user_id, cmd.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)

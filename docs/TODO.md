@@ -1,6 +1,6 @@
 # All
 
-- [ ] Add 'me' as ID for user endpoints.
+- [x] Add 'me' as ID for user endpoints.
 - [x] Check auth permissions for existing use cases.
 - [x] AuthorizationService should return user id only. Not load it.
 - [ ] Create Author from UserService when a new publication is created.
@@ -23,6 +23,10 @@
 - [ ] Make User birthday as value object. Check date ranges.
 - [ ] API for add new categories.
 - [ ] Use username as user id too.
+- [ ] Add 'biography' to Author.
+- [ ] Add favorite interactions for publications and collections.
+- [ ] Refactor interactions and events.
+- [ ] Search by tags for publications and collections.
 
 # Progress
 

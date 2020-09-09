@@ -36,8 +36,15 @@ async fn get_by_id(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
+    let mut user_id = path.into_inner();
+    user_id = if user_id == "me" && auth_id.is_some() {
+        auth_id.clone().unwrap()
+    } else {
+        user_id
+    };
+
     GetById::new(c.publishing.author_repo())
-        .exec(auth_id, path.into_inner())
+        .exec(auth_id, user_id)
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -52,6 +59,13 @@ async fn get_publications(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
+    let mut user_id = path.into_inner();
+    user_id = if user_id == "me" && auth_id.is_some() {
+        auth_id.clone().unwrap()
+    } else {
+        user_id
+    };
+
     SearchPublication::new(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
@@ -61,7 +75,7 @@ async fn get_publications(
     .exec(
         auth_id,
         SearchPublicationCommand {
-            author_id: Some(path.into_inner()),
+            author_id: Some(user_id),
             category_id: None,
             status: None,
             name: None,
@@ -82,6 +96,13 @@ async fn get_collections(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
+    let mut user_id = path.into_inner();
+    user_id = if user_id == "me" && auth_id.is_some() {
+        auth_id.clone().unwrap()
+    } else {
+        user_id
+    };
+
     SearchCollection::new(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
@@ -90,7 +111,7 @@ async fn get_collections(
     .exec(
         auth_id,
         SearchCollectionCommand {
-            author_id: Some(path.into_inner()),
+            author_id: Some(user_id),
             category_id: None,
             publication_id: None,
             name: None,

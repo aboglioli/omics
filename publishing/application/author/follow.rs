@@ -30,7 +30,6 @@ impl<'a> Follow<'a> {
         }
     }
 
-    // TODO: event
     pub async fn exec(&self, auth_id: String, author_id: String) -> Result<CommandResponse> {
         let reader = self
             .reader_repo

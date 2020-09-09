@@ -14,13 +14,21 @@ async fn get_by_id(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
+    let mut user_id = path.into_inner();
+    user_id = if user_id == "me" {
+        auth_id.clone()
+    } else {
+        user_id
+    };
+
     GetById::new(c.publishing.reader_repo())
-        .exec(auth_id, path.into_inner())
+        .exec(auth_id, user_id)
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
 }
 
+// GET /reader/:id/following
 async fn get_following(
     req: HttpRequest,
     path: web::Path<String>,
@@ -28,8 +36,15 @@ async fn get_following(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
+    let mut user_id = path.into_inner();
+    user_id = if user_id == "me" {
+        auth_id.clone()
+    } else {
+        user_id
+    };
+
     GetFollowing::new(c.publishing.author_repo(), c.publishing.interaction_repo())
-        .exec(auth_id, path.into_inner())
+        .exec(auth_id, user_id)
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)

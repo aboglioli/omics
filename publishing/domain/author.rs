@@ -1,6 +1,7 @@
 mod repository;
 pub use repository::*;
 
+use common::error::Error;
 use common::model::{AggregateRoot, StringId};
 use common::result::Result;
 use shared::event::AuthorEvent;
@@ -44,6 +45,10 @@ impl Author {
     }
 
     pub fn follow(&mut self, reader: &Reader) -> Result<()> {
+        if self.base().id() == reader.base().id() {
+            return Err(Error::new("author", "cannot_follow_itself"));
+        }
+
         self.base.record_event(AuthorEvent::Followed {
             author_id: self.base().id().to_string(),
             reader_id: reader.base().id().to_string(),
