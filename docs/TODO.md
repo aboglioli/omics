@@ -32,6 +32,7 @@
 - [ ] Call base.update() and base.delete() in each AggregateRoot.
 - [ ] Consider deleted_at in repositories to not return deleted entities.
 - [ ] Add next_id() implementation in trait of repositories.
+- [ ] Add 'username' as ID of user.
 
 # Progress
 

@@ -44,6 +44,8 @@ impl<'a> Unfollow<'a> {
             .delete_follow(&reader, &mut author)
             .await?;
 
+        self.author_repo.save(&mut author).await?;
+
         self.event_pub.publish_all(author.base().events()?).await?;
 
         Ok(CommandResponse::default())

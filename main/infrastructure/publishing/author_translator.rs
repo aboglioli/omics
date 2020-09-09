@@ -11,6 +11,7 @@ pub struct AuthorTranslator {
     user_repo: Arc<dyn UserRepository>,
 }
 
+// TODO: rethink data synchronization and add extra-data
 impl AuthorTranslator {
     pub fn new(user_repo: Arc<dyn UserRepository>) -> Self {
         AuthorTranslator { user_repo }

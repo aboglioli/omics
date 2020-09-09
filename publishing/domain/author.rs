@@ -70,6 +70,10 @@ impl Author {
             return Err(Error::new("author", "cannot_unfollow_itself"));
         }
 
+        if self.followers == 0 {
+            return Err(Error::new("author", "does_not_have_followers"));
+        }
+
         self.followers -= 1;
 
         self.base.record_event(AuthorEvent::Unfollowed {
