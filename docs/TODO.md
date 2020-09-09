@@ -8,19 +8,19 @@
 - [x] Add API to get events if user is admin.
 - [ ] Make /events accessible only in development env.
 - [ ] If request is a GET and an error occurs, a 404 error should be returned.
-- [ ] Split publicaton view and publication read.
-- [ ] Add Reader preferences.
-- [ ] Add Reader interaction for a viewed publication. DTO.
-- [ ] Allow client to specify the 'fields' to get from a request
-- [ ] Add DateTime and Date support and examples.
-- [ ] Use Include in use cases returning nested data.
+- [x] Split publicaton view and publication read.
+- [x] Add Reader preferences.
+- [x] Add Reader interaction for a viewed publication. DTO.
+- [x] Allow client to specify the 'fields' to get from a request
+- [x] Add DateTime and Date support and examples.
+- [x] Use Include in use cases returning nested data.
 - [ ] User should not include Role. It must include RoleId.
-- [ ] Add Search use case when necessary.
-- [ ] ChangePassword should not validate logged in user to allow change a
+- [x] Add Search use case when necessary.
+- [x] ChangePassword should not validate logged in user to allow change a
   temporal password (RecoverPassword).
-- [ ] Add methods to get events from date in EventRepository.
-- [ ] Add Option<String> for auth_id in use cases where user does not need to be logged in.
-- [ ] Make User birthday as value object. Check date ranges.
+- [x] Add methods to get events from date in EventRepository.
+- [x] Add Option<String> for auth_id in use cases where user does not need to be logged in.
+- [x] Make User birthday as value object. Check date ranges.
 - [ ] API for add new categories.
 - [ ] Use username as user id too.
 - [ ] Add 'biography' to Author.

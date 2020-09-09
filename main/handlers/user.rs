@@ -140,11 +140,11 @@ async fn change_password(
     cmd: web::Json<ChangePasswordCommand>,
     c: web::Data<Container>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let auth_id = auth(&req, &c).await.ok();
 
     let mut user_id = path.into_inner();
-    user_id = if user_id == "me" {
-        auth_id.clone()
+    user_id = if user_id == "me" && auth_id.is_some() {
+        auth_id.clone().unwrap()
     } else {
         user_id
     };
