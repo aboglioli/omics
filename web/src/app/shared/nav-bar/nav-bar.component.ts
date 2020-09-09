@@ -117,7 +117,6 @@ export class NavBarComponent implements OnInit {
 
         this.isAccessUserLogIn = data;
 
-
         if ( this.isAccessUserLogIn ){
           const userId = this.authService.getIdUser();
           this.setAvatarImageFromUser( userId );

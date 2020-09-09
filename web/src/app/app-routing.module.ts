@@ -31,7 +31,7 @@ const routes: Routes = [
   { path: 'authors', component:  AutoresComponent},
   { path: 'deskboard', component:  DeskboardGeneralComponent, canActivate: [AuthLoginGuard]},
   { path: 'deskboard/publication/new', component:  NewPublicationComponent},
-  { path: 'profile/:id', component: PerfilComponent },
+  { path: 'profile/:id', component: PerfilComponent,  canActivate: [AuthLoginGuard] },
   { path: 'profile/:id/editUser', component: PerfilComponent, canActivate: [AuthLoginGuard]},
   { path: 'about', component: AboutComponent },
   { path: 'read/:id', component: VisorComicComponent },

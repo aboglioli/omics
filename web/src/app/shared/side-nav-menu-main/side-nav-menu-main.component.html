@@ -29,7 +29,7 @@
   <div class="body">
 
     <!-- Admin Options -->
-    <div  *ngIf="isAccessUserLogIn && userData"
+    <div  *ngIf="isAccessUserLogIn && userData && (userData.role_id === 'admin' || userData.role_id === 'content-manager') "
           class="menu-admin dir-column">
 
       <button *ngIf="userData.role_id === 'admin'"

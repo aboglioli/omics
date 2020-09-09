@@ -1,0 +1,232 @@
+@import "src/scss/vars";
+
+$avatar-size-big: 196px;
+$avatar-size-small: 128px;
+
+div.perfil-body {
+  display: flex;
+  flex-direction: row;
+
+  @media screen and (min-width: $break-small) {
+    min-height: calc(100vh - 4.6em);
+  }
+
+  @media screen and (max-width: $break-small) {
+    min-height: 100vh;
+  }
+
+
+  div.side {
+
+    // Mobile size
+    @media screen and (min-width: $break-small) {
+      flex: 1;
+      background-image: url('/assets/images/banners/rightBanner.jpg');
+      opacity: 0.25;
+    }
+
+  }
+
+  div.center {
+
+    flex: 4;
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 0px;
+
+    color: white;
+    background-color: $omics-background-menu;
+
+    // Mobile size
+    @media screen and (min-width: $break-small) {
+      box-shadow: 0px 22px 15px 8px $omics-neon-pink;
+    }
+
+    div.header {
+
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+
+      position: relative;
+
+      // Pantalla grande
+      @media screen and (min-width: $break-small) {
+        min-height: 225px;
+      }
+      // Pantalla chica
+      @media screen and (max-width: $break-small) {
+        min-height: 150px
+      }
+
+      background-color: $omics-background-flat;
+
+      div.header-items{
+
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+
+        div.side-box {
+
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+
+          flex: 0.5;
+
+        }
+
+        button {
+
+          margin: 0em 1em;
+
+        }
+
+        .profile-name {
+
+          flex: 2;
+          margin-top: 1em;
+          margin-bottom: 0px;
+
+          text-align: center;
+
+          // Pantalla grande
+          @media screen and (min-width: $break-small) {
+            font-size: 30pt;
+          }
+
+          // Pantalla chica
+          @media screen and (max-width: $break-small) {
+            font-size: 24pt;
+          }
+
+
+
+        }
+
+
+      }
+
+      img {
+        position: absolute;
+
+        // Pantalla grande
+        @media screen and (min-width: $break-small) {
+          bottom: - ( $avatar-size-big / 2.5);
+        }
+
+        // Pantalla chica
+        @media screen and (max-width: $break-small) {
+          bottom: - ( $avatar-size-small / 2.5);
+        }
+
+      }
+
+      div.followers {
+
+        width: 100%;
+
+        display: flex;
+        justify-content: center;
+        align-self: flex-end;
+        flex-direction: row;
+
+        margin-bottom: 1em;
+
+        p {
+          display: flex;
+          align-items: center;
+
+          font-weight: bold;
+          margin-bottom: 0px;
+          margin-left: 1em;
+
+          font-size: 18pt;
+          text-align: center;
+        }
+
+      }
+
+    }
+
+    div.body {
+
+      div.body-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+
+        margin-top: 3em;
+
+        h2 {
+          margin-left: 2em;
+          margin-bottom: 0em;
+        }
+
+        div.text-date {
+
+          display: flex;
+          align-items: center;
+
+          margin-right: 2em;
+          font-weight: bold;
+
+        }
+
+      }
+
+      div.profile-description {
+
+        margin: 1em 2em;
+        font-size: 12pt;
+
+      }
+
+    }
+
+  }
+
+}
+
+// Generales
+img.avatar {
+
+  // Pantalla grande
+  @media screen and (min-width: $break-small) {
+
+    width: $avatar-size-big;
+    height: $avatar-size-big;
+    border-radius: ($avatar-size-big * 0.5);
+
+  }
+
+  // Pantalla chica
+  @media screen and (max-width: $break-small) {
+
+    width: $avatar-size-small;
+    height: $avatar-size-small;
+    border-radius: ($avatar-size-small * 0.5);
+
+  }
+
+
+  border-style: solid;
+  border-width: 2px;
+
+}
+
+button.button-white-borders {
+
+  color: white;
+  border-color: white;
+
+  &:hover {
+    border-style: solid;
+    border-width: 2px;
+  }
+
+}
