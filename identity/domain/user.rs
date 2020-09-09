@@ -116,11 +116,13 @@ impl User {
 
     pub fn set_password(&mut self, password: Password) -> Result<()> {
         self.identity.set_password(password)?;
+        self.base.update();
         Ok(())
     }
 
     pub fn set_person(&mut self, person: Person) -> Result<()> {
         self.person = Some(person);
+        self.base.update();
 
         self.base.record_event(UserEvent::Updated {
             id: self.base().id().to_string(),
@@ -137,6 +139,7 @@ impl User {
         }
 
         self.role = role;
+        self.base.update();
 
         Ok(())
     }
@@ -160,6 +163,8 @@ impl User {
         if !self.is_validated() {
             return Err(Error::new("user", "invalid_code"));
         }
+
+        self.base.update();
 
         self.base.record_event(UserEvent::Validated {
             id: self.base().id().to_string(),

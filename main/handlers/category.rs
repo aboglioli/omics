@@ -151,8 +151,8 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
                 web::get().to(get_publications),
             )
             .route("/{category_id}/collections", web::get().to(get_collections))
-            .route("/{category_id}", web::post().to(create))
+            .route("", web::post().to(create))
             .route("/{category_id}", web::put().to(update))
-            .route("/{category_id}", web::put().to(delete)),
+            .route("/{category_id}", web::delete().to(delete)),
     );
 }

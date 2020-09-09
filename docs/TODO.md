@@ -30,6 +30,8 @@
 - [ ] Add datetimes in DTOs.
 - [ ] Add Author followers.
 - [ ] Call base.update() and base.delete() in each AggregateRoot.
+- [ ] Consider deleted_at in repositories to not return deleted entities.
+- [ ] Add next_id() implementation in trait of repositories.
 
 # Progress
 

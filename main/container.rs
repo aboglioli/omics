@@ -11,13 +11,13 @@ use identity::infrastructure::service::{BcryptHasher, JWTEncoder};
 use publishing::application::reader::InteractionHandler;
 use publishing::container::Container as PublishingContainer;
 use publishing::infrastructure::persistence::inmem::{
-    InMemAdminRepository, InMemCategoryRepository, InMemCollectionRepository,
-    InMemInteractionRepository, InMemPublicationRepository,
+    InMemCategoryRepository, InMemCollectionRepository, InMemInteractionRepository,
+    InMemPublicationRepository,
 };
 
 use crate::development::EventLogger;
 use crate::infrastructure::publishing::{
-    AuthorTranslator, ContentManagerTranslator, ReaderTranslator,
+    AdminTranslator, AuthorTranslator, ContentManagerTranslator, ReaderTranslator,
 };
 
 pub struct Container {
@@ -41,13 +41,12 @@ impl Container {
         let token_enc = Arc::new(JWTEncoder::new());
 
         // Publishing
-        let admin_repo = Arc::new(InMemAdminRepository::new());
-
         let category_repo = Arc::new(InMemCategoryRepository::new());
         let collection_repo = Arc::new(InMemCollectionRepository::new());
         let interaction_repo = Arc::new(InMemInteractionRepository::new());
         let publication_repo = Arc::new(InMemPublicationRepository::new());
 
+        let admin_repo = Arc::new(AdminTranslator::new(user_repo.clone()));
         let author_repo = Arc::new(AuthorTranslator::new(user_repo.clone()));
         let content_manager_repo = Arc::new(ContentManagerTranslator::new(user_repo.clone()));
         let reader_repo = Arc::new(ReaderTranslator::new(user_repo.clone()));
