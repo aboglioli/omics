@@ -43,7 +43,11 @@ pub async fn populate(c: &Container) -> Result<()> {
         None,
     );
     c.identity.user_repo().save(&mut admin).await?;
-    let mut admin = c.publishing.user_serv().get_by_id(admin.base().id()).await?;
+    let mut admin = c
+        .publishing
+        .user_serv()
+        .get_by_id(admin.base().id())
+        .await?;
     c.publishing.user_repo().save(&mut admin).await?;
     c.publishing
         .author_repo()
@@ -73,7 +77,11 @@ pub async fn populate(c: &Container) -> Result<()> {
         None,
     );
     c.identity.user_repo().save(&mut content_manager).await?;
-    let mut content_manager = c.publishing.user_serv().get_by_id(content_manager.base().id()).await?;
+    let mut content_manager = c
+        .publishing
+        .user_serv()
+        .get_by_id(content_manager.base().id())
+        .await?;
     c.publishing.user_repo().save(&mut content_manager).await?;
     c.publishing
         .author_repo()
