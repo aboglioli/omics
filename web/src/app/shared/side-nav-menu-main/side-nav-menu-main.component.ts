@@ -2,16 +2,18 @@ import { Component, OnInit, EventEmitter, Output, OnDestroy } from '@angular/cor
 import { faChevronCircleLeft } from '@fortawesome/free-solid-svg-icons';
 import { Router, NavigationStart, Event as NavigationEvent  } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { AuthService } from 'src/app/domain/services/auth.service';
+import { AuthService } from '../../domain/services/auth.service';
+import { IUser } from 'src/app/domain/models';
+import { IdentityService } from 'src/app/domain/services/identity.service';
 
 @Component({
-  selector: 'app-side-nav-menu',
-  templateUrl: './side-nav-menu.component.html',
-  styleUrls: ['./side-nav-menu.component.scss']
+  selector: 'app-side-nav-menu-main',
+  templateUrl: './side-nav-menu-main.component.html',
+  styleUrls: ['./side-nav-menu-main.component.scss']
 })
-export class SideNavMenuComponent implements OnInit, OnDestroy {
+export class SideNavMenuMainComponent implements OnInit, OnDestroy {
 
-  @Output() clickSideNavToggle = new EventEmitter();
+  @Output() clickSideNavMainToggle = new EventEmitter();
   @Output() clickRegisterLoginDialog = new EventEmitter();
 
   // Font Awseome icons
@@ -24,9 +26,12 @@ export class SideNavMenuComponent implements OnInit, OnDestroy {
   activePathSelected: string;
   isAccessUserLogIn: boolean;  // Para habilitar algunas acciones según si esta el usuario logueado
 
+  public userData: IUser;
+  private userId: string;
 
   constructor(  private router: Router,
-                private authService: AuthService ) {
+                private authService: AuthService,
+                private identifyService: IdentityService ) {
 
     this.subscribeAuthService();
 
@@ -45,6 +50,13 @@ export class SideNavMenuComponent implements OnInit, OnDestroy {
 
     this.isAccessUserLogIn = this.authService.isLoggedIn();
 
+    if ( this.isAccessUserLogIn  ) {
+
+      this.userId = this.authService.getIdUser();
+      this.getUserDataFromService(this.userId);
+
+    }
+
   }
 
   ngOnDestroy(): void {
@@ -55,7 +67,7 @@ export class SideNavMenuComponent implements OnInit, OnDestroy {
 
   public closeSideNavMenu(): void {
 
-    this.clickSideNavToggle.emit();
+    this.clickSideNavMainToggle.emit();
 
   }
 
@@ -75,6 +87,16 @@ export class SideNavMenuComponent implements OnInit, OnDestroy {
 
   }
 
+  private getUserDataFromService( id: string ): void {
+
+    this.identifyService.getById(id).subscribe( (data: IUser) => {
+
+      this.userData = data;
+
+    } );
+
+  }
+
   // Auth User
   private subscribeAuthService(): void {
 
@@ -90,6 +112,8 @@ export class SideNavMenuComponent implements OnInit, OnDestroy {
       } else {
 
         this.isAccessUserLogIn = data;
+        this.userId = this.authService.getIdUser();
+        this.getUserDataFromService(this.userId);
 
       }
 

@@ -14,16 +14,26 @@
       ¡Comienza a ser parte de Omics!
     </button>
 
+    <!-- Rol de usuario -->
+    <span *ngIf="isAccessUserLogIn && userData">
+
+      <h2 *ngIf="userData.role_id !== 'user' ">
+        [ {{ userData.role_id | uppercase }} ]
+      </h2>
+
+    </span>
+
   </div>
 
   <!-- Lista menu opciones -->
   <div class="body">
 
     <!-- Admin Options -->
-    <div  *ngIf="isAccessUserLogIn"
+    <div  *ngIf="isAccessUserLogIn && userData && (userData.role_id === 'admin' || userData.role_id === 'content-manager') "
           class="menu-admin dir-column">
 
-      <button mat-stroked-button class="button-white-borders admin-button"
+      <button *ngIf="userData.role_id === 'admin'"
+              mat-stroked-button class="button-white-borders admin-button"
               [ngClass]="{'active': ( activePathSelected === 'dashboard-reportes' ) }"
               (click)="goToPage('dashboard-reportes')">
               Reportes
@@ -35,13 +45,15 @@
               Gestionar Publicaciones y Contratos
       </button>
 
-      <button mat-stroked-button class="button-white-borders admin-button"
+      <button *ngIf="userData.role_id === 'admin'"
+              mat-stroked-button class="button-white-borders admin-button"
               [ngClass]="{'active': ( activePathSelected === 'dashboard-reglas-negocio' ) }"
               (click)="goToPage('dashboard-reglas-negocio')">
               Gestionar Reglas de Negocio
       </button>
 
-      <button mat-stroked-button class="button-white-borders admin-button"
+      <button *ngIf="userData.role_id === 'admin'"
+              mat-stroked-button class="button-white-borders admin-button"
               [ngClass]="{'active': ( activePathSelected === 'dashboard-general' ) }"
               (click)="goToPage('dashboard-general')">
               Gestionar Categorías, Estados y Etiquetas

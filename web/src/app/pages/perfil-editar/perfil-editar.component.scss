@@ -3,7 +3,7 @@
 $avatar-size-big: 196px;
 $avatar-size-small: 128px;
 
-div.perfil-body {
+div.perfil-editar-body {
   display: flex;
   flex-direction: row;
 
@@ -70,22 +70,6 @@ div.perfil-body {
         justify-content: space-between;
         width: 100%;
 
-        div.side-box {
-
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-
-          flex: 0.5;
-
-        }
-
-        button {
-
-          margin: 0em 1em;
-
-        }
-
         .profile-name {
 
           flex: 2;
@@ -126,65 +110,9 @@ div.perfil-body {
 
       }
 
-      div.followers {
-
-        width: 100%;
-
-        display: flex;
-        justify-content: center;
-        align-self: flex-end;
-        flex-direction: row;
-
-        margin-bottom: 1em;
-
-        p {
-          display: flex;
-          align-items: center;
-
-          font-weight: bold;
-          margin-bottom: 0px;
-          margin-left: 1em;
-
-          font-size: 18pt;
-          text-align: center;
-        }
-
-      }
-
     }
 
     div.body {
-
-      div.body-header {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-
-        margin-top: 3em;
-
-        h2 {
-          margin-left: 2em;
-          margin-bottom: 0em;
-        }
-
-        div.text-date {
-
-          display: flex;
-          align-items: center;
-
-          margin-right: 2em;
-          font-weight: bold;
-
-        }
-
-      }
-
-      div.profile-description {
-
-        margin: 1em 2em;
-        font-size: 12pt;
-
-      }
 
     }
 

@@ -11,6 +11,7 @@ import { PasswordForgotComponent } from '../password-recovery/password-forgot/pa
 import { NgxSpinnerService } from 'ngx-spinner';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import Swal from 'sweetalert2';
+import { IUser } from '../../domain/models/user';
 
 @Component({
   selector: 'app-login-register',
@@ -36,6 +37,7 @@ export class LoginRegisterComponent implements OnInit {
 
   // Otros atributos
   isLoginOptionShow = true;
+  userData: IUser;
 
   passwordListType = {
 
@@ -148,12 +150,11 @@ export class LoginRegisterComponent implements OnInit {
 
         (res: ILoginResponse) => {
 
-          console.log('TEST > Registro realizado con éxito', res);
-
           this.authService.setToken( res.auth_token, res.user_id );
           this.router.navigate(['/home']);
 
-          this.closeMatDialog();
+          this.setUserData( this.authService.getIdUser() );
+
           this.spinnerService.hide();
 
         },
@@ -167,6 +168,29 @@ export class LoginRegisterComponent implements OnInit {
       );
 
     }
+
+  }
+
+  private setUserData( uderId: string ): void {
+
+    this.identityService.getById( uderId ).subscribe( res => {
+
+      this.userData = res
+
+      Swal.fire({
+          icon: 'success',
+          title: '¡BIENVENIDO!',
+          text: `Bienvenido ${ this.userData.username } a Omics.`,
+          focusConfirm: true,
+      }).then( result => {
+
+        this.closeMatDialog();
+
+      } );
+
+
+
+    } );
 
   }
 

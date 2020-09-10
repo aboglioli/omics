@@ -13,17 +13,29 @@
 <!-- Main Container -->
 <mat-drawer-container autosize hasBackdrop="true">
 
-  <!-- Sidenav menu -->
-  <mat-drawer #sidenav_main  mode="over">
+  <!-- Sidenav menu main (left)-->
+  <mat-drawer #sidenav_main  mode="over" position="start">
 
-    <app-side-nav-menu  (clickSideNavToggle)="sidenav_main.toggle()"
-                        (clickRegisterLoginDialog)="header_menu.openLoginRegisterDialog()">
-    </app-side-nav-menu>
+    <app-side-nav-menu-main (clickSideNavMainToggle)="sidenav_main.toggle()"
+                            (clickRegisterLoginDialog)="header_menu.openLoginRegisterDialog()">
+    </app-side-nav-menu-main>
+
+  </mat-drawer>
+
+  <!-- Sidenav menu user (right)-->
+  <mat-drawer #sidenav_user  mode="over" position="end">
+
+    <app-side-nav-menu-user *ngIf="isAccessUserLogIn"
+                            (clickSideNavUserToggle)="sidenav_user.toggle()"
+                            (clickLogout)="header_menu.logout()">
+    </app-side-nav-menu-user>
 
   </mat-drawer>
 
   <app-nav-bar  #header_menu
-                (clickSideNavToggle)="sidenav_main.toggle()">
+                (clickSideNavMainToggle)="sidenav_main.toggle()"
+                (clickSideNavUserToggle)="sidenav_user.toggle()"
+                >
   </app-nav-bar>
 
   <!-- Body page -->

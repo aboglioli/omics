@@ -1,0 +1,40 @@
+<div class="menu-box">
+
+  <div class="header">
+
+    <h2 *ngIf="userData">¡Hola {{ userData.username }}!</h2>
+
+    <!-- Volver -->
+    <button mat-icon-button (click)="closeSideNavMenu()">
+      <fa-icon [icon]="faBack" size="2x"></fa-icon>
+    </button>
+
+
+  </div>
+
+  <!-- Lista menu opciones -->
+  <div class="body">
+
+    <!-- Ver perfil -->
+    <button mat-stroked-button class="button-white-borders user-button"
+            [ngClass]="{'active': ( activePathSelected === 'userProfile' ) }"
+            (click)="goToUserPage(false)">
+      Perfil
+    </button>
+
+    <!-- Editar cuenta -->
+    <button mat-stroked-button class="button-white-borders user-button"
+            [ngClass]="{'active': ( activePathSelected === 'profileEdit' ) }"
+            (click)="goToUserPage(true)">
+      Editar Cuenta
+    </button>
+
+    <!-- Logout -->
+    <button mat-stroked-button class="button-white-borders user-button"
+            (click)="logout()">
+      Logout
+    </button>
+
+  </div>
+
+</div>

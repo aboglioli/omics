@@ -1,7 +1,39 @@
+@import "src/scss/vars";
+
 mat-toolbar {
 
   display: flex;
   justify-content: space-between;
+
+  div.left {
+
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+
+  }
+
+  div.center {
+
+    flex: 2;
+    display: flex;
+    justify-content: center;
+
+  }
+
+  div.rigth {
+
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+
+    button {
+
+      margin: 0em 1em;
+
+    }
+
+  }
 
   span.spacer {
 
@@ -11,11 +43,38 @@ mat-toolbar {
 
   div.image-box {
 
-    width: 160px;
-
     img {
-      width: 100%;
+      width: auto;
       height: 100%;
+
+      @media screen and (min-width: $break-small) {
+        max-height: 60px;
+      }
+
+      @media screen and (max-width: $break-small) {
+        max-height: 40px;
+      }
+
+
+    }
+
+  }
+
+  img.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 24px;
+
+    border-style: solid;
+    border-width: 2px;
+
+    &:not(:hover) {
+      border-color: white;
+
+    }
+
+    &:hover {
+      border-color: $omics-neon-pink;
     }
 
   }

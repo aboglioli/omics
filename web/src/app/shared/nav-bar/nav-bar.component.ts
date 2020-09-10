@@ -1,9 +1,12 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faBell } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { LoginRegisterComponent } from '../../components/login-register/login-register.component';
 import { AuthService } from 'src/app/domain/services/auth.service';
+import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
+import { IdentityService } from 'src/app/domain/services/identity.service';
+import { IUser } from 'src/app/domain/models';
 
 @Component({
   selector: 'app-nav-bar',
@@ -12,17 +15,23 @@ import { AuthService } from 'src/app/domain/services/auth.service';
 })
 export class NavBarComponent implements OnInit {
 
-  @Output() clickSideNavToggle = new EventEmitter();
+  @Output() clickSideNavMainToggle = new EventEmitter();
+  @Output() clickSideNavUserToggle = new EventEmitter();
 
   // Font Awseome icons
   public faBars = faBars;
+  public faBell = faBell;
 
   // Propios
-  isAccessUserLogIn: boolean;  // Para habilitar algunas acciones según si esta el usuario logueado
+  public isAccessUserLogIn: boolean;  // Para habilitar algunas acciones según si esta el usuario logueado
+  public userData: IUser;
+  public userAvatar: string;
 
   constructor(  private router: Router,
                 private authService: AuthService,
-                private dialog: MatDialog ) {
+                private dialog: MatDialog,
+                private sweetAlertGenericService: SweetAlertGenericMessageService,
+                private identifyService: IdentityService ) {
 
 
     this.subscribeAuthService();
@@ -33,11 +42,16 @@ export class NavBarComponent implements OnInit {
 
     this.isAccessUserLogIn = this.authService.isLoggedIn();
 
+    if (  this.isAccessUserLogIn ) {
+      const userId = this.authService.getIdUser();
+      this.setAvatarImageFromUser( userId );
+    }
+
   }
 
-  public toggleSideNavMenu(): void {
+  public toggleSideNavMainMenu(): void {
 
-    this.clickSideNavToggle.emit();
+    this.clickSideNavMainToggle.emit();
 
   }
 
@@ -53,7 +67,41 @@ export class NavBarComponent implements OnInit {
 
   }
 
-  // Auth User
+
+  //#region User Actions
+  public showNotifications(): void {
+
+    // TODO: Agregar sistema de notificaciones como otro componente interno
+    this.sweetAlertGenericService.showUnderConstrucction();
+
+  }
+
+
+  public toggleSideNavUserMenu(): void {
+
+    this.clickSideNavUserToggle.emit();
+
+  }
+
+  //#endregion
+
+  private setAvatarImageFromUser( idUser: string): void {
+
+    this.identifyService.getById(idUser).subscribe( (data: IUser) => {
+
+      this.userData = data;
+
+      if ( this.userData.profile_image ) {
+        this.userAvatar = this.userData.profile_image;
+      } else {
+        this.userAvatar = undefined;
+      }
+
+    } );
+
+  }
+
+  //#region  Auth User
   private subscribeAuthService(): void {
 
     // Para comprobar en tiempo real si tiene o no acceso el usuario
@@ -69,6 +117,12 @@ export class NavBarComponent implements OnInit {
 
         this.isAccessUserLogIn = data;
 
+        if ( this.isAccessUserLogIn ){
+          const userId = this.authService.getIdUser();
+          this.setAvatarImageFromUser( userId );
+        }
+
+
       }
 
     } );
@@ -82,6 +136,8 @@ export class NavBarComponent implements OnInit {
     this.router.navigate(['/home']);
 
   }
+
+  //#endregion
 
 
 }

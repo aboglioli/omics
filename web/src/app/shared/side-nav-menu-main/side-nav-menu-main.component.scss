@@ -4,6 +4,7 @@ div.menu-box {
 
   display: flex;
   flex-direction: column;
+  min-width: 300px;
   height: 100%;
 
   @media screen and (max-width: $break-small) {
@@ -15,6 +16,7 @@ div.menu-box {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
     flex: 1;
 
     min-height: 40px;
@@ -25,6 +27,13 @@ div.menu-box {
 
       color: white;
       height: 75%;
+      margin: 0em 0.5em;
+
+    }
+
+    h2 {
+
+      color: white;
       margin: 0em 0.5em;
 
     }

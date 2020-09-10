@@ -86,8 +86,8 @@ export class AuthInterceptor implements HttpInterceptor {
     if (this.authServ.isLoggedIn()) {
       req = req.clone({
         setHeaders: {
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${this.authServ.getToken()}`,
+          Accept: 'application/json',
+          Authorization: `Bearer ${this.authServ.getToken()}`,
           // 'Content-Type': 'application/json; charset=utf-8',
         },
       });

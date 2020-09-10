@@ -12,6 +12,7 @@ export interface IUser {
   birthdate?: string; // RFC 3339
   gender?: string; // male, female
   profile_image?: string; // allowed extensions: jpg, jpeg, png
+  biography?: string;
   validated: boolean;
   role_id?: string;
   role?: IRole;

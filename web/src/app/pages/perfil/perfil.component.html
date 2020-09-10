@@ -1,1 +1,90 @@
-<app-under-construction></app-under-construction>
+<div class="perfil-body">
+
+  <div class="side"></div>
+
+  <div class="center">
+
+    <span *ngIf="profileData" style="display: flex; flex-direction: column; height: 100%;">
+
+      <div class="header">
+
+        <div class="header-items">
+
+          <div class="side-box">
+            <button *ngIf="!isSameAsUser"
+                    mat-flat-button color="primary"  class="button-white-borders"
+                    (click)="selectDonar()">
+              Donar
+            </button>
+          </div>
+
+          <h1 class="profile-name">{{ profileData.username | uppercase }}</h1>
+
+          <div class="side-box">
+            <div style="flex: 1"></div>
+            <div style="flex: 1; margin-right: 1em;">
+              <button *ngIf="!isSameAsUser"
+                      mat-flat-button color="primary" class="button-white-borders"
+                      style="width: 100%; margin: 0px;"
+                      (click)="selectSeguir()">
+                Seguir
+              </button>
+            </div>
+
+            <div class="followers">
+              <fa-icon [icon]="faFollowers" size="2x"></fa-icon>
+              <p>{{ profileFollowers }}</p>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- #region Imagen avatar perfil-->
+        <img  *ngIf="!profileAvatar"
+              src="assets/images/generic/avatar196x196.jpg"
+              alt="omics-avatar-profile"
+              class="avatar">
+
+        <img  *ngIf="profileAvatar"
+              [src]="profileAvatar"
+              alt="omics-avatar-profile"
+              class="avatar">
+
+        <!-- #endregion -->
+
+      </div>
+
+
+      <div class="body">
+
+        <div class="body-header">
+
+          <h2>Sobre mí:</h2>
+
+          <div class="text-date" >
+
+            Miembro desde: {{ memberSince | date: 'shortDate' }}
+
+          </div>
+
+        </div>
+
+        <div class="profile-description">
+
+          <p class="break-word sangria">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Atque illum, quibusdam laborum, nobis autem veniam repudiandae eos assumenda voluptatem error, impedit fuga tenetur eaque et dolorum sapiente vel quaerat quia.
+          </p>
+
+        </div>
+
+
+      </div>
+
+    </span>
+
+  </div>
+
+  <div class="side"></div>
+
+</div>
