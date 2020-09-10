@@ -23,15 +23,7 @@ impl EventHandler for EventLogger {
     }
 
     async fn handle(&mut self, event: &Event) -> Result<bool> {
-        let payload = String::from_utf8_lossy(event.payload());
-
-        println!("# EVENT");
-        println!("- topic: {}", event.topic());
-        println!("- code: {}", event.code());
-        println!("- payload: {:?}", payload);
-
         self.event_repo.save(&event).await?;
-
         Ok(true)
     }
 }

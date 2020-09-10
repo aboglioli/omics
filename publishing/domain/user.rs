@@ -33,6 +33,26 @@ impl User {
         })
     }
 
+    pub fn build(
+        base: AggregateRoot<UserId, Event>,
+        username: String,
+        name: Option<String>,
+        lastname: Option<String>,
+        biography: Option<String>,
+        profile_image: Option<String>,
+        role_id: String,
+    ) -> Self {
+        User {
+            base,
+            username,
+            name,
+            lastname,
+            biography,
+            profile_image,
+            role_id,
+        }
+    }
+
     pub fn base(&self) -> &AggregateRoot<UserId, Event> {
         &self.base
     }

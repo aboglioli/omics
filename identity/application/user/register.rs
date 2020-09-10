@@ -19,7 +19,6 @@ pub struct RegisterCommand {
 #[derive(Serialize)]
 pub struct RegisterResponse {
     pub id: String,
-    pub validation_code: String, // TODO: remove, only for testing
 }
 
 pub struct Register<'a> {
@@ -65,7 +64,6 @@ impl<'a> Register<'a> {
 
         Ok(RegisterResponse {
             id: user.base().id().to_string(),
-            validation_code: user.validation().unwrap().code().to_string(),
         })
     }
 }

@@ -33,6 +33,8 @@
 - [ ] Consider deleted_at in repositories to not return deleted entities.
 - [ ] Add next_id() implementation in trait of repositories.
 - [ ] Add 'username' as ID of user.
+- [ ] Separate events from AggregateRoot.
+- [ ] Move publishing::UserService to shared crate.
 
 # Progress
 

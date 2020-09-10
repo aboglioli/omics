@@ -8,7 +8,6 @@ use identity::infrastructure::persistence::inmem::{
     InMemRoleRepository, InMemTokenRepository, InMemUserRepository,
 };
 use identity::infrastructure::service::{BcryptHasher, JWTEncoder};
-use publishing::application::reader::InteractionHandler;
 use publishing::container::Container as PublishingContainer;
 use publishing::infrastructure::persistence::inmem::{
     InMemAuthorRepository, InMemCategoryRepository, InMemCollectionRepository,
@@ -17,6 +16,7 @@ use publishing::infrastructure::persistence::inmem::{
 };
 
 use crate::development::EventLogger;
+use crate::infrastructure::publishing::LocalUserService;
 
 pub struct Container {
     pub event_bus: Arc<InMemEventBus>,
@@ -46,6 +46,7 @@ impl Container {
         let p_publication_repo = Arc::new(InMemPublicationRepository::new());
         let p_reader_repo = Arc::new(InMemReaderRepository::new());
         let p_user_repo = Arc::new(PInMemUserRepository::new());
+        let p_user_serv = Arc::new(LocalUserService::new(i_user_repo.clone()));
 
         // Containers
         let identity = IdentityContainer::new(
@@ -66,6 +67,7 @@ impl Container {
             p_publication_repo,
             p_reader_repo,
             p_user_repo,
+            p_user_serv,
         );
 
         Container {
@@ -80,11 +82,8 @@ impl Container {
         let event_logger = EventLogger::new(self.event_repo.clone());
         self.event_bus.subscribe(Box::new(event_logger)).await?;
 
-        let reader_handler = InteractionHandler::new(
-            self.publishing.reader_repo_clone(),
-            self.publishing.publication_repo_clone(),
-        );
-        self.event_bus.subscribe(Box::new(reader_handler)).await?;
+        self.identity.subscribe(self.event_bus.as_ref()).await?;
+        self.publishing.subscribe(self.event_bus.as_ref()).await?;
 
         Ok(())
     }

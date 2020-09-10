@@ -8,6 +8,7 @@ use crate::infrastructure::persistence::inmem::{
     InMemInteractionRepository, InMemPublicationRepository, InMemReaderRepository,
     InMemUserRepository,
 };
+use crate::mocks::FakeUserService;
 
 #[allow(dead_code)]
 pub fn container() -> Container<FakeEventPublisher> {
@@ -20,5 +21,6 @@ pub fn container() -> Container<FakeEventPublisher> {
         Arc::new(InMemPublicationRepository::new()),
         Arc::new(InMemReaderRepository::new()),
         Arc::new(InMemUserRepository::new()),
+        Arc::new(FakeUserService::new()),
     )
 }

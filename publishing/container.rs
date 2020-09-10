@@ -3,13 +3,15 @@ use std::sync::Arc;
 use common::event::{EventPublisher, EventSubscriber};
 use common::result::Result;
 
+use crate::application::handler::UserHandler;
+use crate::application::reader::InteractionHandler;
 use crate::domain::author::AuthorRepository;
 use crate::domain::category::CategoryRepository;
 use crate::domain::collection::CollectionRepository;
 use crate::domain::interaction::{InteractionRepository, InteractionService};
 use crate::domain::publication::{PublicationRepository, StatisticsService};
 use crate::domain::reader::ReaderRepository;
-use crate::domain::user::UserRepository;
+use crate::domain::user::{UserRepository, UserService};
 
 pub struct Container<EPub> {
     event_pub: Arc<EPub>,
@@ -24,6 +26,8 @@ pub struct Container<EPub> {
 
     statistics_serv: Arc<StatisticsService>,
     interaction_serv: Arc<InteractionService>,
+
+    user_serv: Arc<dyn UserService>,
 }
 
 impl<EPub> Container<EPub>
@@ -40,6 +44,7 @@ where
         publication_repo: Arc<dyn PublicationRepository>,
         reader_repo: Arc<dyn ReaderRepository>,
         user_repo: Arc<dyn UserRepository>,
+        user_serv: Arc<dyn UserService>,
     ) -> Self {
         let statistics_serv = Arc::new(StatisticsService::new(interaction_repo.clone()));
         let interaction_serv = Arc::new(InteractionService::new(interaction_repo.clone()));
@@ -57,13 +62,27 @@ where
 
             statistics_serv,
             interaction_serv,
+
+            user_serv,
         }
     }
 
-    pub async fn subscribe<ES>(&self, _event_sub: &ES) -> Result<()>
+    pub async fn subscribe<ES>(&self, event_sub: &ES) -> Result<()>
     where
         ES: EventSubscriber,
     {
+        let user_handler = UserHandler::new(
+            self.author_repo.clone(),
+            self.reader_repo.clone(),
+            self.user_repo.clone(),
+            self.user_serv.clone(),
+        );
+        event_sub.subscribe(Box::new(user_handler)).await?;
+
+        let reader_handler =
+            InteractionHandler::new(self.reader_repo.clone(), self.publication_repo.clone());
+        event_sub.subscribe(Box::new(reader_handler)).await?;
+
         Ok(())
     }
 
@@ -99,7 +118,7 @@ where
         self.user_repo.as_ref()
     }
 
-    // Service
+    // Concrete services
     pub fn statistics_serv(&self) -> &StatisticsService {
         &self.statistics_serv
     }
@@ -108,12 +127,8 @@ where
         &self.interaction_serv
     }
 
-    // Cloning
-    pub fn reader_repo_clone(&self) -> Arc<dyn ReaderRepository> {
-        self.reader_repo.clone()
-    }
-
-    pub fn publication_repo_clone(&self) -> Arc<dyn PublicationRepository> {
-        self.publication_repo.clone()
+    // Abstract services
+    pub fn user_serv(&self) -> &dyn UserService {
+        self.user_serv.as_ref()
     }
 }

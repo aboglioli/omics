@@ -12,6 +12,7 @@ pub struct UserDto {
     pub lastname: Option<String>,
     pub birthdate: Option<String>,
     pub gender: Option<String>,
+    pub biography: Option<String>,
     pub profile_image: Option<String>,
     pub validated: bool,
     pub role_id: Option<String>,
@@ -36,11 +37,15 @@ impl From<&User> for UserDto {
             lastname: user.person().map(|p| p.fullname().lastname().to_string()),
             birthdate: user
                 .person()
-                .map(|p| p.birthdate().map(|b| b.date().to_string()))
+                .map(|p| p.birthdate().map(|b| b.to_string()))
                 .flatten(),
             gender: user
                 .person()
                 .map(|p| p.gender().map(|g| g.to_string()))
+                .flatten(),
+            biography: user
+                .person()
+                .map(|p| p.biography().map(|b| b.to_string()))
                 .flatten(),
             profile_image: user
                 .person()

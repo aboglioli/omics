@@ -37,6 +37,12 @@ impl Birthdate {
     }
 }
 
+impl ToString for Birthdate {
+    fn to_string(&self) -> String {
+        self.date().to_rfc3339()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
