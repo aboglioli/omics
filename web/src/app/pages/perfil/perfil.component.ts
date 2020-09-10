@@ -55,11 +55,8 @@ export class PerfilComponent implements OnInit {
 
         (data: IAuthor) => {
 
-          console.log(data);
           this.profileData = data;
-
           this.assignProfileAvatar( this.profileData );
-
           this.memberSince = new Date();
 
           this.isSameAsUser = ( this.authService.getIdUser() === this.profileData.id )

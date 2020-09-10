@@ -6,24 +6,23 @@ import { AuthService } from '../domain/services/auth.service';
 @Injectable({
   providedIn: 'root'
 })
-export class AuthLoginGuard implements CanActivate {
+export class SameUserGuard implements CanActivate {
 
   constructor(  private authService: AuthService,
                 private router: Router ) {}
 
-  canActivate(): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+  canActivate(next: ActivatedRouteSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
 
-      if (  this.authService.isLoggedIn() ) {
+    const userIdParam = next.paramMap.get('id');
 
-        return true;
+    if ( this.authService.getIdUser() === userIdParam ) {
 
-      } else {
+      return true;
 
-        this.router.navigate(['/home']);
-        return false;
-
-      }
-
+    } else {
+      this.router.navigate(['/home']);
+      return false;
+    }
 
   }
 

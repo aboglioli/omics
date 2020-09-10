@@ -56,6 +56,7 @@ import { DomainModule } from './domain/module';
 import { PasswordForgotComponent } from './components/password-recovery/password-forgot/password-forgot.component';
 import { PasswordRewriteComponent } from './components/password-recovery/password-rewrite/password-rewrite.component';
 import { SideNavMenuUserComponent } from './shared/side-nav-menu-user/side-nav-menu-user.component';
+import { PerfilEditarComponent } from './pages/perfil-editar/perfil-editar.component';
 
 
 @NgModule({
@@ -90,7 +91,8 @@ import { SideNavMenuUserComponent } from './shared/side-nav-menu-user/side-nav-m
     DevelopmentComponent,
     DevUploadFileComponent,
     DevNewPublicationComponent,
-    SideNavMenuUserComponent
+    SideNavMenuUserComponent,
+    PerfilEditarComponent
   ],
   imports: [
     BrowserModule,

@@ -18,6 +18,8 @@ import { NewPublicationComponent } from './components/deskboard/new-publication/
 import { AuthNotLoginGuard } from './guard/auth-not-login.guard';
 import { PerfilComponent } from './pages/perfil/perfil.component';
 import { AuthLoginGuard } from './guard/auth-login.guard';
+import { PerfilEditarComponent } from './pages/perfil-editar/perfil-editar.component';
+import { SameUserGuard } from './guard/same-user.guard';
 
 
 
@@ -32,7 +34,7 @@ const routes: Routes = [
   { path: 'deskboard', component:  DeskboardGeneralComponent, canActivate: [AuthLoginGuard]},
   { path: 'deskboard/publication/new', component:  NewPublicationComponent},
   { path: 'profile/:id', component: PerfilComponent,  canActivate: [AuthLoginGuard] },
-  { path: 'profile/:id/editUser', component: PerfilComponent, canActivate: [AuthLoginGuard]},
+  { path: 'profile/:id/editUser', component: PerfilEditarComponent,  canActivate: [AuthLoginGuard, SameUserGuard]},
   { path: 'about', component: AboutComponent },
   { path: 'read/:id', component: VisorComicComponent },
   { path: 'dashboard-reportes', component: DashboardReportesComponent },
