@@ -1,4 +1,49 @@
 
 <div class="perfil-editar-body">
-  <p>perfil-editar works!</p>
+
+    <div class="side"></div>
+
+    <div class="center">
+
+      <form autocomplete="on" [formGroup]="formProfile" *ngIf="this.userData" >
+
+        <span style="display: flex; flex-direction: column; height: 100%;">
+
+          <div class="header">
+
+            <div class="header-items">
+
+              <h1 class="profile-name">{{ this.userData.username | uppercase }}</h1>
+
+            </div>
+
+            <!-- #region Imagen avatar perfil-->
+              <img  *ngIf="!isProfileAvatarImageExists"
+                    src="assets/images/generic/avatar196x196.jpg"
+                    alt="omics-avatar-profile"
+                    class="avatar">
+
+              <img  *ngIf="isProfileAvatarImageExists"
+                    [src]="profileAvatarImage"
+                    alt="omics-avatar-profile"
+                    class="avatar">
+
+            <!-- #endregion -->
+
+          </div>
+
+
+          <div class="body">
+
+
+          </div>
+
+        </span>
+
+      </form>
+
+    </div>
+
+    <div class="side"></div>
+
 </div>

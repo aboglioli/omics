@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { IdentityService } from '../../domain/services/identity.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { faUsers } from '@fortawesome/free-solid-svg-icons';
@@ -28,7 +27,7 @@ export class PerfilComponent implements OnInit {
 
   constructor(
     private authorService: AuthorService,
-    private route: ActivatedRoute,
+    private activateRoute: ActivatedRoute,
     private router: Router,
     private spinnerService: NgxSpinnerService,
     private authService: AuthService,
@@ -49,7 +48,7 @@ export class PerfilComponent implements OnInit {
     }, 20000); // 20 segundos de espera máxima TODO: Agregar mensaje de error de pasar mucho tiempo
 
 
-    this.route.params.subscribe( params => {
+    this.activateRoute.params.subscribe( params => {
 
       this.authorService.getById(params.id).subscribe(
 
