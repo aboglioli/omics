@@ -39,6 +39,7 @@ export interface IUpdateCommand {
   lastname: string;
   birthdate?: string; // RFC 3339
   gender?: string; // male, female
+  biography?: string;
   profile_image?: string;
 }
 

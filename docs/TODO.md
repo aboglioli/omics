@@ -35,6 +35,7 @@
 - [ ] Add 'username' as ID of user.
 - [ ] Separate events from AggregateRoot.
 - [ ] Move publishing::UserService to shared crate.
+- [ ] Allow change 'username' and 'email' in IdentityService.
 
 # Progress
 
