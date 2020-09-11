@@ -3,7 +3,6 @@ mod repository;
 pub use name::*;
 pub use repository::*;
 
-use common::event::Event;
 use common::model::{AggregateRoot, StringId};
 use common::result::Result;
 
@@ -11,7 +10,7 @@ pub type CategoryId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct Category {
-    base: AggregateRoot<CategoryId, Event>,
+    base: AggregateRoot<CategoryId>,
     name: Name,
 }
 
@@ -23,7 +22,7 @@ impl Category {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<CategoryId, Event> {
+    pub fn base(&self) -> &AggregateRoot<CategoryId> {
         &self.base
     }
 

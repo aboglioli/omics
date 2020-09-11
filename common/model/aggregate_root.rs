@@ -1,25 +1,20 @@
 use chrono::{DateTime, Utc};
 
-use crate::event::{Event, ToEvent};
-use crate::result::Result;
-
 #[derive(Debug)]
-pub struct AggregateRoot<ID, E> {
+pub struct AggregateRoot<ID> {
     id: ID,
     created_at: DateTime<Utc>,
     updated_at: Option<DateTime<Utc>>,
     deleted_at: Option<DateTime<Utc>>,
-    events: Vec<E>,
 }
 
-impl<ID, E> AggregateRoot<ID, E> {
-    pub fn new(id: ID) -> AggregateRoot<ID, E> {
+impl<ID> AggregateRoot<ID> {
+    pub fn new(id: ID) -> AggregateRoot<ID> {
         AggregateRoot {
             id,
             created_at: Utc::now(),
             updated_at: None,
             deleted_at: None,
-            events: Vec::new(),
         }
     }
 
@@ -34,7 +29,6 @@ impl<ID, E> AggregateRoot<ID, E> {
             created_at,
             updated_at,
             deleted_at,
-            events: Vec::new(),
         }
     }
 
@@ -63,37 +57,19 @@ impl<ID, E> AggregateRoot<ID, E> {
     }
 }
 
-impl<ID, E> AggregateRoot<ID, E>
-where
-    E: ToEvent,
-{
-    pub fn record_event(&mut self, event: E) {
-        self.events.push(event);
-    }
-
-    pub fn events(&self) -> Result<Vec<Event>> {
-        let mut events = Vec::new();
-        for event in self.events.iter() {
-            events.push(event.to_event()?);
-        }
-        Ok(events)
-    }
-}
-
-impl<ID: PartialEq, E> PartialEq for AggregateRoot<ID, E> {
+impl<ID: PartialEq> PartialEq for AggregateRoot<ID> {
     fn eq(&self, other: &Self) -> bool {
         self.id == other.id
     }
 }
 
-impl<ID: Clone, E> Clone for AggregateRoot<ID, E> {
+impl<ID: Clone> Clone for AggregateRoot<ID> {
     fn clone(&self) -> Self {
         AggregateRoot {
             id: self.id.clone(),
             created_at: self.created_at,
             updated_at: self.updated_at,
             deleted_at: self.deleted_at,
-            events: Vec::new(),
         }
     }
 }
@@ -102,34 +78,11 @@ impl<ID: Clone, E> Clone for AggregateRoot<ID, E> {
 mod tests {
     use super::*;
 
-    #[derive(Debug)]
-    enum AggRootEvent {
-        Created { text: String },
-        Updated { num: u32 },
-        Deleted(bool),
-    }
-
-    impl ToEvent for AggRootEvent {
-        fn to_event(&self) -> Result<Event> {
-            Ok(match self {
-                AggRootEvent::Created { text } => {
-                    Event::new("agg_root.created", "", text.as_bytes().to_vec())
-                }
-                AggRootEvent::Updated { num } => Event::new(
-                    "agg_root.updated",
-                    "",
-                    vec![if num < &255 { 255 } else { 0 }],
-                ),
-                AggRootEvent::Deleted(_v) => Event::new("agg_root.deleted", "", vec![1]),
-            })
-        }
-    }
-
     type AggRootID = String;
 
     #[derive(Debug)]
     struct AggRoot {
-        base: AggregateRoot<AggRootID, AggRootEvent>,
+        base: AggregateRoot<AggRootID>,
     }
 
     impl AggRoot {
@@ -139,11 +92,11 @@ mod tests {
             }
         }
 
-        fn base(&self) -> &AggregateRoot<AggRootID, AggRootEvent> {
+        fn base(&self) -> &AggregateRoot<AggRootID> {
             &self.base
         }
 
-        fn base_mut(&mut self) -> &mut AggregateRoot<AggRootID, AggRootEvent> {
+        fn base_mut(&mut self) -> &mut AggregateRoot<AggRootID> {
             &mut self.base
         }
     }
@@ -177,23 +130,5 @@ mod tests {
         let ag2 = AggRoot::new(AggRootID::from("AR_101"));
 
         assert_eq!(ag1.base(), ag2.base());
-    }
-
-    #[test]
-    fn events() {
-        let mut ag = AggRoot::new(AggRootID::from("AR_08"));
-        ag.base_mut().record_event(AggRootEvent::Created {
-            text: "agg_root.created".to_owned(),
-        });
-        ag.base_mut()
-            .record_event(AggRootEvent::Updated { num: 32 });
-        ag.base_mut().record_event(AggRootEvent::Deleted(true));
-
-        let events = ag.base().events().unwrap();
-        assert_eq!(events.len(), 3);
-        assert_eq!(events[0].topic(), "agg_root.created");
-        assert_eq!(events[0].payload(), "agg_root.created".as_bytes());
-        assert_eq!(events[1].topic(), "agg_root.updated");
-        assert_eq!(events[2].topic(), "agg_root.deleted");
     }
 }

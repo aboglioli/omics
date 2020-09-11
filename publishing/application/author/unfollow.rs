@@ -46,7 +46,9 @@ impl<'a> Unfollow<'a> {
 
         self.author_repo.save(&mut author).await?;
 
-        self.event_pub.publish_all(author.base().events()?).await?;
+        self.event_pub
+            .publish_all(author.events().to_vec()?)
+            .await?;
 
         Ok(CommandResponse::default())
     }

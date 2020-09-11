@@ -22,7 +22,7 @@ pub use synopsis::*;
 pub use tag::*;
 
 use common::error::Error;
-use common::model::{AggregateRoot, StatusHistory, StringId};
+use common::model::{AggregateRoot, Events, StatusHistory, StringId};
 use common::result::Result;
 use shared::event::PublicationEvent;
 
@@ -35,7 +35,8 @@ pub type PublicationId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct Publication {
-    base: AggregateRoot<PublicationId, PublicationEvent>,
+    base: AggregateRoot<PublicationId>,
+    events: Events<PublicationEvent>,
     author_id: AuthorId,
     header: Header,
 
@@ -50,6 +51,7 @@ impl Publication {
     pub fn new(id: PublicationId, author_id: AuthorId, header: Header) -> Result<Self> {
         let mut publication = Publication {
             base: AggregateRoot::new(id),
+            events: Events::new(),
             author_id,
             header,
             pages: Vec::new(),
@@ -58,7 +60,7 @@ impl Publication {
             status_history: StatusHistory::new(Status::Draft),
         };
 
-        publication.base.record_event(PublicationEvent::Created {
+        publication.events.record_event(PublicationEvent::Created {
             id: publication.base().id().to_string(),
             author_id: publication.author_id().to_string(),
             name: publication.header().name().to_string(),
@@ -77,7 +79,7 @@ impl Publication {
     }
 
     pub fn build(
-        base: AggregateRoot<PublicationId, PublicationEvent>,
+        base: AggregateRoot<PublicationId>,
         author_id: AuthorId,
         header: Header,
 
@@ -89,6 +91,7 @@ impl Publication {
     ) -> Self {
         Publication {
             base,
+            events: Events::new(),
             author_id,
             header,
             pages,
@@ -98,8 +101,12 @@ impl Publication {
         }
     }
 
-    pub fn base(&self) -> &AggregateRoot<PublicationId, PublicationEvent> {
+    pub fn base(&self) -> &AggregateRoot<PublicationId> {
         &self.base
+    }
+
+    pub fn events(&self) -> &Events<PublicationEvent> {
+        &self.events
     }
 
     pub fn author_id(&self) -> &AuthorId {
@@ -140,7 +147,7 @@ impl Publication {
         self.make_draft()?;
         self.base.update();
 
-        self.base.record_event(PublicationEvent::HeaderUpdated {
+        self.events.record_event(PublicationEvent::HeaderUpdated {
             id: self.base().id().to_string(),
             name: self.header().name().to_string(),
             synopsis: self.header().synopsis().to_string(),
@@ -162,7 +169,7 @@ impl Publication {
         self.make_draft()?;
         self.base.update();
 
-        self.base.record_event(PublicationEvent::PagesUpdated {
+        self.events.record_event(PublicationEvent::PagesUpdated {
             id: self.base().id().to_string(),
             pages_count: self.pages().len(),
         });
@@ -177,21 +184,22 @@ impl Publication {
 
         self.statistics.add_view(unique);
 
-        self.base.record_event(PublicationEvent::Viewed {
+        self.events.record_event(PublicationEvent::Viewed {
             reader_id: reader.base().id().to_string(),
             publication_id: self.base().id().to_string(),
             unique,
         });
 
-        self.base.record_event(PublicationEvent::StatisticsUpdated {
-            id: self.base().id().to_string(),
-            views: self.statistics().views(),
-            unique_views: self.statistics().unique_views(),
-            readings: self.statistics().readings(),
-            likes: self.statistics().likes(),
-            reviews: self.statistics().reviews(),
-            stars: self.statistics().stars(),
-        });
+        self.events
+            .record_event(PublicationEvent::StatisticsUpdated {
+                id: self.base().id().to_string(),
+                views: self.statistics().views(),
+                unique_views: self.statistics().unique_views(),
+                readings: self.statistics().readings(),
+                likes: self.statistics().likes(),
+                reviews: self.statistics().reviews(),
+                stars: self.statistics().stars(),
+            });
 
         Ok(View::new(
             reader.base().id().clone(),
@@ -211,20 +219,21 @@ impl Publication {
 
         self.statistics.add_reading();
 
-        self.base.record_event(PublicationEvent::Read {
+        self.events.record_event(PublicationEvent::Read {
             reader_id: reader.base().id().to_string(),
             publication_id: self.base().id().to_string(),
         });
 
-        self.base.record_event(PublicationEvent::StatisticsUpdated {
-            id: self.base().id().to_string(),
-            views: self.statistics().views(),
-            unique_views: self.statistics().unique_views(),
-            readings: self.statistics().readings(),
-            likes: self.statistics().likes(),
-            reviews: self.statistics().reviews(),
-            stars: self.statistics().stars(),
-        });
+        self.events
+            .record_event(PublicationEvent::StatisticsUpdated {
+                id: self.base().id().to_string(),
+                views: self.statistics().views(),
+                unique_views: self.statistics().unique_views(),
+                readings: self.statistics().readings(),
+                likes: self.statistics().likes(),
+                reviews: self.statistics().reviews(),
+                stars: self.statistics().stars(),
+            });
 
         Ok(Reading::new(
             reader.base().id().clone(),
@@ -243,20 +252,21 @@ impl Publication {
 
         self.statistics.add_like();
 
-        self.base.record_event(PublicationEvent::Liked {
+        self.events.record_event(PublicationEvent::Liked {
             reader_id: reader.base().id().to_string(),
             publication_id: self.base().id().to_string(),
         });
 
-        self.base.record_event(PublicationEvent::StatisticsUpdated {
-            id: self.base().id().to_string(),
-            views: self.statistics().views(),
-            unique_views: self.statistics().unique_views(),
-            readings: self.statistics().readings(),
-            likes: self.statistics().likes(),
-            reviews: self.statistics().reviews(),
-            stars: self.statistics().stars(),
-        });
+        self.events
+            .record_event(PublicationEvent::StatisticsUpdated {
+                id: self.base().id().to_string(),
+                views: self.statistics().views(),
+                unique_views: self.statistics().unique_views(),
+                readings: self.statistics().readings(),
+                likes: self.statistics().likes(),
+                reviews: self.statistics().reviews(),
+                stars: self.statistics().stars(),
+            });
 
         Ok(Like::new(
             reader.base().id().clone(),
@@ -275,20 +285,21 @@ impl Publication {
 
         self.statistics.remove_like();
 
-        self.base.record_event(PublicationEvent::Unliked {
+        self.events.record_event(PublicationEvent::Unliked {
             reader_id: reader.base().id().to_string(),
             publication_id: self.base().id().to_string(),
         });
 
-        self.base.record_event(PublicationEvent::StatisticsUpdated {
-            id: self.base().id().to_string(),
-            views: self.statistics().views(),
-            unique_views: self.statistics().unique_views(),
-            readings: self.statistics().readings(),
-            likes: self.statistics().likes(),
-            reviews: self.statistics().reviews(),
-            stars: self.statistics().stars(),
-        });
+        self.events
+            .record_event(PublicationEvent::StatisticsUpdated {
+                id: self.base().id().to_string(),
+                views: self.statistics().views(),
+                unique_views: self.statistics().unique_views(),
+                readings: self.statistics().readings(),
+                likes: self.statistics().likes(),
+                reviews: self.statistics().reviews(),
+                stars: self.statistics().stars(),
+            });
 
         Ok(())
     }
@@ -304,22 +315,23 @@ impl Publication {
 
         self.statistics.add_review(&stars);
 
-        self.base.record_event(PublicationEvent::Reviewed {
+        self.events.record_event(PublicationEvent::Reviewed {
             reader_id: reader.base().id().to_string(),
             publication_id: self.base().id().to_string(),
             stars: stars.value(),
             comment: comment.to_string(),
         });
 
-        self.base.record_event(PublicationEvent::StatisticsUpdated {
-            id: self.base().id().to_string(),
-            views: self.statistics().views(),
-            unique_views: self.statistics().unique_views(),
-            readings: self.statistics().readings(),
-            likes: self.statistics().likes(),
-            reviews: self.statistics().reviews(),
-            stars: self.statistics().stars(),
-        });
+        self.events
+            .record_event(PublicationEvent::StatisticsUpdated {
+                id: self.base().id().to_string(),
+                views: self.statistics().views(),
+                unique_views: self.statistics().unique_views(),
+                readings: self.statistics().readings(),
+                likes: self.statistics().likes(),
+                reviews: self.statistics().reviews(),
+                stars: self.statistics().stars(),
+            });
 
         Ok(Review::new(
             reader.base().id().clone(),
@@ -340,20 +352,21 @@ impl Publication {
 
         self.statistics.remove_review(stars);
 
-        self.base.record_event(PublicationEvent::ReviewDeleted {
+        self.events.record_event(PublicationEvent::ReviewDeleted {
             reader_id: reader.base().id().to_string(),
             publication_id: self.base().id().to_string(),
         });
 
-        self.base.record_event(PublicationEvent::StatisticsUpdated {
-            id: self.base().id().to_string(),
-            views: self.statistics().views(),
-            unique_views: self.statistics().unique_views(),
-            readings: self.statistics().readings(),
-            likes: self.statistics().likes(),
-            reviews: self.statistics().reviews(),
-            stars: self.statistics().stars(),
-        });
+        self.events
+            .record_event(PublicationEvent::StatisticsUpdated {
+                id: self.base().id().to_string(),
+                views: self.statistics().views(),
+                unique_views: self.statistics().unique_views(),
+                readings: self.statistics().readings(),
+                likes: self.statistics().likes(),
+                reviews: self.statistics().reviews(),
+                stars: self.statistics().stars(),
+            });
 
         Ok(())
     }
@@ -370,7 +383,7 @@ impl Publication {
         self.contract = true;
         self.base.update();
 
-        self.base.record_event(PublicationEvent::ContractAdded {
+        self.events.record_event(PublicationEvent::ContractAdded {
             id: self.base().id().to_string(),
         });
 
@@ -385,7 +398,7 @@ impl Publication {
         self.contract = false;
         self.base.update();
 
-        self.base.record_event(PublicationEvent::ContractAdded {
+        self.events.record_event(PublicationEvent::ContractAdded {
             id: self.base().id().to_string(),
         });
 
@@ -398,7 +411,7 @@ impl Publication {
             self.status_history.add_status(draft);
             self.base.update();
 
-            self.base.record_event(PublicationEvent::ChangedToDraft {
+            self.events.record_event(PublicationEvent::ChangedToDraft {
                 id: self.base().id().to_string(),
             });
         }
@@ -423,7 +436,7 @@ impl Publication {
         self.status_history.add_status(waiting_approval);
         self.base.update();
 
-        self.base.record_event(PublicationEvent::ApprovalWaited {
+        self.events.record_event(PublicationEvent::ApprovalWaited {
             id: self.base().id().to_string(),
         });
 
@@ -435,7 +448,7 @@ impl Publication {
         self.status_history.add_status(published);
         self.base.update();
 
-        self.base.record_event(PublicationEvent::Published {
+        self.events.record_event(PublicationEvent::Published {
             id: self.base().id().to_string(),
             author_id: self.author_id().to_string(),
             name: self.header().name().to_string(),
@@ -459,7 +472,7 @@ impl Publication {
         self.status_history.add_status(rejected);
         self.base.update();
 
-        self.base.record_event(PublicationEvent::Rejected {
+        self.events.record_event(PublicationEvent::Rejected {
             id: self.base().id().to_string(),
         });
 
@@ -469,7 +482,7 @@ impl Publication {
     pub fn delete(&mut self) -> Result<()> {
         self.base.delete();
 
-        self.base.record_event(PublicationEvent::Deleted {
+        self.events.record_event(PublicationEvent::Deleted {
             id: self.base().id().to_string(),
         });
 
@@ -492,7 +505,7 @@ mod tests {
         assert_eq!(publication.header().synopsis().value(), "Synopsis...");
         assert_eq!(publication.header().category_id().value(), "#category01");
         assert_eq!(publication.header().tags().len(), 2);
-        assert!(publication.base().events().unwrap().len() > 0);
+        assert!(publication.events().to_vec().unwrap().len() > 0);
         assert!(matches!(
             publication.status_history().current(),
             Status::Draft
@@ -572,6 +585,6 @@ mod tests {
         assert!(publication.remove_contract().is_ok());
 
         // First events: Created, PagesUpdated, ApprovalWaited (publish), Published (approve)
-        assert!(publication.base().events().unwrap().len() > 0);
+        assert!(publication.events().to_vec().unwrap().len() > 0);
     }
 }

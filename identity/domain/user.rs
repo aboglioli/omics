@@ -34,7 +34,7 @@ pub use username::*;
 pub use validation::*;
 
 use common::error::Error;
-use common::model::{AggregateRoot, StringId};
+use common::model::{AggregateRoot, Events, StringId};
 use common::result::Result;
 use shared::event::UserEvent;
 
@@ -45,7 +45,8 @@ pub type UserId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct User {
-    base: AggregateRoot<UserId, UserEvent>,
+    base: AggregateRoot<UserId>,
+    events: Events<UserEvent>,
     identity: Identity,
     person: Option<Person>,
     role_id: RoleId,
@@ -56,13 +57,14 @@ impl User {
     pub fn new(id: UserId, identity: Identity, role_id: RoleId) -> Result<Self> {
         let mut user = User {
             base: AggregateRoot::new(id),
+            events: Events::new(),
             identity,
             person: None,
             role_id,
             validation: Some(Validation::new()),
         };
 
-        user.base.record_event(UserEvent::Registered {
+        user.events.record_event(UserEvent::Registered {
             id: user.base().id().to_string(),
             username: user.identity().username().to_string(),
             email: user.identity().email().to_string(),
@@ -73,7 +75,7 @@ impl User {
     }
 
     pub fn build(
-        base: AggregateRoot<UserId, UserEvent>,
+        base: AggregateRoot<UserId>,
         identity: Identity,
         person: Option<Person>,
         role_id: RoleId,
@@ -81,6 +83,7 @@ impl User {
     ) -> Self {
         User {
             base,
+            events: Events::new(),
             identity,
             person,
             role_id,
@@ -88,8 +91,12 @@ impl User {
         }
     }
 
-    pub fn base(&self) -> &AggregateRoot<UserId, UserEvent> {
+    pub fn base(&self) -> &AggregateRoot<UserId> {
         &self.base
+    }
+
+    pub fn events(&self) -> &Events<UserEvent> {
+        &self.events
     }
 
     pub fn identity(&self) -> &Identity {
@@ -126,7 +133,7 @@ impl User {
         self.person = Some(person);
         self.base.update();
 
-        self.base.record_event(UserEvent::Updated {
+        self.events.record_event(UserEvent::Updated {
             id: self.base().id().to_string(),
             name: self.person().unwrap().fullname().name().to_string(),
             lastname: self.person().unwrap().fullname().lastname().to_string(),
@@ -159,7 +166,7 @@ impl User {
         self.role_id = role_id;
         self.base.update();
 
-        self.base.record_event(UserEvent::RoleChanged {
+        self.events.record_event(UserEvent::RoleChanged {
             id: self.base().id().to_string(),
             role_id: self.role_id().to_string(),
         });
@@ -189,7 +196,7 @@ impl User {
 
         self.base.update();
 
-        self.base.record_event(UserEvent::Validated {
+        self.events.record_event(UserEvent::Validated {
             id: self.base().id().to_string(),
         });
 
@@ -205,7 +212,7 @@ impl User {
             return Err(Error::new("user", "not_active"));
         }
 
-        self.base.record_event(UserEvent::LoggedIn {
+        self.events.record_event(UserEvent::LoggedIn {
             id: self.base().id().to_string(),
             auth_token: token.to_string(),
         });
@@ -215,7 +222,7 @@ impl User {
 
     pub fn recover_password(&mut self, password: Password, temp_password: String) -> Result<()> {
         self.identity.set_password(password)?;
-        self.base
+        self.events
             .record_event(UserEvent::PasswordRecoveryRequested {
                 id: self.base().id().to_string(),
                 temp_password,
@@ -232,7 +239,7 @@ impl User {
 
         self.base.delete();
 
-        self.base.record_event(UserEvent::Deleted {
+        self.events.record_event(UserEvent::Deleted {
             id: self.base().id().to_string(),
         });
 

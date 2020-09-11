@@ -65,7 +65,7 @@ impl<'a> UpdatePages<'a> {
         self.publication_repo.save(&mut publication).await?;
 
         self.event_pub
-            .publish_all(publication.base().events()?)
+            .publish_all(publication.events().to_vec()?)
             .await?;
 
         Ok(CommandResponse::default())

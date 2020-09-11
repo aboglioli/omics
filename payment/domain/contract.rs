@@ -5,7 +5,7 @@ pub use status::*;
 
 use common::error::Error;
 use common::event::Event;
-use common::model::{AggregateRoot, StatusHistory, StringId};
+use common::model::{AggregateRoot, Events, StatusHistory, StringId};
 use common::result::Result;
 
 use crate::domain::admin::Admin;
@@ -15,7 +15,8 @@ pub type ContractId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct Contract {
-    base: AggregateRoot<ContractId, Event>,
+    base: AggregateRoot<ContractId>,
+    events: Events<Event>,
     publication: Publication,
     status_history: StatusHistory<Status>,
 }
@@ -28,13 +29,18 @@ impl Contract {
 
         Ok(Contract {
             base: AggregateRoot::new(id),
+            events: Events::new(),
             publication,
             status_history: StatusHistory::new(Status::Requested),
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<ContractId, Event> {
+    pub fn base(&self) -> &AggregateRoot<ContractId> {
         &self.base
+    }
+
+    pub fn events(&self) -> &Events<Event> {
+        &self.events
     }
 
     pub fn publication(&self) -> &Publication {

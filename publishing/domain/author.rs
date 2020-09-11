@@ -2,7 +2,7 @@ mod repository;
 pub use repository::*;
 
 use common::error::Error;
-use common::model::{AggregateRoot, StringId};
+use common::model::{AggregateRoot, Events, StringId};
 use common::result::Result;
 use shared::event::AuthorEvent;
 
@@ -12,7 +12,8 @@ pub type AuthorId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct Author {
-    base: AggregateRoot<AuthorId, AuthorEvent>,
+    base: AggregateRoot<AuthorId>,
+    events: Events<AuthorEvent>,
     followers: u32,
 }
 
@@ -20,12 +21,17 @@ impl Author {
     pub fn new(id: AuthorId) -> Result<Self> {
         Ok(Author {
             base: AggregateRoot::new(id),
+            events: Events::new(),
             followers: 0,
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<AuthorId, AuthorEvent> {
+    pub fn base(&self) -> &AggregateRoot<AuthorId> {
         &self.base
+    }
+
+    pub fn events(&self) -> &Events<AuthorEvent> {
+        &self.events
     }
 
     pub fn followers(&self) -> u32 {
@@ -40,7 +46,7 @@ impl Author {
         self.followers += 1;
         self.base.update();
 
-        self.base.record_event(AuthorEvent::Followed {
+        self.events.record_event(AuthorEvent::Followed {
             author_id: self.base().id().to_string(),
             reader_id: reader.base().id().to_string(),
         });
@@ -60,7 +66,7 @@ impl Author {
         self.followers -= 1;
         self.base.update();
 
-        self.base.record_event(AuthorEvent::Unfollowed {
+        self.events.record_event(AuthorEvent::Unfollowed {
             author_id: self.base().id().to_string(),
             reader_id: reader.base().id().to_string(),
         });

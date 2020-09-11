@@ -3,7 +3,6 @@ mod repository;
 pub use permission::*;
 pub use repository::*;
 
-use common::event::Event;
 use common::model::{AggregateRoot, StringId};
 use common::result::Result;
 
@@ -11,7 +10,7 @@ pub type RoleId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct Role {
-    base: AggregateRoot<RoleId, Event>,
+    base: AggregateRoot<RoleId>,
     name: String,
     permissions: Vec<Permission>,
 }
@@ -27,7 +26,7 @@ impl Role {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<RoleId, Event> {
+    pub fn base(&self) -> &AggregateRoot<RoleId> {
         &self.base
     }
 

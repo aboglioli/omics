@@ -3,7 +3,6 @@ mod service;
 pub use repository::*;
 pub use service::*;
 
-use common::event::Event;
 use common::model::{AggregateRoot, StringId};
 use common::result::Result;
 
@@ -11,7 +10,7 @@ pub type UserId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct User {
-    base: AggregateRoot<UserId, Event>,
+    base: AggregateRoot<UserId>,
     username: String,
     name: Option<String>,
     lastname: Option<String>,
@@ -34,7 +33,7 @@ impl User {
     }
 
     pub fn build(
-        base: AggregateRoot<UserId, Event>,
+        base: AggregateRoot<UserId>,
         username: String,
         name: Option<String>,
         lastname: Option<String>,
@@ -53,7 +52,7 @@ impl User {
         }
     }
 
-    pub fn base(&self) -> &AggregateRoot<UserId, Event> {
+    pub fn base(&self) -> &AggregateRoot<UserId> {
         &self.base
     }
 

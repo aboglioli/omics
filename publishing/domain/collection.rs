@@ -4,7 +4,7 @@ pub use item::*;
 pub use repository::*;
 
 use common::error::Error;
-use common::model::{AggregateRoot, StringId};
+use common::model::{AggregateRoot, Events, StringId};
 use common::result::Result;
 use shared::event::CollectionEvent;
 
@@ -15,7 +15,8 @@ pub type CollectionId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct Collection {
-    base: AggregateRoot<CollectionId, CollectionEvent>,
+    base: AggregateRoot<CollectionId>,
+    events: Events<CollectionEvent>,
     author_id: AuthorId,
     header: Header,
 
@@ -26,12 +27,13 @@ impl Collection {
     pub fn new(id: CollectionId, author_id: AuthorId, header: Header) -> Result<Self> {
         let mut collection = Collection {
             base: AggregateRoot::new(id),
+            events: Events::new(),
             author_id,
             header,
             items: Vec::new(),
         };
 
-        collection.base.record_event(CollectionEvent::Created {
+        collection.events.record_event(CollectionEvent::Created {
             id: collection.base().id().to_string(),
             author_id: collection.author_id().to_string(),
             name: collection.header().name().to_string(),
@@ -49,8 +51,12 @@ impl Collection {
         Ok(collection)
     }
 
-    pub fn base(&self) -> &AggregateRoot<CollectionId, CollectionEvent> {
+    pub fn base(&self) -> &AggregateRoot<CollectionId> {
         &self.base
+    }
+
+    pub fn events(&self) -> &Events<CollectionEvent> {
+        &self.events
     }
 
     pub fn author_id(&self) -> &AuthorId {
@@ -69,7 +75,7 @@ impl Collection {
         self.header = header;
         self.base.update();
 
-        self.base.record_event(CollectionEvent::HeaderUpdated {
+        self.events.record_event(CollectionEvent::HeaderUpdated {
             id: self.base().id().to_string(),
             name: self.header().name().to_string(),
             synopsis: self.header().synopsis().to_string(),
@@ -97,7 +103,7 @@ impl Collection {
         self.items.push(item);
         self.base.update();
 
-        self.base.record_event(CollectionEvent::PublicationAdded {
+        self.events.record_event(CollectionEvent::PublicationAdded {
             id: self.base().id().to_string(),
             publication_id: publication.base().id().to_string(),
         });
@@ -110,10 +116,11 @@ impl Collection {
             .retain(|item| item.publication_id() != publication_id);
         self.base.update();
 
-        self.base.record_event(CollectionEvent::PublicationRemoved {
-            id: self.base().id().to_string(),
-            publication_id: publication_id.to_string(),
-        });
+        self.events
+            .record_event(CollectionEvent::PublicationRemoved {
+                id: self.base().id().to_string(),
+                publication_id: publication_id.to_string(),
+            });
 
         Ok(())
     }
@@ -121,7 +128,7 @@ impl Collection {
     pub fn delete(&mut self) -> Result<()> {
         self.base.delete();
 
-        self.base.record_event(CollectionEvent::Deleted {
+        self.events.record_event(CollectionEvent::Deleted {
             id: self.base().id().to_string(),
         });
 

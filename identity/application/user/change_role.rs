@@ -12,6 +12,7 @@ pub struct ChangeRoleCommand {
     pub role_id: String,
 }
 
+// TODO: emit event
 pub struct ChangeRole<'a> {
     role_repo: &'a dyn RoleRepository,
     user_repo: &'a dyn UserRepository,

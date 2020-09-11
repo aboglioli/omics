@@ -45,7 +45,7 @@ impl<'a> RecoverPassword<'a> {
 
         self.user_repo.save(&mut user).await?;
 
-        self.event_pub.publish_all(user.base().events()?).await?;
+        self.event_pub.publish_all(user.events().to_vec()?).await?;
 
         Ok(CommandResponse::default())
     }

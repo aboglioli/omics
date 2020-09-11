@@ -7,7 +7,6 @@ pub use discount::*;
 pub use price::*;
 pub use repository::*;
 
-use common::event::Event;
 use common::model::{AggregateRoot, StringId};
 use common::result::Result;
 
@@ -15,7 +14,7 @@ pub type PlanId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct Plan {
-    base: AggregateRoot<PlanId, Event>,
+    base: AggregateRoot<PlanId>,
     price: Price,
 }
 
@@ -27,7 +26,7 @@ impl Plan {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<PlanId, Event> {
+    pub fn base(&self) -> &AggregateRoot<PlanId> {
         &self.base
     }
 

@@ -41,7 +41,7 @@ impl<'a> Login<'a> {
             .await
         {
             Ok((user, token)) => {
-                self.event_pub.publish_all(user.base().events()?).await?;
+                self.event_pub.publish_all(user.events().to_vec()?).await?;
 
                 Ok(LoginResponse {
                     user_id: user.base().id().to_string(),

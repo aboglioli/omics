@@ -8,7 +8,7 @@ pub use repository::*;
 pub use status::*;
 
 use common::error::Error;
-use common::event::Event;
+
 use common::model::{AggregateRoot, StatusHistory, StringId};
 use common::result::Result;
 
@@ -18,7 +18,7 @@ pub type SubscriptionId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct Subscription {
-    base: AggregateRoot<SubscriptionId, Event>,
+    base: AggregateRoot<SubscriptionId>,
     user_id: UserId,
     plan: SubscriptionPlan,
     payments: Vec<SubscriptionPayment>,
@@ -36,7 +36,7 @@ impl Subscription {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<SubscriptionId, Event> {
+    pub fn base(&self) -> &AggregateRoot<SubscriptionId> {
         &self.base
     }
 

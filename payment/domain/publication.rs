@@ -3,7 +3,6 @@ mod statistics;
 pub use repository::*;
 pub use statistics::*;
 
-use common::event::Event;
 use common::model::{AggregateRoot, StringId};
 use common::result::Result;
 
@@ -13,7 +12,7 @@ pub type PublicationId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct Publication {
-    base: AggregateRoot<PublicationId, Event>,
+    base: AggregateRoot<PublicationId>,
     author: User,
     statistics: Statistics,
 }
@@ -27,7 +26,7 @@ impl Publication {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<PublicationId, Event> {
+    pub fn base(&self) -> &AggregateRoot<PublicationId> {
         &self.base
     }
 

@@ -1,7 +1,6 @@
 mod repository;
 pub use repository::*;
 
-use common::event::Event;
 use common::model::{AggregateRoot, StringId};
 use common::result::Result;
 
@@ -9,7 +8,7 @@ pub type AdminId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct Admin {
-    base: AggregateRoot<AdminId, Event>,
+    base: AggregateRoot<AdminId>,
 }
 
 impl Admin {
@@ -19,7 +18,7 @@ impl Admin {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<AdminId, Event> {
+    pub fn base(&self) -> &AggregateRoot<AdminId> {
         &self.base
     }
 }

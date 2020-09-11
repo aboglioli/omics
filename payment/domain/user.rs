@@ -2,7 +2,7 @@ mod repository;
 pub use repository::*;
 
 use common::error::Error;
-use common::event::Event;
+
 use common::model::{AggregateRoot, StringId};
 use common::result::Result;
 
@@ -13,7 +13,7 @@ pub type UserId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct User {
-    base: AggregateRoot<UserId, Event>,
+    base: AggregateRoot<UserId>,
     subscriptions: Vec<Subscription>,
 }
 
@@ -25,7 +25,7 @@ impl User {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<UserId, Event> {
+    pub fn base(&self) -> &AggregateRoot<UserId> {
         &self.base
     }
 

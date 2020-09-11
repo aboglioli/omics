@@ -41,7 +41,7 @@ impl<'a> RemovePublication<'a> {
         self.collection_repo.save(&mut collection).await?;
 
         self.event_pub
-            .publish_all(collection.base().events()?)
+            .publish_all(collection.events().to_vec()?)
             .await?;
 
         Ok(CommandResponse::default())

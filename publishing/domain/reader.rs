@@ -3,7 +3,6 @@ mod repository;
 pub use preferences::*;
 pub use repository::*;
 
-use common::event::Event;
 use common::model::{AggregateRoot, StringId};
 use common::result::Result;
 
@@ -11,7 +10,7 @@ pub type ReaderId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct Reader {
-    base: AggregateRoot<ReaderId, Event>,
+    base: AggregateRoot<ReaderId>,
     subscribed: bool,
     preferences: Preferences,
 }
@@ -25,7 +24,7 @@ impl Reader {
         })
     }
 
-    pub fn base(&self) -> &AggregateRoot<ReaderId, Event> {
+    pub fn base(&self) -> &AggregateRoot<ReaderId> {
         &self.base
     }
 

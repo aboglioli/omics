@@ -3,7 +3,6 @@ mod status;
 pub use amount::*;
 pub use status::*;
 
-use common::event::Event;
 use common::model::{AggregateRoot, StatusHistory, StringId};
 use common::result::Result;
 
@@ -11,7 +10,7 @@ pub type PaymentId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct Payment {
-    base: AggregateRoot<PaymentId, Event>,
+    base: AggregateRoot<PaymentId>,
     amount: Amount,
     status_history: StatusHistory<Status>,
 }
@@ -26,7 +25,7 @@ impl Payment {
     }
 
     pub fn build(
-        base: AggregateRoot<PaymentId, Event>,
+        base: AggregateRoot<PaymentId>,
         amount: Amount,
         status_history: StatusHistory<Status>,
     ) -> Self {
@@ -37,7 +36,7 @@ impl Payment {
         }
     }
 
-    pub fn base(&self) -> &AggregateRoot<PaymentId, Event> {
+    pub fn base(&self) -> &AggregateRoot<PaymentId> {
         &self.base
     }
 

@@ -41,7 +41,7 @@ where
         self.contract_repo.save(&mut contract).await?;
 
         self.event_pub
-            .publish_all(contract.base().events()?)
+            .publish_all(contract.events().to_vec()?)
             .await?;
 
         Ok(RequestReponse {

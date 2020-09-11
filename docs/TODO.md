@@ -21,19 +21,19 @@
 - [x] Add methods to get events from date in EventRepository.
 - [x] Add Option<String> for auth_id in use cases where user does not need to be logged in.
 - [x] Make User birthday as value object. Check date ranges.
-- [ ] API for add new categories.
+- [x] API for add new categories.
 - [ ] Use username as user id too.
-- [ ] Add 'biography' to Author.
+- [x] Add 'biography' to Author.
 - [ ] Add favorite interactions for publications and collections.
 - [ ] Refactor interactions and events.
 - [ ] Search by tags for publications and collections.
 - [ ] Add datetimes in DTOs.
-- [ ] Add Author followers.
+- [x] Add Author followers.
 - [ ] Call base.update() and base.delete() in each AggregateRoot.
 - [ ] Consider deleted_at in repositories to not return deleted entities.
-- [ ] Add next_id() implementation in trait of repositories.
+- [x] Add next_id() implementation in trait of repositories.
 - [ ] Add 'username' as ID of user.
-- [ ] Separate events from AggregateRoot.
+- [x] Separate events from AggregateRoot.
 - [ ] Move publishing::UserService to shared crate.
 - [ ] Allow change 'username' and 'email' in IdentityService.
 
