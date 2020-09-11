@@ -36,6 +36,7 @@
 - [x] Separate events from AggregateRoot.
 - [ ] Move publishing::UserService to shared crate.
 - [ ] Allow change 'username' and 'email' in IdentityService.
+- [ ] Merge 'code' with 'topic' in Event.
 
 # Progress
 

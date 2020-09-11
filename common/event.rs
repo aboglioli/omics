@@ -35,6 +35,22 @@ impl Event {
         }
     }
 
+    pub fn build(
+        id: EventId,
+        topic: String,
+        code: String,
+        timestamp: DateTime<Utc>,
+        payload: Vec<u8>,
+    ) -> Self {
+        Event {
+            id,
+            topic,
+            code,
+            timestamp,
+            payload,
+        }
+    }
+
     pub fn id(&self) -> &EventId {
         &self.id
     }

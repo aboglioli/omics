@@ -10,6 +10,8 @@ use crate::error::PublicError;
 #[derive(Serialize)]
 pub struct PublicEvent {
     pub id: String,
+    pub topic: String,
+    pub code: String,
     pub timestamp: String,
     pub payload: Value,
 }
@@ -24,12 +26,13 @@ async fn get(c: web::Data<Container>) -> impl Responder {
     c.event_repo()
         .find_all()
         .await
-        .map(|mut events| {
-            events.sort_by(|a, b| a.timestamp().cmp(b.timestamp()));
+        .map(|events| {
             events
                 .into_iter()
                 .map(|event| PublicEvent {
                     id: event.id().to_string(),
+                    topic: event.topic().to_string(),
+                    code: event.code().to_string(),
                     timestamp: event.timestamp().to_string(),
                     payload: serde_json::from_slice(event.payload()).unwrap(),
                 })
