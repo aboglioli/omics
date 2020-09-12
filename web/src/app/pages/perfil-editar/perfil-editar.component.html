@@ -18,6 +18,11 @@
             </div>
 
             <!-- #region Imagen avatar perfil-->
+            <div  class="avatar-edit"
+                  (click)="uploadImageAvatar()">
+
+              <fa-icon [icon]="faEditField" size="2x"></fa-icon>
+
               <img  *ngIf="!isProfileAvatarImageExists"
                     src="assets/images/generic/avatar196x196.jpg"
                     alt="omics-avatar-profile"
@@ -28,6 +33,7 @@
                     alt="omics-avatar-profile"
                     class="avatar">
 
+            </div>
             <!-- #endregion -->
 
           </div>

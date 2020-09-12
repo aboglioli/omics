@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { AuthService } from 'src/app/domain/services/auth.service';
 import { IUser } from '../../domain/models/user';
+import { faEdit } from '@fortawesome/free-solid-svg-icons';
 import { IdentityService } from '../../domain/services/identity.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FileService } from 'src/app/domain/services/file.service';
 
 @Component({
   selector: 'app-perfil-editar',
@@ -12,15 +14,23 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 })
 export class PerfilEditarComponent implements OnInit {
 
+  // FontAwesome Icon
+  public faEditField = faEdit;
+
+  // Usuario
   private userId: string;
   public userData: IUser;
 
+  // Otros
   public formProfile: FormGroup;
+
+
 
   constructor(
 
     private spinnerService: NgxSpinnerService,
     private authService: AuthService,
+    private fileServ: FileService,
     private identityService: IdentityService,
     private fb: FormBuilder,
 
@@ -91,6 +101,45 @@ export class PerfilEditarComponent implements OnInit {
     });
 
     console.log(this.formProfile.value);
+
+  }
+
+  public uploadImageAvatar(): void {
+
+    // Crear elemento input de tipo 'file' para poder manejarlo desde el botón que lo llama
+    const inputFileElement = document.createElement('input');
+    inputFileElement.type = 'file'; // Nota:  Solo uno a la vez, para varios: inputFileElement.multiple = multiple
+    inputFileElement.accept = '.png, .jpg, .jpeg';
+    inputFileElement.click();
+
+
+    // Definir la función del llamado al hacer click (cuando realiza un cambio)
+    inputFileElement.onchange = ( event: any ) => {
+
+
+      const fdImage: FormData = new FormData();
+      const imagenAvatar  = event.target.files[0];
+
+      this.spinnerService.show();
+      fdImage.append('image', imagenAvatar, imagenAvatar.name);
+
+      this.fileServ.upload(fdImage).subscribe(
+        (res: any) => {
+
+          this.formProfile.get('profile_image').setValue( res.files[0].url);
+
+          this.spinnerService.hide();
+
+        }, (err: Error) => {
+
+          // TODO: Manejar error por si se cae S3
+          console.error(err);
+          this.spinnerService.hide();
+
+        }
+      );
+
+    };
 
   }
 

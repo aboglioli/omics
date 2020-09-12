@@ -131,7 +131,6 @@ export class NewPublicationComponent implements OnInit {
     // Definir la función del llamado al hacer click (cuando realiza un cambio)
     inputFileElement.onchange = ( event: any ) => {
 
-
       const fdImage: FormData = new FormData();
       const imagePortada  = event.target.files[0];
 
