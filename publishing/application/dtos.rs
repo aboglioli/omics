@@ -40,6 +40,8 @@ pub struct AuthorDto {
     pub biography: Option<String>,
     pub profile_image: Option<String>,
     pub followers: u32,
+    pub created_at: String,
+    pub updated_at: Option<String>,
 }
 
 impl AuthorDto {
@@ -54,6 +56,8 @@ impl AuthorDto {
                 .profile_image()
                 .map(|profile_image| profile_image.to_string()),
             followers: author.followers(),
+            created_at: user.base().created_at().to_rfc3339(),
+            updated_at: user.base().updated_at().map(|d| d.to_rfc3339()),
         }
     }
 }
@@ -62,6 +66,8 @@ impl AuthorDto {
 pub struct CategoryDto {
     pub id: String,
     pub name: String,
+    pub created_at: String,
+    pub updated_at: Option<String>,
 }
 
 impl From<&Category> for CategoryDto {
@@ -69,6 +75,8 @@ impl From<&Category> for CategoryDto {
         CategoryDto {
             id: category.base().id().to_string(),
             name: category.name().to_string(),
+            created_at: category.base().created_at().to_rfc3339(),
+            updated_at: category.base().updated_at().map(|d| d.to_rfc3339()),
         }
     }
 }
@@ -114,6 +122,8 @@ pub struct PublicationDto {
     pub statistics: StatisticsDto,
     pub pages: Option<Vec<PageDto>>,
     pub status: Option<String>,
+    pub created_at: String,
+    pub updated_at: Option<String>,
 }
 
 impl From<&Publication> for PublicationDto {
@@ -135,6 +145,8 @@ impl From<&Publication> for PublicationDto {
             statistics: StatisticsDto::from(publication.statistics()),
             pages: None,
             status: None,
+            created_at: publication.base().created_at().to_rfc3339(),
+            updated_at: publication.base().updated_at().map(|d| d.to_rfc3339()),
         }
     }
 }
@@ -173,6 +185,8 @@ pub struct CollectionDto {
     pub category_id: Option<String>,
     pub category: Option<CategoryDto>,
     pub tags: Vec<String>,
+    pub created_at: String,
+    pub updated_at: Option<String>,
 }
 
 impl From<&Collection> for CollectionDto {
@@ -191,6 +205,8 @@ impl From<&Collection> for CollectionDto {
                 .iter()
                 .map(|tag| tag.name().to_string())
                 .collect(),
+            created_at: collection.base().created_at().to_rfc3339(),
+            updated_at: collection.base().updated_at().map(|d| d.to_rfc3339()),
         }
     }
 }
@@ -216,6 +232,7 @@ pub struct ReviewDto {
     pub publication_id: String,
     pub stars: u8,
     pub comment: String,
+    pub created_at: String,
 }
 
 impl From<&Review> for ReviewDto {
@@ -226,6 +243,7 @@ impl From<&Review> for ReviewDto {
             publication_id: review.base().publication_id().to_string(),
             stars: review.stars().value(),
             comment: review.comment().to_string(),
+            created_at: review.base().date().to_rfc3339(),
         }
     }
 }
@@ -269,6 +287,8 @@ pub struct ReaderDto {
     pub lastname: Option<String>,
     pub subscribed: bool,
     pub preferences: Option<PreferencesDto>,
+    pub created_at: String,
+    pub updated_at: Option<String>,
 }
 
 impl ReaderDto {
@@ -280,6 +300,8 @@ impl ReaderDto {
             lastname: user.name().map(|lastname| lastname.to_string()),
             subscribed: reader.is_subscribed(),
             preferences: None,
+            created_at: user.base().created_at().to_rfc3339(),
+            updated_at: user.base().updated_at().map(|d| d.to_rfc3339()),
         }
     }
 }

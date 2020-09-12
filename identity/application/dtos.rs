@@ -17,6 +17,8 @@ pub struct UserDto {
     pub validated: bool,
     pub role_id: Option<String>,
     pub role: Option<RoleDto>,
+    pub created_at: String,
+    pub updated_at: Option<String>,
 }
 
 impl UserDto {
@@ -54,6 +56,8 @@ impl From<&User> for UserDto {
             validated: user.is_validated(),
             role_id: Some(user.role_id().to_string()),
             role: None,
+            created_at: user.base().created_at().to_rfc3339(),
+            updated_at: user.base().updated_at().map(|d| d.to_rfc3339()),
         }
     }
 }
