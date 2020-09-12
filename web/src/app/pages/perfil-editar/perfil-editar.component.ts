@@ -21,10 +21,24 @@ export class PerfilEditarComponent implements OnInit {
   private userId: string;
   public userData: IUser;
 
-  // Otros
+  // Del formulario
   public formProfile: FormGroup;
+  public maxDateBirthday: Date;
 
-
+  public generosList  = [
+    {
+      name: 'Femenino',
+      value: 'female'
+    },
+    {
+      name: 'Masculino',
+      value: 'male'
+    },
+    {
+      name: 'Otro',
+      value: 'other'
+    }
+  ];
 
   constructor(
 
@@ -38,9 +52,10 @@ export class PerfilEditarComponent implements OnInit {
 
   ngOnInit(): void {
 
+    this.maxDateBirthday = new Date();
+
     this.createForm();
     this.userId = this.authService.getIdUser();
-
 
     this.buildFormByIdentityService();
 
