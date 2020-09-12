@@ -123,6 +123,14 @@ impl User {
         self.base.deleted_at().is_none() && self.is_validated()
     }
 
+    pub fn is_admin(&self) -> bool {
+        self.role_id.value() == "admin"
+    }
+
+    pub fn is_content_manager(&self) -> bool {
+        self.role_id.value() == "admin" || self.role_id.value() == "content-manager"
+    }
+
     pub fn set_password(&mut self, password: Password) -> Result<()> {
         self.identity.set_password(password)?;
         self.base.update();

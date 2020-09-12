@@ -27,7 +27,7 @@ impl<'a> GetById<'a> {
     ) -> Result<UserDto> {
         if auth_id != user_id {
             let auth_user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-            if auth_user.role_id().value() != "admin" {
+            if !auth_user.is_admin() {
                 return Err(Error::unauthorized());
             }
         }

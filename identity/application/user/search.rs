@@ -38,7 +38,7 @@ impl<'a> Search<'a> {
         include: Include,
     ) -> Result<SearchResponse> {
         let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-        if user.role_id().value() != "admin" {
+        if !user.is_admin() {
             return Err(Error::unauthorized());
         }
 

@@ -34,7 +34,7 @@ impl<'a> ChangeRole<'a> {
     ) -> Result<CommandResponse> {
         let admin = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
 
-        if admin.role_id().value() != "admin" {
+        if !admin.is_admin() {
             return Err(Error::unauthorized());
         }
 
