@@ -14,7 +14,7 @@
 - [x] Allow client to specify the 'fields' to get from a request
 - [x] Add DateTime and Date support and examples.
 - [x] Use Include in use cases returning nested data.
-- [ ] User should not include Role. It must include RoleId.
+- [x] User should not include Role. It must include RoleId.
 - [x] Add Search use case when necessary.
 - [x] ChangePassword should not validate logged in user to allow change a
   temporal password (RecoverPassword).

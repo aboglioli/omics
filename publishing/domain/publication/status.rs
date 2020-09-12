@@ -1,14 +1,15 @@
 use common::error::Error;
 use common::result::Result;
 
+use crate::domain::interaction::Comment;
 use crate::domain::user::UserId;
 
 #[derive(Debug, Clone)]
 pub enum Status {
     Draft,
     WaitingApproval,
-    Published { admin_id: UserId },
-    Rejected { admin_id: UserId },
+    Published { admin_id: UserId, comment: Comment },
+    Rejected { admin_id: UserId, comment: Comment },
 }
 
 impl ToString for Status {
@@ -37,16 +38,22 @@ impl Status {
         }
     }
 
-    pub fn approve(&self, user_id: UserId) -> Result<Self> {
+    pub fn approve(&self, user_id: UserId, comment: Comment) -> Result<Self> {
         match self {
-            Status::WaitingApproval => Ok(Status::Published { admin_id: user_id }),
+            Status::WaitingApproval => Ok(Status::Published {
+                admin_id: user_id,
+                comment,
+            }),
             _ => Err(Error::new("publication", "not_waiting_approval")),
         }
     }
 
-    pub fn reject(&self, user_id: UserId) -> Result<Self> {
+    pub fn reject(&self, user_id: UserId, comment: Comment) -> Result<Self> {
         match self {
-            Status::WaitingApproval => Ok(Status::Rejected { admin_id: user_id }),
+            Status::WaitingApproval => Ok(Status::Rejected {
+                admin_id: user_id,
+                comment,
+            }),
             _ => Err(Error::new("publication", "not_waiting_approval")),
         }
     }

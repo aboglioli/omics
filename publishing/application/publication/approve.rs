@@ -1,12 +1,19 @@
+use serde::Deserialize;
+
 use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 
+use crate::domain::interaction::Comment;
 use crate::domain::publication::{PublicationId, PublicationRepository};
 use crate::domain::user::{UserId, UserRepository};
 
-// TODO: add comment
+#[derive(Deserialize)]
+pub struct ApproveCommand {
+    pub comment: String,
+}
+
 pub struct Approve<'a> {
     event_pub: &'a dyn EventPublisher,
 
@@ -27,7 +34,12 @@ impl<'a> Approve<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<CommandResponse> {
+    pub async fn exec(
+        &self,
+        auth_id: String,
+        publication_id: String,
+        cmd: ApproveCommand,
+    ) -> Result<CommandResponse> {
         let user_id = UserId::new(auth_id)?;
         let user = self.user_repo.find_by_id(&user_id).await?;
 
@@ -38,7 +50,9 @@ impl<'a> Approve<'a> {
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        publication.approve(user_id)?;
+        let comment = Comment::new(cmd.comment)?;
+
+        publication.approve(user_id, comment)?;
 
         self.publication_repo.save(&mut publication).await?;
 
@@ -77,6 +91,9 @@ mod tests {
         uc.exec(
             cm.base().id().to_string(),
             publication.base().id().to_string(),
+            ApproveCommand {
+                comment: "All is OK".to_owned(),
+            },
         )
         .await
         .unwrap();
@@ -91,8 +108,9 @@ mod tests {
             "published"
         );
 
-        if let Status::Published { admin_id } = publication.status_history().current() {
+        if let Status::Published { admin_id, comment } = publication.status_history().current() {
             assert_eq!(admin_id, cm.base().id());
+            assert_eq!(comment.value(), "All is OK");
         }
     }
 }

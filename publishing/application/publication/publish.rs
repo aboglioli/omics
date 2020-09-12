@@ -54,7 +54,6 @@ impl<'a> Publish<'a> {
 mod tests {
     use super::*;
 
-    use crate::domain::publication::Status;
     use crate::mocks;
 
     #[tokio::test]
@@ -83,9 +82,5 @@ mod tests {
             publication.status_history().current().to_string(),
             "waiting-approval"
         );
-
-        if let Status::Published { admin_id } = publication.status_history().current() {
-            assert_eq!(admin_id, author.base().id());
-        }
     }
 }

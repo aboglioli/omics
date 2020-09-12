@@ -1,6 +1,7 @@
 use crate::domain::author::{Author, AuthorId};
 use crate::domain::category::{Category, CategoryId, Name as CategoryName};
 use crate::domain::collection::{Collection, CollectionId};
+use crate::domain::interaction::Comment;
 use crate::domain::publication::{
     Header, Image, Name, Page, Publication, PublicationId, Synopsis, Tag,
 };
@@ -68,7 +69,10 @@ pub fn published_publication1() -> Publication {
 
     publication.publish().unwrap();
     publication
-        .approve(content_manager1().0.base().id().clone())
+        .approve(
+            content_manager1().0.base().id().clone(),
+            Comment::new("comment").unwrap(),
+        )
         .unwrap();
     publication
 }

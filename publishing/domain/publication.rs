@@ -443,8 +443,8 @@ impl Publication {
         Ok(())
     }
 
-    pub fn approve(&mut self, user_id: UserId) -> Result<()> {
-        let published = self.status_history.current().approve(user_id)?;
+    pub fn approve(&mut self, user_id: UserId, comment: Comment) -> Result<()> {
+        let published = self.status_history.current().approve(user_id, comment)?;
         self.status_history.add_status(published);
         self.base.update();
 
@@ -467,8 +467,8 @@ impl Publication {
         Ok(())
     }
 
-    pub fn reject(&mut self, user_id: UserId) -> Result<()> {
-        let rejected = self.status_history().current().reject(user_id)?;
+    pub fn reject(&mut self, user_id: UserId, comment: Comment) -> Result<()> {
+        let rejected = self.status_history().current().reject(user_id, comment)?;
         self.status_history.add_status(rejected);
         self.base.update();
 
@@ -517,11 +517,17 @@ mod tests {
         let mut publication = mocks::publication1();
         let cm1 = mocks::content_manager1().0;
 
+        let comment = Comment::new("comment").unwrap();
+
         assert!(publication.make_draft().is_ok());
         assert!(publication.make_draft().is_ok());
 
-        assert!(publication.approve(cm1.base().id().clone()).is_err());
-        assert!(publication.reject(cm1.base().id().clone()).is_err());
+        assert!(publication
+            .approve(cm1.base().id().clone(), comment.clone())
+            .is_err());
+        assert!(publication
+            .reject(cm1.base().id().clone(), comment.clone())
+            .is_err());
 
         assert!(publication.publish().is_ok());
         assert!(matches!(
@@ -529,7 +535,9 @@ mod tests {
             Status::WaitingApproval
         ));
 
-        assert!(publication.approve(cm1.base().id().clone()).is_ok());
+        assert!(publication
+            .approve(cm1.base().id().clone(), comment.clone())
+            .is_ok());
         assert!(matches!(publication.status_history().current(), Status::Published { .. }));
         assert!(publication.publish().is_err());
 
@@ -540,7 +548,9 @@ mod tests {
         ));
         assert!(publication.publish().is_ok());
 
-        assert!(publication.reject(cm1.base().id().clone()).is_ok());
+        assert!(publication
+            .reject(cm1.base().id().clone(), comment.clone())
+            .is_ok());
         assert!(matches!(publication.status_history().current(), Status::Rejected { .. }));
         assert!(publication.publish().is_err());
 

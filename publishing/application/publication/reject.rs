@@ -1,10 +1,18 @@
+use serde::Deserialize;
+
 use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 
+use crate::domain::interaction::Comment;
 use crate::domain::publication::{PublicationId, PublicationRepository};
 use crate::domain::user::{UserId, UserRepository};
+
+#[derive(Deserialize)]
+pub struct RejectCommand {
+    pub comment: String,
+}
 
 pub struct Reject<'a> {
     event_pub: &'a dyn EventPublisher,
@@ -26,7 +34,12 @@ impl<'a> Reject<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<CommandResponse> {
+    pub async fn exec(
+        &self,
+        auth_id: String,
+        publication_id: String,
+        cmd: RejectCommand,
+    ) -> Result<CommandResponse> {
         let user_id = UserId::new(auth_id)?;
         let user = self.user_repo.find_by_id(&user_id).await?;
 
@@ -37,7 +50,9 @@ impl<'a> Reject<'a> {
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        publication.reject(user_id)?;
+        let comment = Comment::new(cmd.comment)?;
+
+        publication.reject(user_id, comment)?;
 
         self.publication_repo.save(&mut publication).await?;
 
@@ -76,6 +91,9 @@ mod tests {
         uc.exec(
             cm.base().id().to_string(),
             publication.base().id().to_string(),
+            RejectCommand {
+                comment: "All is OK".to_owned(),
+            },
         )
         .await
         .unwrap();
@@ -90,8 +108,9 @@ mod tests {
             "rejected"
         );
 
-        if let Status::Rejected { admin_id } = publication.status_history().current() {
+        if let Status::Rejected { admin_id, comment } = publication.status_history().current() {
             assert_eq!(admin_id, cm.base().id());
+            assert_eq!(comment.value(), "All is OK");
         }
     }
 }

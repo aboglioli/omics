@@ -5,6 +5,7 @@ use identity::domain::user::{Image as UserImage, *};
 use publishing::domain::author::Author;
 use publishing::domain::category::{Name as CategoryName, *};
 use publishing::domain::collection::*;
+use publishing::domain::interaction::Comment;
 use publishing::domain::publication::{Image as PublicationImage, Name as PublicationName, *};
 use publishing::domain::reader::Reader;
 
@@ -161,7 +162,10 @@ pub async fn populate(c: &Container) -> Result<()> {
     )?])?;
     publication_1.set_pages(vec![page_1, page_2])?;
     publication_1.publish()?;
-    publication_1.approve(content_manager.base().id().clone())?;
+    publication_1.approve(
+        content_manager.base().id().clone(),
+        Comment::new("comment").unwrap(),
+    )?;
     c.publishing
         .publication_repo()
         .save(&mut publication_1)

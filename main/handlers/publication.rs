@@ -2,9 +2,9 @@ use actix_web::{web, HttpRequest, HttpResponse, Responder};
 
 use common::request::IncludeParams;
 use publishing::application::publication::{
-    AddReview, AddReviewCommand, Approve, Create, CreateCommand, Delete, DeleteReview, GetById,
-    GetReviews, Like, Publish, Read, Reject, Search, SearchCommand, Unlike, Update, UpdateCommand,
-    UpdatePages, UpdatePagesCommand,
+    AddReview, AddReviewCommand, Approve, ApproveCommand, Create, CreateCommand, Delete,
+    DeleteReview, GetById, GetReviews, Like, Publish, Read, Reject, RejectCommand, Search,
+    SearchCommand, Unlike, Update, UpdateCommand, UpdatePages, UpdatePagesCommand,
 };
 
 use crate::authorization::auth;
@@ -151,6 +151,7 @@ async fn publish(
 async fn approve(
     req: HttpRequest,
     path: web::Path<String>,
+    cmd: web::Json<ApproveCommand>,
     c: web::Data<Container>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
@@ -160,7 +161,7 @@ async fn approve(
         c.publishing.publication_repo(),
         c.publishing.user_repo(),
     )
-    .exec(auth_id, path.into_inner())
+    .exec(auth_id, path.into_inner(), cmd.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -170,6 +171,7 @@ async fn approve(
 async fn reject(
     req: HttpRequest,
     path: web::Path<String>,
+    cmd: web::Json<RejectCommand>,
     c: web::Data<Container>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
@@ -179,7 +181,7 @@ async fn reject(
         c.publishing.publication_repo(),
         c.publishing.user_repo(),
     )
-    .exec(auth_id, path.into_inner())
+    .exec(auth_id, path.into_inner(), cmd.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
