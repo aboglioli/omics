@@ -1,5 +1,6 @@
 use serde::Serialize;
 
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::Include;
 use common::result::Result;
@@ -115,6 +116,10 @@ impl<'a> GetById<'a> {
                 )
             }
         } else {
+            if !publication.is_published() {
+                return Err(Error::new("publication", "not_published"));
+            }
+
             (PublicationDto::from(&publication), None)
         };
 

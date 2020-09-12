@@ -39,8 +39,12 @@ impl CategoryRepository for InMemCategoryRepository {
     }
 
     async fn save(&self, category: &mut Category) -> Result<()> {
-        self.cache
-            .set(category.base().id().clone(), category.clone())
-            .await
+        if category.base().deleted_at().is_none() {
+            self.cache
+                .set(category.base().id().clone(), category.clone())
+                .await
+        } else {
+            self.cache.delete(category.base().id()).await
+        }
     }
 }

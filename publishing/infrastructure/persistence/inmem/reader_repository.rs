@@ -35,8 +35,12 @@ impl ReaderRepository for InMemReaderRepository {
     }
 
     async fn save(&self, reader: &mut Reader) -> Result<()> {
-        self.cache
-            .set(reader.base().id().clone(), reader.clone())
-            .await
+        if reader.base().deleted_at().is_none() {
+            self.cache
+                .set(reader.base().id().clone(), reader.clone())
+                .await
+        } else {
+            self.cache.delete(reader.base().id()).await
+        }
     }
 }

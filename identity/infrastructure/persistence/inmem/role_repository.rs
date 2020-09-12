@@ -39,6 +39,10 @@ impl RoleRepository for InMemRoleRepository {
     }
 
     async fn save(&self, role: &mut Role) -> Result<()> {
-        self.cache.set(role.base().id().clone(), role.clone()).await
+        if role.base().deleted_at().is_none() {
+            self.cache.set(role.base().id().clone(), role.clone()).await
+        } else {
+            self.cache.delete(role.base().id()).await
+        }
     }
 }

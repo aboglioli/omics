@@ -1,1 +1,9 @@
-<app-under-construction></app-under-construction>
+<div class="container">
+  <app-publication-card
+    *ngFor="let publication of publications"
+    [publication]="publication"
+  >
+    <button (click)="reject(publication)">Rechazar</button>
+    <button (click)="approve(publication)">Aprobar</button>
+  </app-publication-card>
+</div>

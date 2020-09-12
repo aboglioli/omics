@@ -81,8 +81,12 @@ impl PublicationRepository for InMemPublicationRepository {
     }
 
     async fn save(&self, publication: &mut Publication) -> Result<()> {
-        self.cache
-            .set(publication.base().id().clone(), publication.clone())
-            .await
+        if publication.base().deleted_at().is_none() {
+            self.cache
+                .set(publication.base().id().clone(), publication.clone())
+                .await
+        } else {
+            self.cache.delete(publication.base().id()).await
+        }
     }
 }

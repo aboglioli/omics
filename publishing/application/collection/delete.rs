@@ -65,12 +65,11 @@ mod tests {
             .await
             .is_ok());
 
-        let collection = c
+        assert!(c
             .collection_repo()
             .find_by_id(&collection.base().id())
             .await
-            .unwrap();
-        assert!(collection.base().deleted_at().is_some());
+            .is_err());
     }
 
     #[tokio::test]

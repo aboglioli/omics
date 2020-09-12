@@ -90,8 +90,12 @@ impl CollectionRepository for InMemCollectionRepository {
     }
 
     async fn save(&self, collection: &mut Collection) -> Result<()> {
-        self.cache
-            .set(collection.base().id().clone(), collection.clone())
-            .await
+        if collection.base().deleted_at().is_none() {
+            self.cache
+                .set(collection.base().id().clone(), collection.clone())
+                .await
+        } else {
+            self.cache.delete(collection.base().id()).await
+        }
     }
 }

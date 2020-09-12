@@ -44,6 +44,7 @@ import { AutoresComponent } from './pages/autores/autores.component';
 import { UnderConstructionComponent } from './shared/under-construction/under-construction.component';
 import { DeskboardMisComicsComponent } from './components/deskboard/deskboard-mis-comics/deskboard-mis-comics.component';
 import { NewPublicationComponent } from './components/deskboard/new-publication/new-publication.component';
+import { PublicationCardComponent } from './components/publication-card/publication-card.component';
 // --->
 
 // Development
@@ -87,6 +88,7 @@ import { PerfilEditarComponent } from './pages/perfil-editar/perfil-editar.compo
     NewPublicationComponent,
     PasswordForgotComponent,
     PasswordRewriteComponent,
+    PublicationCardComponent,
 
     DevelopmentComponent,
     DevUploadFileComponent,

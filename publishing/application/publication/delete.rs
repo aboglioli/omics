@@ -65,12 +65,11 @@ mod tests {
             .await
             .is_ok());
 
-        let publication = c
+        assert!(c
             .publication_repo()
             .find_by_id(&publication.base().id())
             .await
-            .unwrap();
-        assert!(publication.base().deleted_at().is_some());
+            .is_err());
     }
 
     #[tokio::test]

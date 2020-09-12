@@ -203,6 +203,30 @@ pub async fn populate(c: &Container) -> Result<()> {
         .save(&mut publication_3)
         .await?;
 
+    let mut publication_4 = Publication::new(
+        PublicationId::new("publication-4")?,
+        user.base().id().clone(),
+        Header::new(
+            PublicationName::new("Lista para aprobarse")?,
+            Synopsis::new("Ojalá la aprueben...")?,
+            category_1.base().id().clone(),
+            vec![],
+            PublicationImage::new("https://via.placeholder.com/768x1024.jpg")?,
+        )?,
+    )?;
+    let mut page_1 = Page::new(0)?;
+    page_1.set_images(vec![
+        PublicationImage::new("https://via.placeholder.com/768x1024.jpg")?,
+        PublicationImage::new("https://via.placeholder.com/768x1024.jpg")?,
+        PublicationImage::new("https://via.placeholder.com/768x1024.jpg")?,
+    ])?;
+    publication_4.set_pages(vec![page_1])?;
+    publication_4.publish()?;
+    c.publishing
+        .publication_repo()
+        .save(&mut publication_4)
+        .await?;
+
     let mut collection_1 = Collection::new(
         CollectionId::new("collection-1")?,
         user.base().id().clone(),

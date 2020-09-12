@@ -14,6 +14,7 @@ export class PublicationCardComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    console.log(this.publication);
   }
 
 }

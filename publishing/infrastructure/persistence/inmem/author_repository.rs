@@ -39,8 +39,12 @@ impl AuthorRepository for InMemAuthorRepository {
     }
 
     async fn save(&self, author: &mut Author) -> Result<()> {
-        self.cache
-            .set(author.base().id().clone(), author.clone())
-            .await
+        if author.base().deleted_at().is_none() {
+            self.cache
+                .set(author.base().id().clone(), author.clone())
+                .await
+        } else {
+            self.cache.delete(author.base().id()).await
+        }
     }
 }

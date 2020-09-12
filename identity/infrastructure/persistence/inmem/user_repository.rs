@@ -61,7 +61,11 @@ impl UserRepository for InMemUserRepository {
     }
 
     async fn save(&self, user: &mut User) -> Result<()> {
-        self.cache.set(user.base().id().clone(), user.clone()).await
+        if user.base().deleted_at().is_none() {
+            self.cache.set(user.base().id().clone(), user.clone()).await
+        } else {
+            self.cache.delete(user.base().id()).await
+        }
     }
 }
 
