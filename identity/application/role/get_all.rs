@@ -27,7 +27,7 @@ impl<'a> GetAll<'a> {
 
     pub async fn exec(&self, auth_id: String) -> Result<GetAllResponse> {
         let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-        if user.role_id().value() != "admin" {
+        if !user.is_admin() {
             return Err(Error::unauthorized());
         }
 
