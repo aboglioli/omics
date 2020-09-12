@@ -41,8 +41,134 @@
 
           <div class="body">
 
+            <!-- Apellido y nombre -->
+            <div class="box-row">
+
+              <!-- Block: campo nombre -->
+              <div class="block-field">
+
+                <div class="input-field-row">
+
+                <div class="title-and-error">
+                  <p class="field-name">Nombre: </p>
+
+                  <!-- mensaje de error -->
+                  <p  *ngIf="nombreNovalido"
+                      class="form-text text-danger">
+                      Ingrese un nombre de al menos 2 caracteres
+                  </p>
+                </div>
+
+                </div>
+
+                <!-- Input text -->
+                <input  class="form-control"
+                        type="text"
+                        placeholder="Nombre"
+                        formControlName="name"
+                        [class.is-invalid]="nombreNovalido">
+
+
+              </div>
+
+              <!-- Block: campo apellido -->
+              <div class="block-field">
+
+                <div class="input-field-row">
+
+                <div class="title-and-error">
+                  <p class="field-name">Apellido: </p>
+
+                  <!-- mensaje de error -->
+                  <p  *ngIf="apellidoNovalido"
+                      class="form-text text-danger">
+                      Ingrese un apellido de al menos 2 caracteres
+                  </p>
+
+                </div>
+
+                </div>
+
+                <!-- Input text -->
+                <input class="form-control"
+                        type="text"
+                        placeholder="Nombre"
+                        formControlName="lastname"
+                        [class.is-invalid]="apellidoNovalido">
+
+
+              </div>
+
+            </div>
+
+            <!-- Email -->
+            <div class="box-row">
+
+              <!-- Block: campo email -->
+              <div class="block-field">
+
+                <div class="input-field-row">
+
+                  <div class="title-and-error">
+                    <p class="field-name">Correro: </p>
+
+                    <!-- mensaje de error -->
+                    <p  *ngIf="correoNovalido"
+                        class="form-text text-danger">
+                        Ingrese un correo válido
+                    </p>
+                  </div>
+
+                </div>
+
+                <!-- Input text -->
+                <input  class="form-control"
+                        type="email"
+                        placeholder="Correo electrónico"
+                        formControlName="email"
+                        [class.is-invalid]="correoNovalido">
+
+
+              </div>
+
+              <!-- Block: espacio auxiliar -->
+              <div class="block-field">
+
+              </div>
+
+            </div>
+
+            <div class="box-row">
+
+                <div class="block-field">
+
+                  <div class="input-field-row">
+
+                    <div class="title-and-error">
+                      <p class="field-name">Descripción: </p>
+
+                      <!-- mensaje de error -->
+                      <p  *ngIf="biografiaNovalido"
+                          class="form-text text-danger">
+                          Requiere que sea menos de 256 caracteres.
+                      </p>
+                    </div>
+
+                  </div>
+
+
+                  <mat-form-field appearance="fill" class="text-area">
+                    <mat-label>{{ biografiaLenght }} / 512</mat-label>
+                    <textarea matInput
+                              formControlName="biography"></textarea>
+                  </mat-form-field>
+
+                </div>
+
+            </div>
 
           </div>
+
 
         </span>
 

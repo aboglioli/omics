@@ -100,7 +100,7 @@ export class LoginRegisterComponent implements OnInit {
     // SignUp
     this.formSignUp = this.fb.group({
 
-      correo     : ['', [ Validators.required, Validators.pattern( '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$' )] ],
+      correo     : ['', [ Validators.required, Validators.pattern( ' ^[a-zA-Z0-9]+[a-zA-Z0-9_.+-]*@[a-zA-Z0-9]+[a-zA-Z0-9-]*\.[a-zA-Z0-9-.]+$' )] ],
       usuario    : ['', [ Validators.required, Validators.minLength(5) ]],
       password1  : ['', [ Validators.required, Validators.minLength(8) ] ],
       password2  : ['', [ Validators.required, Validators.minLength(8) ] ],
@@ -175,7 +175,7 @@ export class LoginRegisterComponent implements OnInit {
 
     this.identityService.getById( uderId ).subscribe( res => {
 
-      this.userData = res
+      this.userData = res;
 
       Swal.fire({
           icon: 'success',

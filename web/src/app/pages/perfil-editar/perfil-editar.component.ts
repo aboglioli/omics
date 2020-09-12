@@ -51,14 +51,13 @@ export class PerfilEditarComponent implements OnInit {
     this.formProfile = this.fb.group({
 
       username:       ['', [ Validators.required, Validators.minLength(5) ] ],
-      email:          ['', [ Validators.pattern( '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$' )] ],
-      name:           ['', ],
-      lastname:       ['', ],
+      email:          ['', [ Validators.required, Validators.pattern( ' ^[a-zA-Z0-9]+[a-zA-Z0-9_.+-]*@[a-zA-Z0-9]+[a-zA-Z0-9-]*\.[a-zA-Z0-9-.]+$' )] ],
+      name:           ['', [ Validators.required, Validators.minLength(2) ]],
+      lastname:       ['', [ Validators.required, Validators.minLength(2) ]],
       birthdate:      ['', ],
       gender:         ['', ],
       profile_image:  ['', ],
-      biography:      ['', ]
-
+      biography:      ['', [Validators.maxLength(252) ] ],
     });
 
   }
@@ -116,7 +115,6 @@ export class PerfilEditarComponent implements OnInit {
     // Definir la función del llamado al hacer click (cuando realiza un cambio)
     inputFileElement.onchange = ( event: any ) => {
 
-
       const fdImage: FormData = new FormData();
       const imagenAvatar  = event.target.files[0];
 
@@ -150,9 +148,27 @@ export class PerfilEditarComponent implements OnInit {
 
   }
   get profileAvatarImage(): string {
-
     return this.formProfile.get( 'profile_image' ).value;
+  }
 
+  get nombreNovalido(): boolean {
+    return ( this.formProfile.get('name').invalid && this.formProfile.get('name').touched );
+  }
+
+  get apellidoNovalido(): boolean {
+    return ( this.formProfile.get('lastname').invalid && this.formProfile.get('lastname').touched );
+  }
+
+  get correoNovalido(): boolean {
+    return ( this.formProfile.get('email').invalid && this.formProfile.get('email').touched );
+  }
+
+  get biografiaNovalido(): boolean {
+    return ( this.formProfile.get('biography').invalid && this.formProfile.get('biography').touched );
+  }
+
+  get biografiaLenght(): number {
+    return this.formProfile.get('biography').value.length;
   }
 
   // #endregion
