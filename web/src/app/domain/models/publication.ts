@@ -7,22 +7,23 @@ export interface IImage {
 }
 
 export interface IPage {
-  number: number; // TODO: not used
-  images: FileReader; // TODO: change to string?
+  number: number;
+  images: IImage;
 }
 
 export interface IPublication {
   id: string;
   author_id?: string;
   author?: IAuthor;
-  cover: FileReader;
   name: string;
-  collection: string;
   synopsis: string;
   category_id?: string;
   category?: ICategory;
   tags: string[];
+  cover: string;
   statistics?: IStatistics;
   status?: string;
   pages?: IPage[];
+  created_at: string;
+  updated_at?: string;
 }

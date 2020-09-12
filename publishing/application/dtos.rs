@@ -187,6 +187,7 @@ pub struct CollectionDto {
     pub category_id: Option<String>,
     pub category: Option<CategoryDto>,
     pub tags: Vec<String>,
+    pub cover: String,
     pub created_at: String,
     pub updated_at: Option<String>,
 }
@@ -207,6 +208,7 @@ impl From<&Collection> for CollectionDto {
                 .iter()
                 .map(|tag| tag.name().to_string())
                 .collect(),
+            cover: collection.header().cover().to_string(),
             created_at: collection.base().created_at().to_rfc3339(),
             updated_at: collection.base().updated_at().map(|d| d.to_rfc3339()),
         }

@@ -33,7 +33,7 @@ async fn get(c: web::Data<Container>) -> impl Responder {
                     id: event.id().to_string(),
                     topic: event.topic().to_string(),
                     code: event.code().to_string(),
-                    timestamp: event.timestamp().to_string(),
+                    timestamp: event.timestamp().to_rfc3339(),
                     payload: serde_json::from_slice(event.payload()).unwrap(),
                 })
                 .collect()

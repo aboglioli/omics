@@ -6,14 +6,16 @@ export interface IRole {
 export interface IUser {
   id: string;
   username: string;
-  email?: string;
+  email: string;
   name?: string;
   lastname?: string;
   birthdate?: string; // RFC 3339
   gender?: string; // male, female
-  profile_image?: string; // allowed extensions: jpg, jpeg, png
   biography?: string;
+  profile_image?: string; // allowed extensions: jpg, jpeg, png
   validated: boolean;
   role_id?: string;
   role?: IRole;
+  created_at: string;
+  updated_at?: string;
 }
