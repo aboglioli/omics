@@ -62,11 +62,17 @@ export interface IReadResponse {
   pages: IPage[];
 }
 
+export interface IApproveCommand {
+  comment: string;
+}
+
+export interface IRejectCommand {
+  comment: string;
+}
+
 @Injectable()
 export class PublicationService {
   private baseUrl: string;
-
-
 
   constructor(private http: HttpClient, configServ: ConfigService) {
     this.baseUrl = `${configServ.baseUrl()}/publications`;
@@ -128,12 +134,12 @@ export class PublicationService {
     return this.http.post(`${this.baseUrl}/${id}/publish`, {});
   }
 
-  public approve(id: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${id}/approve`, {});
+  public approve(id: string, cmd: IApproveCommand): Observable<any> {
+    return this.http.post(`${this.baseUrl}/${id}/approve`, cmd);
   }
 
-  public reject(id: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${id}/reject`, {});
+  public reject(id: string, cmd: IRejectCommand): Observable<any> {
+    return this.http.post(`${this.baseUrl}/${id}/reject`, cmd);
   }
 
   public read(id: string): Observable<IReadResponse> {

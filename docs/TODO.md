@@ -37,6 +37,7 @@
 - [ ] Move publishing::UserService to shared crate.
 - [ ] Allow change 'username' and 'email' in IdentityService.
 - [ ] Merge 'code' with 'topic' in Event.
+- [ ] Add entpoint for /publications/:id/collections (collections having the given publication).
 
 # Progress
 
