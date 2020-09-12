@@ -24,7 +24,20 @@ export class PerfilEditarComponent implements OnInit {
   // Otros
   public formProfile: FormGroup;
 
-
+  public generosList  = [
+    {
+      name: 'Femenino',
+      value: 'female'
+    },
+    {
+      name: 'Masculino',
+      value: 'male'
+    },
+    {
+      name: 'Otro',
+      value: 'other'
+    }
+  ];
 
   constructor(
 

@@ -185,18 +185,18 @@
 
                   <!-- Opciones únicas -->
                   <mat-radio-group formControlName="category_id">
-                  <ul>
-                    <li style="width: 100%; padding-left: 1em;"
-                        *ngFor="let category of categoryList">
+                    <ul>
+                      <li style="width: 100%; padding-left: 1em;"
+                          *ngFor="let category of categoryList">
 
-                      <mat-radio-button color="primary"
-                                    [value]="category.valueId">
-                        {{ category.name }}
-                      </mat-radio-button>
+                        <mat-radio-button color="primary"
+                                      [value]="category.valueId">
+                          {{ category.name }}
+                        </mat-radio-button>
 
-                    </li>
-                  </ul>
-                </mat-radio-group>
+                      </li>
+                    </ul>
+                  </mat-radio-group>
 
                 </div>
 

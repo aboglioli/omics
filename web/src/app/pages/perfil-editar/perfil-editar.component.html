@@ -38,7 +38,6 @@
 
           </div>
 
-
           <div class="body">
 
             <!-- Apellido y nombre -->
@@ -138,6 +137,7 @@
 
             </div>
 
+            <!-- Biografía -->
             <div class="box-row">
 
                 <div class="block-field">
@@ -167,8 +167,32 @@
 
             </div>
 
-          </div>
+            <!-- Genero -->
+            <div class="box-row">
 
+              <div class="block-field">
+
+                <div class="input-field-row">
+
+                  <div class="title-and-error">
+                    <p class="field-name">Género: </p>
+                  </div>
+
+                </div>
+
+                <mat-radio-group formControlName="gender">
+                  <mat-radio-button  *ngFor="let genero of generosList"
+                                      [value]="genero.value">
+                    {{ genero.name }}
+                  </mat-radio-button>
+                </mat-radio-group>
+
+
+              </div>
+
+            </div>
+
+          </div>
 
         </span>
 

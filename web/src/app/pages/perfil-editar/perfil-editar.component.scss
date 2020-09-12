@@ -225,6 +225,20 @@ div.perfil-editar-body {
           }
         }
 
+        mat-radio-group {
+
+          display: flex;
+          flex-direction: row;
+          background-color: white;
+          color: black;
+          border-radius: 6px;
+
+          mat-radio-button {
+            margin: 1em 1em;
+          }
+
+        }
+
 
       }
 
