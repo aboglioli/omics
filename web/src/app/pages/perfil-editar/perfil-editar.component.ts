@@ -6,6 +6,7 @@ import { faEdit } from '@fortawesome/free-solid-svg-icons';
 import { IdentityService } from '../../domain/services/identity.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { FileService } from 'src/app/domain/services/file.service';
+import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 
 @Component({
   selector: 'app-perfil-editar',
@@ -47,6 +48,7 @@ export class PerfilEditarComponent implements OnInit {
     private fileServ: FileService,
     private identityService: IdentityService,
     private fb: FormBuilder,
+    private sweetAlertGenericService: SweetAlertGenericMessageService,
 
   ) {}
 
@@ -66,7 +68,7 @@ export class PerfilEditarComponent implements OnInit {
     this.formProfile = this.fb.group({
 
       username:       ['', [ Validators.required, Validators.minLength(5) ] ],
-      email:          ['', [ Validators.required, Validators.pattern( ' ^[a-zA-Z0-9]+[a-zA-Z0-9_.+-]*@[a-zA-Z0-9]+[a-zA-Z0-9-]*\.[a-zA-Z0-9-.]+$' )] ],
+      email:          ['', [ Validators.required, Validators.pattern( '^[a-zA-Z0-9]+[a-zA-Z0-9_.+-]*@[a-zA-Z0-9]+[a-zA-Z0-9-]*\.[a-zA-Z0-9-.]+$' )] ],
       name:           ['', [ Validators.required, Validators.minLength(2) ]],
       lastname:       ['', [ Validators.required, Validators.minLength(2) ]],
       birthdate:      ['', ],
@@ -153,6 +155,39 @@ export class PerfilEditarComponent implements OnInit {
       );
 
     };
+
+  }
+
+  public convertDateToRFC3339(changeDate: Date): void {
+
+    this.formProfile.get('birthdate').setValue( changeDate.toISOString() );
+
+  }
+
+  public onGuardarCambios(): void {
+
+    console.log(this.formProfile.value);
+
+  }
+
+  public onSuscribirse(): void {
+
+    // TODO: Agregar pantalla de suscripción
+    this.sweetAlertGenericService.showUnderConstrucction();
+
+  }
+
+  public onMedioCobro(): void {
+
+    // TODO: Agregar pantalla de Medio de Cobro
+    this.sweetAlertGenericService.showUnderConstrucction();
+
+  }
+
+  public onEliminarCuenta(): void {
+
+    // TODO: Agregar pantalla de eliminar
+    this.sweetAlertGenericService.showUnderConstrucction();
 
   }
 

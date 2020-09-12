@@ -256,6 +256,17 @@ div.perfil-editar-body {
 
   }
 
+  div.button-actions {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+
+    button {
+      margin: 1em 2em;
+    }
+
+  }
+
 }
 
 // Generales
@@ -263,11 +274,8 @@ div.perfil-editar-body {
 button.button-white-borders {
 
   color: white;
-  border-color: white;
-
   &:hover {
-    border-style: solid;
-    border-width: 2px;
+    box-shadow: inset 0px 0px 0px 2px white;
   }
 
 }

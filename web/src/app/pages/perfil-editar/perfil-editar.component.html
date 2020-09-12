@@ -40,6 +40,32 @@
 
           <div class="body">
 
+            <div class="button-actions">
+
+              <button mat-flat-button
+                      color="accent"
+                      class="button-white-borders"
+                      (click)="onGuardarCambios()">
+                Guardar Cambios
+              </button>
+
+              <button mat-flat-button
+                      color="primary"
+                      class="button-white-borders"
+                      (click)="onSuscribirse()">
+                Suscribirse
+              </button>
+
+              <button mat-flat-button
+                      color="primary"
+                      class="button-white-borders"
+                      (click)="onMedioCobro()">
+                Medio de Cobro
+              </button>
+
+
+            </div>
+
             <!-- Apellido y nombre -->
             <div class="box-row">
 
@@ -208,7 +234,8 @@
                   <input  matInput
                           [max]="maxDateBirthday"
                           [matDatepicker]="picker"
-                          formControlName="birthdate">
+                          formControlName="birthdate"
+                          (dateChange)="convertDateToRFC3339($event.value)">
                   <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                   <mat-datepicker #picker></mat-datepicker>
                 </mat-form-field>
@@ -222,6 +249,17 @@
 
             </div>
 
+          </div>
+
+
+          <!-- Eliminar cuenta -->
+          <div style="display: flex; justify-content: center; margin-bottom: 1em;">
+            <button mat-flat-button color="warn"
+                    class="button-white-borders"
+                    style="width: 50%;"
+                    (click)="onEliminarCuenta()">
+              Eliminar Cuenta
+            </button>
           </div>
 
         </span>
