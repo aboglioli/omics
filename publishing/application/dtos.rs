@@ -119,6 +119,7 @@ pub struct PublicationDto {
     pub category_id: Option<String>,
     pub category: Option<CategoryDto>,
     pub tags: Vec<String>,
+    pub cover: String,
     pub statistics: StatisticsDto,
     pub pages: Option<Vec<PageDto>>,
     pub status: Option<String>,
@@ -142,6 +143,7 @@ impl From<&Publication> for PublicationDto {
                 .iter()
                 .map(|tag| tag.name().to_string())
                 .collect(),
+            cover: publication.header().cover().to_string(),
             statistics: StatisticsDto::from(publication.statistics()),
             pages: None,
             status: None,

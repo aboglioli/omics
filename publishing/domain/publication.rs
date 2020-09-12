@@ -72,7 +72,7 @@ impl Publication {
                 .iter()
                 .map(|t| t.name().to_string())
                 .collect(),
-            cover: publication.header().cover().url().to_string(),
+            cover: publication.header().cover().to_string(),
         });
 
         Ok(publication)

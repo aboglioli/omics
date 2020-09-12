@@ -20,7 +20,9 @@ impl Email {
             return Err(Error::new("email", "too_long"));
         }
 
-        match Regex::new(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$") {
+        match Regex::new(
+            r"^[a-zA-Z0-9]+[a-zA-Z0-9_.+-]*@[a-zA-Z0-9]+[a-zA-Z0-9-]*\.[a-zA-Z0-9-.]+$",
+        ) {
             Ok(re) => {
                 if !re.is_match(&email) {
                     return Err(Error::new("email", "invalid"));

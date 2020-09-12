@@ -37,6 +37,12 @@ impl Image {
     }
 }
 
+impl ToString for Image {
+    fn to_string(&self) -> String {
+        self.url().to_owned()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
