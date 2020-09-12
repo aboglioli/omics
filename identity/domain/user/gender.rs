@@ -5,6 +5,7 @@ use common::result::Result;
 pub enum Gender {
     Male,
     Female,
+    Other,
 }
 
 impl Gender {
@@ -12,6 +13,7 @@ impl Gender {
         match date_str {
             "male" => Ok(Gender::Male),
             "female" => Ok(Gender::Female),
+            "other" => Ok(Gender::Other),
             _ => Err(Error::new("gender", "invalid")),
         }
     }
@@ -22,6 +24,7 @@ impl ToString for Gender {
         match self {
             Gender::Male => "male".to_owned(),
             Gender::Female => "female".to_owned(),
+            Gender::Other => "other".to_owned(),
         }
     }
 }
