@@ -239,6 +239,16 @@ div.perfil-editar-body {
 
         }
 
+        mat-form-field.matDate {
+
+          max-width: 296px;
+
+          ::ng-deep div.mat-form-field-flex {
+            background-color: white;
+            color: black;
+          }
+        }
+
 
       }
 

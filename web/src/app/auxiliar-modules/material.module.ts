@@ -6,12 +6,13 @@ import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatRippleModule} from '@angular/material/core';
+import {MatRippleModule, MatNativeDateModule, MAT_DATE_LOCALE} from '@angular/material/core';
 import {MatSelectModule} from '@angular/material/select';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatRadioModule} from '@angular/material/radio';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatInputModule } from '@angular/material/input';
+import {MatDatepickerModule} from '@angular/material/datepicker';
 
 @NgModule({
   declarations: [],
@@ -28,7 +29,9 @@ import {MatInputModule } from '@angular/material/input';
     MatCheckboxModule,
     MatRadioModule,
     MatChipsModule,
-    MatInputModule
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   exports: [
     MatToolbarModule,
@@ -43,8 +46,11 @@ import {MatInputModule } from '@angular/material/input';
     MatCheckboxModule,
     MatRadioModule,
     MatChipsModule,
-    MatInputModule
-  ]
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule
+  ],
+  providers: [{ provide: MAT_DATE_LOCALE, useValue: 'es-ES' }]
 })
 
 

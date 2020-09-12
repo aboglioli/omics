@@ -132,7 +132,6 @@
 
               <!-- Block: espacio auxiliar -->
               <div class="block-field">
-
               </div>
 
             </div>
@@ -155,7 +154,6 @@
                     </div>
 
                   </div>
-
 
                   <mat-form-field appearance="fill" class="text-area">
                     <mat-label>{{ biografiaLenght }} / 512</mat-label>
@@ -189,6 +187,38 @@
 
 
               </div>
+
+            </div>
+
+            <!-- Fecha Nacimiento -->
+            <div class="box-row">
+
+              <div class="block-field">
+
+                <div class="input-field-row">
+
+                  <div class="title-and-error">
+                    <p class="field-name">Fecha de Nacimiento: </p>
+                  </div>
+
+                </div>
+
+                <mat-form-field appearance="fill" class="matDate">
+                  <mat-label>Slecciona una fecha</mat-label>
+                  <input  matInput
+                          [max]="maxDateBirthday"
+                          [matDatepicker]="picker"
+                          formControlName="birthdate">
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+
+              </div>
+
+              <!-- Block: espacio auxiliar -->
+              <div class="block-field">
+              </div>
+
 
             </div>
 
