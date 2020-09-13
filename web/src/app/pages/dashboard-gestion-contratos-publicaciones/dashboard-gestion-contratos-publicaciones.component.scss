@@ -1,0 +1,14 @@
+div.container-box {
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  div.body {
+
+    margin: 0em 4em;
+    overflow-y: auto;
+
+  }
+
+}

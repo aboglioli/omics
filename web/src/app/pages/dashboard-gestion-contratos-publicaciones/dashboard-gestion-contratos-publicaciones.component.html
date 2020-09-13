@@ -1,9 +1,31 @@
-<div class="container">
-  <app-publication-card
-    *ngFor="let publication of publications"
-    [publication]="publication"
-  >
-    <button (click)="reject(publication)">Rechazar</button>
-    <button (click)="approve(publication)">Aprobar</button>
-  </app-publication-card>
+<div class="container-box">
+
+  <div class="header">
+  </div>
+
+  <div class="body">
+
+    <br>
+    <div *ngFor="let publication of publicationList">
+
+      <!-- Publication Thumbail -->
+      <app-publication-card [publication]="publication">
+      </app-publication-card>
+
+      <!-- Action Buttons -->
+      <div class="action-button-publication">
+        <button (click)="reject(publication)">
+          Rechazar
+        </button>
+
+        <button (click)="approve(publication)">
+          Aprobar
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+
 </div>
