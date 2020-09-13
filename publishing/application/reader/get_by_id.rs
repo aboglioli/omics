@@ -1,9 +1,9 @@
 use common::error::Error;
 use common::result::Result;
+use shared::domain::user::UserRepository;
 
 use crate::application::dtos::ReaderDto;
 use crate::domain::reader::{ReaderId, ReaderRepository};
-use crate::domain::user::UserRepository;
 
 pub struct GetById<'a> {
     reader_repo: &'a dyn ReaderRepository,

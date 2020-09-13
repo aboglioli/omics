@@ -1,1 +1,1 @@
-pub mod publishing;
+pub mod shared;

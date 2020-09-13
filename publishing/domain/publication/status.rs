@@ -1,8 +1,8 @@
 use common::error::Error;
 use common::result::Result;
+use shared::domain::user::UserId;
 
 use crate::domain::interaction::Comment;
-use crate::domain::user::UserId;
 
 #[derive(Debug, Clone)]
 pub enum Status {

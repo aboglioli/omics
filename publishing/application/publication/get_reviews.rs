@@ -1,12 +1,12 @@
 use serde::Serialize;
 
 use common::result::Result;
+use shared::domain::user::UserRepository;
 
 use crate::application::dtos::{ReaderDto, ReviewDto};
 use crate::domain::interaction::InteractionRepository;
 use crate::domain::publication::PublicationId;
 use crate::domain::reader::ReaderRepository;
-use crate::domain::user::UserRepository;
 
 #[derive(Serialize)]
 pub struct GetReviewsResponse {

@@ -2,13 +2,13 @@ use serde::{Deserialize, Serialize};
 
 use common::request::Include;
 use common::result::Result;
+use shared::domain::user::UserRepository;
 
 use crate::application::dtos::{AuthorDto, CategoryDto, CollectionDto};
 use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::category::{CategoryId, CategoryRepository};
 use crate::domain::collection::CollectionRepository;
 use crate::domain::publication::PublicationId;
-use crate::domain::user::UserRepository;
 
 #[derive(Deserialize)]
 pub struct SearchCommand {

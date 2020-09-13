@@ -2,9 +2,9 @@ use serde::{Deserialize, Serialize};
 
 use common::error::Error;
 use common::result::Result;
+use shared::domain::user::{UserId, UserRepository};
 
 use crate::domain::category::{Category, CategoryId, CategoryRepository, Name};
-use crate::domain::user::{UserId, UserRepository};
 
 #[derive(Serialize)]
 pub struct CreateResponse {

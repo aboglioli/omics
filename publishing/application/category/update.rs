@@ -3,9 +3,9 @@ use serde::Deserialize;
 use common::error::Error;
 use common::request::CommandResponse;
 use common::result::Result;
+use shared::domain::user::{UserId, UserRepository};
 
 use crate::domain::category::{CategoryId, CategoryRepository, Name};
-use crate::domain::user::{UserId, UserRepository};
 
 #[derive(Deserialize)]
 pub struct UpdateCommand {

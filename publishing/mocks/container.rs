@@ -1,14 +1,14 @@
 use std::sync::Arc;
 
 use common::mocks::FakeEventPublisher;
+use shared::infrastructure::persistence::inmem::InMemUserRepository;
+use shared::mocks::FakeUserService;
 
 use crate::container::Container;
 use crate::infrastructure::persistence::inmem::{
     InMemAuthorRepository, InMemCategoryRepository, InMemCollectionRepository,
     InMemInteractionRepository, InMemPublicationRepository, InMemReaderRepository,
-    InMemUserRepository,
 };
-use crate::mocks::FakeUserService;
 
 #[allow(dead_code)]
 pub fn container() -> Container<FakeEventPublisher> {

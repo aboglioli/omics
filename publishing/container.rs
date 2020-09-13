@@ -2,16 +2,16 @@ use std::sync::Arc;
 
 use common::event::{EventPublisher, EventSubscriber};
 use common::result::Result;
+use shared::domain::user::{UserRepository, UserService};
 
-use crate::application::handler::UserHandler;
-use crate::application::reader::InteractionHandler;
+use crate::application::author::AuthorFromUserHandler;
+use crate::application::reader::{InteractionHandler, ReaderFromUserHandler};
 use crate::domain::author::AuthorRepository;
 use crate::domain::category::CategoryRepository;
 use crate::domain::collection::CollectionRepository;
 use crate::domain::interaction::{InteractionRepository, InteractionService};
 use crate::domain::publication::{PublicationRepository, StatisticsService};
 use crate::domain::reader::ReaderRepository;
-use crate::domain::user::{UserRepository, UserService};
 
 pub struct Container<EPub> {
     event_pub: Arc<EPub>,
@@ -71,13 +71,15 @@ where
     where
         ES: EventSubscriber,
     {
-        let user_handler = UserHandler::new(
-            self.author_repo.clone(),
-            self.reader_repo.clone(),
-            self.user_repo.clone(),
-            self.user_serv.clone(),
-        );
-        event_sub.subscribe(Box::new(user_handler)).await?;
+        let author_from_user_handler = AuthorFromUserHandler::new(self.author_repo.clone());
+        event_sub
+            .subscribe(Box::new(author_from_user_handler))
+            .await?;
+
+        let reader_from_user_handler = ReaderFromUserHandler::new(self.reader_repo.clone());
+        event_sub
+            .subscribe(Box::new(reader_from_user_handler))
+            .await?;
 
         let reader_handler =
             InteractionHandler::new(self.reader_repo.clone(), self.publication_repo.clone());

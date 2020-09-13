@@ -12,15 +12,17 @@ use publishing::container::Container as PublishingContainer;
 use publishing::infrastructure::persistence::inmem::{
     InMemAuthorRepository, InMemCategoryRepository, InMemCollectionRepository,
     InMemInteractionRepository, InMemPublicationRepository, InMemReaderRepository,
-    InMemUserRepository as PInMemUserRepository,
 };
+use shared::container::Container as SharedContainer;
+use shared::infrastructure::persistence::inmem::InMemUserRepository as SharedInMemUserRepository;
 
 use crate::development::EventLogger;
-use crate::infrastructure::publishing::LocalUserService;
+use crate::infrastructure::shared::LocalUserService;
 
 pub struct Container {
     pub event_bus: Arc<InMemEventBus>,
     pub event_repo: Arc<InMemEventRepository>,
+    pub shared: SharedContainer<InMemEventBus>,
     pub identity: IdentityContainer<InMemEventBus>,
     pub publishing: PublishingContainer<InMemEventBus>,
 }
@@ -45,8 +47,12 @@ impl Container {
         let p_interaction_repo = Arc::new(InMemInteractionRepository::new());
         let p_publication_repo = Arc::new(InMemPublicationRepository::new());
         let p_reader_repo = Arc::new(InMemReaderRepository::new());
-        let p_user_repo = Arc::new(PInMemUserRepository::new());
+        let p_user_repo = Arc::new(SharedInMemUserRepository::new());
         let p_user_serv = Arc::new(LocalUserService::new(i_user_repo.clone()));
+
+        // Shared
+        let s_user_repo = Arc::new(SharedInMemUserRepository::new());
+        let s_user_serv = Arc::new(LocalUserService::new(i_user_repo.clone()));
 
         // Containers
         let identity = IdentityContainer::new(
@@ -70,9 +76,12 @@ impl Container {
             p_user_serv,
         );
 
+        let shared = SharedContainer::new(event_bus.clone(), s_user_repo, s_user_serv);
+
         Container {
             event_bus,
             event_repo,
+            shared,
             identity,
             publishing,
         }
@@ -82,6 +91,7 @@ impl Container {
         let event_logger = EventLogger::new(self.event_repo.clone());
         self.event_bus.subscribe(Box::new(event_logger)).await?;
 
+        self.shared.subscribe(self.event_bus.as_ref()).await?;
         self.identity.subscribe(self.event_bus.as_ref()).await?;
         self.publishing.subscribe(self.event_bus.as_ref()).await?;
 

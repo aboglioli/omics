@@ -4,6 +4,7 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::Include;
 use common::result::Result;
+use shared::domain::user::{UserId, UserRepository};
 
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto, ReaderInteractionDto};
 use crate::domain::author::AuthorRepository;
@@ -11,7 +12,6 @@ use crate::domain::category::CategoryRepository;
 use crate::domain::interaction::InteractionService;
 use crate::domain::publication::{PublicationId, PublicationRepository, StatisticsService};
 use crate::domain::reader::{ReaderId, ReaderRepository};
-use crate::domain::user::{UserId, UserRepository};
 
 #[derive(Serialize)]
 pub struct GetByIdResponse {

@@ -24,12 +24,12 @@ pub use tag::*;
 use common::error::Error;
 use common::model::{AggregateRoot, Events, StatusHistory, StringId};
 use common::result::Result;
+use shared::domain::user::UserId;
 use shared::event::PublicationEvent;
 
 use crate::domain::author::AuthorId;
 use crate::domain::interaction::{Comment, Like, Reading, Review, Stars, View};
 use crate::domain::reader::Reader;
-use crate::domain::user::UserId;
 
 pub type PublicationId = StringId;
 

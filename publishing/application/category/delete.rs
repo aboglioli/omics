@@ -1,9 +1,9 @@
 use common::error::Error;
 use common::request::CommandResponse;
 use common::result::Result;
+use shared::domain::user::{UserId, UserRepository};
 
 use crate::domain::category::{CategoryId, CategoryRepository};
-use crate::domain::user::{UserId, UserRepository};
 
 pub struct Delete<'a> {
     category_repo: &'a dyn CategoryRepository,

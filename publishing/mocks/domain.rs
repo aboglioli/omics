@@ -1,3 +1,5 @@
+use shared::domain::user::{User, UserId};
+
 use crate::domain::author::{Author, AuthorId};
 use crate::domain::category::{Category, CategoryId, Name as CategoryName};
 use crate::domain::collection::{Collection, CollectionId};
@@ -6,7 +8,6 @@ use crate::domain::publication::{
     Header, Image, Name, Page, Publication, PublicationId, Synopsis, Tag,
 };
 use crate::domain::reader::{Reader, ReaderId};
-use crate::domain::user::{User, UserId};
 
 pub fn publication1() -> Publication {
     let author_id = user1().0.base().id().clone();

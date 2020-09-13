@@ -4,4 +4,3 @@ pub mod collection;
 pub mod interaction;
 pub mod publication;
 pub mod reader;
-pub mod user;

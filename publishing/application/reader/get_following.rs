@@ -2,12 +2,12 @@ use serde::Serialize;
 
 use common::error::Error;
 use common::result::Result;
+use shared::domain::user::UserRepository;
 
 use crate::application::dtos::AuthorDto;
 use crate::domain::author::AuthorRepository;
 use crate::domain::interaction::InteractionRepository;
 use crate::domain::reader::ReaderId;
-use crate::domain::user::UserRepository;
 
 #[derive(Serialize)]
 pub struct GetFollowingResponse {

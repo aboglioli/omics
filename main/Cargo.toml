@@ -16,6 +16,7 @@ publishing = { path = "../publishing" }
 
 [dependencies]
 common = { path = "../common" }
+shared = { path = "../shared" }
 file = { path = "../file" }
 identity = { path = "../identity" }
 payment = { path = "../payment" }

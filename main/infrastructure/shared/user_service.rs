@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use common::model::AggregateRoot;
 use common::result::Result;
 use identity::domain::user::UserRepository;
-use publishing::domain::user::{User, UserId, UserService};
+use shared::domain::user::{User, UserId, UserService};
 
 pub struct LocalUserService {
     user_repo: Arc<dyn UserRepository>,

@@ -1,12 +1,13 @@
 use serde::Serialize;
 
+use shared::domain::user::User;
+
 use crate::domain::author::Author;
 use crate::domain::category::Category;
 use crate::domain::collection::Collection;
 use crate::domain::interaction::Review;
 use crate::domain::publication::{Image, Page, Publication, Statistics};
 use crate::domain::reader::{Preferences, Reader};
-use crate::domain::user::User;
 
 #[derive(Serialize)]
 pub struct StatisticsDto {

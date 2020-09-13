@@ -6,7 +6,6 @@ use common::result::Result;
 use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::publication::{PublicationId, PublicationRepository};
 
-// TODO: add comment
 pub struct Publish<'a> {
     event_pub: &'a dyn EventPublisher,
 

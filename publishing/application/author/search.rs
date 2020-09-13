@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
 
 use common::result::Result;
+use shared::domain::user::UserRepository;
 
 use crate::application::dtos::AuthorDto;
 use crate::domain::author::AuthorRepository;
-use crate::domain::user::UserRepository;
 
 #[derive(Deserialize)]
 pub struct SearchCommand {

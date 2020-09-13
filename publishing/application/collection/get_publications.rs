@@ -2,13 +2,13 @@ use serde::Serialize;
 
 use common::request::Include;
 use common::result::Result;
+use shared::domain::user::UserRepository;
 
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};
 use crate::domain::author::AuthorRepository;
 use crate::domain::category::CategoryRepository;
 use crate::domain::collection::{CollectionId, CollectionRepository};
 use crate::domain::publication::PublicationRepository;
-use crate::domain::user::UserRepository;
 
 #[derive(Serialize)]
 pub struct GetPublicationsResponse {
