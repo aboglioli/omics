@@ -1,14 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { AuthService } from 'src/app/domain/services/auth.service';
 import { IUser } from '../../domain/models/user';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
-import { IdentityService } from '../../domain/services/identity.service';
+import { IdentityService, IUpdateCommandUser } from '../../domain/services/identity.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { FileService } from 'src/app/domain/services/file.service';
-import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 import { MatDialog } from '@angular/material/dialog';
 import { PasswordRewriteComponent } from 'src/app/components/password-recovery/password-rewrite/password-rewrite.component';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
+import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-perfil-editar',
@@ -16,6 +19,8 @@ import { PasswordRewriteComponent } from 'src/app/components/password-recovery/p
   styleUrls: ['./perfil-editar.component.scss']
 })
 export class PerfilEditarComponent implements OnInit {
+
+  @ViewChild('formDataInvalid') private swalFormDataInvalid: SwalComponent;
 
   // FontAwesome Icon
   public faEditField = faEdit;
@@ -50,8 +55,9 @@ export class PerfilEditarComponent implements OnInit {
     private fileServ: FileService,
     private identityService: IdentityService,
     private fb: FormBuilder,
-    private sweetAlertGenericService: SweetAlertGenericMessageService,
-    private dialog: MatDialog
+    private router: Router,
+    private dialog: MatDialog,
+    private sweetAlertGenericService: SweetAlertGenericMessageService
 
   ) {}
 
@@ -68,10 +74,11 @@ export class PerfilEditarComponent implements OnInit {
 
   private createForm(): void  {
 
+    // TODO: corroborar el cambio de email y username que IUpdateCommand no lo acepta
     this.formProfile = this.fb.group({
 
-      username:       ['', [ Validators.required, Validators.minLength(5) ] ],
-      email:          ['', [ Validators.required, Validators.pattern( '^[a-zA-Z0-9]+[a-zA-Z0-9_.+-]*@[a-zA-Z0-9]+[a-zA-Z0-9-]*\.[a-zA-Z0-9-.]+$' )] ],
+      username:       [ { value: '', disabled: true }, [ Validators.required, Validators.minLength(5) ] ],
+      email:          [ { value: '', disabled: true }, [ Validators.required, Validators.pattern( '^[a-zA-Z0-9]+[a-zA-Z0-9_.+-]*@[a-zA-Z0-9]+[a-zA-Z0-9-]*\.[a-zA-Z0-9-.]+$' )] ],
       name:           ['', [ Validators.required, Validators.minLength(2) ]],
       lastname:       ['', [ Validators.required, Validators.minLength(2) ]],
       birthdate:      ['', ],
@@ -108,8 +115,8 @@ export class PerfilEditarComponent implements OnInit {
 
     this.formProfile.reset({ // Para actualizar algunos se utiliza patchValue
 
-      username: userDataObject.username,
-      email: userDataObject.email,
+      username: { value: userDataObject.username, disabled: true },
+      email: { value: userDataObject.email, disabled: true },
       name: userDataObject.name,
       lastname: userDataObject.lastname,
       birthdate: userDataObject.birthdate,
@@ -170,6 +177,59 @@ export class PerfilEditarComponent implements OnInit {
   public onGuardarCambios(): void {
 
     console.log(this.formProfile.value);
+
+    if ( this.formProfile.invalid ) {
+
+      this.swalFormDataInvalid.fire();
+
+      return Object.values( this.formProfile.controls ).forEach( control => {
+
+        // Si es un objeto
+        if ( control instanceof FormGroup ) {
+
+          Object.values( control.controls ).forEach( subControl => subControl.markAsTouched() );
+
+        } else {
+
+          control.markAsTouched(); // Marcar todos como tocadas
+
+        }
+
+      } );
+
+    } else {
+
+      this.spinnerService.show();
+      const userNewData: IUpdateCommandUser = this.formProfile.value;
+
+      this.identityService.update( this.userId, userNewData ).subscribe(
+
+        (res: any) => {
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Actualizado',
+            text: 'Los datos fueron actualizados exitosamente'
+          }).then(  (result) => {
+    
+            this.router.navigate([`/profile/${ this.userId}`]);
+      
+          });
+
+          
+          this.spinnerService.hide();
+
+        },
+        (err: Error) => {
+
+          console.error(err);
+          this.spinnerService.hide();
+
+        }
+
+      );
+
+    }
 
   }
 

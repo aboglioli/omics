@@ -465,8 +465,6 @@ export class NewPublicationComponent implements OnInit {
         newPage.get('image').setValue(fdImage);
 
         this.pagesList.push( newPage );
-        // console.log('TEST > ', newPage );
-        // console.log('TEST > ', fdImage.getAll('image') );
 
       };
 
