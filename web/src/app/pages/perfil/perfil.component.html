@@ -64,7 +64,7 @@
 
           <div class="text-date" >
 
-            Miembro desde: {{ memberSince | date: 'shortDate' }}
+            Miembro desde: {{ memberSince | date: 'shortDate' | date: 'dd/MM/yyyy' }}
 
           </div>
 
@@ -73,7 +73,15 @@
         <div class="profile-description">
 
           <p class="break-word sangria">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Atque illum, quibusdam laborum, nobis autem veniam repudiandae eos assumenda voluptatem error, impedit fuga tenetur eaque et dolorum sapiente vel quaerat quia.
+
+            <span *ngIf="profileData.biography">
+              {{ profileData.biography }}
+            </span>
+
+            <span *ngIf="!profileData.biography">
+              < El autor no ha escrito descripción alguna >
+            </span>
+
           </p>
 
         </div>

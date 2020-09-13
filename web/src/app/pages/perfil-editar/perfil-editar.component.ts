@@ -7,6 +7,8 @@ import { IdentityService } from '../../domain/services/identity.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { FileService } from 'src/app/domain/services/file.service';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
+import { MatDialog } from '@angular/material/dialog';
+import { PasswordRewriteComponent } from 'src/app/components/password-recovery/password-rewrite/password-rewrite.component';
 
 @Component({
   selector: 'app-perfil-editar',
@@ -49,6 +51,7 @@ export class PerfilEditarComponent implements OnInit {
     private identityService: IdentityService,
     private fb: FormBuilder,
     private sweetAlertGenericService: SweetAlertGenericMessageService,
+    private dialog: MatDialog
 
   ) {}
 
@@ -191,6 +194,18 @@ export class PerfilEditarComponent implements OnInit {
 
   }
 
+  public onChangePassword(): void {
+
+    const dialogRef = this.dialog.open(PasswordRewriteComponent, {
+      data: {
+              userId:  this.userId,
+              isRecoveryPassword: false
+            },
+      panelClass: 'no-padding-dialog'
+    });
+
+  }
+
   // #region Getters
   get isProfileAvatarImageExists(): boolean {
 
@@ -218,7 +233,11 @@ export class PerfilEditarComponent implements OnInit {
   }
 
   get biografiaLenght(): number {
-    return this.formProfile.get('biography').value.length;
+
+    const bio = this.formProfile.get('biography').value;
+
+    return ( bio ) ? bio.length : 0;
+
   }
 
   // #endregion

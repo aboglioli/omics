@@ -117,7 +117,7 @@
                 <!-- Input text -->
                 <input class="form-control"
                         type="text"
-                        placeholder="Nombre"
+                        placeholder="Apellido"
                         formControlName="lastname"
                         [class.is-invalid]="apellidoNovalido">
 
@@ -205,8 +205,9 @@
                 </div>
 
                 <mat-radio-group formControlName="gender">
-                  <mat-radio-button  *ngFor="let genero of generosList"
-                                      [value]="genero.value">
+                  <mat-radio-button *ngFor="let genero of generosList"
+                                    color="primary"
+                                    [value]="genero.value">
                     {{ genero.name }}
                   </mat-radio-button>
                 </mat-radio-group>
@@ -242,8 +243,16 @@
 
               </div>
 
-              <!-- Block: espacio auxiliar -->
-              <div class="block-field">
+              <!-- Block: cambiar contraseña -->
+              <div class="block-field" style="justify-content: center;">
+
+                <button mat-flat-button
+                        color="primary"
+                        class="button-white-borders"
+                        (click)="onChangePassword()">
+                  Cambiar contraseña
+                </button>
+
               </div>
 
 
@@ -257,7 +266,7 @@
             <button mat-flat-button color="warn"
                     class="button-white-borders"
                     style="width: 50%;"
-                    (click)="onEliminarCuenta()">
+                    (click)="onChangePassword()">
               Eliminar Cuenta
             </button>
           </div>

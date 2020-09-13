@@ -45,7 +45,8 @@ export class HomeComponent implements OnInit {
     const dialogRef = this.dialog.open(PasswordRewriteComponent, {
       data: {
               userId:  this.paramsToUse.id,
-              temporalPass: this.paramsToUse.temporal_password
+              temporalPass: this.paramsToUse.temporal_password,
+              isRecoveryPassword: true
             },
       panelClass: 'no-padding-dialog'
     });
