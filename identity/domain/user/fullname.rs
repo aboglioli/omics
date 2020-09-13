@@ -32,7 +32,7 @@ impl Fullname {
             err = err.add_context("lastname", "too_long");
         }
 
-        match Regex::new("^[a-zA-Z]+ *[a-zA-Z]+$") {
+        match Regex::new("^[a-zA-ZáéíóúñÁÉÍÓÚÑ]+ *[a-zA-ZáéíóúñÁÉÍÓÚÑ]+$") {
             Ok(re) => {
                 if !re.is_match(&name) {
                     err = err.add_context("name", "invalid_characters");
@@ -82,6 +82,8 @@ mod tests {
         assert!(Fullname::new("User Valid", "One").is_ok());
         assert!(Fullname::new("Lee", "Jo").is_ok());
         assert!(Fullname::new("Alan Daniel", "Boglioli Caffe").is_ok());
+        assert!(Fullname::new("Julián", "Muñoz Velázquez").is_ok());
+        assert!(Fullname::new("Ítalo É", "Éáó ú").is_ok());
     }
 
     #[test]
