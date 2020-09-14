@@ -29,10 +29,38 @@ div.container-box {
 
     }
 
+    div.date-range {
+      display: flex;
+      flex-direction: row;
+    }
+
+    div.button-action {
+
+      display: flex;
+
+      // Pantalla grande
+      @media screen and (min-width: $break-small) {
+        justify-content: flex-end;
+      }
+      // Pantalla chica
+      @media screen and (max-width: $break-small) {
+        justify-content: center;
+        margin: 1em 0em;
+      }
+
+    }
+
     div.selector-type {
 
       display: flex;
       flex-direction: row;
+
+      // Pantalla chica
+      @media screen and (max-width: $break-small) {
+        min-width: 100%;
+        justify-content: center;
+        margin: 1em 0em;
+      }
 
       div.box-type {
 
@@ -51,7 +79,6 @@ div.container-box {
       }
 
     }
-
   }
 
   div.body {

@@ -5,7 +5,7 @@
     <div class="header-container">
 
       <!-- Selección Publicaciones / Contratos -->
-      <div class="selector-type" >
+      <div class="selector-type" style="flex: 1">
 
         <h2 style="margin: 0; display: flex; align-items: center;">
           Gestionar:
@@ -17,16 +17,22 @@
 
       </div>
 
-         <!-- Refresh publication -->
-      <button mat-stroked-button class="button-white-borders rounded border-wide"
-              style="padding-top: 0.25em;"
-              (click)="getAllPublication()">
+      <!-- TODO: Rango Fecha -->
+      <div class="date-range" style="flex: 1">
 
-        <fa-icon [icon]="faRefresh" size="2x"></fa-icon>
-        Actualizar Solicitudes
+      </div>
 
-      </button>
+      <!-- Refresh publication -->
+      <div class="button-action" style="flex: 1">
+        <button mat-stroked-button class="button-white-borders rounded border-wide"
+                style="padding-top: 0.25em;"
+                (click)="getAllPublication()">
 
+          <fa-icon [icon]="faRefresh" size="2x"></fa-icon>
+          Actualizar Solicitudes
+
+        </button>
+      </div>
 
     </div>
 
@@ -36,7 +42,7 @@
   <div class="body">
 
     <br>
-    <div *ngFor="let publication of publicationList">
+    <div class="publication-list" *ngFor="let publication of publicationList">
 
       <!-- Publication Thumbail -->
       <app-publication-card [publication]="publication">
