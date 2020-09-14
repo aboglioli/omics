@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ConfigService } from './config.service';
-import { IPublication, IReview, IPage, IReaderInteraction } from '../models';
+import { IPublication, IReview, IPage, IReaderInteraction, ICollection } from '../models';
 
 
 export interface IGetByIdResponse {
@@ -68,6 +68,10 @@ export interface IApproveCommand {
 
 export interface IRejectCommand {
   comment: string;
+}
+
+export interface IGetCollectionsResponse {
+  collections: ICollection[];
 }
 
 @Injectable()
@@ -164,6 +168,20 @@ export class PublicationService {
 
   public getReviews(id: string): Observable<IGetReviewsResponse> {
     return this.http.get<IGetReviewsResponse>(`${this.baseUrl}/${id}/reviews`);
+  }
+
+  public getCollections(id: string, include: string = ''): Observable<IGetCollectionsResponse> {
+    let params = new HttpParams();
+
+    if (include) {
+      params = params.append('include', include);
+    }
+
+    return this.http.get<IGetCollectionsResponse>(`${this.baseUrl}/${id}/collections`, { params });
+  }
+
+  public follow(id: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/${id}/follow`, {});
   }
 
 }

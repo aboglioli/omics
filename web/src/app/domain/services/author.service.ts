@@ -50,7 +50,7 @@ export class AuthorService {
       params = params.append('include', include);
     }
 
-    return this.http.get<IGetPublicationsResponse>(`${this.baseUrl}/${id}`, { params });
+    return this.http.get<IGetPublicationsResponse>(`${this.baseUrl}/${id}/publications`, { params });
   }
 
   public getCollections(id: string, include: string = ''): Observable<IGetCollectionsResponse> {
@@ -60,7 +60,7 @@ export class AuthorService {
       params = params.append('include', include);
     }
 
-    return this.http.get<IGetCollectionsResponse>(`${this.baseUrl}/${id}`, { params });
+    return this.http.get<IGetCollectionsResponse>(`${this.baseUrl}/${id}/collections`, { params });
   }
 
   public follow(id: string): Observable<any> {

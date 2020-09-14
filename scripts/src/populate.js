@@ -71,7 +71,7 @@ async function user({
     birthdate,
     gender,
     biography,
-    profile_image: image(),
+    profile_image: image(200),
   });
 }
 
@@ -88,7 +88,7 @@ async function publication({
     synopsis,
     category_id: categoryId,
     tags,
-    cover: image(),
+    cover: image(250),
   });
 
   if (publish) {
@@ -97,7 +97,7 @@ async function publication({
 
   const pages = [];
   for (let i = 0; i < pagesCount; i++) {
-    pages.push({ images: [image()] });
+    pages.push({ images: [image('663x1024')] });
   }
 
   await req.put(`/publications/${publicationId}/pages`, { pages });
@@ -119,7 +119,7 @@ async function collection({
     synopsis,
     category_id: categoryId,
     tags,
-    cover: image(),
+    cover: image(250),
   });
 
   for (const publicationId of publicationIds) {
