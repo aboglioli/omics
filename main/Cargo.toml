@@ -22,11 +22,10 @@ identity = { path = "../identity" }
 payment = { path = "../payment" }
 publishing = { path = "../publishing" }
 
-actix-cors = "*"
-actix-http = "*"
-actix-multipart="0.2.0"
-actix-rt = "1.0"
-actix-web = "2.0"
+actix-cors = "0.3"
+actix-multipart="0.3"
+actix-rt = "1.1"
+actix-web = "3"
 async-trait = "0.1.36"
 bytes = { version = "0.5", features = ["serde"] }
 chrono = "0.4"

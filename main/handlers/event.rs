@@ -1,4 +1,4 @@
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::{get, web, HttpResponse, Responder};
 use serde::Serialize;
 use serde_json::Value;
 
@@ -22,6 +22,7 @@ pub struct GetAllResponse {
 }
 
 // GET /events
+#[get("")]
 async fn get(c: web::Data<Container>) -> impl Responder {
     c.event_repo()
         .find_all()
@@ -43,5 +44,5 @@ async fn get(c: web::Data<Container>) -> impl Responder {
 }
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("/events").route("", web::get().to(get)));
+    cfg.service(web::scope("/events").service(get));
 }

@@ -1,5 +1,5 @@
 use actix_multipart::Multipart;
-use actix_web::{web, Error, HttpRequest, HttpResponse, Responder};
+use actix_web::{get, post, web, Error, HttpResponse};
 use serde::Serialize;
 
 use file::file::UploadedFile;
@@ -12,7 +12,7 @@ pub struct UploadResponse {
     files: Vec<UploadedFile>,
 }
 
-// POST /upload
+#[post("")]
 async fn upload(mut payload: Multipart) -> Result<HttpResponse, Error> {
     let (data, files) = file::extract_payload(&mut payload)
         .await
@@ -36,7 +36,7 @@ async fn upload(mut payload: Multipart) -> Result<HttpResponse, Error> {
     }))
 }
 
-// GET /upload
+#[get("")]
 fn index() -> HttpResponse {
     let html = r#"<html>
         <head><title>Upload Test</title></head>
@@ -82,9 +82,5 @@ fn index() -> HttpResponse {
 pub fn routes(cfg: &mut web::ServiceConfig) {
     std::fs::create_dir_all("./tmp").unwrap();
 
-    cfg.service(
-        web::scope("/upload")
-            .route("", web::get().to(index))
-            .route("", web::post().to(upload)),
-    );
+    cfg.service(web::scope("/upload").service(index).service(upload));
 }

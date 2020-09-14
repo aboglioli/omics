@@ -1,4 +1,4 @@
-use actix_web::{web, HttpRequest, HttpResponse, Responder};
+use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 
 use common::request::IncludeParams;
 use publishing::application::author::{Follow, GetById, Search, SearchCommand, Unfollow};
@@ -13,7 +13,7 @@ use crate::authorization::auth;
 use crate::container::Container;
 use crate::error::PublicError;
 
-// GET /authors
+#[get("")]
 async fn search(
     req: HttpRequest,
     cmd: web::Query<SearchCommand>,
@@ -28,7 +28,7 @@ async fn search(
         .map_err(PublicError::from)
 }
 
-// GET /authors/:id
+#[get("/{author_id}")]
 async fn get_by_id(
     req: HttpRequest,
     path: web::Path<String>,
@@ -50,7 +50,8 @@ async fn get_by_id(
         .map_err(PublicError::from)
 }
 
-// GET /authors/:id/publications
+// TODO: consider other options of searching
+#[get("/{author_id}/publications")]
 async fn get_publications(
     req: HttpRequest,
     path: web::Path<String>,
@@ -87,7 +88,7 @@ async fn get_publications(
     .map_err(PublicError::from)
 }
 
-// GET /authors/:id/collections
+#[get("/{author_id}/collections")]
 async fn get_collections(
     req: HttpRequest,
     path: web::Path<String>,
@@ -124,7 +125,7 @@ async fn get_collections(
     .map_err(PublicError::from)
 }
 
-// POST /authors/:id/follow
+#[post("/{author_id}/follow")]
 async fn follow(
     req: HttpRequest,
     path: web::Path<String>,
@@ -144,7 +145,7 @@ async fn follow(
     .map_err(PublicError::from)
 }
 
-// POST /authors/:id/unfollow
+#[post("/{author_id}/unfollow")]
 async fn unfollow(
     req: HttpRequest,
     path: web::Path<String>,
@@ -167,11 +168,11 @@ async fn unfollow(
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/authors")
-            .route("", web::get().to(search))
-            .route("/{author_id}", web::get().to(get_by_id))
-            .route("/{author_id}/publications", web::get().to(get_publications))
-            .route("/{author_id}/collections", web::get().to(get_collections))
-            .route("/{author_id}/follow", web::post().to(follow))
-            .route("/{author_id}/unfollow", web::post().to(unfollow)),
+            .service(search)
+            .service(get_by_id)
+            .service(get_publications)
+            .service(get_collections)
+            .service(follow)
+            .service(unfollow),
     );
 }

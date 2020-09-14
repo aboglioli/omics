@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
-use actix_http::ResponseBuilder;
-use actix_web::{error, http::header, http::StatusCode, HttpResponse};
+use actix_web::{dev::HttpResponseBuilder, error, http::header, http::StatusCode, HttpResponse};
 use serde::Serialize;
 
 use common::error::{Error, ErrorKind};
@@ -64,7 +63,7 @@ impl From<Error> for PublicError {
 
 impl error::ResponseError for PublicError {
     fn error_response(&self) -> HttpResponse {
-        ResponseBuilder::new(self.status_code())
+        HttpResponseBuilder::new(self.status_code())
             .set_header(header::CONTENT_TYPE, "application/json")
             .body(serde_json::to_string(self).unwrap())
     }
