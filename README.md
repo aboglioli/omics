@@ -103,6 +103,14 @@ Build backend (for production):
 cargo build --release
 ```
 
+Populate
+
+```
+cd scripts
+npm install
+npm run populate
+```
+
 ## Angular
 
 See [web/README.md](./web/README.md).
