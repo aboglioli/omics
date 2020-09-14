@@ -1,14 +1,85 @@
+@import "src/scss/vars";
+
 div.container-box {
 
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
 
+  color: white;
+
+  div.header {
+
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    min-height: 100px;
+    background-color: $omics-background-button;
+
+    div.header-container {
+
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      width: 100%;
+
+      padding: 0em 2em;
+
+    }
+
+    div.selector-type {
+
+      display: flex;
+      flex-direction: row;
+
+      div.box-type {
+
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin: 0em 2em;
+        padding: 0.5em 1em;
+
+        font-weight: bold;
+        font-size: 12pt;
+        color: $omics-background-flat;
+
+        background-color: white;
+
+      }
+
+    }
+
+  }
+
   div.body {
 
     margin: 0em 4em;
     overflow-y: auto;
 
+  }
+
+}
+
+
+// Generales
+button.button-white-borders {
+
+  color: white;
+  border-color: white;
+
+  &.rounded {
+    border-radius: 12px;
+  }
+
+  &.border-wide {
+    border-width: medium;
+  }
+
+  &:hover {
+    box-shadow: 0px 0px 10px 4px $omics-neon-pink;
   }
 
 }

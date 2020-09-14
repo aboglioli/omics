@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 
+import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 import { IPublication } from '../../domain/models';
 import { PublicationService } from '../../domain/services/publication.service';
 import { NgxSpinnerService } from 'ngx-spinner';
+
 
 @Component({
   selector: 'app-dashboard-gestion-contratos-publicaciones',
@@ -10,6 +12,10 @@ import { NgxSpinnerService } from 'ngx-spinner';
   styleUrls: ['./dashboard-gestion-contratos-publicaciones.component.scss']
 })
 export class DashboardGestionContratosPublicacionesComponent implements OnInit {
+
+  // FontAwesome Icon
+  public faRefresh = faSyncAlt;
+
   public publicationList: IPublication[];
 
   constructor(
@@ -24,7 +30,7 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
 
   }
 
-  private getAllPublication(): void {
+  public getAllPublication(): void {
 
     this.spinnerService.show();
 
