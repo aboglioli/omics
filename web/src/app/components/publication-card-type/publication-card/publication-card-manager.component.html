@@ -1,0 +1,31 @@
+<div class="card-box" *ngIf="publication">
+
+  <!-- Cover thumbail -->
+  <div class="left">
+    <img [src]="publication.cover" alt="Thumbail image" >
+  </div>
+
+  <!-- Info -->
+  <div class="right">
+
+    <h2>{{publication.name}}</h2>
+
+    <div class="by-author">
+      <h3>By</h3>
+      <span style="margin: 0em 0.5em"></span>
+      <p (click)="goToProfile()">
+        {{publication.author.username}}
+      </p>
+    </div>
+
+    <p>{{publication.created_at | date: 'shortDate' | date: 'dd/MM/yyyy' }}</p>
+
+    <button mat-stroked-button class="button-white-borders"
+            style="padding-top: 0.25em;"
+            (click)="goToPublication()">
+      Ver Detalles
+    </button>
+
+  </div>
+
+</div>

@@ -28,7 +28,7 @@ export interface ICreateResponse {
   id: string;
 }
 
-export interface IUpdateCommand {
+export interface IUpdateCommandCollection {
   name: string;
   synopsis: string;
   category_id: string;
@@ -97,7 +97,7 @@ export class CollectionService {
     return this.http.post<ICreateResponse>(`${this.baseUrl}`, cmd);
   }
 
-  public update(id: string, cmd: IUpdateCommand): Observable<any> {
+  public update(id: string, cmd: IUpdateCommandCollection): Observable<any> {
     return this.http.put(`${this.baseUrl}/${id}`, cmd);
   }
 

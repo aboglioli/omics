@@ -1,9 +1,76 @@
-<div class="container">
-  <app-publication-card
-    *ngFor="let publication of publications"
-    [publication]="publication"
-  >
-    <button (click)="reject(publication)">Rechazar</button>
-    <button (click)="approve(publication)">Aprobar</button>
-  </app-publication-card>
+<div class="container-box">
+
+  <div class="header">
+
+    <div class="header-container">
+
+      <!-- Selección Publicaciones / Contratos -->
+      <div class="selector-type" style="flex: 1">
+
+        <h2 style="margin: 0; display: flex; align-items: center;">
+          Gestionar:
+        </h2>
+
+        <div class="box-type">
+          Publicaciones
+        </div>
+
+      </div>
+
+      <!-- TODO: Rango Fecha -->
+      <div class="date-range" style="flex: 1">
+
+      </div>
+
+      <!-- Refresh publication -->
+      <div class="button-action" style="flex: 1">
+        <button mat-stroked-button class="button-white-borders rounded border-wide neon-shadow-hover"
+                style="padding-top: 0.25em;"
+                (click)="getAllPublication()">
+
+          <fa-icon [icon]="faRefresh" size="2x"></fa-icon>
+          Actualizar Solicitudes
+
+        </button>
+      </div>
+
+    </div>
+
+
+  </div>
+
+  <div class="body">
+
+    <div *ngFor="let publication of publicationList" class="publication-box">
+
+      <!-- Publication Thumbail -->
+      <app-publication-card [publication]="publication">
+      </app-publication-card>
+
+      <!-- Action Buttons -->
+      <div class="action-button-publication">
+
+        <button mat-flat-button color="warn"
+                (click)="openMessageReasonDialog(publication, false)">
+
+          <fa-icon [icon]="faReject" size="1x"></fa-icon>
+          Rechazar
+
+        </button>
+
+        <button mat-flat-button color="accent"
+                (click)="openMessageReasonDialog(publication, true)">
+
+          <fa-icon [icon]="faApprove" size="1x"></fa-icon>
+          Aprobar
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
 </div>

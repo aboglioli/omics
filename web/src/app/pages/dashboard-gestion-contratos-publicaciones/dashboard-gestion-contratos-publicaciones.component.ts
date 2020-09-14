@@ -1,7 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 
+import { faSyncAlt, faBan, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { IPublication } from '../../domain/models';
 import { PublicationService } from '../../domain/services/publication.service';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { MatDialog } from '@angular/material/dialog';
+import { PublicationApproveRejectMotiveComponent } from '../../components/publication-approve-reject-motive/publication-approve-reject-motive.component';
+import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 
 @Component({
   selector: 'app-dashboard-gestion-contratos-publicaciones',
@@ -9,52 +14,116 @@ import { PublicationService } from '../../domain/services/publication.service';
   styleUrls: ['./dashboard-gestion-contratos-publicaciones.component.scss']
 })
 export class DashboardGestionContratosPublicacionesComponent implements OnInit {
-  public publications: IPublication[];
+
+  // FontAwesome Icon
+  public faRefresh = faSyncAlt;
+  public faReject = faBan;
+  public faApprove = faCheckCircle;
+
+  public publicationList: IPublication[];
 
   constructor(
     private publicationService: PublicationService,
+    private spinnerService: NgxSpinnerService,
+    public dialog: MatDialog,
+    private sweetAlertGenericService: SweetAlertGenericMessageService,
   ) { }
 
   ngOnInit(): void {
+
+    this.getAllPublication();
+
+  }
+
+  public getAllPublication(): void {
+
+    this.spinnerService.show();
+
     this.publicationService.search({ status: 'waiting-approval' }, 'author,category').subscribe(
-      (res) => {
-        this.publications = res.publications;
-        console.log(this.publications);
+      (res: any) => {
+
+        this.publicationList = res.publications;
+        console.log(this.publicationList);
+
+        this.spinnerService.hide();
+
       },
-      (err) => {
-        console.log(err);
+      (err: Error) => {
+
+        console.error(err);
+        this.spinnerService.hide();
+
       },
     );
+
   }
 
-  approve(publication: IPublication): void {
-    this.publicationService.approve(
-      publication.id,
-      {
-        comment: 'comment...' // TODO: take from input
+
+  public openMessageReasonDialog( publication: IPublication, isApproved: boolean ): void {
+
+    let reasonPublication: string;
+
+    const dialogRef = this.dialog.open(PublicationApproveRejectMotiveComponent, {
+      width: '300px',
+      data: {
+        approve: isApproved,
+        publicationName: publication.name
       }
-    ).subscribe(
-      res => {
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      reasonPublication = result;
+
+      if ( reasonPublication ) {
+
+        ( isApproved ) ?
+          this.approve(publication, reasonPublication)
+          :
+          this.reject( publication, reasonPublication );
+
+      }
+
+    });
+
+  }
+
+
+  private approve(publication: IPublication, commentReason: string): void {
+
+
+    this.spinnerService.show();
+
+    this.publicationService.approve( publication.id,  { comment: commentReason }).subscribe(
+      (res: any) => {
         console.log(res);
+        this.getAllPublication();
       },
-      err => {
-        console.log(err);
+      (err: Error) => {
+        console.error(err);
+        this.sweetAlertGenericService.showAlertError( `No se ha podido aprobar la publicación ${ publication.id }` );
+        this.spinnerService.hide();
       }
     );
+
   }
 
-  reject(publication: IPublication): void {
-    this.publicationService.reject(
-      publication.id,
-      {
-        comment: 'comment...' // TODO: take from input
-      }
-    ).subscribe(
-      res => {
+  private reject(publication: IPublication, commentReason: string): void {
+
+    this.spinnerService.show();
+
+    this.publicationService.reject(publication.id, { comment: commentReason }).subscribe(
+      (res: any) => {
+
         console.log(res);
+        this.getAllPublication();
+
       },
-      err => {
-        console.log(err);
+      (err: Error) => {
+
+        console.error(err);
+        this.sweetAlertGenericService.showAlertError( `No se ha podido rechazar la publicación ${ publication.id }` );
+        this.spinnerService.hide();
+
       }
     );
   }

@@ -16,14 +16,18 @@ import { Router } from '@angular/router';
 })
 export class PasswordRewriteComponent implements OnInit {
 
+
   @ViewChild('formUserNotValid') private swalFormUserNotValid: SwalComponent;
+  @ViewChild('formUserSameOldNewPass') private swalFormUserSameOldNewPass: SwalComponent;
   @ViewChild('formUserValid') private swalFormUserValid: SwalComponent;
+
 
   // Font Awseome icons
   public faClose = faTimesCircle;
   public faArrowRight = faChevronCircleRight;
   public faEyeOpen = faEye;
   public faEyeSlash = faEyeSlash;
+  public isRecoveryPassword = true;
 
   // Forms
   formRewritePassword: FormGroup;
@@ -49,6 +53,7 @@ export class PasswordRewriteComponent implements OnInit {
 
   ngOnInit(): void {
 
+    this.isRecoveryPassword = this.data.isRecoveryPassword;
     this.formCreate();
 
   }
@@ -57,6 +62,7 @@ export class PasswordRewriteComponent implements OnInit {
 
     this.formRewritePassword = this.fb.group({
 
+      oldPassword: [this.data.temporalPass, [ Validators.required, Validators.minLength(8) ]],
       password1  : ['', [ Validators.required, Validators.minLength(8) ] ],
       password2  : ['', [ Validators.required, Validators.minLength(8) ] ],
 
@@ -90,12 +96,9 @@ export class PasswordRewriteComponent implements OnInit {
     } else {
 
       this.spinnerService.show();
-      setTimeout(() => {
-        this.spinnerService.hide();
-      }, 10000);
 
       const passwordChange: IChangePasswordCommand = {
-        old_password: this.data.temporalPass,
+        old_password: this.formRewritePassword.get('oldPassword').value,
         new_password: this.formRewritePassword.get('password1').value
       };
 
@@ -109,23 +112,44 @@ export class PasswordRewriteComponent implements OnInit {
           this.swalFormUserValid.fire();
 
 
-        }, (error: Error ) => {
+        }, (err: any ) => {
 
-          console.error(error);
           this.spinnerService.hide();
-          this.swalFormUserNotValid.fire();
+          console.error(err);
+
+          const errorCode = err.error.code;
+
+          if ( errorCode === 'are_the_same' ) {
+            this.swalFormUserSameOldNewPass.fire();
+          } else {
+
+            this.swalFormUserNotValid.fire();
+
+          }
 
         }
       );
+
+
 
     }
 
   }
 
-  public closeMatDialog(): void {
+  public closeMatDialog( isValidClose: boolean ): void {
 
-    this.router.navigate(['/home']);
-    this.dialogRef.close();
+    if ( isValidClose ) {
+
+      this.dialogRef.close();
+
+    } else {
+
+      if (  this.isRecoveryPassword ) {
+        this.router.navigate(['/home']);
+        this.dialogRef.close();
+      }
+
+    }
 
   }
 
@@ -139,6 +163,10 @@ export class PasswordRewriteComponent implements OnInit {
   }
 
   // getters
+  get oldPasswordChangeNoValido(): boolean {
+    return ( this.formRewritePassword.get('oldPassword').invalid && this.formRewritePassword.get('oldPassword').touched );
+  }
+
   get password1ChangeNoValido(): boolean {
     return ( this.formRewritePassword.get('password1').invalid && this.formRewritePassword.get('password1').touched );
   }
@@ -151,5 +179,6 @@ export class PasswordRewriteComponent implements OnInit {
     return ( pass1 === pass2 ) ? false : true;
 
   }
+
 
 }

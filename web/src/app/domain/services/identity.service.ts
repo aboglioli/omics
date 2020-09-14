@@ -34,7 +34,7 @@ export interface ILoginResponse {
   auth_token: string;
 }
 
-export interface IUpdateCommand {
+export interface IUpdateCommandUser {
   name: string;
   lastname: string;
   birthdate?: string; // RFC 3339
@@ -92,7 +92,7 @@ export class IdentityService {
     return this.http.post<ILoginResponse>(`${this.configServ.baseUrl()}/login`, cmd);
   }
 
-  public update(id: string, cmd: IUpdateCommand): Observable<any> {
+  public update(id: string, cmd: IUpdateCommandUser): Observable<any> {
     return this.http.put(`${this.baseUrl}/${id}`, cmd);
   }
 

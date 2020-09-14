@@ -1,0 +1,68 @@
+@import "src/scss/vars";
+
+div.card-box {
+
+  display: flex;
+  flex-direction: row;
+
+  border-style: solid;
+  border-width: 2px;
+  border-color: $omics-background-menu;
+
+  color: white;
+
+  div.left {
+
+    width: 180px;
+    height: 180px;
+
+    img {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+    }
+
+  }
+
+  div.right {
+    width: 300px;
+    max-height: 180px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5em;
+
+    div.by-author {
+
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      p {
+
+        &:hover {
+          text-decoration: underline;
+          cursor: pointer;
+          font-weight: bold;
+        }
+      }
+
+    }
+
+  }
+
+}
+
+
+// Generales
+button.button-white-borders {
+
+  color: white;
+  border-color: white;
+
+  &:hover {
+    box-shadow: 0px 0px 10px 4px $omics-neon-pink;
+  }
+
+}
