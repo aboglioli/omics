@@ -24,7 +24,7 @@
 
       <!-- Refresh publication -->
       <div class="button-action" style="flex: 1">
-        <button mat-stroked-button class="button-white-borders rounded border-wide"
+        <button mat-stroked-button class="button-white-borders rounded border-wide neon-shadow-hover"
                 style="padding-top: 0.25em;"
                 (click)="getAllPublication()">
 
@@ -41,8 +41,7 @@
 
   <div class="body">
 
-    <br>
-    <div class="publication-list" *ngFor="let publication of publicationList">
+    <div *ngFor="let publication of publicationList" class="publication-box">
 
       <!-- Publication Thumbail -->
       <app-publication-card [publication]="publication">
@@ -50,13 +49,17 @@
 
       <!-- Action Buttons -->
       <div class="action-button-publication">
-        <button (click)="reject(publication)">
+
+        <button mat-flat-button color="warn"
+                (click)="reject(publication)">
           Rechazar
         </button>
 
-        <button (click)="approve(publication)">
+        <button mat-flat-button color="accent"
+                (click)="approve(publication)">
           Aprobar
         </button>
+
       </div>
 
     </div>

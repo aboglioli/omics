@@ -56,28 +56,28 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
   approve(publication: IPublication): void {
 
     const commentPublication = 'comment...';  // TODO: sacar de un input de un popup
-    this.publicationService.approve( publication.id,  { comment: commentPublication }).subscribe(
-      (res: any) => {
-        console.log(res);
-      },
-      (err: Error) => {
-        console.log(err);
-      }
-    );
+    // this.publicationService.approve( publication.id,  { comment: commentPublication }).subscribe(
+    //   (res: any) => {
+    //     console.log(res);
+    //   },
+    //   (err: Error) => {
+    //     console.log(err);
+    //   }
+    // );
 
   }
 
   reject(publication: IPublication): void {
 
     const commentPublication = 'comment...'; // TODO: sacar de un input de un popup
-    this.publicationService.reject(publication.id, { comment: commentPublication }).subscribe(
-      (res: any) => {
-        console.log(res);
-      },
-      (err: Error) => {
-        console.log(err);
-      }
-    );
+    // this.publicationService.reject(publication.id, { comment: commentPublication }).subscribe(
+    //   (res: any) => {
+    //     console.log(res);
+    //   },
+    //   (err: Error) => {
+    //     console.log(err);
+    //   }
+    // );
   }
 
 }
