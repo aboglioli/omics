@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
+import { faSyncAlt, faBan, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { IPublication } from '../../domain/models';
 import { PublicationService } from '../../domain/services/publication.service';
 import { NgxSpinnerService } from 'ngx-spinner';
@@ -15,6 +15,8 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
 
   // FontAwesome Icon
   public faRefresh = faSyncAlt;
+  public faReject = faBan;
+  public faApprove = faCheckCircle;
 
   public publicationList: IPublication[];
 

@@ -118,6 +118,11 @@ div.container-box {
         border-width: 2px;
         border-color: $omics-background-menu;
 
+        button {
+          flex: 1;
+          margin: 0em 1em;
+        }
+
       }
 
     }
