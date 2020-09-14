@@ -1,5 +1,9 @@
 # All
 
+## Urgent
+- [ ] Publication status should be an object in DTO to show comments.
+- [ ] Get collections that a publication is in.
+
 - [x] Add 'me' as ID for user endpoints.
 - [x] Check auth permissions for existing use cases.
 - [x] AuthorizationService should return user id only. Not load it.

@@ -51,6 +51,7 @@ impl<'a> GetPublications<'a> {
             .find_by_id(&CollectionId::new(collection_id)?)
             .await?;
 
+        // TODO: consider admin
         let is_owner = if let Some(auth_id) = auth_id {
             collection.author_id().value() == auth_id
         } else {

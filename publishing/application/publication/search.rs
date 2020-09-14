@@ -105,12 +105,8 @@ impl<'a> Search<'a> {
 
             if let Some(auth_id) = &auth_id {
                 if publication.author_id().value() == auth_id {
-                    publication_dto = publication_dto.status(&publication).pages(&publication)
+                    publication_dto = publication_dto.pages(&publication)
                 }
-            }
-
-            if is_content_manager {
-                publication_dto = publication_dto.status(&publication)
             }
 
             publication_dtos.push(publication_dto);

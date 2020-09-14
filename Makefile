@@ -1,4 +1,5 @@
 WEB_DIR = web
+SCRIPTS_DIR = scripts
 
 # ----------
 # Server
@@ -21,6 +22,12 @@ test:
 
 build: dependencies
 	cargo build --release
+
+api-test:
+	$(MAKE) -C $(SCRIPTS_DIR) test
+
+populate:
+	$(MAKE) -C $(SCRIPTS_DIR) populate
 
 # ----------
 # Web

@@ -123,7 +123,7 @@ pub struct PublicationDto {
     pub cover: String,
     pub statistics: StatisticsDto,
     pub pages: Option<Vec<PageDto>>,
-    pub status: Option<String>,
+    pub status: String,
     pub created_at: String,
     pub updated_at: Option<String>,
 }
@@ -147,7 +147,7 @@ impl From<&Publication> for PublicationDto {
             cover: publication.header().cover().to_string(),
             statistics: StatisticsDto::from(publication.statistics()),
             pages: None,
-            status: None,
+            status: publication.status_history().current().to_string(),
             created_at: publication.base().created_at().to_rfc3339(),
             updated_at: publication.base().updated_at().map(|d| d.to_rfc3339()),
         }
@@ -169,11 +169,6 @@ impl PublicationDto {
 
     pub fn pages(mut self, publication: &Publication) -> Self {
         self.pages = Some(publication.pages().iter().map(PageDto::from).collect());
-        self
-    }
-
-    pub fn status(mut self, publication: &Publication) -> Self {
-        self.status = Some(publication.status_history().current().to_string());
         self
     }
 }

@@ -37,8 +37,9 @@ impl<'a> Search<'a> {
 
         let mut author_dtos = Vec::new();
         for user in users.iter() {
-            let author = self.author_repo.find_by_id(user.base().id()).await?;
-            author_dtos.push(AuthorDto::from(&user, &author));
+            if let Ok(author) = self.author_repo.find_by_id(user.base().id()).await {
+                author_dtos.push(AuthorDto::from(&user, &author));
+            }
         }
 
         Ok(SearchResponse {

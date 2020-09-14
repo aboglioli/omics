@@ -6,6 +6,7 @@ use publishing::application::publication::{
     DeleteReview, GetById, GetReviews, Like, Publish, Read, Reject, RejectCommand, Search,
     SearchCommand, Unlike, Update, UpdateCommand, UpdatePages, UpdatePagesCommand,
 };
+use publishing::application::collection::{Search as SearchCollection, SearchCommand as SearchCollectionCommand};
 
 use crate::authorization::auth;
 use crate::container::Container;
@@ -307,6 +308,32 @@ async fn get_reviews(
     .map_err(PublicError::from)
 }
 
+// GET /publications/:id/collections
+async fn get_collections(
+    req: HttpRequest,
+    path: web::Path<String>,
+    include: web::Query<IncludeParams>,
+    c: web::Data<Container>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await.ok();
+
+    SearchCollection::new(
+        c.publishing.author_repo(),
+        c.publishing.category_repo(),
+        c.publishing.collection_repo(),
+        c.publishing.user_repo(),
+    )
+    .exec(auth_id, SearchCollectionCommand {
+        author_id: None,
+        category_id: None,
+        publication_id: Some(path.into_inner()),
+        name: None,
+    }, include.into_inner().into())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
+}
+
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/publications")
@@ -324,6 +351,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .route("/{publicaton_id}/unlike", web::post().to(unlike))
             .route("/{publicaton_id}/review", web::post().to(review))
             .route("/{publicaton_id}/review", web::delete().to(delete_review))
-            .route("/{publicaton_id}/reviews", web::get().to(get_reviews)),
+            .route("/{publicaton_id}/reviews", web::get().to(get_reviews))
+            .route("/{publicaton_id}/collections", web::get().to(get_collections)),
     );
 }

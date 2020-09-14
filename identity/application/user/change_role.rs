@@ -3,6 +3,7 @@ use serde::Deserialize;
 use common::error::Error;
 use common::request::CommandResponse;
 use common::result::Result;
+use common::event::EventPublisher;
 
 use crate::domain::role::{RoleId, RoleRepository};
 use crate::domain::user::{UserId, UserRepository};
@@ -12,15 +13,17 @@ pub struct ChangeRoleCommand {
     pub role_id: String,
 }
 
-// TODO: emit event
 pub struct ChangeRole<'a> {
+    event_pub: &'a dyn EventPublisher,
+
     role_repo: &'a dyn RoleRepository,
     user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> ChangeRole<'a> {
-    pub fn new(role_repo: &'a dyn RoleRepository, user_repo: &'a dyn UserRepository) -> Self {
+    pub fn new(event_pub: &'a dyn EventPublisher, role_repo: &'a dyn RoleRepository, user_repo: &'a dyn UserRepository) -> Self {
         ChangeRole {
+            event_pub,
             role_repo,
             user_repo,
         }
@@ -47,6 +50,8 @@ impl<'a> ChangeRole<'a> {
         user.change_role(role.base().id().clone())?;
 
         self.user_repo.save(&mut user).await?;
+
+        self.event_pub.publish_all(user.events().to_vec()?).await?;
 
         Ok(CommandResponse::default())
     }

@@ -12,7 +12,7 @@ pub struct BcryptHasher {
 
 impl BcryptHasher {
     pub fn new() -> Self {
-        BcryptHasher { cost: DEFAULT_COST }
+        BcryptHasher { cost: 4 }
     }
 }
 

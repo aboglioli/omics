@@ -27,8 +27,6 @@ impl std::error::Error for PublicError {}
 
 impl From<Error> for PublicError {
     fn from(err: Error) -> Self {
-        println!("--- ERROR\n{:?}", err);
-
         if let ErrorKind::Internal = err.kind() {
             return PublicError {
                 kind: ErrorKind::Application.to_string(),

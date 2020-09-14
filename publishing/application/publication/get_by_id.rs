@@ -77,13 +77,12 @@ impl<'a> GetById<'a> {
             if is_reader_author {
                 (
                     PublicationDto::from(&publication)
-                        .status(&publication)
                         .pages(&publication),
                     None,
                 )
             } else if is_content_manager {
                 (
-                    PublicationDto::from(&publication).status(&publication),
+                    PublicationDto::from(&publication),
                     None,
                 )
             } else {

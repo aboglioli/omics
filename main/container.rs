@@ -47,8 +47,6 @@ impl Container {
         let p_interaction_repo = Arc::new(InMemInteractionRepository::new());
         let p_publication_repo = Arc::new(InMemPublicationRepository::new());
         let p_reader_repo = Arc::new(InMemReaderRepository::new());
-        let p_user_repo = Arc::new(SharedInMemUserRepository::new());
-        let p_user_serv = Arc::new(LocalUserService::new(i_user_repo.clone()));
 
         // Shared
         let s_user_repo = Arc::new(SharedInMemUserRepository::new());
@@ -72,8 +70,8 @@ impl Container {
             p_interaction_repo,
             p_publication_repo,
             p_reader_repo,
-            p_user_repo,
-            p_user_serv,
+            s_user_repo.clone(),
+            s_user_serv.clone(),
         );
 
         let shared = SharedContainer::new(event_bus.clone(), s_user_repo, s_user_serv);

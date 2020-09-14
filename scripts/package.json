@@ -1,0 +1,20 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "populate": "node src/populate",
+    "test": "jest"
+  },
+  "author": "Alan Boglioli <alan.boglioli@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^26.4.2"
+  },
+  "dependencies": {
+    "axios": "^0.20.0",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6"
+  }
+}
