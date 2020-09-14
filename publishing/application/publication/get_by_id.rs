@@ -75,16 +75,9 @@ impl<'a> GetById<'a> {
             let is_reader_author = publication.author_id().value() == auth_id;
 
             if is_reader_author {
-                (
-                    PublicationDto::from(&publication)
-                        .pages(&publication),
-                    None,
-                )
+                (PublicationDto::from(&publication).pages(&publication), None)
             } else if is_content_manager {
-                (
-                    PublicationDto::from(&publication),
-                    None,
-                )
+                (PublicationDto::from(&publication), None)
             } else {
                 let reader_id = ReaderId::new(auth_id)?;
                 let reader = self.reader_repo.find_by_id(&reader_id).await?;
@@ -199,7 +192,8 @@ mod tests {
         assert_eq!(res.statistics.views, 0);
         assert_eq!(res.statistics.unique_views, 0);
         assert_eq!(res.statistics.readings, 0);
-        assert_eq!(res.status.unwrap(), "draft");
+        assert_eq!(res.status.status, "draft");
+        assert!(res.status.changed_by.is_none());
 
         assert_eq!(c.event_pub().events().await.len(), 0);
     }
@@ -288,7 +282,8 @@ mod tests {
         assert!(res.pages.is_none());
         assert_eq!(res.statistics.views, 1);
         assert_eq!(res.statistics.unique_views, 1);
-        assert!(res.status.is_none());
+        assert_eq!(res.status.status, "published");
+        assert!(res.status.changed_by.is_some());
 
         assert!(c.event_pub().events().await.len() > 0);
     }

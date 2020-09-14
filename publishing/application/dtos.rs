@@ -6,7 +6,7 @@ use crate::domain::author::Author;
 use crate::domain::category::Category;
 use crate::domain::collection::Collection;
 use crate::domain::interaction::Review;
-use crate::domain::publication::{Image, Page, Publication, Statistics};
+use crate::domain::publication::{Image, Page, Publication, Statistics, Status};
 use crate::domain::reader::{Preferences, Reader};
 
 #[derive(Serialize)]
@@ -111,6 +111,33 @@ impl From<&Page> for PageDto {
 }
 
 #[derive(Serialize)]
+pub struct PublicationStatusDto {
+    pub status: String,
+    pub changed_by: Option<String>,
+    pub comment: Option<String>,
+}
+
+impl From<&Status> for PublicationStatusDto {
+    fn from(status: &Status) -> Self {
+        let mut dto = PublicationStatusDto {
+            status: status.to_string(),
+            changed_by: None,
+            comment: None,
+        };
+
+        match status {
+            Status::Published { admin_id, comment } | Status::Rejected { admin_id, comment } => {
+                dto.changed_by = Some(admin_id.to_string());
+                dto.comment = Some(comment.to_string());
+            }
+            _ => {}
+        }
+
+        dto
+    }
+}
+
+#[derive(Serialize)]
 pub struct PublicationDto {
     pub id: String,
     pub author_id: Option<String>,
@@ -123,7 +150,7 @@ pub struct PublicationDto {
     pub cover: String,
     pub statistics: StatisticsDto,
     pub pages: Option<Vec<PageDto>>,
-    pub status: String,
+    pub status: PublicationStatusDto,
     pub created_at: String,
     pub updated_at: Option<String>,
 }
@@ -147,7 +174,7 @@ impl From<&Publication> for PublicationDto {
             cover: publication.header().cover().to_string(),
             statistics: StatisticsDto::from(publication.statistics()),
             pages: None,
-            status: publication.status_history().current().to_string(),
+            status: PublicationStatusDto::from(publication.status_history().current()),
             created_at: publication.base().created_at().to_rfc3339(),
             updated_at: publication.base().updated_at().map(|d| d.to_rfc3339()),
         }

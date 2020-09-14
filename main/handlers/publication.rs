@@ -1,12 +1,14 @@
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
 
 use common::request::IncludeParams;
+use publishing::application::collection::{
+    Search as SearchCollection, SearchCommand as SearchCollectionCommand,
+};
 use publishing::application::publication::{
     AddReview, AddReviewCommand, Approve, ApproveCommand, Create, CreateCommand, Delete,
     DeleteReview, GetById, GetReviews, Like, Publish, Read, Reject, RejectCommand, Search,
     SearchCommand, Unlike, Update, UpdateCommand, UpdatePages, UpdatePagesCommand,
 };
-use publishing::application::collection::{Search as SearchCollection, SearchCommand as SearchCollectionCommand};
 
 use crate::authorization::auth;
 use crate::container::Container;
@@ -323,12 +325,16 @@ async fn get_collections(
         c.publishing.collection_repo(),
         c.publishing.user_repo(),
     )
-    .exec(auth_id, SearchCollectionCommand {
-        author_id: None,
-        category_id: None,
-        publication_id: Some(path.into_inner()),
-        name: None,
-    }, include.into_inner().into())
+    .exec(
+        auth_id,
+        SearchCollectionCommand {
+            author_id: None,
+            category_id: None,
+            publication_id: Some(path.into_inner()),
+            name: None,
+        },
+        include.into_inner().into(),
+    )
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -352,6 +358,9 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .route("/{publicaton_id}/review", web::post().to(review))
             .route("/{publicaton_id}/review", web::delete().to(delete_review))
             .route("/{publicaton_id}/reviews", web::get().to(get_reviews))
-            .route("/{publicaton_id}/collections", web::get().to(get_collections)),
+            .route(
+                "/{publicaton_id}/collections",
+                web::get().to(get_collections),
+            ),
     );
 }

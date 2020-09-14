@@ -187,11 +187,15 @@ async fn change_role(
         user_id
     };
 
-    ChangeRole::new(c.identity.event_pub(), c.identity.role_repo(), c.identity.user_repo())
-        .exec(auth_id, user_id, cmd.into_inner())
-        .await
-        .map(|res| HttpResponse::Ok().json(res))
-        .map_err(PublicError::from)
+    ChangeRole::new(
+        c.identity.event_pub(),
+        c.identity.role_repo(),
+        c.identity.user_repo(),
+    )
+    .exec(auth_id, user_id, cmd.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
 }
 
 pub fn routes(cfg: &mut web::ServiceConfig) {

@@ -2,7 +2,7 @@ use serde::Serialize;
 
 use common::request::Include;
 use common::result::Result;
-use shared::domain::user::UserRepository;
+use shared::domain::user::{UserId, UserRepository};
 
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};
 use crate::domain::author::AuthorRepository;
@@ -51,9 +51,9 @@ impl<'a> GetPublications<'a> {
             .find_by_id(&CollectionId::new(collection_id)?)
             .await?;
 
-        // TODO: consider admin
-        let is_owner = if let Some(auth_id) = auth_id {
-            collection.author_id().value() == auth_id
+        let can_view_unpublished_publications = if let Some(auth_id) = auth_id {
+            let user = self.user_repo.find_by_id(&UserId::new(&auth_id)?).await?;
+            collection.author_id().value() == auth_id || user.is_content_manager()
         } else {
             false
         };
@@ -66,7 +66,7 @@ impl<'a> GetPublications<'a> {
                 .find_by_id(item.publication_id())
                 .await?;
 
-            if !publication.is_published() && !is_owner {
+            if !can_view_unpublished_publications && !publication.is_published() {
                 continue;
             }
 

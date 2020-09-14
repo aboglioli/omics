@@ -1,9 +1,9 @@
 use serde::Deserialize;
 
 use common::error::Error;
+use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
-use common::event::EventPublisher;
 
 use crate::domain::role::{RoleId, RoleRepository};
 use crate::domain::user::{UserId, UserRepository};
@@ -21,7 +21,11 @@ pub struct ChangeRole<'a> {
 }
 
 impl<'a> ChangeRole<'a> {
-    pub fn new(event_pub: &'a dyn EventPublisher, role_repo: &'a dyn RoleRepository, user_repo: &'a dyn UserRepository) -> Self {
+    pub fn new(
+        event_pub: &'a dyn EventPublisher,
+        role_repo: &'a dyn RoleRepository,
+        user_repo: &'a dyn UserRepository,
+    ) -> Self {
         ChangeRole {
             event_pub,
             role_repo,

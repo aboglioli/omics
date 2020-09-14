@@ -1,4 +1,4 @@
-use bcrypt::{hash, verify, DEFAULT_COST};
+use bcrypt::{hash, verify};
 
 use common::error::Error;
 use common::result::Result;

@@ -11,6 +11,12 @@ export interface IPage {
   images: IImage;
 }
 
+export interface IStatus {
+  status: string;
+  changed_by?: string;
+  comment?: string;
+}
+
 export interface IPublication {
   id: string;
   author_id?: string;
@@ -22,7 +28,7 @@ export interface IPublication {
   tags: string[];
   cover: string;
   statistics?: IStatistics;
-  status?: string;
+  status: IStatus;
   pages?: IPage[];
   created_at: string;
   updated_at?: string;

@@ -1,12 +1,12 @@
 use common::model::AggregateRoot;
 use common::result::Result;
 use identity::domain::role::*;
-use identity::domain::user::{Image as UserImage, *};
+use identity::domain::user::*;
 use publishing::domain::author::Author;
-use publishing::domain::category::{Name as CategoryName, *};
+use publishing::domain::category::*;
 use publishing::domain::collection::*;
-use publishing::domain::interaction::Comment;
-use publishing::domain::publication::{Image as PublicationImage, Name as PublicationName, *};
+
+use publishing::domain::publication::*;
 use publishing::domain::reader::Reader;
 
 use crate::container::Container;
