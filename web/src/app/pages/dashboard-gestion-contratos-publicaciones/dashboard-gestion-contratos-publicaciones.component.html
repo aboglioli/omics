@@ -51,7 +51,7 @@
       <div class="action-button-publication">
 
         <button mat-flat-button color="warn"
-                (click)="reject(publication)">
+                (click)="openMessageReasonDialog(publication, false)">
 
           <fa-icon [icon]="faReject" size="1x"></fa-icon>
           Rechazar
@@ -59,7 +59,7 @@
         </button>
 
         <button mat-flat-button color="accent"
-                (click)="approve(publication)">
+                (click)="openMessageReasonDialog(publication, true)">
 
           <fa-icon [icon]="faApprove" size="1x"></fa-icon>
           Aprobar

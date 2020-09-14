@@ -58,6 +58,7 @@ import { PasswordForgotComponent } from './components/password-recovery/password
 import { PasswordRewriteComponent } from './components/password-recovery/password-rewrite/password-rewrite.component';
 import { SideNavMenuUserComponent } from './shared/side-nav-menu-user/side-nav-menu-user.component';
 import { PerfilEditarComponent } from './pages/perfil-editar/perfil-editar.component';
+import { PublicationApproveRejectMotiveComponent } from './components/publication-approve-reject-motive/publication-approve-reject-motive.component';
 
 
 @NgModule({
@@ -94,7 +95,8 @@ import { PerfilEditarComponent } from './pages/perfil-editar/perfil-editar.compo
     DevUploadFileComponent,
     DevNewPublicationComponent,
     SideNavMenuUserComponent,
-    PerfilEditarComponent
+    PerfilEditarComponent,
+    PublicationApproveRejectMotiveComponent
   ],
   imports: [
     BrowserModule,

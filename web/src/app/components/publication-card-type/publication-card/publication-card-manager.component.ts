@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 
 
-
 @Component({
   selector: 'app-publication-card',
   templateUrl: './publication-card-manager.component.html',
@@ -15,7 +14,7 @@ export class PublicationCardManagerComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private sweetAlertGenericService: SweetAlertGenericMessageService
+    private sweetAlertGenericService: SweetAlertGenericMessageService,
   ) { }
 
   ngOnInit(): void {

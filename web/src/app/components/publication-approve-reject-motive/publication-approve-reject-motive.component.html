@@ -1,0 +1,59 @@
+<div class="container">
+
+  <!-- Volver -->
+  <div class="button-top-menu">
+    <button mat-icon-button mat-dialog-close (click)="onClose()">
+      <fa-icon [icon]="faClose" size="2x"></fa-icon>
+    </button>
+  </div>
+
+  <div mat-dialog-title >
+
+    <!-- Cabecera -->
+    <h1>{{ title }}</h1>
+
+  </div>
+
+  <div mat-dialog-content>
+    <form  [formGroup]="formReason" style="width: 100%;">
+
+      <div class="block-field">
+
+        <div class="input-field-row">
+
+          <div class="title-and-error">
+            <h3 stlye="font-weight: bold;">Motivo: </h3>
+
+            <!-- mensaje de error -->
+            <p  *ngIf="reasonNovalido"
+                class="form-text text-danger">
+                Requiere enviar una motivo de al menos 6 caracteres.
+            </p>
+          </div>
+
+        </div>
+
+        <mat-form-field appearance="fill" class="text-area">
+          <textarea matInput
+                    formControlName="reason"></textarea>
+        </mat-form-field>
+
+      </div>
+
+    </form>
+
+  </div>
+
+  <hr>
+  <div mat-dialog-actions>
+    <button mat-flat-button
+            color="primary"
+            class="neon-shadow-hover"
+            style="margin-bottom: 1em"
+            (click)="onSubmitMessage()">
+      Enviar
+    </button>
+
+  </div>
+
+</div>
