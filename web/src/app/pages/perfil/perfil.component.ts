@@ -62,7 +62,7 @@ export class PerfilComponent implements OnInit {
 
           this.memberSince = new Date(this.profileData.created_at);
 
-          this.isSameAsUser = ( this.authService.getIdUser() === this.profileData.id )
+          this.isSameAsUser = ( this.authService.getIdUser() === this.profileData.id );
 
           this.spinnerService.hide();
 
