@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output } from '@angular/core';
+import { IPublication } from 'src/app/domain/models';
 
 @Component({
   selector: 'app-publication-card-reader',
@@ -6,6 +7,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./publication-card-reader.component.scss']
 })
 export class PublicationCardReaderComponent implements OnInit {
+
+  @Input() publication: IPublication;
 
   constructor() { }
 

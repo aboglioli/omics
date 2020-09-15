@@ -1,11 +1,11 @@
 <div class="listado-biblioteca">
 
-  <div class="comic-thumbail" *ngFor="let obra of listaObras">
+  <div class="comic-thumbail" *ngFor="let publication of publicationList">
 
-    <div (click)="goToObra( obra.id )">
-    <img src={{obra.thumbailUrl}} alt="250x250 Image Template">
-
-    </div>
+    <app-publication-card-reader
+          [publication]="publication"
+          (click)="goToObra( publication.id )">
+    </app-publication-card-reader>
 
   </div>
 

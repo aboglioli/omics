@@ -7,7 +7,7 @@
 
     <div  *ngIf="statusToShow.title != '' "
           class="status-box"
-          [ngClass]="( statusToShow.index == 0) ? 'waiting' : ( (statusToShow.index == 1)? 'rejected' : 'published')"
+          [ngClass]="( statusToShow.index == 0) ? 'waiting' : ( (statusToShow.index == 1)? 'rejected' :  ( (statusToShow.index == 2)? 'published' : 'draft') )"
           (click)="showStatusMsg()">
       {{ statusToShow.title }}
     </div>
