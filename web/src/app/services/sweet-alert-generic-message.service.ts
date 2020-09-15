@@ -21,7 +21,7 @@ export class SweetAlertGenericMessageService {
   public showAlertSuccess( msg: string, titleMsg: string = 'Éxito' ): void {
 
     Swal.fire({
-      icon: 'error',
+      icon: 'success',
       title: titleMsg,
       text: msg
     });
