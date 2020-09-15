@@ -17,6 +17,12 @@ div.page {
     justify-content: center;
     flex: 15;
 
+    span {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
     img {
 
       width: auto;
