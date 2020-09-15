@@ -6,7 +6,9 @@ use common::request::Include;
 use common::result::Result;
 use shared::domain::user::{UserId, UserRepository};
 
-use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto, ReaderPublicationInteractionDto};
+use crate::application::dtos::{
+    AuthorDto, CategoryDto, PublicationDto, ReaderPublicationInteractionDto,
+};
 use crate::domain::author::AuthorRepository;
 use crate::domain::category::CategoryRepository;
 use crate::domain::interaction::InteractionRepository;

@@ -371,8 +371,6 @@ pub struct ReaderAuthorInteractionDto {
 
 impl ReaderAuthorInteractionDto {
     pub fn new(followed: bool) -> Self {
-        ReaderAuthorInteractionDto {
-            followed,
-        }
+        ReaderAuthorInteractionDto { followed }
     }
 }

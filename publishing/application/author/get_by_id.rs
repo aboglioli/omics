@@ -33,7 +33,11 @@ impl<'a> GetById<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: Option<String>, author_id: String) -> Result<GetByIdResponse> {
+    pub async fn exec(
+        &self,
+        auth_id: Option<String>,
+        author_id: String,
+    ) -> Result<GetByIdResponse> {
         let author_id = AuthorId::new(author_id)?;
         let author = self.author_repo.find_by_id(&author_id).await?;
         let user = self.user_repo.find_by_id(&author_id).await?;
@@ -41,12 +45,11 @@ impl<'a> GetById<'a> {
         let reader_interaction_dto = if let Some(auth_id) = auth_id {
             if auth_id != author_id.value() {
                 Some(ReaderAuthorInteractionDto::new(
-                        !self.interaction_repo.find_follows(
-                            Some(&ReaderId::new(auth_id)?),
-                            Some(&author_id),
-                            None,
-                            None,
-                        ).await?.is_empty(),
+                    !self
+                        .interaction_repo
+                        .find_follows(Some(&ReaderId::new(auth_id)?), Some(&author_id), None, None)
+                        .await?
+                        .is_empty(),
                 ))
             } else {
                 None
