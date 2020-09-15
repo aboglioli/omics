@@ -66,4 +66,8 @@ export class AuthorService {
   public follow(id: string): Observable<any> {
     return this.http.post(`${this.baseUrl}/${id}/follow`, {});
   }
+
+  public unfollow(id: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/${id}/unfollow`, {});
+  }
 }

@@ -180,8 +180,11 @@ export class PublicationService {
     return this.http.get<IGetCollectionsResponse>(`${this.baseUrl}/${id}/collections`, { params });
   }
 
-  public follow(id: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${id}/follow`, {});
+  public addToFavorites(id: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/${id}/favorite`, {});
   }
 
+  public removeFromFavorites(id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${id}/favorite`);
+  }
 }

@@ -13,6 +13,7 @@ export interface IPage {
 
 export interface IStatus {
   status: string;
+  changed_at: string;
   changed_by?: string;
   comment?: string;
 }
