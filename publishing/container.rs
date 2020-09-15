@@ -9,7 +9,7 @@ use crate::application::reader::{InteractionHandler, ReaderFromUserHandler};
 use crate::domain::author::AuthorRepository;
 use crate::domain::category::CategoryRepository;
 use crate::domain::collection::CollectionRepository;
-use crate::domain::interaction::{InteractionRepository, InteractionService};
+use crate::domain::interaction::InteractionRepository;
 use crate::domain::publication::{PublicationRepository, StatisticsService};
 use crate::domain::reader::ReaderRepository;
 
@@ -25,7 +25,6 @@ pub struct Container<EPub> {
     user_repo: Arc<dyn UserRepository>,
 
     statistics_serv: Arc<StatisticsService>,
-    interaction_serv: Arc<InteractionService>,
 
     user_serv: Arc<dyn UserService>,
 }
@@ -47,7 +46,6 @@ where
         user_serv: Arc<dyn UserService>,
     ) -> Self {
         let statistics_serv = Arc::new(StatisticsService::new(interaction_repo.clone()));
-        let interaction_serv = Arc::new(InteractionService::new(interaction_repo.clone()));
 
         Container {
             event_pub,
@@ -61,7 +59,6 @@ where
             user_repo,
 
             statistics_serv,
-            interaction_serv,
 
             user_serv,
         }
@@ -123,10 +120,6 @@ where
     // Concrete services
     pub fn statistics_serv(&self) -> &StatisticsService {
         &self.statistics_serv
-    }
-
-    pub fn interaction_serv(&self) -> &InteractionService {
-        &self.interaction_serv
     }
 
     // Abstract services

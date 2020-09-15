@@ -4,7 +4,7 @@ use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::domain::interaction::{Comment, InteractionService, Stars};
+use crate::domain::interaction::{Comment, InteractionRepository, Stars};
 use crate::domain::publication::{PublicationId, PublicationRepository};
 use crate::domain::reader::{ReaderId, ReaderRepository};
 
@@ -17,24 +17,23 @@ pub struct AddReviewCommand {
 pub struct AddReview<'a> {
     event_pub: &'a dyn EventPublisher,
 
+    interaction_repo: &'a dyn InteractionRepository,
     publication_repo: &'a dyn PublicationRepository,
     reader_repo: &'a dyn ReaderRepository,
-
-    interaction_serv: &'a InteractionService,
 }
 
 impl<'a> AddReview<'a> {
     pub fn new(
         event_pub: &'a dyn EventPublisher,
+        interaction_repo: &'a dyn InteractionRepository,
         publication_repo: &'a dyn PublicationRepository,
         reader_repo: &'a dyn ReaderRepository,
-        interaction_serv: &'a InteractionService,
     ) -> Self {
         AddReview {
             event_pub,
+            interaction_repo,
             publication_repo,
             reader_repo,
-            interaction_serv,
         }
     }
 
@@ -52,10 +51,10 @@ impl<'a> AddReview<'a> {
 
         let stars = Stars::new(cmd.stars)?;
         let comment = Comment::new(cmd.comment)?;
-        self.interaction_serv
-            .add_review(&reader, &mut publication, stars, comment)
-            .await?;
 
+        let mut review = publication.review(&reader, stars, comment)?;
+
+        self.interaction_repo.save_review(&mut review).await?;
         self.publication_repo.save(&mut publication).await?;
 
         self.event_pub

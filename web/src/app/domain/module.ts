@@ -7,9 +7,10 @@ import { AuthService, AuthInterceptor } from './services/auth.service';
 import { CategoryService } from './services/category.service';
 import { CollectionService } from './services/collection.service';
 import { ConfigService } from './services/config.service';
+import { FileService } from './services/file.service';
 import { IdentityService } from './services/identity.service';
 import { PublicationService } from './services/publication.service';
-import { FileService } from './services/file.service';
+import { ReaderService } from './services/reader.service';
 
 @NgModule({
   imports: [
@@ -22,9 +23,10 @@ import { FileService } from './services/file.service';
     CategoryService,
     CollectionService,
     ConfigService,
+    FileService,
     IdentityService,
     PublicationService,
-    FileService,
+    ReaderService,
 
     // Auth interceptor
     {

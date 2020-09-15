@@ -4,24 +4,18 @@ use common::result::Result;
 use crate::domain::interaction::ReaderPublicationId;
 
 #[derive(Debug, Clone)]
-pub struct View {
+pub struct PublicationFavorite {
     base: AggregateRoot<ReaderPublicationId>,
-    unique: bool,
 }
 
-impl View {
-    pub fn new(id: ReaderPublicationId, unique: bool) -> Result<Self> {
-        Ok(View {
+impl PublicationFavorite {
+    pub fn new(id: ReaderPublicationId) -> Result<Self> {
+        Ok(PublicationFavorite {
             base: AggregateRoot::new(id),
-            unique,
         })
     }
 
     pub fn base(&self) -> &AggregateRoot<ReaderPublicationId> {
         &self.base
-    }
-
-    pub fn is_unique(&self) -> bool {
-        self.unique
     }
 }

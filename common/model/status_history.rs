@@ -7,7 +7,7 @@ pub struct StatusItem<S> {
 }
 
 impl<S> StatusItem<S> {
-    fn new(status: S) -> Self {
+    pub fn new(status: S) -> Self {
         StatusItem {
             status,
             date: Utc::now(),

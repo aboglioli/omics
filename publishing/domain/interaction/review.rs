@@ -1,31 +1,27 @@
+use common::model::AggregateRoot;
 use common::result::Result;
 
-use crate::domain::interaction::{Base, Comment, Stars};
-use crate::domain::publication::PublicationId;
-use crate::domain::reader::ReaderId;
+use crate::domain::interaction::ReaderPublicationId;
+
+use crate::domain::interaction::{Comment, Stars};
 
 #[derive(Debug, Clone)]
 pub struct Review {
-    base: Base,
+    base: AggregateRoot<ReaderPublicationId>,
     stars: Stars,
     comment: Comment,
 }
 
 impl Review {
-    pub fn new(
-        reader_id: ReaderId,
-        publication_id: PublicationId,
-        stars: Stars,
-        comment: Comment,
-    ) -> Result<Self> {
+    pub fn new(id: ReaderPublicationId, stars: Stars, comment: Comment) -> Result<Self> {
         Ok(Review {
-            base: Base::new(reader_id, publication_id)?,
+            base: AggregateRoot::new(id),
             stars,
             comment,
         })
     }
 
-    pub fn base(&self) -> &Base {
+    pub fn base(&self) -> &AggregateRoot<ReaderPublicationId> {
         &self.base
     }
 

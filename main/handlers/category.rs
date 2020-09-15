@@ -1,4 +1,4 @@
-use actix_web::{web, HttpRequest, HttpResponse, Responder};
+use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse, Responder};
 
 use common::request::IncludeParams;
 use publishing::application::category::{
@@ -15,7 +15,7 @@ use crate::authorization::auth;
 use crate::container::Container;
 use crate::error::PublicError;
 
-// GET /categories
+#[get("")]
 async fn get_all(req: HttpRequest, c: web::Data<Container>) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
@@ -26,7 +26,7 @@ async fn get_all(req: HttpRequest, c: web::Data<Container>) -> impl Responder {
         .map_err(PublicError::from)
 }
 
-// GET /categories/:id
+#[get("/{category_id}")]
 async fn get_by_id(
     req: HttpRequest,
     path: web::Path<String>,
@@ -41,6 +41,7 @@ async fn get_by_id(
         .map_err(PublicError::from)
 }
 
+#[get("/{category_id}/publications")]
 async fn get_publications(
     req: HttpRequest,
     path: web::Path<String>,
@@ -70,6 +71,7 @@ async fn get_publications(
     .map_err(PublicError::from)
 }
 
+#[get("/{category_id}/collections")]
 async fn get_collections(
     req: HttpRequest,
     path: web::Path<String>,
@@ -99,6 +101,7 @@ async fn get_collections(
     .map_err(PublicError::from)
 }
 
+#[post("")]
 async fn create(
     req: HttpRequest,
     cmd: web::Json<CreateCommand>,
@@ -113,6 +116,7 @@ async fn create(
         .map_err(PublicError::from)
 }
 
+#[put("/{category_id}")]
 async fn update(
     req: HttpRequest,
     path: web::Path<String>,
@@ -128,6 +132,7 @@ async fn update(
         .map_err(PublicError::from)
 }
 
+#[delete("/{category_id}")]
 async fn delete(
     req: HttpRequest,
     path: web::Path<String>,
@@ -145,15 +150,12 @@ async fn delete(
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/categories")
-            .route("", web::get().to(get_all))
-            .route("/{category_id}", web::get().to(get_by_id))
-            .route(
-                "/{category_id}/publications",
-                web::get().to(get_publications),
-            )
-            .route("/{category_id}/collections", web::get().to(get_collections))
-            .route("", web::post().to(create))
-            .route("/{category_id}", web::put().to(update))
-            .route("/{category_id}", web::delete().to(delete)),
+            .service(get_all)
+            .service(get_by_id)
+            .service(get_publications)
+            .service(get_collections)
+            .service(create)
+            .service(update)
+            .service(delete),
     );
 }

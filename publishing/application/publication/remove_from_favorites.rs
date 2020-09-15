@@ -6,7 +6,7 @@ use crate::domain::interaction::InteractionRepository;
 use crate::domain::publication::{PublicationId, PublicationRepository};
 use crate::domain::reader::{ReaderId, ReaderRepository};
 
-pub struct DeleteReview<'a> {
+pub struct RemoveFromFavorites<'a> {
     event_pub: &'a dyn EventPublisher,
 
     interaction_repo: &'a dyn InteractionRepository,
@@ -14,14 +14,14 @@ pub struct DeleteReview<'a> {
     reader_repo: &'a dyn ReaderRepository,
 }
 
-impl<'a> DeleteReview<'a> {
+impl<'a> RemoveFromFavorites<'a> {
     pub fn new(
         event_pub: &'a dyn EventPublisher,
         interaction_repo: &'a dyn InteractionRepository,
         publication_repo: &'a dyn PublicationRepository,
         reader_repo: &'a dyn ReaderRepository,
     ) -> Self {
-        DeleteReview {
+        RemoveFromFavorites {
             event_pub,
             interaction_repo,
             publication_repo,
@@ -30,28 +30,20 @@ impl<'a> DeleteReview<'a> {
     }
 
     pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<CommandResponse> {
-        let publication_id = PublicationId::new(publication_id)?;
-        let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
-
         let reader_id = ReaderId::new(auth_id)?;
-        let reader = self.reader_repo.find_by_id(&reader_id).await?;
+        let mut reader = self.reader_repo.find_by_id(&reader_id).await?;
 
-        let reviews = self
-            .interaction_repo
-            .find_reviews(Some(&reader_id), Some(&publication_id), None, None)
-            .await?;
-
-        if let Some(review) = reviews.first() {
-            publication.delete_review(&reader, review.stars())?;
-        }
+        let publication_id = PublicationId::new(publication_id)?;
+        let publication = self.publication_repo.find_by_id(&publication_id).await?;
 
         self.interaction_repo
-            .delete_review(&reader_id, &publication_id)
+            .delete_publication_favorite(&reader_id, &publication_id)
             .await?;
-        self.publication_repo.save(&mut publication).await?;
+
+        reader.remove_publication_from_favorites(&publication)?;
 
         self.event_pub
-            .publish_all(publication.events().to_vec()?)
+            .publish_all(reader.events().to_vec()?)
             .await?;
 
         Ok(CommandResponse::default())

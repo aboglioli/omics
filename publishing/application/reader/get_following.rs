@@ -46,8 +46,14 @@ impl<'a> GetFollowing<'a> {
         let mut author_dtos = Vec::new();
 
         for follow in follows.iter() {
-            let author = self.author_repo.find_by_id(follow.author_id()).await?;
-            let user = self.user_repo.find_by_id(follow.author_id()).await?;
+            let author = self
+                .author_repo
+                .find_by_id(follow.base().id().author_id())
+                .await?;
+            let user = self
+                .user_repo
+                .find_by_id(follow.base().id().author_id())
+                .await?;
             author_dtos.push(AuthorDto::from(&user, &author));
         }
 

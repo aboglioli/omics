@@ -1,20 +1,21 @@
-use actix_web::{web, HttpRequest, HttpResponse, Responder};
+use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse, Responder};
 
 use common::request::IncludeParams;
 use publishing::application::collection::{
     Search as SearchCollection, SearchCommand as SearchCollectionCommand,
 };
 use publishing::application::publication::{
-    AddReview, AddReviewCommand, Approve, ApproveCommand, Create, CreateCommand, Delete,
-    DeleteReview, GetById, GetReviews, Like, Publish, Read, Reject, RejectCommand, Search,
-    SearchCommand, Unlike, Update, UpdateCommand, UpdatePages, UpdatePagesCommand,
+    AddReview, AddReviewCommand, AddToFavorites, Approve, ApproveCommand, Create, CreateCommand,
+    Delete, DeleteReview, GetById, GetReviews, Like, Publish, Read, Reject, RejectCommand,
+    RemoveFromFavorites, Search, SearchCommand, Unlike, Update, UpdateCommand, UpdatePages,
+    UpdatePagesCommand,
 };
 
 use crate::authorization::auth;
 use crate::container::Container;
 use crate::error::PublicError;
 
-// POST /publications
+#[post("")]
 async fn create(
     req: HttpRequest,
     cmd: web::Json<CreateCommand>,
@@ -34,7 +35,7 @@ async fn create(
     .map_err(PublicError::from)
 }
 
-// GET /publications
+#[get("")]
 async fn search(
     req: HttpRequest,
     cmd: web::Query<SearchCommand>,
@@ -55,7 +56,7 @@ async fn search(
     .map_err(PublicError::from)
 }
 
-// GET /publications/:id
+#[get("/{publication_id}")]
 async fn get_by_id(
     req: HttpRequest,
     path: web::Path<String>,
@@ -68,10 +69,10 @@ async fn get_by_id(
         c.publishing.event_pub(),
         c.publishing.author_repo(),
         c.publishing.category_repo(),
+        c.publishing.interaction_repo(),
         c.publishing.publication_repo(),
         c.publishing.reader_repo(),
         c.publishing.user_repo(),
-        c.publishing.interaction_serv(),
         c.publishing.statistics_serv(),
     )
     .exec(auth_id, path.into_inner(), include.into_inner().into())
@@ -80,7 +81,7 @@ async fn get_by_id(
     .map_err(PublicError::from)
 }
 
-// PUT /publications/:id
+#[put("/{publication_id}")]
 async fn update(
     req: HttpRequest,
     path: web::Path<String>,
@@ -100,7 +101,7 @@ async fn update(
     .map_err(PublicError::from)
 }
 
-// PUT /publications/:id/pages
+#[put("/{publication_id}/pages")]
 async fn update_pages(
     req: HttpRequest,
     path: web::Path<String>,
@@ -116,7 +117,7 @@ async fn update_pages(
         .map_err(PublicError::from)
 }
 
-// DELETE /publications/:id
+#[delete("/{publication_id}")]
 async fn delete(
     req: HttpRequest,
     path: web::Path<String>,
@@ -131,7 +132,7 @@ async fn delete(
         .map_err(PublicError::from)
 }
 
-// POST /publications/:id/publish
+#[post("/{publication_id}/publish")]
 async fn publish(
     req: HttpRequest,
     path: web::Path<String>,
@@ -150,7 +151,7 @@ async fn publish(
     .map_err(PublicError::from)
 }
 
-// POST /publications/:id/approve
+#[post("/{publication_id}/approve")]
 async fn approve(
     req: HttpRequest,
     path: web::Path<String>,
@@ -170,7 +171,7 @@ async fn approve(
     .map_err(PublicError::from)
 }
 
-// POST /publications/:id/reject
+#[post("/{publication_id}/reject")]
 async fn reject(
     req: HttpRequest,
     path: web::Path<String>,
@@ -190,7 +191,7 @@ async fn reject(
     .map_err(PublicError::from)
 }
 
-// GET /publications/:id/read
+#[get("/{publication_id}/read")]
 async fn read(
     req: HttpRequest,
     path: web::Path<String>,
@@ -200,9 +201,9 @@ async fn read(
 
     Read::new(
         c.publishing.event_pub(),
+        c.publishing.interaction_repo(),
         c.publishing.publication_repo(),
         c.publishing.reader_repo(),
-        c.publishing.interaction_serv(),
     )
     .exec(auth_id, path.into_inner())
     .await
@@ -210,7 +211,7 @@ async fn read(
     .map_err(PublicError::from)
 }
 
-// POST /publications/:id/like
+#[post("/{publication_id}/like")]
 async fn like(
     req: HttpRequest,
     path: web::Path<String>,
@@ -220,9 +221,9 @@ async fn like(
 
     Like::new(
         c.publishing.event_pub(),
+        c.publishing.interaction_repo(),
         c.publishing.publication_repo(),
         c.publishing.reader_repo(),
-        c.publishing.interaction_serv(),
     )
     .exec(auth_id, path.into_inner())
     .await
@@ -230,7 +231,7 @@ async fn like(
     .map_err(PublicError::from)
 }
 
-// POST /publications/:id/unlike
+#[post("/{publication_id}/unlike")]
 async fn unlike(
     req: HttpRequest,
     path: web::Path<String>,
@@ -240,9 +241,9 @@ async fn unlike(
 
     Unlike::new(
         c.publishing.event_pub(),
+        c.publishing.interaction_repo(),
         c.publishing.publication_repo(),
         c.publishing.reader_repo(),
-        c.publishing.interaction_serv(),
     )
     .exec(auth_id, path.into_inner())
     .await
@@ -250,7 +251,7 @@ async fn unlike(
     .map_err(PublicError::from)
 }
 
-// POST /publications/:id/review
+#[post("/{publication_id}/review")]
 async fn review(
     req: HttpRequest,
     path: web::Path<String>,
@@ -261,9 +262,9 @@ async fn review(
 
     AddReview::new(
         c.publishing.event_pub(),
+        c.publishing.interaction_repo(),
         c.publishing.publication_repo(),
         c.publishing.reader_repo(),
-        c.publishing.interaction_serv(),
     )
     .exec(auth_id, path.into_inner(), cmd.into_inner())
     .await
@@ -271,7 +272,7 @@ async fn review(
     .map_err(PublicError::from)
 }
 
-// DELETE /publications/:id/review
+#[delete("/{publication_id}/review")]
 async fn delete_review(
     req: HttpRequest,
     path: web::Path<String>,
@@ -281,9 +282,9 @@ async fn delete_review(
 
     DeleteReview::new(
         c.publishing.event_pub(),
+        c.publishing.interaction_repo(),
         c.publishing.publication_repo(),
         c.publishing.reader_repo(),
-        c.publishing.interaction_serv(),
     )
     .exec(auth_id, path.into_inner())
     .await
@@ -291,7 +292,7 @@ async fn delete_review(
     .map_err(PublicError::from)
 }
 
-// GET /publications/:id/reviews
+#[get("/{publication_id}/reviews")]
 async fn get_reviews(
     req: HttpRequest,
     path: web::Path<String>,
@@ -310,7 +311,7 @@ async fn get_reviews(
     .map_err(PublicError::from)
 }
 
-// GET /publications/:id/collections
+#[get("/{publication_id}/collections")]
 async fn get_collections(
     req: HttpRequest,
     path: web::Path<String>,
@@ -340,27 +341,66 @@ async fn get_collections(
     .map_err(PublicError::from)
 }
 
+#[post("/{publication_id}/favorite")]
+async fn add_to_favorites(
+    req: HttpRequest,
+    path: web::Path<String>,
+    c: web::Data<Container>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    AddToFavorites::new(
+        c.publishing.event_pub(),
+        c.publishing.interaction_repo(),
+        c.publishing.publication_repo(),
+        c.publishing.reader_repo(),
+    )
+    .exec(auth_id, path.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
+}
+
+#[delete("/{publication_id}/favorite")]
+async fn remove_from_favorites(
+    req: HttpRequest,
+    path: web::Path<String>,
+    c: web::Data<Container>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    RemoveFromFavorites::new(
+        c.publishing.event_pub(),
+        c.publishing.interaction_repo(),
+        c.publishing.publication_repo(),
+        c.publishing.reader_repo(),
+    )
+    .exec(auth_id, path.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
+}
+
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/publications")
-            .route("", web::post().to(create))
-            .route("", web::get().to(search))
-            .route("/{publicaton_id}", web::get().to(get_by_id))
-            .route("/{publicaton_id}", web::put().to(update))
-            .route("/{publicaton_id}/pages", web::put().to(update_pages))
-            .route("/{publicaton_id}", web::delete().to(delete))
-            .route("/{publicaton_id}/publish", web::post().to(publish))
-            .route("/{publicaton_id}/approve", web::post().to(approve))
-            .route("/{publicaton_id}/reject", web::post().to(reject))
-            .route("/{publicaton_id}/read", web::get().to(read))
-            .route("/{publicaton_id}/like", web::post().to(like))
-            .route("/{publicaton_id}/unlike", web::post().to(unlike))
-            .route("/{publicaton_id}/review", web::post().to(review))
-            .route("/{publicaton_id}/review", web::delete().to(delete_review))
-            .route("/{publicaton_id}/reviews", web::get().to(get_reviews))
-            .route(
-                "/{publicaton_id}/collections",
-                web::get().to(get_collections),
-            ),
+            .service(create)
+            .service(search)
+            .service(get_by_id)
+            .service(update)
+            .service(update_pages)
+            .service(delete)
+            .service(publish)
+            .service(approve)
+            .service(reject)
+            .service(read)
+            .service(like)
+            .service(unlike)
+            .service(review)
+            .service(delete_review)
+            .service(get_reviews)
+            .service(get_collections)
+            .service(add_to_favorites)
+            .service(remove_from_favorites),
     );
 }

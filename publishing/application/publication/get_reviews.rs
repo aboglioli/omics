@@ -46,7 +46,7 @@ impl<'a> GetReviews<'a> {
         for review in reviews.iter() {
             let reader = self
                 .reader_repo
-                .find_by_id(review.base().reader_id())
+                .find_by_id(review.base().id().reader_id())
                 .await?;
             let user = self.user_repo.find_by_id(reader.base().id()).await?;
             review_dtos.push(ReviewDto::from(review).reader(ReaderDto::from(&user, &reader)));

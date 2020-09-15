@@ -1,4 +1,4 @@
-use actix_web::{web, HttpRequest, HttpResponse, Responder};
+use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse, Responder};
 
 use common::request::IncludeParams;
 use identity::application::user::{
@@ -11,7 +11,7 @@ use crate::authorization::auth;
 use crate::container::Container;
 use crate::error::PublicError;
 
-// POST /register
+#[post("/register")]
 async fn register(cmd: web::Json<RegisterCommand>, c: web::Data<Container>) -> impl Responder {
     Register::new(
         c.identity.event_pub(),
@@ -24,7 +24,7 @@ async fn register(cmd: web::Json<RegisterCommand>, c: web::Data<Container>) -> i
     .map_err(PublicError::from)
 }
 
-// POST /login
+#[post("/login")]
 async fn login(cmd: web::Json<LoginCommand>, c: web::Data<Container>) -> impl Responder {
     Login::new(c.identity.event_pub(), c.identity.authentication_serv())
         .exec(cmd.into_inner())
@@ -33,7 +33,7 @@ async fn login(cmd: web::Json<LoginCommand>, c: web::Data<Container>) -> impl Re
         .map_err(PublicError::from)
 }
 
-// POST /recover-password
+#[post("/recover-password")]
 async fn recover_password(
     cmd: web::Json<RecoverPasswordCommand>,
     c: web::Data<Container>,
@@ -49,7 +49,7 @@ async fn recover_password(
     .map_err(PublicError::from)
 }
 
-// GET /users?role_id=...
+#[get("")]
 async fn search(
     req: HttpRequest,
     cmd: web::Query<SearchCommand>,
@@ -65,7 +65,7 @@ async fn search(
         .map_err(PublicError::from)
 }
 
-// GET /users/:id
+#[get("/{user_id}")]
 async fn get_by_id(
     req: HttpRequest,
     path: web::Path<String>,
@@ -88,7 +88,7 @@ async fn get_by_id(
         .map_err(PublicError::from)
 }
 
-// PUT /users/:id
+#[put("/{user_id}")]
 async fn update(
     req: HttpRequest,
     path: web::Path<String>,
@@ -111,7 +111,7 @@ async fn update(
         .map_err(PublicError::from)
 }
 
-// DELETE /users/:id
+#[delete("/{user_id}")]
 async fn delete(
     req: HttpRequest,
     path: web::Path<String>,
@@ -133,7 +133,7 @@ async fn delete(
         .map_err(PublicError::from)
 }
 
-// PUT /users/:id/password
+#[put("/{user_id}/password")]
 async fn change_password(
     req: HttpRequest,
     path: web::Path<String>,
@@ -160,7 +160,7 @@ async fn change_password(
     .map_err(PublicError::from)
 }
 
-// GET /users/:id/validate/:code
+#[get("/{user_id}/validate/{code}")]
 async fn validate(path: web::Path<(String, String)>, c: web::Data<Container>) -> impl Responder {
     let path = path.into_inner();
 
@@ -171,7 +171,7 @@ async fn validate(path: web::Path<(String, String)>, c: web::Data<Container>) ->
         .map_err(PublicError::from)
 }
 
-// PUT /users/:id/role
+#[put("/{user_id}/role")]
 async fn change_role(
     req: HttpRequest,
     path: web::Path<String>,
@@ -199,20 +199,17 @@ async fn change_role(
 }
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
-    cfg.route("/register", web::post().to(register))
-        .route("/login", web::post().to(login))
-        .route("/recover-password", web::post().to(recover_password))
+    cfg.service(register)
+        .service(login)
+        .service(recover_password)
         .service(
             web::scope("/users")
-                .route("", web::get().to(search))
-                .route("/{user_id}", web::get().to(get_by_id))
-                .route("/{user_id}", web::put().to(update))
-                .route("/{user_id}", web::delete().to(delete))
-                .route("/{user_id}/password", web::put().to(change_password))
-                .route(
-                    "/{user_id}/validate/{validation_code}",
-                    web::get().to(validate),
-                )
-                .route("/{user_id}/role", web::put().to(change_role)),
+                .service(search)
+                .service(get_by_id)
+                .service(update)
+                .service(delete)
+                .service(change_password)
+                .service(validate)
+                .service(change_role),
         );
 }

@@ -9,7 +9,7 @@ use shared::domain::user::{UserId, UserRepository};
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto, ReaderInteractionDto};
 use crate::domain::author::AuthorRepository;
 use crate::domain::category::CategoryRepository;
-use crate::domain::interaction::InteractionService;
+use crate::domain::interaction::InteractionRepository;
 use crate::domain::publication::{PublicationId, PublicationRepository, StatisticsService};
 use crate::domain::reader::{ReaderId, ReaderRepository};
 
@@ -24,11 +24,11 @@ pub struct GetById<'a> {
 
     author_repo: &'a dyn AuthorRepository,
     category_repo: &'a dyn CategoryRepository,
+    interaction_repo: &'a dyn InteractionRepository,
     publication_repo: &'a dyn PublicationRepository,
     reader_repo: &'a dyn ReaderRepository,
     user_repo: &'a dyn UserRepository,
 
-    interaction_serv: &'a InteractionService,
     statistics_serv: &'a StatisticsService,
 }
 
@@ -37,20 +37,20 @@ impl<'a> GetById<'a> {
         event_pub: &'a dyn EventPublisher,
         author_repo: &'a dyn AuthorRepository,
         category_repo: &'a dyn CategoryRepository,
+        interaction_repo: &'a dyn InteractionRepository,
         publication_repo: &'a dyn PublicationRepository,
         reader_repo: &'a dyn ReaderRepository,
         user_repo: &'a dyn UserRepository,
-        interaction_serv: &'a InteractionService,
         statistics_serv: &'a StatisticsService,
     ) -> Self {
         GetById {
             event_pub,
             author_repo,
             category_repo,
+            interaction_repo,
             publication_repo,
             reader_repo,
             user_repo,
-            interaction_serv,
             statistics_serv,
         }
     }
@@ -82,10 +82,15 @@ impl<'a> GetById<'a> {
                 let reader_id = ReaderId::new(auth_id)?;
                 let reader = self.reader_repo.find_by_id(&reader_id).await?;
 
-                self.interaction_serv
-                    .add_view(&reader, &mut publication)
-                    .await?;
+                let mut view = publication.view(
+                    &reader,
+                    self.interaction_repo
+                        .find_views(Some(&reader_id), Some(&publication_id), None, None)
+                        .await?
+                        .is_empty(),
+                )?;
 
+                self.interaction_repo.save_view(&mut view).await?;
                 self.publication_repo.save(&mut publication).await?;
 
                 self.event_pub
@@ -149,10 +154,10 @@ mod tests {
             c.event_pub(),
             c.author_repo(),
             c.category_repo(),
+            c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
             c.user_repo(),
-            c.interaction_serv(),
             c.statistics_serv(),
         );
 
@@ -205,10 +210,10 @@ mod tests {
             c.event_pub(),
             c.author_repo(),
             c.category_repo(),
+            c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
             c.user_repo(),
-            c.interaction_serv(),
             c.statistics_serv(),
         );
 
@@ -245,10 +250,10 @@ mod tests {
             c.event_pub(),
             c.author_repo(),
             c.category_repo(),
+            c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
             c.user_repo(),
-            c.interaction_serv(),
             c.statistics_serv(),
         );
 
@@ -295,10 +300,10 @@ mod tests {
             c.event_pub(),
             c.author_repo(),
             c.category_repo(),
+            c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
             c.user_repo(),
-            c.interaction_serv(),
             c.statistics_serv(),
         );
 
@@ -335,10 +340,10 @@ mod tests {
             c.event_pub(),
             c.author_repo(),
             c.category_repo(),
+            c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
             c.user_repo(),
-            c.interaction_serv(),
             c.statistics_serv(),
         );
 
@@ -358,10 +363,8 @@ mod tests {
         let mut publication = mocks::published_publication1();
         c.publication_repo().save(&mut publication).await.unwrap();
 
-        c.interaction_serv()
-            .add_like(&reader2, &mut publication)
-            .await
-            .unwrap();
+        let mut like = publication.like(&reader2).unwrap();
+        c.interaction_repo().save_like(&mut like).await.unwrap();
 
         let res = uc
             .exec(
