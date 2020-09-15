@@ -60,6 +60,7 @@ import { SideNavMenuUserComponent } from './shared/side-nav-menu-user/side-nav-m
 import { PerfilEditarComponent } from './pages/perfil-editar/perfil-editar.component';
 import { PublicationApproveRejectMotiveComponent } from './components/publication-approve-reject-motive/publication-approve-reject-motive.component';
 import { PublicationCardAuthorComponent } from './components/publication-card-type/publication-card-author/publication-card-author.component';
+import { PublicationCardReaderComponent } from './components/publication-card-type/publication-card-reader/publication-card-reader.component';
 
 
 @NgModule({
@@ -98,7 +99,8 @@ import { PublicationCardAuthorComponent } from './components/publication-card-ty
     SideNavMenuUserComponent,
     PerfilEditarComponent,
     PublicationApproveRejectMotiveComponent,
-    PublicationCardAuthorComponent
+    PublicationCardAuthorComponent,
+    PublicationCardReaderComponent
   ],
   imports: [
     BrowserModule,
