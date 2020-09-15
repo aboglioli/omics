@@ -8,3 +8,7 @@ edition = "2018"
 path = "lib.rs"
 
 [dependencies]
+common = { path = "../common" }
+shared = { path = "../shared" }
+
+async-trait = "*"
