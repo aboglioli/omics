@@ -69,10 +69,10 @@ async fn get_by_id(
         c.publishing.event_pub(),
         c.publishing.author_repo(),
         c.publishing.category_repo(),
+        c.publishing.interaction_repo(),
         c.publishing.publication_repo(),
         c.publishing.reader_repo(),
         c.publishing.user_repo(),
-        c.publishing.interaction_serv(),
         c.publishing.statistics_serv(),
     )
     .exec(auth_id, path.into_inner(), include.into_inner().into())
@@ -201,9 +201,9 @@ async fn read(
 
     Read::new(
         c.publishing.event_pub(),
+        c.publishing.interaction_repo(),
         c.publishing.publication_repo(),
         c.publishing.reader_repo(),
-        c.publishing.interaction_serv(),
     )
     .exec(auth_id, path.into_inner())
     .await
@@ -221,9 +221,9 @@ async fn like(
 
     Like::new(
         c.publishing.event_pub(),
+        c.publishing.interaction_repo(),
         c.publishing.publication_repo(),
         c.publishing.reader_repo(),
-        c.publishing.interaction_serv(),
     )
     .exec(auth_id, path.into_inner())
     .await
@@ -241,9 +241,9 @@ async fn unlike(
 
     Unlike::new(
         c.publishing.event_pub(),
+        c.publishing.interaction_repo(),
         c.publishing.publication_repo(),
         c.publishing.reader_repo(),
-        c.publishing.interaction_serv(),
     )
     .exec(auth_id, path.into_inner())
     .await
@@ -262,9 +262,9 @@ async fn review(
 
     AddReview::new(
         c.publishing.event_pub(),
+        c.publishing.interaction_repo(),
         c.publishing.publication_repo(),
         c.publishing.reader_repo(),
-        c.publishing.interaction_serv(),
     )
     .exec(auth_id, path.into_inner(), cmd.into_inner())
     .await
@@ -282,9 +282,9 @@ async fn delete_review(
 
     DeleteReview::new(
         c.publishing.event_pub(),
+        c.publishing.interaction_repo(),
         c.publishing.publication_repo(),
         c.publishing.reader_repo(),
-        c.publishing.interaction_serv(),
     )
     .exec(auth_id, path.into_inner())
     .await

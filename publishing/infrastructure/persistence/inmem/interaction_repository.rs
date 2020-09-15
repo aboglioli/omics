@@ -2,6 +2,7 @@ use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use tokio::sync::Mutex;
 
+use common::error::Error;
 use common::result::Result;
 
 use crate::domain::author::AuthorId;
@@ -357,16 +358,55 @@ impl InteractionRepository for InMemInteractionRepository {
     }
 
     async fn save_like(&self, like: &mut Like) -> Result<()> {
+        if !self
+            .find_likes(
+                Some(like.base().id().reader_id()),
+                Some(like.base().id().publication_id()),
+                None,
+                None,
+            )
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("like", "aleady_exists"));
+        }
+
         self.likes.lock().await.push(like.clone());
         Ok(())
     }
 
     async fn save_review(&self, review: &mut Review) -> Result<()> {
+        if !self
+            .find_reviews(
+                Some(review.base().id().reader_id()),
+                Some(review.base().id().publication_id()),
+                None,
+                None,
+            )
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("review", "already_exists"));
+        }
+
         self.reviews.lock().await.push(review.clone());
         Ok(())
     }
 
     async fn save_publication_favorite(&self, favorite: &mut PublicationFavorite) -> Result<()> {
+        if !self
+            .find_publication_favorites(
+                Some(favorite.base().id().reader_id()),
+                Some(favorite.base().id().publication_id()),
+                None,
+                None,
+            )
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("favorite", "already_exists"));
+        }
+
         self.publication_favorites
             .lock()
             .await
@@ -375,6 +415,19 @@ impl InteractionRepository for InMemInteractionRepository {
     }
 
     async fn save_collection_favorite(&self, favorite: &mut CollectionFavorite) -> Result<()> {
+        if !self
+            .find_collection_favorites(
+                Some(favorite.base().id().reader_id()),
+                Some(favorite.base().id().collection_id()),
+                None,
+                None,
+            )
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("favorite", "already_exists"));
+        }
+
         self.collection_favorites
             .lock()
             .await
@@ -383,6 +436,19 @@ impl InteractionRepository for InMemInteractionRepository {
     }
 
     async fn save_follow(&self, follow: &mut Follow) -> Result<()> {
+        if !self
+            .find_follows(
+                Some(follow.base().id().reader_id()),
+                Some(follow.base().id().author_id()),
+                None,
+                None,
+            )
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("follow", "already_exists"));
+        }
+
         self.follows.lock().await.push(follow.clone());
         Ok(())
     }
@@ -392,6 +458,14 @@ impl InteractionRepository for InMemInteractionRepository {
         reader_id: &ReaderId,
         publication_id: &PublicationId,
     ) -> Result<()> {
+        if self
+            .find_likes(Some(reader_id), Some(publication_id), None, None)
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("like", "not_found"));
+        }
+
         self.likes.lock().await.retain(|like| {
             like.base().id().reader_id() != reader_id
                 && like.base().id().publication_id() != publication_id
@@ -404,6 +478,14 @@ impl InteractionRepository for InMemInteractionRepository {
         reader_id: &ReaderId,
         publication_id: &PublicationId,
     ) -> Result<()> {
+        if self
+            .find_reviews(Some(reader_id), Some(publication_id), None, None)
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("review", "not_found"));
+        }
+
         self.reviews.lock().await.retain(|review| {
             review.base().id().reader_id() != reader_id
                 && review.base().id().publication_id() != publication_id
@@ -416,6 +498,14 @@ impl InteractionRepository for InMemInteractionRepository {
         reader_id: &ReaderId,
         publication_id: &PublicationId,
     ) -> Result<()> {
+        if self
+            .find_publication_favorites(Some(reader_id), Some(publication_id), None, None)
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("favorite", "not_found"));
+        }
+
         self.publication_favorites.lock().await.retain(|favorite| {
             favorite.base().id().reader_id() != reader_id
                 && favorite.base().id().publication_id() != publication_id
@@ -428,6 +518,14 @@ impl InteractionRepository for InMemInteractionRepository {
         reader_id: &ReaderId,
         collection_id: &CollectionId,
     ) -> Result<()> {
+        if self
+            .find_collection_favorites(Some(reader_id), Some(collection_id), None, None)
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("favorite", "not_found"));
+        }
+
         self.collection_favorites.lock().await.retain(|favorite| {
             favorite.base().id().reader_id() != reader_id
                 && favorite.base().id().collection_id() != collection_id
@@ -436,6 +534,14 @@ impl InteractionRepository for InMemInteractionRepository {
     }
 
     async fn delete_follow(&self, reader_id: &ReaderId, author_id: &AuthorId) -> Result<()> {
+        if self
+            .find_follows(Some(reader_id), Some(author_id), None, None)
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("follow", "not_found"));
+        }
+
         self.follows.lock().await.retain(|follow| {
             follow.base().id().reader_id() != reader_id
                 && follow.base().id().author_id() != author_id

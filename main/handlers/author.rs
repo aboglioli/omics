@@ -136,8 +136,8 @@ async fn follow(
     Follow::new(
         c.publishing.event_pub(),
         c.publishing.author_repo(),
+        c.publishing.interaction_repo(),
         c.publishing.reader_repo(),
-        c.publishing.interaction_serv(),
     )
     .exec(auth_id, path.into_inner())
     .await
@@ -156,8 +156,8 @@ async fn unfollow(
     Unfollow::new(
         c.publishing.event_pub(),
         c.publishing.author_repo(),
+        c.publishing.interaction_repo(),
         c.publishing.reader_repo(),
-        c.publishing.interaction_serv(),
     )
     .exec(auth_id, path.into_inner())
     .await

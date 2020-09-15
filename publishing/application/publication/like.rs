@@ -2,31 +2,30 @@ use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::domain::interaction::InteractionService;
+use crate::domain::interaction::InteractionRepository;
 use crate::domain::publication::{PublicationId, PublicationRepository};
 use crate::domain::reader::{ReaderId, ReaderRepository};
 
 pub struct Like<'a> {
     event_pub: &'a dyn EventPublisher,
 
+    interaction_repo: &'a dyn InteractionRepository,
     publication_repo: &'a dyn PublicationRepository,
     reader_repo: &'a dyn ReaderRepository,
-
-    interaction_serv: &'a InteractionService,
 }
 
 impl<'a> Like<'a> {
     pub fn new(
         event_pub: &'a dyn EventPublisher,
+        interaction_repo: &'a dyn InteractionRepository,
         publication_repo: &'a dyn PublicationRepository,
         reader_repo: &'a dyn ReaderRepository,
-        interaction_serv: &'a InteractionService,
     ) -> Self {
         Like {
             event_pub,
+            interaction_repo,
             publication_repo,
             reader_repo,
-            interaction_serv,
         }
     }
 
@@ -37,10 +36,9 @@ impl<'a> Like<'a> {
         let reader_id = ReaderId::new(auth_id)?;
         let reader = self.reader_repo.find_by_id(&reader_id).await?;
 
-        self.interaction_serv
-            .add_like(&reader, &mut publication)
-            .await?;
+        let mut like = publication.like(&reader)?;
 
+        self.interaction_repo.save_like(&mut like).await?;
         self.publication_repo.save(&mut publication).await?;
 
         self.event_pub
@@ -62,9 +60,9 @@ mod tests {
         let c = mocks::container();
         let uc = Like::new(
             c.event_pub(),
+            c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
-            c.interaction_serv(),
         );
 
         let mut reader = mocks::user1().2;
@@ -93,9 +91,9 @@ mod tests {
         let c = mocks::container();
         let uc = Like::new(
             c.event_pub(),
+            c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
-            c.interaction_serv(),
         );
 
         let mut reader = mocks::user1().2;
@@ -117,9 +115,9 @@ mod tests {
         let c = mocks::container();
         let uc = Like::new(
             c.event_pub(),
+            c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
-            c.interaction_serv(),
         );
 
         let mut reader = mocks::user1().2;
