@@ -39,7 +39,6 @@ export class PublicationCardAuthorComponent implements OnInit {
 
     switch ( status.status ) {
 
-
       case 'waiting-approval': {
 
         this.statusToShow.title = 'PENDIENTE';
@@ -66,6 +65,15 @@ export class PublicationCardAuthorComponent implements OnInit {
 
       }
 
+      case 'draft': {
+
+        this.statusToShow.title = 'BORRADOR';
+        this.statusToShow.msg = status.comment;
+        this.statusToShow.index = 3;
+        break;
+
+      }
+
     }
 
   }
@@ -86,6 +94,11 @@ export class PublicationCardAuthorComponent implements OnInit {
 
       case 2: {
         this.sweetAlertGenericService.showAlertSuccess(  this.statusToShow.msg, this.statusToShow.title );
+        break;
+      }
+
+      case 3: {
+        this.sweetAlertGenericService.showAlertInfo(  'Aún no se ha enviado para revisión', 'BORRADOR' );
         break;
       }
 

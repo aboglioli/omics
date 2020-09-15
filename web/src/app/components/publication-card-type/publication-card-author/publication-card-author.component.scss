@@ -72,6 +72,15 @@ div.card-box {
 
       }
 
+      &.draft {
+        background-color: rgba($color: $omics-background-flat, $alpha: 0.75);
+
+        &:hover {
+          background-color: $omics-background-flat;
+        }
+
+      }
+
 
     }
 

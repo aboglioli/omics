@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { ObrasService } from '../../services/obras.service';
 import { Router } from '@angular/router';
+import { PublicationService, ISearchResponse } from '../../domain/services/publication.service';
+import { IPublication } from '../../domain/models/publication';
+import { ISearchCommand } from '../../domain/services/author.service';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-catalogo',
@@ -9,22 +12,34 @@ import { Router } from '@angular/router';
 })
 export class CatalogoComponent implements OnInit {
 
-  listaObras: any[] = [];
+  publicationList: IPublication[] = [];
 
 
   constructor(
     private router: Router,
-    private obrasService: ObrasService
+    private publicationService: PublicationService,
+    private spinnerService: NgxSpinnerService,
   ) { }
 
   ngOnInit(): void {
 
-    this.obrasService.getListaObras().subscribe( obras => {
+    this.spinnerService.show();
+    this.publicationService.search( { status: 'published' } ).subscribe(
+      (searchRes: ISearchResponse ) => {
 
-      this.listaObras = obras;
-      // console.log('test > ', obras);
+        this.publicationList = searchRes.publications;
+        this.spinnerService.hide();
+        console.log(this.publicationList);
 
-    } );
+
+      },
+      (err: Error) =>  {
+
+        console.error(err);
+        this.spinnerService.hide();
+
+      }
+    );
 
   }
 
