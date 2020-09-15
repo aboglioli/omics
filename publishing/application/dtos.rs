@@ -1,5 +1,6 @@
 use serde::Serialize;
 
+use common::model::StatusItem;
 use shared::domain::user::User;
 
 use crate::domain::author::Author;
@@ -113,14 +114,18 @@ impl From<&Page> for PageDto {
 #[derive(Serialize)]
 pub struct PublicationStatusDto {
     pub status: String,
+    pub changed_at: String,
     pub changed_by: Option<String>,
     pub comment: Option<String>,
 }
 
-impl From<&Status> for PublicationStatusDto {
-    fn from(status: &Status) -> Self {
+impl From<&StatusItem<Status>> for PublicationStatusDto {
+    fn from(status_item: &StatusItem<Status>) -> Self {
+        let status = status_item.status();
+
         let mut dto = PublicationStatusDto {
             status: status.to_string(),
+            changed_at: status_item.date().to_rfc3339(),
             changed_by: None,
             comment: None,
         };
@@ -174,7 +179,7 @@ impl From<&Publication> for PublicationDto {
             cover: publication.header().cover().to_string(),
             statistics: StatisticsDto::from(publication.statistics()),
             pages: None,
-            status: PublicationStatusDto::from(publication.status_history().current()),
+            status: PublicationStatusDto::from(publication.status_history().current_item()),
             created_at: publication.base().created_at().to_rfc3339(),
             updated_at: publication.base().updated_at().map(|d| d.to_rfc3339()),
         }
