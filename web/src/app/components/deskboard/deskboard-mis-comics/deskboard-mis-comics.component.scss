@@ -1,12 +1,15 @@
+@import "src/scss/vars";
+
 div.mis-comics-container {
 
   display: flex;
   flex-direction: column;
+  padding: 0em 1em;
 
   div.top-menu {
 
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-around;
 
     padding: 0.5em 0.5em;
 
@@ -22,4 +25,16 @@ button.button-white-borders {
   color: white;
   border-color: white;
 
+  &.pink-hover:hover {
+    color: $omics-neon-pink;
+    border-color: $omics-neon-pink;
+  }
+
+}
+
+hr {
+  color: white;
+  width: 100%;
+  border-style: solid;
+  border-width: 1px;
 }

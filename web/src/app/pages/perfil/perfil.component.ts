@@ -56,7 +56,6 @@ export class PerfilComponent implements OnInit {
 
           this.profileData = data;
           this.assignProfileAvatar( this.profileData );
-          console.log(this.profileData);
 
           this.memberSince = new Date(this.profileData.created_at);
 

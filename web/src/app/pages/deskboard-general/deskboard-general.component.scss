@@ -49,6 +49,7 @@ div.deskboard-body {
 
       display: flex;
       align-items: center;
+      justify-content: space-between;
 
       h1 {
         font-style: italic;
@@ -56,7 +57,35 @@ div.deskboard-body {
         margin: 0px;
       }
 
+      h3 {
+        margin: 0px;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+          cursor: pointer;
+          font-weight: bold;
+        }
+
+      }
+
     }
+
+    div.box-type {
+
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 0.5em 1em;
+
+      font-weight: bold;
+      font-size: 12pt;
+      color: $omics-background-flat;
+
+      background-color: white;
+
+    }
+
 
     div.menu {
 
@@ -67,8 +96,6 @@ div.deskboard-body {
       display: flex;
       justify-content: space-around;
       align-items: center;
-
-
 
     }
 
@@ -83,5 +110,13 @@ button.button-white-borders {
 
   color: white;
   border-color: white;
+
+  &.pink-hover:hover {
+
+    color: $omics-neon-pink;
+    border-color: $omics-neon-pink;
+
+  }
+
 
 }
