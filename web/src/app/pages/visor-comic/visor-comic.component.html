@@ -3,12 +3,12 @@
 
   <div class="body-page">
 
-    <span *ngIf="!publicationToShow.pages">
+    <span *ngIf="!pagesList">
       <img src="https://via.placeholder.com/663x1024.jpg" alt="test-image">
     </span>
 
-    <span *ngIf="publicationToShow.pages">
-      <img [src]="publicationToShow.pages[0].images[0].url" alt="test-image">
+    <span *ngIf="pagesList">
+      <img [src]="pagesList[0].images[0].url" alt="test-image">
     </span>
 
   </div>

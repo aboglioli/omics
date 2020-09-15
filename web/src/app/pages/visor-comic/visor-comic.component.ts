@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { PublicationService } from 'src/app/domain/services/publication.service';
-import { IPublication } from '../../domain/models/publication';
-import { IGetByIdResponse } from '../../domain/services/publication.service';
+import { IPublication, IPage } from '../../domain/models/publication';
+import { IGetByIdResponse, IReadResponse } from '../../domain/services/publication.service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -13,6 +13,7 @@ import { ActivatedRoute } from '@angular/router';
 export class VisorComicComponent implements OnInit {
 
   publicationToShow: IPublication;
+  pagesList: IPage[];
 
   constructor(
     private spinnerService: NgxSpinnerService,
@@ -34,9 +35,21 @@ export class VisorComicComponent implements OnInit {
         (resPub: IGetByIdResponse) => {
 
           this.publicationToShow = resPub.publication;
-          console.log(this.publicationToShow);
 
-          this.spinnerService.hide();
+          this.publicationService.read( params.id ).subscribe(
+
+            (resPages: IReadResponse) => {
+
+              this.pagesList = resPages.pages;
+              console.log(this.pagesList);
+              this.spinnerService.hide();
+
+            },
+            (err: Error) => {
+              console.error(err);
+            }
+          );
+
 
         },
         (err: Error ) => {
