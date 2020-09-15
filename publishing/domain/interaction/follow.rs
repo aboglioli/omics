@@ -1,35 +1,21 @@
-use chrono::{DateTime, Utc};
-
+use common::model::AggregateRoot;
 use common::result::Result;
 
-use crate::domain::author::AuthorId;
-use crate::domain::reader::ReaderId;
+use crate::domain::interaction::ReaderAuthorId;
 
 #[derive(Debug, Clone)]
 pub struct Follow {
-    reader_id: ReaderId,
-    author_id: AuthorId,
-    date: DateTime<Utc>,
+    base: AggregateRoot<ReaderAuthorId>,
 }
 
 impl Follow {
-    pub fn new(reader_id: ReaderId, author_id: AuthorId) -> Result<Self> {
+    pub fn new(id: ReaderAuthorId) -> Result<Self> {
         Ok(Follow {
-            reader_id,
-            author_id,
-            date: Utc::now(),
+            base: AggregateRoot::new(id),
         })
     }
 
-    pub fn reader_id(&self) -> &ReaderId {
-        &self.reader_id
-    }
-
-    pub fn author_id(&self) -> &AuthorId {
-        &self.author_id
-    }
-
-    pub fn date(&self) -> &DateTime<Utc> {
-        &self.date
+    pub fn base(&self) -> &AggregateRoot<ReaderAuthorId> {
+        &self.base
     }
 }

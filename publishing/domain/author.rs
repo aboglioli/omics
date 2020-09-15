@@ -6,6 +6,7 @@ use common::model::{AggregateRoot, Events, StringId};
 use common::result::Result;
 use shared::event::AuthorEvent;
 
+use crate::domain::interaction::{Follow, ReaderAuthorId};
 use crate::domain::reader::Reader;
 
 pub type AuthorId = StringId;
@@ -38,10 +39,15 @@ impl Author {
         self.followers
     }
 
-    pub fn follow(&mut self, reader: &Reader) -> Result<()> {
+    pub fn follow(&mut self, reader: &Reader) -> Result<Follow> {
         if self.base().id() == reader.base().id() {
             return Err(Error::new("author", "cannot_follow_itself"));
         }
+
+        let follow = Follow::new(ReaderAuthorId::new(
+            reader.base().id().clone(),
+            self.base().id().clone(),
+        )?)?;
 
         self.followers += 1;
         self.base.update();
@@ -51,7 +57,7 @@ impl Author {
             reader_id: reader.base().id().to_string(),
         });
 
-        Ok(())
+        Ok(follow)
     }
 
     pub fn unfollow(&mut self, reader: &Reader) -> Result<()> {

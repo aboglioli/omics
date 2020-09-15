@@ -28,7 +28,9 @@ use shared::domain::user::UserId;
 use shared::event::PublicationEvent;
 
 use crate::domain::author::AuthorId;
-use crate::domain::interaction::{Comment, Like, Reading, Review, Stars, View};
+use crate::domain::interaction::{
+    Comment, Like, ReaderPublicationId, Reading, Review, Stars, View,
+};
 use crate::domain::reader::Reader;
 
 pub type PublicationId = StringId;
@@ -202,8 +204,7 @@ impl Publication {
             });
 
         Ok(View::new(
-            reader.base().id().clone(),
-            self.base().id().clone(),
+            ReaderPublicationId::new(reader.base().id().clone(), self.base().id().clone())?,
             unique,
         )?)
     }
@@ -235,10 +236,10 @@ impl Publication {
                 stars: self.statistics().stars(),
             });
 
-        Ok(Reading::new(
+        Ok(Reading::new(ReaderPublicationId::new(
             reader.base().id().clone(),
             self.base().id().clone(),
-        )?)
+        )?)?)
     }
 
     pub fn like(&mut self, reader: &Reader) -> Result<Like> {
@@ -268,10 +269,10 @@ impl Publication {
                 stars: self.statistics().stars(),
             });
 
-        Ok(Like::new(
+        Ok(Like::new(ReaderPublicationId::new(
             reader.base().id().clone(),
             self.base().id().clone(),
-        )?)
+        )?)?)
     }
 
     pub fn unlike(&mut self, reader: &Reader) -> Result<()> {
@@ -334,8 +335,7 @@ impl Publication {
             });
 
         Ok(Review::new(
-            reader.base().id().clone(),
-            self.base().id().clone(),
+            ReaderPublicationId::new(reader.base().id().clone(), self.base().id().clone())?,
             stars,
             comment,
         )?)

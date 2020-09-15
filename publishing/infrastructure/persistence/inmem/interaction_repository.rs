@@ -5,8 +5,10 @@ use tokio::sync::Mutex;
 use common::result::Result;
 
 use crate::domain::author::AuthorId;
+use crate::domain::collection::CollectionId;
 use crate::domain::interaction::{
-    Favorite, Follow, InteractionRepository, Like, Reading, Review, View,
+    CollectionFavorite, Follow, InteractionRepository, Like, PublicationFavorite, Reading, Review,
+    View,
 };
 use crate::domain::publication::PublicationId;
 use crate::domain::reader::ReaderId;
@@ -16,7 +18,8 @@ pub struct InMemInteractionRepository {
     readings: Mutex<Vec<Reading>>,
     likes: Mutex<Vec<Like>>,
     reviews: Mutex<Vec<Review>>,
-    favorites: Mutex<Vec<Favorite>>,
+    publication_favorites: Mutex<Vec<PublicationFavorite>>,
+    collection_favorites: Mutex<Vec<CollectionFavorite>>,
     follows: Mutex<Vec<Follow>>,
 }
 
@@ -27,7 +30,8 @@ impl InMemInteractionRepository {
             readings: Mutex::new(Vec::new()),
             likes: Mutex::new(Vec::new()),
             reviews: Mutex::new(Vec::new()),
-            favorites: Mutex::new(Vec::new()),
+            publication_favorites: Mutex::new(Vec::new()),
+            collection_favorites: Mutex::new(Vec::new()),
             follows: Mutex::new(Vec::new()),
         }
     }
@@ -45,8 +49,8 @@ impl InteractionRepository for InMemInteractionRepository {
         &self,
         reader_id: Option<&ReaderId>,
         publication_id: Option<&PublicationId>,
-        _from: Option<&DateTime<Utc>>,
-        _to: Option<&DateTime<Utc>>,
+        from: Option<&DateTime<Utc>>,
+        to: Option<&DateTime<Utc>>,
     ) -> Result<Vec<View>> {
         Ok(self
             .views
@@ -55,13 +59,25 @@ impl InteractionRepository for InMemInteractionRepository {
             .iter()
             .filter(|view| {
                 if let Some(reader_id) = reader_id {
-                    if view.base().reader_id() != reader_id {
+                    if view.base().id().reader_id() != reader_id {
                         return false;
                     }
                 }
 
                 if let Some(publication_id) = publication_id {
-                    if view.base().publication_id() != publication_id {
+                    if view.base().id().publication_id() != publication_id {
+                        return false;
+                    }
+                }
+
+                if let Some(from) = from {
+                    if view.base().created_at() < from {
+                        return false;
+                    }
+                }
+
+                if let Some(to) = to {
+                    if view.base().created_at() > to {
                         return false;
                     }
                 }
@@ -76,8 +92,8 @@ impl InteractionRepository for InMemInteractionRepository {
         &self,
         reader_id: Option<&ReaderId>,
         publication_id: Option<&PublicationId>,
-        _from: Option<&DateTime<Utc>>,
-        _to: Option<&DateTime<Utc>>,
+        from: Option<&DateTime<Utc>>,
+        to: Option<&DateTime<Utc>>,
     ) -> Result<Vec<Reading>> {
         Ok(self
             .readings
@@ -86,13 +102,25 @@ impl InteractionRepository for InMemInteractionRepository {
             .iter()
             .filter(|reading| {
                 if let Some(reader_id) = reader_id {
-                    if reading.reader_id() != reader_id {
+                    if reading.base().id().reader_id() != reader_id {
                         return false;
                     }
                 }
 
                 if let Some(publication_id) = publication_id {
-                    if reading.publication_id() != publication_id {
+                    if reading.base().id().publication_id() != publication_id {
+                        return false;
+                    }
+                }
+
+                if let Some(from) = from {
+                    if reading.base().created_at() < from {
+                        return false;
+                    }
+                }
+
+                if let Some(to) = to {
+                    if reading.base().created_at() > to {
                         return false;
                     }
                 }
@@ -107,8 +135,8 @@ impl InteractionRepository for InMemInteractionRepository {
         &self,
         reader_id: Option<&ReaderId>,
         publication_id: Option<&PublicationId>,
-        _from: Option<&DateTime<Utc>>,
-        _to: Option<&DateTime<Utc>>,
+        from: Option<&DateTime<Utc>>,
+        to: Option<&DateTime<Utc>>,
     ) -> Result<Vec<Like>> {
         Ok(self
             .likes
@@ -117,13 +145,25 @@ impl InteractionRepository for InMemInteractionRepository {
             .iter()
             .filter(|like| {
                 if let Some(reader_id) = reader_id {
-                    if like.reader_id() != reader_id {
+                    if like.base().id().reader_id() != reader_id {
                         return false;
                     }
                 }
 
                 if let Some(publication_id) = publication_id {
-                    if like.publication_id() != publication_id {
+                    if like.base().id().publication_id() != publication_id {
+                        return false;
+                    }
+                }
+
+                if let Some(from) = from {
+                    if like.base().created_at() < from {
+                        return false;
+                    }
+                }
+
+                if let Some(to) = to {
+                    if like.base().created_at() > to {
                         return false;
                     }
                 }
@@ -138,8 +178,8 @@ impl InteractionRepository for InMemInteractionRepository {
         &self,
         reader_id: Option<&ReaderId>,
         publication_id: Option<&PublicationId>,
-        _from: Option<&DateTime<Utc>>,
-        _to: Option<&DateTime<Utc>>,
+        from: Option<&DateTime<Utc>>,
+        to: Option<&DateTime<Utc>>,
     ) -> Result<Vec<Review>> {
         Ok(self
             .reviews
@@ -148,13 +188,25 @@ impl InteractionRepository for InMemInteractionRepository {
             .iter()
             .filter(|review| {
                 if let Some(reader_id) = reader_id {
-                    if review.base().reader_id() != reader_id {
+                    if review.base().id().reader_id() != reader_id {
                         return false;
                     }
                 }
 
                 if let Some(publication_id) = publication_id {
-                    if review.base().publication_id() != publication_id {
+                    if review.base().id().publication_id() != publication_id {
+                        return false;
+                    }
+                }
+
+                if let Some(from) = from {
+                    if review.base().created_at() < from {
+                        return false;
+                    }
+                }
+
+                if let Some(to) = to {
+                    if review.base().created_at() > to {
                         return false;
                     }
                 }
@@ -165,27 +217,82 @@ impl InteractionRepository for InMemInteractionRepository {
             .collect())
     }
 
-    async fn find_favorites(
+    async fn find_publication_favorites(
         &self,
         reader_id: Option<&ReaderId>,
         publication_id: Option<&PublicationId>,
-        _from: Option<&DateTime<Utc>>,
-        _to: Option<&DateTime<Utc>>,
-    ) -> Result<Vec<Favorite>> {
+        from: Option<&DateTime<Utc>>,
+        to: Option<&DateTime<Utc>>,
+    ) -> Result<Vec<PublicationFavorite>> {
         Ok(self
-            .favorites
+            .publication_favorites
             .lock()
             .await
             .iter()
             .filter(|favorite| {
                 if let Some(reader_id) = reader_id {
-                    if favorite.reader_id() != reader_id {
+                    if favorite.base().id().reader_id() != reader_id {
                         return false;
                     }
                 }
 
                 if let Some(publication_id) = publication_id {
-                    if favorite.publication_id() != publication_id {
+                    if favorite.base().id().publication_id() != publication_id {
+                        return false;
+                    }
+                }
+
+                if let Some(from) = from {
+                    if favorite.base().created_at() < from {
+                        return false;
+                    }
+                }
+
+                if let Some(to) = to {
+                    if favorite.base().created_at() > to {
+                        return false;
+                    }
+                }
+
+                true
+            })
+            .cloned()
+            .collect())
+    }
+
+    async fn find_collection_favorites(
+        &self,
+        reader_id: Option<&ReaderId>,
+        collection_id: Option<&CollectionId>,
+        from: Option<&DateTime<Utc>>,
+        to: Option<&DateTime<Utc>>,
+    ) -> Result<Vec<CollectionFavorite>> {
+        Ok(self
+            .collection_favorites
+            .lock()
+            .await
+            .iter()
+            .filter(|favorite| {
+                if let Some(reader_id) = reader_id {
+                    if favorite.base().id().reader_id() != reader_id {
+                        return false;
+                    }
+                }
+
+                if let Some(collection_id) = collection_id {
+                    if favorite.base().id().collection_id() != collection_id {
+                        return false;
+                    }
+                }
+
+                if let Some(from) = from {
+                    if favorite.base().created_at() < from {
+                        return false;
+                    }
+                }
+
+                if let Some(to) = to {
+                    if favorite.base().created_at() > to {
                         return false;
                     }
                 }
@@ -200,8 +307,8 @@ impl InteractionRepository for InMemInteractionRepository {
         &self,
         reader_id: Option<&ReaderId>,
         author_id: Option<&AuthorId>,
-        _from: Option<&DateTime<Utc>>,
-        _to: Option<&DateTime<Utc>>,
+        from: Option<&DateTime<Utc>>,
+        to: Option<&DateTime<Utc>>,
     ) -> Result<Vec<Follow>> {
         Ok(self
             .follows
@@ -210,13 +317,25 @@ impl InteractionRepository for InMemInteractionRepository {
             .iter()
             .filter(|follow| {
                 if let Some(reader_id) = reader_id {
-                    if follow.reader_id() != reader_id {
+                    if follow.base().id().reader_id() != reader_id {
                         return false;
                     }
                 }
 
                 if let Some(author_id) = author_id {
-                    if follow.author_id() != author_id {
+                    if follow.base().id().author_id() != author_id {
+                        return false;
+                    }
+                }
+
+                if let Some(from) = from {
+                    if follow.base().created_at() < from {
+                        return false;
+                    }
+                }
+
+                if let Some(to) = to {
+                    if follow.base().created_at() > to {
                         return false;
                     }
                 }
@@ -247,8 +366,19 @@ impl InteractionRepository for InMemInteractionRepository {
         Ok(())
     }
 
-    async fn save_favorite(&self, favorite: &mut Favorite) -> Result<()> {
-        self.favorites.lock().await.push(favorite.clone());
+    async fn save_publication_favorite(&self, favorite: &mut PublicationFavorite) -> Result<()> {
+        self.publication_favorites
+            .lock()
+            .await
+            .push(favorite.clone());
+        Ok(())
+    }
+
+    async fn save_collection_favorite(&self, favorite: &mut CollectionFavorite) -> Result<()> {
+        self.collection_favorites
+            .lock()
+            .await
+            .push(favorite.clone());
         Ok(())
     }
 
@@ -263,7 +393,8 @@ impl InteractionRepository for InMemInteractionRepository {
         publication_id: &PublicationId,
     ) -> Result<()> {
         self.likes.lock().await.retain(|like| {
-            like.reader_id() != reader_id && like.publication_id() != publication_id
+            like.base().id().reader_id() != reader_id
+                && like.base().id().publication_id() != publication_id
         });
         Ok(())
     }
@@ -274,28 +405,41 @@ impl InteractionRepository for InMemInteractionRepository {
         publication_id: &PublicationId,
     ) -> Result<()> {
         self.reviews.lock().await.retain(|review| {
-            review.base().reader_id() != reader_id
-                && review.base().publication_id() != publication_id
+            review.base().id().reader_id() != reader_id
+                && review.base().id().publication_id() != publication_id
         });
         Ok(())
     }
 
-    async fn delete_favorite(
+    async fn delete_publication_favorite(
         &self,
         reader_id: &ReaderId,
         publication_id: &PublicationId,
     ) -> Result<()> {
-        self.favorites.lock().await.retain(|favorite| {
-            favorite.reader_id() != reader_id && favorite.publication_id() != publication_id
+        self.publication_favorites.lock().await.retain(|favorite| {
+            favorite.base().id().reader_id() != reader_id
+                && favorite.base().id().publication_id() != publication_id
+        });
+        Ok(())
+    }
+
+    async fn delete_collection_favorite(
+        &self,
+        reader_id: &ReaderId,
+        collection_id: &CollectionId,
+    ) -> Result<()> {
+        self.collection_favorites.lock().await.retain(|favorite| {
+            favorite.base().id().reader_id() != reader_id
+                && favorite.base().id().collection_id() != collection_id
         });
         Ok(())
     }
 
     async fn delete_follow(&self, reader_id: &ReaderId, author_id: &AuthorId) -> Result<()> {
-        self.follows
-            .lock()
-            .await
-            .retain(|follow| follow.reader_id() != reader_id && follow.author_id() != author_id);
+        self.follows.lock().await.retain(|follow| {
+            follow.base().id().reader_id() != reader_id
+                && follow.base().id().author_id() != author_id
+        });
         Ok(())
     }
 }

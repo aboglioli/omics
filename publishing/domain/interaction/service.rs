@@ -4,8 +4,10 @@ use common::error::Error;
 use common::result::Result;
 
 use crate::domain::author::Author;
+use crate::domain::collection::Collection;
 use crate::domain::interaction::{
-    Comment, Favorite, Follow, InteractionRepository, Like, Reading, Review, Stars, View,
+    CollectionFavorite, Comment, Follow, InteractionRepository, Like, PublicationFavorite,
+    ReaderAuthorId, ReaderCollectionId, ReaderPublicationId, Reading, Review, Stars, View,
 };
 use crate::domain::publication::Publication;
 use crate::domain::reader::Reader;
@@ -154,10 +156,14 @@ impl InteractionService {
         Ok(())
     }
 
-    pub async fn add_favorite(&self, reader: &Reader, publication: &Publication) -> Result<()> {
+    pub async fn add_publication_favorite(
+        &self,
+        reader: &mut Reader,
+        publication: &Publication,
+    ) -> Result<()> {
         let favorites_res = self
             .interaction_repo
-            .find_favorites(
+            .find_publication_favorites(
                 Some(reader.base().id()),
                 Some(publication.base().id()),
                 None,
@@ -171,18 +177,23 @@ impl InteractionService {
             }
         }
 
-        let mut favorite =
-            Favorite::new(reader.base().id().clone(), publication.base().id().clone())?;
+        let mut favorite = reader.add_publication_to_favorites(publication)?;
 
-        self.interaction_repo.save_favorite(&mut favorite).await?;
+        self.interaction_repo
+            .save_publication_favorite(&mut favorite)
+            .await?;
 
         Ok(())
     }
 
-    pub async fn delete_favorite(&self, reader: &Reader, publication: &Publication) -> Result<()> {
+    pub async fn delete_publication_favorite(
+        &self,
+        reader: &mut Reader,
+        publication: &Publication,
+    ) -> Result<()> {
         let favorites = self
             .interaction_repo
-            .find_favorites(
+            .find_publication_favorites(
                 Some(reader.base().id()),
                 Some(publication.base().id()),
                 None,
@@ -194,8 +205,68 @@ impl InteractionService {
             return Err(Error::new("favorite", "does_not_exist"));
         }
 
+        reader.remove_publication_from_favorites(publication)?;
+
         self.interaction_repo
-            .delete_favorite(reader.base().id(), publication.base().id())
+            .delete_publication_favorite(reader.base().id(), publication.base().id())
+            .await?;
+
+        Ok(())
+    }
+
+    pub async fn add_collection_favorite(
+        &self,
+        reader: &mut Reader,
+        collection: &Collection,
+    ) -> Result<()> {
+        let favorites_res = self
+            .interaction_repo
+            .find_collection_favorites(
+                Some(reader.base().id()),
+                Some(collection.base().id()),
+                None,
+                None,
+            )
+            .await;
+
+        if let Ok(favorites) = favorites_res {
+            if !favorites.is_empty() {
+                return Err(Error::new("favorite", "already_exists"));
+            }
+        }
+
+        let mut favorite = reader.add_collection_to_favorites(collection)?;
+
+        self.interaction_repo
+            .save_collection_favorite(&mut favorite)
+            .await?;
+
+        Ok(())
+    }
+
+    pub async fn delete_collection_favorite(
+        &self,
+        reader: &mut Reader,
+        collection: &Collection,
+    ) -> Result<()> {
+        let favorites = self
+            .interaction_repo
+            .find_collection_favorites(
+                Some(reader.base().id()),
+                Some(collection.base().id()),
+                None,
+                None,
+            )
+            .await?;
+
+        if favorites.is_empty() {
+            return Err(Error::new("favorite", "does_not_exist"));
+        }
+
+        reader.remove_collection_from_favorites(collection)?;
+
+        self.interaction_repo
+            .delete_collection_favorite(reader.base().id(), collection.base().id())
             .await?;
 
         Ok(())
@@ -218,9 +289,7 @@ impl InteractionService {
             }
         }
 
-        author.follow(reader)?;
-
-        let mut follow = Follow::new(reader.base().id().clone(), author.base().id().clone())?;
+        let mut follow = author.follow(reader)?;
 
         self.interaction_repo.save_follow(&mut follow).await?;
 

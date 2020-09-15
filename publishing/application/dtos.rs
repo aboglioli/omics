@@ -265,12 +265,12 @@ pub struct ReviewDto {
 impl From<&Review> for ReviewDto {
     fn from(review: &Review) -> Self {
         ReviewDto {
-            reader_id: Some(review.base().reader_id().to_string()),
+            reader_id: Some(review.base().id().reader_id().to_string()),
             reader: None,
-            publication_id: review.base().publication_id().to_string(),
+            publication_id: review.base().id().publication_id().to_string(),
             stars: review.stars().value(),
             comment: review.comment().to_string(),
-            created_at: review.base().date().to_rfc3339(),
+            created_at: review.base().created_at().to_rfc3339(),
         }
     }
 }
