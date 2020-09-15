@@ -187,9 +187,9 @@ async function main() {
     for (const publication of waitingApprovalPublications) {
       const r = rand(0, 100);
       if (r < 50) {
-        await req.post(`/publications/${publication.id}/approve`, { comment: 'All is OK' });
+        await req.post(`/publications/${publication.id}/approve`, { comment: 'Todo correcto' });
       } else if (r < 70) {
-        await req.post(`/publications/${publication.id}/reject`, { comment: 'All is OK' });
+        await req.post(`/publications/${publication.id}/reject`, { comment: 'La obra puede resultar ofensiva' });
       }
     }
 
