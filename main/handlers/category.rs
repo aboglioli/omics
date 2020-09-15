@@ -109,11 +109,15 @@ async fn create(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
-    Create::new(c.publishing.category_repo(), c.publishing.user_repo())
-        .exec(auth_id, cmd.into_inner())
-        .await
-        .map(|res| HttpResponse::Ok().json(res))
-        .map_err(PublicError::from)
+    Create::new(
+        c.publishing.event_pub(),
+        c.publishing.category_repo(),
+        c.publishing.user_repo(),
+    )
+    .exec(auth_id, cmd.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
 }
 
 #[put("/{category_id}")]
@@ -125,11 +129,15 @@ async fn update(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
-    Update::new(c.publishing.category_repo(), c.publishing.user_repo())
-        .exec(auth_id, path.into_inner(), cmd.into_inner())
-        .await
-        .map(|res| HttpResponse::Ok().json(res))
-        .map_err(PublicError::from)
+    Update::new(
+        c.publishing.event_pub(),
+        c.publishing.category_repo(),
+        c.publishing.user_repo(),
+    )
+    .exec(auth_id, path.into_inner(), cmd.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
 }
 
 #[delete("/{category_id}")]
@@ -140,11 +148,15 @@ async fn delete(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
-    Delete::new(c.publishing.category_repo(), c.publishing.user_repo())
-        .exec(auth_id, path.into_inner())
-        .await
-        .map(|res| HttpResponse::Ok().json(res))
-        .map_err(PublicError::from)
+    Delete::new(
+        c.publishing.event_pub(),
+        c.publishing.category_repo(),
+        c.publishing.user_repo(),
+    )
+    .exec(auth_id, path.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
 }
 
 pub fn routes(cfg: &mut web::ServiceConfig) {

@@ -1,6 +1,7 @@
 use serde::Deserialize;
 
 use common::error::Error;
+use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 use shared::domain::user::{UserId, UserRepository};
@@ -13,22 +14,24 @@ pub struct UpdateCommand {
 }
 
 pub struct Update<'a> {
+    event_pub: &'a dyn EventPublisher,
     category_repo: &'a dyn CategoryRepository,
     user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Update<'a> {
     pub fn new(
+        event_pub: &'a dyn EventPublisher,
         category_repo: &'a dyn CategoryRepository,
         user_repo: &'a dyn UserRepository,
     ) -> Self {
         Update {
+            event_pub,
             category_repo,
             user_repo,
         }
     }
 
-    // TODO: events
     pub async fn exec(
         &self,
         auth_id: String,
@@ -47,6 +50,10 @@ impl<'a> Update<'a> {
         category.set_name(Name::new(cmd.name)?)?;
 
         self.category_repo.save(&mut category).await?;
+
+        self.event_pub
+            .publish_all(category.events().to_vec()?)
+            .await?;
 
         Ok(CommandResponse::default())
     }
