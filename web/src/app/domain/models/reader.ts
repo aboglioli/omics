@@ -14,9 +14,13 @@ export interface IReader {
   updated_at?: string;
 }
 
-export interface IReaderInteraction {
+export interface IReaderPublicationInteraction {
   viewed: boolean;
   read: boolean;
   liked: boolean;
   reviewed: boolean;
+}
+
+export interface IReaderAuthorInteraction {
+  followed: boolean;
 }
