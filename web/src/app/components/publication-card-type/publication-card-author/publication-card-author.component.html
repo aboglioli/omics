@@ -1,0 +1,35 @@
+<div class="card-box" *ngIf="publication">
+
+
+  <!-- Cover thumbail -->
+  <div class="left">
+    <img [src]="publication.cover" alt="Thumbail image" >
+
+    <div  *ngIf="statusToShow.title != '' "
+          class="status-box"
+          [ngClass]="( statusToShow.index == 0) ? 'waiting' : ( (statusToShow.index == 1)? 'rejected' : 'published')"
+          (click)="showStatusMsg()">
+      {{ statusToShow.title }}
+    </div>
+
+  </div>
+
+  <!-- Info -->
+  <div class="right">
+
+    <h2>{{publication.name}}</h2>
+
+    <div style="display: flex; flex-direction: column;">
+      <small>Fecha creación:</small>
+      <p>{{publication.created_at | date: 'shortDate' | date: 'dd/MM/yyyy' }}</p>
+    </div>
+    <button mat-stroked-button class="button-white-borders"
+            style="padding-top: 0.25em;"
+            (click)="goToEdit()">
+      Editar
+    </button>
+
+  </div>
+
+
+</div>

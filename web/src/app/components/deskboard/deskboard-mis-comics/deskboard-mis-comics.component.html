@@ -13,8 +13,11 @@
 
   <hr>
 
-  <div class="publicaciones">
+  <div *ngIf="publicationList" class="publication-container" >
 
+    <div *ngFor="let publication of publicationList" class="publication-card">
+      <app-publication-card-author [publication]="publication"></app-publication-card-author>
+    </div>
 
   </div>
 

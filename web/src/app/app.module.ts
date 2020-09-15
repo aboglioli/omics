@@ -59,6 +59,7 @@ import { PasswordRewriteComponent } from './components/password-recovery/passwor
 import { SideNavMenuUserComponent } from './shared/side-nav-menu-user/side-nav-menu-user.component';
 import { PerfilEditarComponent } from './pages/perfil-editar/perfil-editar.component';
 import { PublicationApproveRejectMotiveComponent } from './components/publication-approve-reject-motive/publication-approve-reject-motive.component';
+import { PublicationCardAuthorComponent } from './components/publication-card-type/publication-card-author/publication-card-author.component';
 
 
 @NgModule({
@@ -96,7 +97,8 @@ import { PublicationApproveRejectMotiveComponent } from './components/publicatio
     DevNewPublicationComponent,
     SideNavMenuUserComponent,
     PerfilEditarComponent,
-    PublicationApproveRejectMotiveComponent
+    PublicationApproveRejectMotiveComponent,
+    PublicationCardAuthorComponent
   ],
   imports: [
     BrowserModule,

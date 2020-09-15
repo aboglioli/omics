@@ -5,13 +5,12 @@ div.deskboard-body {
   flex-direction: row;
 
   @media screen and (min-width: $break-small) {
-    height: calc(100vh - 4.6em);
+    min-height: calc(100vh - 4.6em);
   }
 
   @media screen and (max-width: $break-small) {
-    height: calc(100vh - 4.0em);
+    min-height: 100vh;
   }
-
 
   div.side {
 
@@ -109,12 +108,20 @@ div.deskboard-body {
 button.button-white-borders {
 
   color: white;
-  border-color: white;
+
+  // Pantalla grande
+  @media screen and (min-width: $break-small) {
+    border-color: white;
+  }
 
   &.pink-hover:hover {
 
     color: $omics-neon-pink;
-    border-color: $omics-neon-pink;
+
+    // Pantalla grande
+    @media screen and (min-width: $break-small) {
+      border-color: $omics-neon-pink;
+    }
 
   }
 
