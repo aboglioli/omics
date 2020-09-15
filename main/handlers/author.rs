@@ -43,11 +43,15 @@ async fn get_by_id(
         user_id
     };
 
-    GetById::new(c.publishing.author_repo(), c.publishing.user_repo())
-        .exec(auth_id, user_id)
-        .await
-        .map(|res| HttpResponse::Ok().json(res))
-        .map_err(PublicError::from)
+    GetById::new(
+        c.publishing.author_repo(),
+        c.publishing.interaction_repo(),
+        c.publishing.user_repo(),
+    )
+    .exec(auth_id, user_id)
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
 }
 
 // TODO: consider other options of searching

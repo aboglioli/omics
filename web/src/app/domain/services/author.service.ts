@@ -3,7 +3,12 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ConfigService } from './config.service';
-import { IAuthor, IPublication, ICollection } from '../models';
+import { IAuthor, IPublication, ICollection, IReaderAuthorInteraction } from '../models';
+
+export interface IGetByIdResponse {
+  author: IAuthor;
+  reader?: IReaderAuthorInteraction;
+}
 
 export interface ISearchCommand {
   name?: string;
@@ -29,8 +34,8 @@ export class AuthorService {
     this.baseUrl = `${configServ.baseUrl()}/authors`;
   }
 
-  public getById(id: string): Observable<IAuthor> {
-    return this.http.get<IAuthor>(`${this.baseUrl}/${id}`);
+  public getById(id: string): Observable<IGetByIdResponse> {
+    return this.http.get<IGetByIdResponse>(`${this.baseUrl}/${id}`);
   }
 
   public search(cmd: ISearchCommand): Observable<ISearchResponse> {

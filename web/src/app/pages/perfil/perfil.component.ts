@@ -5,7 +5,7 @@ import { faUsers } from '@fortawesome/free-solid-svg-icons';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 import { AuthService } from '../../domain/services/auth.service';
 import Swal from 'sweetalert2';
-import { AuthorService } from '../../domain/services/author.service';
+import { AuthorService, IGetByIdResponse } from '../../domain/services/author.service';
 import { IAuthor } from '../../domain/models/author';
 
 @Component({
@@ -20,6 +20,7 @@ export class PerfilComponent implements OnInit {
   public profileFollowers = 0;
   public memberSince: Date;
   public isSameAsUser = false;
+  public followed = false;
 
   // Font Awseome icons
   public faFollowers = faUsers;
@@ -52,9 +53,11 @@ export class PerfilComponent implements OnInit {
 
       this.authorService.getById(params.id).subscribe(
 
-        (data: IAuthor) => {
+        (data: IGetByIdResponse) => {
 
-          this.profileData = data;
+          this.profileData = data.author;
+          this.profileFollowers = data.author.followers;
+          this.followed = data.reader ? data.reader.followed : false;
           this.assignProfileAvatar( this.profileData );
 
           this.memberSince = new Date(this.profileData.created_at);
@@ -111,8 +114,27 @@ export class PerfilComponent implements OnInit {
 
   public selectSeguir(): void {
 
-    // TODO: Agregar funcionalidad seguir
-    this.sweetAlertGenericService.showUnderConstrucction();
+    this.authorService.follow(this.profileData.id).subscribe(
+      res => {
+        this.getUserDataByParams();
+      },
+      err => {
+        console.log(err);
+      }
+    );
+
+  }
+
+  public selectUnfollow(): void {
+
+    this.authorService.unfollow(this.profileData.id).subscribe(
+      res => {
+        this.getUserDataByParams();
+      },
+      err => {
+        console.log(err);
+      }
+    );
 
   }
 

@@ -3,12 +3,11 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ConfigService } from './config.service';
-import { IPublication, IReview, IPage, IReaderInteraction, ICollection } from '../models';
-
+import { IPublication, IReview, IPage, IReaderPublicationInteraction, ICollection } from '../models';
 
 export interface IGetByIdResponse {
   publication: IPublication;
-  reader?: IReaderInteraction;
+  reader?: IReaderPublicationInteraction;
 }
 
 export interface ISearchCommand {

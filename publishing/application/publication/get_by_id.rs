@@ -6,7 +6,7 @@ use common::request::Include;
 use common::result::Result;
 use shared::domain::user::{UserId, UserRepository};
 
-use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto, ReaderInteractionDto};
+use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto, ReaderPublicationInteractionDto};
 use crate::domain::author::AuthorRepository;
 use crate::domain::category::CategoryRepository;
 use crate::domain::interaction::InteractionRepository;
@@ -16,7 +16,7 @@ use crate::domain::reader::{ReaderId, ReaderRepository};
 #[derive(Serialize)]
 pub struct GetByIdResponse {
     pub publication: PublicationDto,
-    pub reader: Option<ReaderInteractionDto>,
+    pub reader: Option<ReaderPublicationInteractionDto>,
 }
 
 pub struct GetById<'a> {
@@ -104,7 +104,7 @@ impl<'a> GetById<'a> {
 
                 (
                     PublicationDto::from(&publication),
-                    Some(ReaderInteractionDto::new(
+                    Some(ReaderPublicationInteractionDto::new(
                         reader_statistics.views() > 0,
                         reader_statistics.readings() > 0,
                         reader_statistics.likes() > 0,

@@ -346,20 +346,33 @@ impl ReaderDto {
 }
 
 #[derive(Serialize)]
-pub struct ReaderInteractionDto {
+pub struct ReaderPublicationInteractionDto {
     pub viewed: bool,
     pub read: bool,
     pub liked: bool,
     pub reviewed: bool,
 }
 
-impl ReaderInteractionDto {
+impl ReaderPublicationInteractionDto {
     pub fn new(viewed: bool, read: bool, liked: bool, reviewed: bool) -> Self {
-        ReaderInteractionDto {
+        ReaderPublicationInteractionDto {
             viewed,
             read,
             liked,
             reviewed,
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct ReaderAuthorInteractionDto {
+    pub followed: bool,
+}
+
+impl ReaderAuthorInteractionDto {
+    pub fn new(followed: bool) -> Self {
+        ReaderAuthorInteractionDto {
+            followed,
         }
     }
 }
