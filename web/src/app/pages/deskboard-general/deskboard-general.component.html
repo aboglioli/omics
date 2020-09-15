@@ -17,8 +17,9 @@
       </div>
 
       <div *ngIf="isBigScreen">
-        <h3 *ngIf="userData"
-            (click)="onGoToProfile()">{{ userData.username }}</h3>
+        <h2 *ngIf="userData"
+            (click)="onGoToProfile()">{{ userData.username }}
+        </h2>
       </div>
 
     </div>
