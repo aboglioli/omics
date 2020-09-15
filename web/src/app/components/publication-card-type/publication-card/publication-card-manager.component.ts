@@ -5,7 +5,7 @@ import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-ge
 
 
 @Component({
-  selector: 'app-publication-card',
+  selector: 'app-publication-card-manager',
   templateUrl: './publication-card-manager.component.html',
   styleUrls: ['./publication-card-manager.component.scss']
 })
@@ -17,9 +17,7 @@ export class PublicationCardManagerComponent implements OnInit {
     private sweetAlertGenericService: SweetAlertGenericMessageService,
   ) { }
 
-  ngOnInit(): void {
-    console.log(this.publication);
-  }
+  ngOnInit(): void {}
 
   public goToProfile(): void {
 

@@ -5,13 +5,12 @@ div.deskboard-body {
   flex-direction: row;
 
   @media screen and (min-width: $break-small) {
-    height: calc(100vh - 4.6em);
+    min-height: calc(100vh - 4.6em);
   }
 
   @media screen and (max-width: $break-small) {
-    height: calc(100vh - 4.0em);
+    min-height: 100vh;
   }
-
 
   div.side {
 
@@ -49,6 +48,7 @@ div.deskboard-body {
 
       display: flex;
       align-items: center;
+      justify-content: space-between;
 
       h1 {
         font-style: italic;
@@ -56,7 +56,35 @@ div.deskboard-body {
         margin: 0px;
       }
 
+      h2 {
+        margin: 0px;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+          cursor: pointer;
+          font-weight: bold;
+        }
+
+      }
+
     }
+
+    div.box-type {
+
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 0.5em 1em;
+
+      font-weight: bold;
+      font-size: 12pt;
+      color: $omics-background-flat;
+
+      background-color: white;
+
+    }
+
 
     div.menu {
 
@@ -67,8 +95,6 @@ div.deskboard-body {
       display: flex;
       justify-content: space-around;
       align-items: center;
-
-
 
     }
 
@@ -82,6 +108,22 @@ div.deskboard-body {
 button.button-white-borders {
 
   color: white;
-  border-color: white;
+
+  // Pantalla grande
+  @media screen and (min-width: $break-small) {
+    border-color: white;
+  }
+
+  &.pink-hover:hover {
+
+    color: $omics-neon-pink;
+
+    // Pantalla grande
+    @media screen and (min-width: $break-small) {
+      border-color: $omics-neon-pink;
+    }
+
+  }
+
 
 }

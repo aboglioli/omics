@@ -2,18 +2,22 @@
 
   <div class="top-menu">
 
-    <button mat-stroked-button class="button-white-borders"
+    <button mat-stroked-button class="button-white-borders pink-hover"
             style="padding-top: 0.25em;"
             (click)="goToNewPublication()">
-      <fa-icon [icon]="faUpload" size="2x"></fa-icon>
+      <fa-icon [icon]="faUpload" size="2x" style="margin-right: 0.5em"></fa-icon>
       Añadir Publicación
     </button>
 
   </div>
 
-  <div class="publicaciones">
+  <hr>
 
-    <app-under-construction></app-under-construction>
+  <div *ngIf="publicationList" class="publication-container" >
+
+    <div *ngFor="let publication of publicationList" class="publication-card">
+      <app-publication-card-author [publication]="publication"></app-publication-card-author>
+    </div>
 
   </div>
 

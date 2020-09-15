@@ -18,6 +18,26 @@ export class SweetAlertGenericMessageService {
 
   }
 
+  public showAlertSuccess( msg: string, titleMsg: string = 'Éxito' ): void {
+
+    Swal.fire({
+      icon: 'success',
+      title: titleMsg,
+      text: msg
+    });
+
+  }
+
+  public showAlertInfo( msg: string, titleMsg: string = 'Información' ): void {
+
+    Swal.fire({
+      icon: 'info',
+      title: titleMsg,
+      text: msg
+    });
+
+  }
+
   public showUnderConstrucction(): void {
 
     Swal.fire({
