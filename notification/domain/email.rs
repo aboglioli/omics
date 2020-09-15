@@ -11,15 +11,7 @@ pub struct Email {
 }
 
 impl Email {
-    pub fn new(
-        to: String,
-        title: String,
-        body: String,
-    ) -> Result<Self> {
-        Ok(Email {
-            to,
-            title,
-            body,
-        })
+    pub fn new(to: String, title: String, body: String) -> Result<Self> {
+        Ok(Email { to, title, body })
     }
 }

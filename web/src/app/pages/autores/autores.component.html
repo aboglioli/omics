@@ -1,1 +1,10 @@
-<app-under-construction></app-under-construction>
+<div class="authors-container">
+  <a class="author" [href]="'/profile/' + author.id" *ngFor="let author of authors">
+    <img class="profile-image" [src]="author.profile_image" />
+
+    <div class="text">
+      <span class="username">{{author.username}}</span>
+      <span class="followers">{{author.followers}} seguidores</span>
+    </div>
+  </a>
+</div>

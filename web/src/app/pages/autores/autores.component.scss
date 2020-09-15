@@ -1,0 +1,37 @@
+@import "src/scss/vars";
+
+.authors-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  .author {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+
+    .profile-image {
+      height: 200px;
+      width: 200px;
+    }
+
+    .text {
+      margin-top: 0.5rem;
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+
+      .username {
+        font-weight: bold;
+        color: #fff;
+      }
+
+      .followers {
+        color: #aaa;
+      }
+    }
+  }
+}
