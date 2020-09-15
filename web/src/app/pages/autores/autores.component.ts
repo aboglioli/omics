@@ -23,7 +23,7 @@ export class AutoresComponent implements OnInit {
       err => {
         console.log(err);
       },
-    )
+    );
   }
 
 }
