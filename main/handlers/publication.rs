@@ -5,9 +5,10 @@ use publishing::application::collection::{
     Search as SearchCollection, SearchCommand as SearchCollectionCommand,
 };
 use publishing::application::publication::{
-    AddReview, AddReviewCommand, Approve, ApproveCommand, Create, CreateCommand, Delete,
-    DeleteReview, GetById, GetReviews, Like, Publish, Read, Reject, RejectCommand, Search,
-    SearchCommand, Unlike, Update, UpdateCommand, UpdatePages, UpdatePagesCommand,
+    AddReview, AddReviewCommand, AddToFavorites, Approve, ApproveCommand, Create, CreateCommand,
+    Delete, DeleteReview, GetById, GetReviews, Like, Publish, Read, Reject, RejectCommand,
+    RemoveFromFavorites, Search, SearchCommand, Unlike, Update, UpdateCommand, UpdatePages,
+    UpdatePagesCommand,
 };
 
 use crate::authorization::auth;
@@ -340,6 +341,46 @@ async fn get_collections(
     .map_err(PublicError::from)
 }
 
+#[post("/{publication_id}/favorite")]
+async fn add_to_favorites(
+    req: HttpRequest,
+    path: web::Path<String>,
+    c: web::Data<Container>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    AddToFavorites::new(
+        c.publishing.event_pub(),
+        c.publishing.interaction_repo(),
+        c.publishing.publication_repo(),
+        c.publishing.reader_repo(),
+    )
+    .exec(auth_id, path.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
+}
+
+#[delete("/{publication_id}/favorite")]
+async fn remove_from_favorites(
+    req: HttpRequest,
+    path: web::Path<String>,
+    c: web::Data<Container>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    RemoveFromFavorites::new(
+        c.publishing.event_pub(),
+        c.publishing.interaction_repo(),
+        c.publishing.publication_repo(),
+        c.publishing.reader_repo(),
+    )
+    .exec(auth_id, path.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
+}
+
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/publications")
@@ -358,6 +399,8 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .service(review)
             .service(delete_review)
             .service(get_reviews)
-            .service(get_collections),
+            .service(get_collections)
+            .service(add_to_favorites)
+            .service(remove_from_favorites),
     );
 }

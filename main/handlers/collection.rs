@@ -2,8 +2,8 @@ use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse, Responde
 
 use common::request::IncludeParams;
 use publishing::application::collection::{
-    AddPublication, Create, CreateCommand, Delete, GetById, GetPublications, RemovePublication,
-    Search, SearchCommand, Update, UpdateCommand,
+    AddPublication, AddToFavorites, Create, CreateCommand, Delete, GetById, GetPublications,
+    RemoveFromFavorites, RemovePublication, Search, SearchCommand, Update, UpdateCommand,
 };
 
 use crate::authorization::auth;
@@ -165,6 +165,46 @@ async fn remove_publication(
         .map_err(PublicError::from)
 }
 
+#[post("/{collection_id}/favorite")]
+async fn add_to_favorites(
+    req: HttpRequest,
+    path: web::Path<String>,
+    c: web::Data<Container>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    AddToFavorites::new(
+        c.publishing.event_pub(),
+        c.publishing.collection_repo(),
+        c.publishing.interaction_repo(),
+        c.publishing.reader_repo(),
+    )
+    .exec(auth_id, path.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
+}
+
+#[delete("/{collection_id}/favorite")]
+async fn remove_from_favorites(
+    req: HttpRequest,
+    path: web::Path<String>,
+    c: web::Data<Container>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    RemoveFromFavorites::new(
+        c.publishing.event_pub(),
+        c.publishing.collection_repo(),
+        c.publishing.interaction_repo(),
+        c.publishing.reader_repo(),
+    )
+    .exec(auth_id, path.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
+}
+
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/collections")
@@ -175,6 +215,8 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .service(update)
             .service(delete)
             .service(add_publication)
-            .service(remove_publication),
+            .service(remove_publication)
+            .service(add_to_favorites)
+            .service(remove_from_favorites),
     );
 }

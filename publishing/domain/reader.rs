@@ -3,6 +3,7 @@ mod repository;
 pub use preferences::*;
 pub use repository::*;
 
+use common::error::Error;
 use common::model::{AggregateRoot, Events, StringId};
 use common::result::Result;
 use shared::event::ReaderEvent;
@@ -77,6 +78,10 @@ impl Reader {
         &mut self,
         publication: &Publication,
     ) -> Result<PublicationFavorite> {
+        if !publication.is_published() {
+            return Err(Error::new("publication", "not_published"));
+        }
+
         let favorite = PublicationFavorite::new(ReaderPublicationId::new(
             self.base().id().clone(),
             publication.base().id().clone(),
