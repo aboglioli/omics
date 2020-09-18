@@ -1,17 +1,13 @@
 # All
 
 ## Urgent
-- [ ] Publication status should be an object in DTO to show comments.
-- [ ] Get collections that a publication is in.
-
+- [x] Publication status should be an object in DTO to show comments.
+- [x] Get collections that a publication is in.
 - [x] Add 'me' as ID for user endpoints.
 - [x] Check auth permissions for existing use cases.
 - [x] AuthorizationService should return user id only. Not load it.
-- [ ] Create Author from UserService when a new publication is created.
 - [x] Persist events in EventRepository.
 - [x] Add API to get events if user is admin.
-- [ ] Make /events accessible only in development env.
-- [ ] If request is a GET and an error occurs, a 404 error should be returned.
 - [x] Split publicaton view and publication read.
 - [x] Add Reader preferences.
 - [x] Add Reader interaction for a viewed publication. DTO.
@@ -26,22 +22,26 @@
 - [x] Add Option<String> for auth_id in use cases where user does not need to be logged in.
 - [x] Make User birthday as value object. Check date ranges.
 - [x] API for add new categories.
-- [ ] Use username as user id too.
 - [x] Add 'biography' to Author.
-- [ ] Add favorite interactions for publications and collections.
-- [ ] Refactor interactions and events.
-- [ ] Search by tags for publications and collections.
-- [ ] Add datetimes in DTOs.
+- [x] Add favorite interactions for publications and collections.
+- [x] Refactor interactions and events.
+- [x] Add datetimes in DTOs.
 - [x] Add Author followers.
-- [ ] Call base.update() and base.delete() in each AggregateRoot.
-- [ ] Consider deleted_at in repositories to not return deleted entities.
+- [x] Call base.update() and base.delete() in each AggregateRoot.
 - [x] Add next_id() implementation in trait of repositories.
-- [ ] Add 'username' as ID of user.
 - [x] Separate events from AggregateRoot.
-- [ ] Move publishing::UserService to shared crate.
+- [x] Move publishing::UserService to shared crate.
+- [x] Add entpoint for /publications/:id/collections (collections having the given publication).
+
+- [ ] Create Author from UserService when a new publication is created.
+- [ ] Make /events accessible only in development env.
+- [ ] If request is a GET and an error occurs, a 404 error should be returned.
+- [ ] Use username as user id too.
+- [ ] Add 'username' as ID of user.
+- [ ] Search by tags for publications and collections.
+- [ ] Consider deleted_at in repositories to not return deleted entities.
 - [ ] Allow change 'username' and 'email' in IdentityService.
 - [ ] Merge 'code' with 'topic' in Event.
-- [ ] Add entpoint for /publications/:id/collections (collections having the given publication).
 
 # Progress
 

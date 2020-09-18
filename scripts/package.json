@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "populate": "node src/populate",
+    "migrate": "node src/migrate",
     "test": "jest"
   },
   "author": "Alan Boglioli <alan.boglioli@gmail.com>",
@@ -13,6 +14,8 @@
     "jest": "^26.4.2"
   },
   "dependencies": {
-    "axios": "^0.20.0"
+    "axios": "^0.20.0",
+    "dotenv": "^8.2.0",
+    "pg": "^8.3.3"
   }
 }

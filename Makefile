@@ -12,7 +12,7 @@ fix:
 	cargo fix --allow-dirty
 
 run:
-	PORT=3000 cargo run
+	PORT=3000 cargo run --bin omics
 
 dependencies:
 	cargo update
@@ -28,6 +28,10 @@ api-test:
 
 populate:
 	$(MAKE) -C $(SCRIPTS_DIR) populate
+
+migrate:
+	$(MAKE) -C $(SCRIPTS_DIR) migrate
+
 
 # ----------
 # Web
