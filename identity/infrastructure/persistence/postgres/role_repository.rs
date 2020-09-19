@@ -57,7 +57,7 @@ impl RoleRepository for PostgresRoleRepository {
     async fn find_by_id(&self, id: &RoleId) -> Result<Role> {
         let row = self
             .client
-            .query_one("SELECT * FROM roles WHERE id = $1", &[&id.to_uuid()?])
+            .query_one("SELECT * FROM roles WHERE id = $1", &[&id.value()])
             .await
             .map_err(|err| Error::not_found("role").wrap_raw(err))?;
 
@@ -69,7 +69,7 @@ impl RoleRepository for PostgresRoleRepository {
             .client
             .query_one(
                 "SELECT * FROM roles WHERE id = $1",
-                &[&role.base().id().to_uuid()?],
+                &[&role.base().id().value()],
             )
             .await
             .is_err();
@@ -77,11 +77,10 @@ impl RoleRepository for PostgresRoleRepository {
         if create {
             self.client
                 .execute(
-                    "
-                    INSERT INTO roles(id, name, created_at)
+                    "INSERT INTO roles(id, name, created_at)
                     VALUES ($1, $2, $3)",
                     &[
-                        &role.base().id().to_uuid()?,
+                        &role.base().id().value(),
                         &role.name(),
                         &role.base().created_at(),
                     ],
@@ -91,13 +90,12 @@ impl RoleRepository for PostgresRoleRepository {
         } else {
             self.client
                 .execute(
-                    "
-                    UPDATE roles
+                    "UPDATE roles
                     SET
                         name = $2
                     WHERE
                         id = $1",
-                    &[&role.base().id().to_uuid()?, &role.name()],
+                    &[&role.base().id().value(), &role.name()],
                 )
                 .await
                 .map_err(|err| Error::new("role", "update").wrap_raw(err))?;

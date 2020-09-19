@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS collections (
   name VARCHAR(255) NOT NULL,
   synopsis TEXT NOT NULL,
   category_id VARCHAR(255) NOT NULL,
-  tags TEXT[],
+  tags TEXT[] NOT NULL,
   cover VARCHAR(1024) NOT NULL,
 
   created_at TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS publications (
   name VARCHAR(255) NOT NULL,
   synopsis TEXT NOT NULL,
   category_id VARCHAR(255) NOT NULL,
-  tags TEXT[],
+  tags TEXT[] NOT NULL,
   cover VARCHAR(1024) NOT NULL,
 
   contract BOOLEAN DEFAULT FALSE,

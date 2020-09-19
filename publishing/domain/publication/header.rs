@@ -21,7 +21,7 @@ impl Header {
         tags: Vec<Tag>,
         cover: Image,
     ) -> Result<Header> {
-        if tags.len() > 5 {
+        if tags.len() > 25 {
             return Err(Error::new("publication", "maximum_tags_exceeded"));
         }
 

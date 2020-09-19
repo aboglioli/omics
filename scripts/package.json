@@ -6,6 +6,7 @@
   "scripts": {
     "populate": "node src/populate",
     "migrate": "node src/migrate",
+    "clean-db": "node src/clean-db",
     "test": "jest"
   },
   "author": "Alan Boglioli <alan.boglioli@gmail.com>",

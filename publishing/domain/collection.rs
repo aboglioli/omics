@@ -51,6 +51,21 @@ impl Collection {
         Ok(collection)
     }
 
+    pub fn build(
+        base: AggregateRoot<CollectionId>,
+        author_id: AuthorId,
+        header: Header,
+        items: Vec<Item>,
+    ) -> Self {
+        Collection {
+            base,
+            events: Events::new(),
+            author_id,
+            header,
+            items,
+        }
+    }
+
     pub fn base(&self) -> &AggregateRoot<CollectionId> {
         &self.base
     }

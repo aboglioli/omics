@@ -106,8 +106,7 @@ impl UserRepository for PostgresUserRepository {
         let row = self
             .client
             .query_one(
-                "
-                SELECT * FROM users
+                "SELECT * FROM users
                 WHERE id = $1",
                 &[&id.to_uuid()?],
             )
@@ -121,8 +120,7 @@ impl UserRepository for PostgresUserRepository {
         let row = self
             .client
             .query_one(
-                "
-                SELECT * FROM users
+                "SELECT * FROM users
                 WHERE username = $1",
                 &[&username.value()],
             )
@@ -136,8 +134,7 @@ impl UserRepository for PostgresUserRepository {
         let row = self
             .client
             .query_one(
-                "
-                SELECT * FROM users
+                "SELECT * FROM users
                 WHERE email = $1",
                 &[&email.value()],
             )
@@ -151,8 +148,7 @@ impl UserRepository for PostgresUserRepository {
         let rows = self
             .client
             .query(
-                "
-                SELECT * FROM users
+                "SELECT * FROM users
                 WHERE role_id = $1",
                 &[&role_id.value()],
             )
@@ -181,8 +177,7 @@ impl UserRepository for PostgresUserRepository {
         if create {
             self.client
                 .execute(
-                    "
-                    INSERT INTO users(
+                    "INSERT INTO users(
                         id,
                         provider,
                         username,
@@ -253,8 +248,7 @@ impl UserRepository for PostgresUserRepository {
         } else {
             self.client
                 .execute(
-                    "
-                    UPDATE users
+                    "UPDATE users
                     SET
                         password = $2,
                         name = $3,
@@ -316,7 +310,6 @@ mod tests {
     #[tokio::test]
     async fn all() {
         let config = Config::get();
-
         let (client, connection) = tokio_postgres::connect(
             &format!(
                 "host={} user={} password={} dbname={}",

@@ -32,6 +32,9 @@ populate:
 migrate:
 	$(MAKE) -C $(SCRIPTS_DIR) migrate
 
+clean-db:
+	$(MAKE) -C $(SCRIPTS_DIR) clean-db
+
 
 # ----------
 # Web

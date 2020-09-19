@@ -6,3 +6,6 @@ populate:
 
 migrate:
 	npm run migrate
+
+clean-db:
+	npm run clean-db

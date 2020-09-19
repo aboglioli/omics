@@ -18,6 +18,13 @@ impl Item {
         })
     }
 
+    pub fn build(publication_id: PublicationId, date: DateTime<Utc>) -> Self {
+        Item {
+            publication_id,
+            date,
+        }
+    }
+
     pub fn publication_id(&self) -> &PublicationId {
         &self.publication_id
     }

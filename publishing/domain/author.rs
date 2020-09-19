@@ -27,6 +27,14 @@ impl Author {
         })
     }
 
+    pub fn build(base: AggregateRoot<AuthorId>, followers: u32) -> Self {
+        Author {
+            base,
+            events: Events::new(),
+            followers,
+        }
+    }
+
     pub fn base(&self) -> &AggregateRoot<AuthorId> {
         &self.base
     }

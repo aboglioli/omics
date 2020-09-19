@@ -42,6 +42,7 @@
 - [ ] Consider deleted_at in repositories to not return deleted entities.
 - [ ] Allow change 'username' and 'email' in IdentityService.
 - [ ] Merge 'code' with 'topic' in Event.
+- [ ] Add Uuid as base id (StringId for string id only).
 
 # Progress
 
