@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use chrono::{DateTime, Duration, Utc};
 
 use common::error::Error;
@@ -24,16 +26,20 @@ impl Birthdate {
         Ok(Birthdate { date })
     }
 
-    pub fn from_str(s: &str) -> Result<Self> {
+    pub fn date(&self) -> &DateTime<Utc> {
+        &self.date
+    }
+}
+
+impl FromStr for Birthdate {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self> {
         Self::new(
             DateTime::parse_from_rfc3339(s)
                 .map(|datetime| DateTime::<Utc>::from(datetime))
                 .map_err(|err| Error::bad_format("birthdate").wrap_raw(err))?,
         )
-    }
-
-    pub fn date(&self) -> &DateTime<Utc> {
-        &self.date
     }
 }
 

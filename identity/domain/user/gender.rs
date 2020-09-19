@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use common::error::Error;
 use common::result::Result;
 
@@ -8,9 +10,11 @@ pub enum Gender {
     Other,
 }
 
-impl Gender {
-    pub fn from(date_str: &str) -> Result<Gender> {
-        match date_str {
+impl FromStr for Gender {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self> {
+        match s {
             "male" => Ok(Gender::Male),
             "female" => Ok(Gender::Female),
             "other" => Ok(Gender::Other),

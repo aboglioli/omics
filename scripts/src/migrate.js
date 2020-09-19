@@ -1,37 +1,34 @@
-const dotenv = require('dotenv');
-const { Client } = require('pg');
 const fs = require('fs');
-
-dotenv.config({
-  path: '../.env',
-});
-
-const config = {
-  postgres_host: process.env.POSTGRES_HOST,
-  postgres_port: process.env.POSTGRES_PORT,
-  postgres_username: process.env.POSTGRES_USERNAME,
-  postgres_password: process.env.POSTGRES_PASSWORD,
-  postgres_database: process.env.POSTGRES_DATABASE,
-  migrations_dir: './migrations',
-};
-
+const client = require('./db');
+const config = require('./config');
 
 async function main() {
-  const client = new Client({
-    user: config.postgres_username,
-    host: config.postgres_host,
-    database: config.postgres_database,
-    password: config.postgres_password,
-    port: config.postgres_port,
-  });
-
   console.log('[ MIGRATE ]');
+  client.connect();
+
+  try {
+    process.stdout.write('Droping tables...');
+
+    await client.query(`
+      DO $$ DECLARE
+          r RECORD;
+      BEGIN
+          FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = current_schema()) LOOP
+              EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE';
+          END LOOP;
+      END $$;
+    `);
+
+    console.log('READY');
+  } catch(err) {
+    console.log(err);
+  }
+
   console.log('Migrating...');
 
   try {
     let files = fs.readdirSync(config.migrations_dir);
 
-    client.connect();
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS Migrations (
@@ -44,11 +41,12 @@ async function main() {
     const existingFiles = res.rows.map(row => row.file);
 
     for (const file of files) {
+      process.stdout.write(`${file}: `);
 
       let existing = existingFiles.some(f => f === file);
 
       if (existing) {
-        console.log(`${file}: EXISTING`);
+        console.log('EXISTING');
         continue;
       }
 
@@ -61,7 +59,7 @@ async function main() {
         [file, new Date()],
       );
 
-      console.log(`${file}: RUN`);
+      console.log('RUN');
     }
   } catch(err) {
     console.log(err);

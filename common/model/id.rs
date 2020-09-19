@@ -1,5 +1,7 @@
 use std::hash::{Hash, Hasher};
 
+use uuid::Uuid;
+
 use crate::error::Error;
 use crate::result::Result;
 
@@ -25,6 +27,10 @@ impl StringId {
 
     pub fn value(&self) -> &str {
         &self.id
+    }
+
+    pub fn to_uuid(&self) -> Result<Uuid> {
+        Uuid::parse_str(self.value()).map_err(|err| Error::bad_format("id").wrap_raw(err))
     }
 }
 

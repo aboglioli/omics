@@ -26,6 +26,14 @@ impl Role {
         })
     }
 
+    pub fn build(base: AggregateRoot<RoleId>, name: String) -> Self {
+        Role {
+            base,
+            name,
+            permissions: Vec::new(),
+        }
+    }
+
     pub fn base(&self) -> &AggregateRoot<RoleId> {
         &self.base
     }

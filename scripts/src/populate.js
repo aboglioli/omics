@@ -17,25 +17,6 @@ const registerAndValidate = async cmd => {
   return userId;
 };
 
-async function categories() {
-  await req.login('admin', password);
-
-  await req.post('/categories', { id: 'action', name: 'Acción' });
-  await req.post('/categories', { id: 'adventure', name: 'Aventura' });
-  await req.post('/categories', { id: 'comedy', name: 'Comedia' });
-  await req.post('/categories', { id: 'crime', name: 'Crimen' });
-  await req.post('/categories', { id: 'drama', name: 'Drama' });
-  await req.post('/categories', { id: 'fantasy', name: 'Fantasía' });
-  await req.post('/categories', { id: 'historical', name: 'Histórico' });
-  await req.post('/categories', { id: 'horror', name: 'Terror' });
-  await req.post('/categories', { id: 'mystery', name: 'Misterio' });
-  await req.post('/categories', { id: 'romance', name: 'Romance' });
-  await req.post('/categories', { id: 'science-fiction', name: 'Ciencia Ficción' });
-  await req.post('/categories', { id: 'thriller', name: 'Thriller' });
-
-  req.logout();
-}
-
 async function contentManager() {
   await req.login('admin', password);
 
@@ -131,7 +112,6 @@ async function main() {
   console.log('Populating...');
 
   try {
-    await categories();
     await contentManager();
 
     for (let i = 0; i < 5; i++) {

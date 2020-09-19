@@ -1,12 +1,17 @@
 CREATE TABLE IF NOT EXISTS roles (
   id VARCHAR(255) PRIMARY KEY,
-  name VARCHAR(255) NOT NULL
+  name VARCHAR(255) NOT NULL,
+
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE,
+  deleted_at TIMESTAMP WITH TIME ZONE
 );
 
 CREATE TABLE IF NOT EXISTS permissions (
   module VARCHAR(255) NOT NULL,
   permissions VARCHAR(16) NOT NULL,
   role_id VARCHAR(255) NOT NULL,
+
   PRIMARY KEY(role_id, module),
   FOREIGN KEY(role_id) REFERENCES roles(id)
 );
@@ -21,16 +26,18 @@ CREATE TABLE IF NOT EXISTS users (
 
   name VARCHAR(64),
   lastname VARCHAR(64),
-  birthdate TIMESTAMP,
+  birthdate TIMESTAMP WITH TIME ZONE,
   gender VARCHAR(16),
   biography TEXT,
   profile_image VARCHAR(1024),
 
   role_id VARCHAR(255) NOT NULL,
 
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP,
-  deleted_at TIMESTAMP,
+  validation_code VARCHAR(255),
+
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE,
+  deleted_at TIMESTAMP WITH TIME ZONE,
 
   FOREIGN KEY(role_id) REFERENCES roles(id)
 );
@@ -40,9 +47,9 @@ CREATE TABLE IF NOT EXISTS authors (
 
   followers INTEGER DEFAULT 0,
 
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP,
-  deleted_at TIMESTAMP,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE,
+  deleted_at TIMESTAMP WITH TIME ZONE,
 
   FOREIGN KEY(id) REFERENCES users(id)
 );
@@ -52,9 +59,9 @@ CREATE TABLE IF NOT EXISTS readers (
 
   subscribed BOOLEAN DEFAULT FALSE,
 
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP,
-  deleted_at TIMESTAMP,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE,
+  deleted_at TIMESTAMP WITH TIME ZONE,
 
   FOREIGN KEY(id) REFERENCES users(id)
 );
@@ -64,9 +71,9 @@ CREATE TABLE IF NOT EXISTS categories (
 
   name VARCHAR(255) NOT NULL,
 
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP,
-  deleted_at TIMESTAMP
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE,
+  deleted_at TIMESTAMP WITH TIME ZONE
 );
 
 
@@ -81,9 +88,9 @@ CREATE TABLE IF NOT EXISTS collections (
   tags TEXT[],
   cover VARCHAR(1024) NOT NULL,
 
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP,
-  deleted_at TIMESTAMP,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE,
+  deleted_at TIMESTAMP WITH TIME ZONE,
 
   FOREIGN KEY(author_id) REFERENCES authors(id),
   FOREIGN KEY(category_id) REFERENCES categories(id)
@@ -102,9 +109,9 @@ CREATE TABLE IF NOT EXISTS publications (
 
   contract BOOLEAN DEFAULT FALSE,
 
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP,
-  deleted_at TIMESTAMP,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE,
+  deleted_at TIMESTAMP WITH TIME ZONE,
 
   FOREIGN KEY(author_id) REFERENCES authors(id),
   FOREIGN KEY(category_id) REFERENCES categories(id)
@@ -113,7 +120,7 @@ CREATE TABLE IF NOT EXISTS publications (
 CREATE TABLE IF NOT EXISTS collection_items (
   collection_id UUID NOT NULL,
   publication_id UUID NOT NULL,
-  datetime TIMESTAMP NOT NULL,
+  datetime TIMESTAMP WITH TIME ZONE NOT NULL,
 
   PRIMARY KEY(collection_id, publication_id),
   FOREIGN KEY(collection_id) REFERENCES collections(id),
@@ -162,7 +169,7 @@ CREATE TABLE IF NOT EXISTS publication_status_history (
 
   admin_id UUID,
   comment TEXT,
-  datetime TIMESTAMP NOT NULL,
+  datetime TIMESTAMP WITH TIME ZONE NOT NULL,
 
   FOREIGN KEY(publication_id) REFERENCES publications(id),
   FOREIGN KEY(status_id) REFERENCES publication_status(id),
@@ -174,7 +181,7 @@ CREATE TABLE IF NOT EXISTS views (
 
   reader_id UUID NOT NULL,
   publication_id UUID NOT NULL,
-  datetime TIMESTAMP NOT NULL,
+  datetime TIMESTAMP WITH TIME ZONE NOT NULL,
 
   is_unique BOOLEAN DEFAULT FALSE,
 
@@ -187,7 +194,7 @@ CREATE TABLE IF NOT EXISTS readings (
 
   reader_id UUID NOT NULL,
   publication_id UUID NOT NULL,
-  datetime TIMESTAMP NOT NULL,
+  datetime TIMESTAMP WITH TIME ZONE NOT NULL,
 
   FOREIGN KEY(reader_id) REFERENCES readers(id),
   FOREIGN KEY(publication_id) REFERENCES publications(id)
@@ -198,7 +205,7 @@ CREATE TABLE IF NOT EXISTS likes (
 
   reader_id UUID NOT NULL,
   publication_id UUID NOT NULL,
-  datetime TIMESTAMP NOT NULL,
+  datetime TIMESTAMP WITH TIME ZONE NOT NULL,
 
   FOREIGN KEY(reader_id) REFERENCES readers(id),
   FOREIGN KEY(publication_id) REFERENCES publications(id)
@@ -209,7 +216,7 @@ CREATE TABLE IF NOT EXISTS reviews (
 
   reader_id UUID NOT NULL,
   publication_id UUID NOT NULL,
-  datetime TIMESTAMP NOT NULL,
+  datetime TIMESTAMP WITH TIME ZONE NOT NULL,
 
   stars SMALLINT DEFAULT 0,
   comment TEXT NOT NULL,

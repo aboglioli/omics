@@ -12,6 +12,10 @@ impl Validation {
         }
     }
 
+    pub fn build<S: Into<String>>(code: S) -> Self {
+        Validation { code: code.into() }
+    }
+
     pub fn code(&self) -> &str {
         &self.code
     }

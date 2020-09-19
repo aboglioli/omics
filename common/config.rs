@@ -107,4 +107,40 @@ impl Config {
     pub fn aws_region(&self) -> &str {
         &self.aws_region
     }
+
+    pub fn postgres_host(&self) -> &str {
+        &self.postgres_host
+    }
+
+    pub fn postgres_port(&self) -> u16 {
+        self.postgres_port
+    }
+
+    pub fn postgres_username(&self) -> &str {
+        &self.postgres_username
+    }
+
+    pub fn postgres_password(&self) -> &str {
+        &self.postgres_password
+    }
+
+    pub fn postgres_database(&self) -> &str {
+        &self.postgres_database
+    }
+
+    pub fn smtp_server(&self) -> &str {
+        &self.smtp_server
+    }
+
+    pub fn smtp_email(&self) -> &str {
+        &self.smtp_email
+    }
+
+    pub fn smtp_password(&self) -> &str {
+        &self.smtp_password
+    }
+
+    pub fn smtp_port(&self) -> u16 {
+        self.smtp_port
+    }
 }

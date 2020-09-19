@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use serde::Deserialize;
 
 use common::error::Error;
@@ -53,7 +55,10 @@ impl<'a> Update<'a> {
             .map(|date| Birthdate::from_str(&date))
             .transpose()?;
 
-        let gender = cmd.gender.map(|gender| Gender::from(&gender)).transpose()?;
+        let gender = cmd
+            .gender
+            .map(|gender| Gender::from_str(&gender))
+            .transpose()?;
 
         let biography = cmd
             .biography
