@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { forkJoin, Observable, concat } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
 import { MatCheckbox } from '@angular/material/checkbox';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
@@ -22,11 +22,11 @@ import { SweetAlertGenericMessageService } from '../../../services/sweet-alert-g
 
 
 @Component({
-  selector: 'app-new-publication',
-  templateUrl: './new-publication.component.html',
-  styleUrls: ['./new-publication.component.scss']
+  selector: 'app-publication-new-edit',
+  templateUrl: './publication-new-edit.component.html',
+  styleUrls: ['./publication-new-edit.component.scss']
 })
-export class NewPublicationComponent implements OnInit {
+export class PublicationNewEditComponent implements OnInit {
 
   @ViewChild('formDataInvalid') private swalFormDataInvalid: SwalComponent;
   @ViewChild('formDataValid') private swalFormDataValid: SwalComponent;

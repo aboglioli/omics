@@ -43,7 +43,7 @@ import { SideNavMenuMainComponent } from './shared/side-nav-menu-main/side-nav-m
 import { AutoresComponent } from './pages/autores/autores.component';
 import { UnderConstructionComponent } from './shared/under-construction/under-construction.component';
 import { DeskboardMisComicsComponent } from './components/deskboard/deskboard-mis-comics/deskboard-mis-comics.component';
-import { NewPublicationComponent } from './components/deskboard/new-publication/new-publication.component';
+import { PublicationNewEditComponent } from './components/deskboard/publication-new-edit/publication-new-edit.component';
 import { PublicationCardManagerComponent } from './components/publication-card-type/publication-card/publication-card-manager.component';
 // --->
 
@@ -88,7 +88,7 @@ import { PublicationCardReaderComponent } from './components/publication-card-ty
     AutoresComponent,
     UnderConstructionComponent,
     DeskboardMisComicsComponent,
-    NewPublicationComponent,
+    PublicationNewEditComponent,
     PasswordForgotComponent,
     PasswordRewriteComponent,
     PublicationCardManagerComponent,

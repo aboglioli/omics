@@ -18,7 +18,7 @@ export class AutoresComponent implements OnInit {
   ngOnInit(): void {
     this.authorService.search({}).subscribe(
       res => {
-        this.authors = res.authors.filter(author => !!author.profile_image);
+        this.authors = res.authors;
       },
       err => {
         console.log(err);

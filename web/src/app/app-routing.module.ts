@@ -14,7 +14,7 @@ import { DashboardGestionAdminComponent } from './pages/dashboard-gestion-admin/
 
 import { DevelopmentComponent } from './pages/development/development.component';
 import { VisorComicComponent } from './pages/visor-comic/visor-comic.component';
-import { NewPublicationComponent } from './components/deskboard/new-publication/new-publication.component';
+import { PublicationNewEditComponent } from './components/deskboard/publication-new-edit/publication-new-edit.component';
 import { AuthNotLoginGuard } from './guard/auth-not-login.guard';
 import { PerfilComponent } from './pages/perfil/perfil.component';
 import { AuthLoginGuard } from './guard/auth-login.guard';
@@ -32,8 +32,8 @@ const routes: Routes = [
   { path: 'catalogue', component: CatalogoComponent },
   { path: 'authors', component:  AutoresComponent},
   { path: 'deskboard', component:  DeskboardGeneralComponent, canActivate: [AuthLoginGuard]},
-  { path: 'deskboard/publication/new', component:  NewPublicationComponent},
-  { path: 'deskboard/publication/edit/:id', component:  NewPublicationComponent},
+  { path: 'deskboard/publication/new', component:  PublicationNewEditComponent},
+  { path: 'deskboard/publication/edit/:id', component:  PublicationNewEditComponent},
   { path: 'profile/:id', component: PerfilComponent,  canActivate: [AuthLoginGuard] },
   { path: 'profile/:id/editUser', component: PerfilEditarComponent,  canActivate: [AuthLoginGuard, SameUserGuard]},
   { path: 'about', component: AboutComponent },
