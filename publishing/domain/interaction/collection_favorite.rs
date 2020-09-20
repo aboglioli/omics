@@ -15,6 +15,10 @@ impl CollectionFavorite {
         })
     }
 
+    pub fn build(base: AggregateRoot<ReaderCollectionId>) -> Self {
+        CollectionFavorite { base }
+    }
+
     pub fn base(&self) -> &AggregateRoot<ReaderCollectionId> {
         &self.base
     }

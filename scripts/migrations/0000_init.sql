@@ -131,18 +131,10 @@ CREATE TABLE IF NOT EXISTS pages (
   publication_id UUID NOT NULL,
   number INTEGER NOT NULL,
 
+  images VARCHAR(1024)[],
+
   PRIMARY KEY(publication_id, number),
   FOREIGN KEY(publication_id) REFERENCES publications(id)
-);
-
-CREATE TABLE IF NOT EXISTS page_items (
-  id SERIAL PRIMARY KEY,
-  image_url VARCHAR(1024) NOT NULL,
-
-  publication_id UUID NOT NULL,
-  number INTEGER NOT NULL,
-
-  FOREIGN KEY(publication_id, number) REFERENCES pages(publication_id, number)
 );
 
 CREATE TABLE IF NOT EXISTS statistics (
@@ -223,4 +215,37 @@ CREATE TABLE IF NOT EXISTS reviews (
 
   FOREIGN KEY(reader_id) REFERENCES readers(id),
   FOREIGN KEY(publication_id) REFERENCES publications(id)
+);
+
+CREATE TABLE IF NOT EXISTS publication_favorites (
+  id SERIAL PRIMARY KEY,
+
+  reader_id UUID NOT NULL,
+  publication_id UUID NOT NULL,
+  datetime TIMESTAMP WITH TIME ZONE NOT NULL,
+
+  FOREIGN KEY(reader_id) REFERENCES readers(id),
+  FOREIGN KEY(publication_id) REFERENCES publications(id)
+);
+
+CREATE TABLE IF NOT EXISTS collection_favorites (
+  id SERIAL PRIMARY KEY,
+
+  reader_id UUID NOT NULL,
+  collection_id UUID NOT NULL,
+  datetime TIMESTAMP WITH TIME ZONE NOT NULL,
+
+  FOREIGN KEY(reader_id) REFERENCES readers(id),
+  FOREIGN KEY(collection_id) REFERENCES collections(id)
+);
+
+CREATE TABLE IF NOT EXISTS follows (
+  id SERIAL PRIMARY KEY,
+
+  reader_id UUID NOT NULL,
+  author_id UUID NOT NULL,
+  datetime TIMESTAMP WITH TIME ZONE NOT NULL,
+
+  FOREIGN KEY(reader_id) REFERENCES readers(id),
+  FOREIGN KEY(author_id) REFERENCES authors(id)
 );

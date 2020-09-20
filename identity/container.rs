@@ -3,8 +3,7 @@ use std::sync::Arc;
 use async_trait::async_trait;
 
 use common::container::Container;
-use common::event::{EventPublisher, EventSubscriber};
-use common::result::Result;
+use common::event::EventPublisher;
 
 use crate::domain::role::RoleRepository;
 use crate::domain::token::{TokenEncoder, TokenRepository, TokenService};
@@ -111,22 +110,4 @@ where
 }
 
 #[async_trait]
-impl<EPub> Container for IdentityContainer<EPub>
-where
-    EPub: Sync + Send,
-{
-    async fn subscribe<ES>(&self, _event_sub: &ES) -> Result<()>
-    where
-        ES: EventSubscriber + Sync + Send,
-    {
-        Ok(())
-    }
-
-    async fn start(&self) -> Result<()> {
-        Ok(())
-    }
-
-    async fn stop(&self) -> Result<()> {
-        Ok(())
-    }
-}
+impl<EPub> Container for IdentityContainer<EPub> where EPub: Sync + Send {}

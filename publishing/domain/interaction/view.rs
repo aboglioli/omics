@@ -17,6 +17,10 @@ impl View {
         })
     }
 
+    pub fn build(base: AggregateRoot<ReaderPublicationId>, unique: bool) -> Self {
+        View { base, unique }
+    }
+
     pub fn base(&self) -> &AggregateRoot<ReaderPublicationId> {
         &self.base
     }

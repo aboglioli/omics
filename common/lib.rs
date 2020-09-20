@@ -9,4 +9,5 @@ pub mod model;
 pub mod prelude;
 pub mod request;
 pub mod result;
+pub mod sql;
 pub mod transaction;

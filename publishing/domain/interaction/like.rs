@@ -15,6 +15,10 @@ impl Like {
         })
     }
 
+    pub fn build(base: AggregateRoot<ReaderPublicationId>) -> Self {
+        Like { base }
+    }
+
     pub fn base(&self) -> &AggregateRoot<ReaderPublicationId> {
         &self.base
     }

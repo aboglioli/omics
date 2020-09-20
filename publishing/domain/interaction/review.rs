@@ -21,6 +21,14 @@ impl Review {
         })
     }
 
+    pub fn build(base: AggregateRoot<ReaderPublicationId>, stars: Stars, comment: Comment) -> Self {
+        Review {
+            base,
+            stars,
+            comment,
+        }
+    }
+
     pub fn base(&self) -> &AggregateRoot<ReaderPublicationId> {
         &self.base
     }

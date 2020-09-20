@@ -15,6 +15,10 @@ impl Reading {
         })
     }
 
+    pub fn build(base: AggregateRoot<ReaderPublicationId>) -> Self {
+        Reading { base }
+    }
+
     pub fn base(&self) -> &AggregateRoot<ReaderPublicationId> {
         &self.base
     }

@@ -135,12 +135,4 @@ where
 
         Ok(())
     }
-
-    async fn start(&self) -> Result<()> {
-        Ok(())
-    }
-
-    async fn stop(&self) -> Result<()> {
-        Ok(())
-    }
 }

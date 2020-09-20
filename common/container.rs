@@ -5,9 +5,22 @@ use crate::result::Result;
 
 #[async_trait]
 pub trait Container: Sync + Send {
-    async fn subscribe<ES>(&self, event_sub: &ES) -> Result<()>
+    async fn start(&self) -> Result<()> {
+        Ok(())
+    }
+
+    async fn subscribe<ES>(&self, _event_sub: &ES) -> Result<()>
     where
-        ES: EventSubscriber + Sync + Send;
-    async fn start(&self) -> Result<()>;
-    async fn stop(&self) -> Result<()>;
+        ES: EventSubscriber + Sync + Send,
+    {
+        Ok(())
+    }
+
+    async fn populate(&self) -> Result<()> {
+        Ok(())
+    }
+
+    async fn stop(&self) -> Result<()> {
+        Ok(())
+    }
 }

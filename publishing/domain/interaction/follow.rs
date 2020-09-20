@@ -15,6 +15,10 @@ impl Follow {
         })
     }
 
+    pub fn build(base: AggregateRoot<ReaderAuthorId>) -> Self {
+        Follow { base }
+    }
+
     pub fn base(&self) -> &AggregateRoot<ReaderAuthorId> {
         &self.base
     }

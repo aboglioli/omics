@@ -561,6 +561,7 @@ dependencies = [
  "regex",
  "serde",
  "tokio",
+ "tokio-postgres",
  "uuid",
 ]
 

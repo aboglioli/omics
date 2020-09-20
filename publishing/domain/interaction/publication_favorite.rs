@@ -15,6 +15,10 @@ impl PublicationFavorite {
         })
     }
 
+    pub fn build(base: AggregateRoot<ReaderPublicationId>) -> Self {
+        PublicationFavorite { base }
+    }
+
     pub fn base(&self) -> &AggregateRoot<ReaderPublicationId> {
         &self.base
     }
