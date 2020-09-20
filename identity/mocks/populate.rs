@@ -1,9 +1,9 @@
 use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::container::Container;
+use crate::container::IdentityContainer;
 
-pub async fn populate<EPub>(_c: &Container<EPub>) -> Result<()>
+pub async fn populate<EPub>(_c: &IdentityContainer<EPub>) -> Result<()>
 where
     EPub: EventPublisher,
 {

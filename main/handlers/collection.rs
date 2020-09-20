@@ -7,14 +7,14 @@ use publishing::application::collection::{
 };
 
 use crate::authorization::auth;
-use crate::container::Container;
+use crate::container::MainContainer;
 use crate::error::PublicError;
 
 #[post("")]
 async fn create(
     req: HttpRequest,
     cmd: web::Json<CreateCommand>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -35,7 +35,7 @@ async fn search(
     req: HttpRequest,
     cmd: web::Query<SearchCommand>,
     include: web::Query<IncludeParams>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
@@ -56,7 +56,7 @@ async fn get_by_id(
     req: HttpRequest,
     path: web::Path<String>,
     include: web::Query<IncludeParams>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
@@ -77,7 +77,7 @@ async fn get_publications(
     req: HttpRequest,
     path: web::Path<String>,
     include: web::Query<IncludeParams>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
@@ -99,7 +99,7 @@ async fn update(
     req: HttpRequest,
     path: web::Path<String>,
     cmd: web::Json<UpdateCommand>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -118,7 +118,7 @@ async fn update(
 async fn delete(
     req: HttpRequest,
     path: web::Path<String>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -133,7 +133,7 @@ async fn delete(
 async fn add_publication(
     req: HttpRequest,
     path: web::Path<(String, String)>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -153,7 +153,7 @@ async fn add_publication(
 async fn remove_publication(
     req: HttpRequest,
     path: web::Path<(String, String)>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -169,7 +169,7 @@ async fn remove_publication(
 async fn add_to_favorites(
     req: HttpRequest,
     path: web::Path<String>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -189,7 +189,7 @@ async fn add_to_favorites(
 async fn remove_from_favorites(
     req: HttpRequest,
     path: web::Path<String>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 

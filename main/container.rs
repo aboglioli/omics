@@ -1,25 +1,26 @@
 use std::sync::Arc;
 
+use common::container::Container;
 use common::event::EventSubscriber;
 use common::infrastructure::event::{InMemEventBus, InMemEventRepository};
 use common::result::Result;
-use identity::container::Container as IdentityContainer;
+use identity::container::IdentityContainer;
 use identity::infrastructure::persistence::inmem::{
     InMemRoleRepository, InMemTokenRepository, InMemUserRepository,
 };
 use identity::infrastructure::service::{BcryptHasher, JWTEncoder};
-use publishing::container::Container as PublishingContainer;
+use publishing::container::PublishingContainer;
 use publishing::infrastructure::persistence::inmem::{
     InMemAuthorRepository, InMemCategoryRepository, InMemCollectionRepository,
     InMemInteractionRepository, InMemPublicationRepository, InMemReaderRepository,
 };
-use shared::container::Container as SharedContainer;
+use shared::container::SharedContainer;
 use shared::infrastructure::persistence::inmem::InMemUserRepository as SharedInMemUserRepository;
 
 use crate::development::EventLogger;
 use crate::infrastructure::shared::LocalUserService;
 
-pub struct Container {
+pub struct MainContainer {
     pub event_bus: Arc<InMemEventBus>,
     pub event_repo: Arc<InMemEventRepository>,
     pub shared: SharedContainer<InMemEventBus>,
@@ -27,7 +28,7 @@ pub struct Container {
     pub publishing: PublishingContainer<InMemEventBus>,
 }
 
-impl Container {
+impl MainContainer {
     pub async fn new() -> Self {
         // Common
         let event_bus = Arc::new(InMemEventBus::new());
@@ -76,7 +77,7 @@ impl Container {
 
         let shared = SharedContainer::new(event_bus.clone(), s_user_repo, s_user_serv);
 
-        Container {
+        MainContainer {
             event_bus,
             event_repo,
             shared,

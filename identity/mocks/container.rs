@@ -2,15 +2,15 @@ use std::sync::Arc;
 
 use common::mocks::FakeEventPublisher;
 
-use crate::container::Container;
+use crate::container::IdentityContainer;
 use crate::infrastructure::persistence::inmem::{
     InMemRoleRepository, InMemTokenRepository, InMemUserRepository,
 };
 
 use crate::mocks::{FakePasswordHasher, FakeTokenEncoder};
 
-pub fn container() -> Container<FakeEventPublisher> {
-    Container::new(
+pub fn container() -> IdentityContainer<FakeEventPublisher> {
+    IdentityContainer::new(
         Arc::new(FakeEventPublisher::new()),
         Arc::new(InMemRoleRepository::new()),
         Arc::new(InMemTokenRepository::new()),

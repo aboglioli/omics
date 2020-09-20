@@ -12,11 +12,11 @@ use publishing::application::publication::{
 };
 
 use crate::authorization::auth;
-use crate::container::Container;
+use crate::container::MainContainer;
 use crate::error::PublicError;
 
 #[get("")]
-async fn get_all(req: HttpRequest, c: web::Data<Container>) -> impl Responder {
+async fn get_all(req: HttpRequest, c: web::Data<MainContainer>) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
     GetAll::new(c.publishing.category_repo())
@@ -30,7 +30,7 @@ async fn get_all(req: HttpRequest, c: web::Data<Container>) -> impl Responder {
 async fn get_by_id(
     req: HttpRequest,
     path: web::Path<String>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
@@ -46,7 +46,7 @@ async fn get_publications(
     req: HttpRequest,
     path: web::Path<String>,
     include: web::Query<IncludeParams>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
@@ -76,7 +76,7 @@ async fn get_collections(
     req: HttpRequest,
     path: web::Path<String>,
     include: web::Query<IncludeParams>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
@@ -105,7 +105,7 @@ async fn get_collections(
 async fn create(
     req: HttpRequest,
     cmd: web::Json<CreateCommand>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -125,7 +125,7 @@ async fn update(
     req: HttpRequest,
     path: web::Path<String>,
     cmd: web::Json<UpdateCommand>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -144,7 +144,7 @@ async fn update(
 async fn delete(
     req: HttpRequest,
     path: web::Path<String>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 

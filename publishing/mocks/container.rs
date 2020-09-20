@@ -5,14 +5,14 @@ use common::mocks::FakeEventPublisher;
 use shared::infrastructure::persistence::inmem::InMemUserRepository;
 use shared::mocks::FakeUserService;
 
-use crate::container::Container;
+use crate::container::PublishingContainer;
 use crate::infrastructure::persistence::inmem::{
     InMemAuthorRepository, InMemCategoryRepository, InMemCollectionRepository,
     InMemInteractionRepository, InMemPublicationRepository, InMemReaderRepository,
 };
 
-pub fn container() -> Container<FakeEventPublisher> {
-    Container::new(
+pub fn container() -> PublishingContainer<FakeEventPublisher> {
+    PublishingContainer::new(
         Arc::new(FakeEventPublisher::new()),
         Arc::new(InMemAuthorRepository::new()),
         Arc::new(InMemCategoryRepository::new()),

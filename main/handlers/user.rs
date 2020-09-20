@@ -8,11 +8,11 @@ use identity::application::user::{
 };
 
 use crate::authorization::auth;
-use crate::container::Container;
+use crate::container::MainContainer;
 use crate::error::PublicError;
 
 #[post("/register")]
-async fn register(cmd: web::Json<RegisterCommand>, c: web::Data<Container>) -> impl Responder {
+async fn register(cmd: web::Json<RegisterCommand>, c: web::Data<MainContainer>) -> impl Responder {
     Register::new(
         c.identity.event_pub(),
         c.identity.user_repo(),
@@ -25,7 +25,7 @@ async fn register(cmd: web::Json<RegisterCommand>, c: web::Data<Container>) -> i
 }
 
 #[post("/login")]
-async fn login(cmd: web::Json<LoginCommand>, c: web::Data<Container>) -> impl Responder {
+async fn login(cmd: web::Json<LoginCommand>, c: web::Data<MainContainer>) -> impl Responder {
     Login::new(c.identity.event_pub(), c.identity.authentication_serv())
         .exec(cmd.into_inner())
         .await
@@ -36,7 +36,7 @@ async fn login(cmd: web::Json<LoginCommand>, c: web::Data<Container>) -> impl Re
 #[post("/recover-password")]
 async fn recover_password(
     cmd: web::Json<RecoverPasswordCommand>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     RecoverPassword::new(
         c.identity.event_pub(),
@@ -54,7 +54,7 @@ async fn search(
     req: HttpRequest,
     cmd: web::Query<SearchCommand>,
     include: web::Query<IncludeParams>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -70,7 +70,7 @@ async fn get_by_id(
     req: HttpRequest,
     path: web::Path<String>,
     include: web::Query<IncludeParams>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -93,7 +93,7 @@ async fn update(
     req: HttpRequest,
     path: web::Path<String>,
     cmd: web::Json<UpdateCommand>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -115,7 +115,7 @@ async fn update(
 async fn delete(
     req: HttpRequest,
     path: web::Path<String>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -138,7 +138,7 @@ async fn change_password(
     req: HttpRequest,
     path: web::Path<String>,
     cmd: web::Json<ChangePasswordCommand>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
@@ -161,7 +161,10 @@ async fn change_password(
 }
 
 #[get("/{user_id}/validate/{code}")]
-async fn validate(path: web::Path<(String, String)>, c: web::Data<Container>) -> impl Responder {
+async fn validate(
+    path: web::Path<(String, String)>,
+    c: web::Data<MainContainer>,
+) -> impl Responder {
     let path = path.into_inner();
 
     Validate::new(c.identity.event_pub(), c.identity.user_repo())
@@ -176,7 +179,7 @@ async fn change_role(
     req: HttpRequest,
     path: web::Path<String>,
     cmd: web::Json<ChangeRoleCommand>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 

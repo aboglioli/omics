@@ -230,8 +230,6 @@ mod tests {
     use common::config::Config;
     use tokio_postgres::NoTls;
 
-    
-
     #[tokio::test]
     async fn all() {
         let config = Config::get();

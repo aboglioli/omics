@@ -4,14 +4,14 @@ use common::request::IncludeParams;
 use publishing::application::reader::{GetById, GetFavorites, GetFollowing};
 
 use crate::authorization::auth;
-use crate::container::Container;
+use crate::container::MainContainer;
 use crate::error::PublicError;
 
 #[get("/{reader_id}")]
 async fn get_by_id(
     req: HttpRequest,
     path: web::Path<String>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -33,7 +33,7 @@ async fn get_by_id(
 async fn get_following(
     req: HttpRequest,
     path: web::Path<String>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -60,7 +60,7 @@ async fn get_favorites(
     req: HttpRequest,
     path: web::Path<String>,
     include: web::Query<IncludeParams>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 

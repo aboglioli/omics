@@ -9,9 +9,9 @@ use publishing::domain::collection::*;
 use publishing::domain::publication::*;
 use publishing::domain::reader::Reader;
 
-use crate::container::Container;
+use crate::container::MainContainer;
 
-pub async fn populate(c: &Container) -> Result<()> {
+pub async fn populate(c: &MainContainer) -> Result<()> {
     // Identity
     let mut admin_role = Role::new(RoleId::new("admin")?, "Administrator")?;
     let mut content_manager_role = Role::new(RoleId::new("content-manager")?, "Content Manager")?;

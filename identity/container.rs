@@ -1,5 +1,8 @@
 use std::sync::Arc;
 
+use async_trait::async_trait;
+
+use common::container::Container;
 use common::event::{EventPublisher, EventSubscriber};
 use common::result::Result;
 
@@ -9,7 +12,7 @@ use crate::domain::user::{
     AuthenticationService, AuthorizationService, PasswordHasher, UserRepository, UserService,
 };
 
-pub struct Container<EPub> {
+pub struct IdentityContainer<EPub> {
     event_pub: Arc<EPub>,
 
     role_repo: Arc<dyn RoleRepository>,
@@ -25,7 +28,7 @@ pub struct Container<EPub> {
     authorization_serv: Arc<AuthorizationService>,
 }
 
-impl<EPub> Container<EPub>
+impl<EPub> IdentityContainer<EPub>
 where
     EPub: EventPublisher,
 {
@@ -48,7 +51,7 @@ where
         ));
         let authorization_serv = Arc::new(AuthorizationService::new(token_serv.clone()));
 
-        Container {
+        IdentityContainer {
             event_pub,
 
             role_repo,
@@ -63,13 +66,6 @@ where
             authentication_serv,
             authorization_serv,
         }
-    }
-
-    pub async fn subscribe<ES>(&self, _event_sub: &ES) -> Result<()>
-    where
-        ES: EventSubscriber,
-    {
-        Ok(())
     }
 
     pub fn event_pub(&self) -> &EPub {
@@ -111,5 +107,26 @@ where
 
     pub fn authorization_serv(&self) -> &AuthorizationService {
         &self.authorization_serv
+    }
+}
+
+#[async_trait]
+impl<EPub> Container for IdentityContainer<EPub>
+where
+    EPub: Sync + Send,
+{
+    async fn subscribe<ES>(&self, _event_sub: &ES) -> Result<()>
+    where
+        ES: EventSubscriber + Sync + Send,
+    {
+        Ok(())
+    }
+
+    async fn start(&self) -> Result<()> {
+        Ok(())
+    }
+
+    async fn stop(&self) -> Result<()> {
+        Ok(())
     }
 }

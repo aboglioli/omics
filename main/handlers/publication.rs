@@ -12,14 +12,14 @@ use publishing::application::publication::{
 };
 
 use crate::authorization::auth;
-use crate::container::Container;
+use crate::container::MainContainer;
 use crate::error::PublicError;
 
 #[post("")]
 async fn create(
     req: HttpRequest,
     cmd: web::Json<CreateCommand>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -40,7 +40,7 @@ async fn search(
     req: HttpRequest,
     cmd: web::Query<SearchCommand>,
     include: web::Query<IncludeParams>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
@@ -61,7 +61,7 @@ async fn get_by_id(
     req: HttpRequest,
     path: web::Path<String>,
     include: web::Query<IncludeParams>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
@@ -86,7 +86,7 @@ async fn update(
     req: HttpRequest,
     path: web::Path<String>,
     cmd: web::Json<UpdateCommand>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -106,7 +106,7 @@ async fn update_pages(
     req: HttpRequest,
     path: web::Path<String>,
     cmd: web::Json<UpdatePagesCommand>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -121,7 +121,7 @@ async fn update_pages(
 async fn delete(
     req: HttpRequest,
     path: web::Path<String>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -136,7 +136,7 @@ async fn delete(
 async fn publish(
     req: HttpRequest,
     path: web::Path<String>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -156,7 +156,7 @@ async fn approve(
     req: HttpRequest,
     path: web::Path<String>,
     cmd: web::Json<ApproveCommand>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -176,7 +176,7 @@ async fn reject(
     req: HttpRequest,
     path: web::Path<String>,
     cmd: web::Json<RejectCommand>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -195,7 +195,7 @@ async fn reject(
 async fn read(
     req: HttpRequest,
     path: web::Path<String>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -215,7 +215,7 @@ async fn read(
 async fn like(
     req: HttpRequest,
     path: web::Path<String>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -235,7 +235,7 @@ async fn like(
 async fn unlike(
     req: HttpRequest,
     path: web::Path<String>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -256,7 +256,7 @@ async fn review(
     req: HttpRequest,
     path: web::Path<String>,
     cmd: web::Json<AddReviewCommand>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -276,7 +276,7 @@ async fn review(
 async fn delete_review(
     req: HttpRequest,
     path: web::Path<String>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -296,7 +296,7 @@ async fn delete_review(
 async fn get_reviews(
     req: HttpRequest,
     path: web::Path<String>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
@@ -316,7 +316,7 @@ async fn get_collections(
     req: HttpRequest,
     path: web::Path<String>,
     include: web::Query<IncludeParams>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
@@ -345,7 +345,7 @@ async fn get_collections(
 async fn add_to_favorites(
     req: HttpRequest,
     path: web::Path<String>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -365,7 +365,7 @@ async fn add_to_favorites(
 async fn remove_from_favorites(
     req: HttpRequest,
     path: web::Path<String>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 

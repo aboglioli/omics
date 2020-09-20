@@ -2,7 +2,7 @@ use common::event::EventPublisher;
 use common::result::Result;
 use shared::domain::user;
 
-use crate::container::Container;
+use crate::container::PublishingContainer;
 use crate::domain::author;
 use crate::domain::category;
 use crate::domain::collection;
@@ -10,7 +10,7 @@ use crate::domain::interaction;
 use crate::domain::publication;
 use crate::domain::reader;
 
-pub async fn populate<EPub>(c: &Container<EPub>) -> Result<()>
+pub async fn populate<EPub>(c: &PublishingContainer<EPub>) -> Result<()>
 where
     EPub: EventPublisher,
 {

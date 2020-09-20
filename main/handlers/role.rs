@@ -5,11 +5,11 @@ use identity::application::role::{GetAll, GetById};
 use identity::application::user::{Search as SearchUser, SearchCommand as SearchUserCommand};
 
 use crate::authorization::auth;
-use crate::container::Container;
+use crate::container::MainContainer;
 use crate::error::PublicError;
 
 #[get("")]
-async fn get_all(req: HttpRequest, c: web::Data<Container>) -> impl Responder {
+async fn get_all(req: HttpRequest, c: web::Data<MainContainer>) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
     GetAll::new(c.identity.role_repo(), c.identity.user_repo())
@@ -24,7 +24,7 @@ async fn get_by_id(
     req: HttpRequest,
     path: web::Path<String>,
     _include: web::Query<IncludeParams>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
@@ -40,7 +40,7 @@ async fn get_users(
     req: HttpRequest,
     path: web::Path<String>,
     include: web::Query<IncludeParams>,
-    c: web::Data<Container>,
+    c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 

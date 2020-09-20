@@ -1,5 +1,8 @@
 use std::sync::Arc;
 
+use async_trait::async_trait;
+
+use common::container::Container;
 use common::event::{EventPublisher, EventSubscriber};
 use common::result::Result;
 use shared::domain::user::{UserRepository, UserService};
@@ -13,7 +16,7 @@ use crate::domain::interaction::InteractionRepository;
 use crate::domain::publication::{PublicationRepository, StatisticsService};
 use crate::domain::reader::ReaderRepository;
 
-pub struct Container<EPub> {
+pub struct PublishingContainer<EPub> {
     event_pub: Arc<EPub>,
 
     author_repo: Arc<dyn AuthorRepository>,
@@ -29,7 +32,7 @@ pub struct Container<EPub> {
     user_serv: Arc<dyn UserService>,
 }
 
-impl<EPub> Container<EPub>
+impl<EPub> PublishingContainer<EPub>
 where
     EPub: EventPublisher,
 {
@@ -47,7 +50,7 @@ where
     ) -> Self {
         let statistics_serv = Arc::new(StatisticsService::new(interaction_repo.clone()));
 
-        Container {
+        PublishingContainer {
             event_pub,
 
             author_repo,
@@ -62,27 +65,6 @@ where
 
             user_serv,
         }
-    }
-
-    pub async fn subscribe<ES>(&self, event_sub: &ES) -> Result<()>
-    where
-        ES: EventSubscriber,
-    {
-        let author_from_user_handler = AuthorFromUserHandler::new(self.author_repo.clone());
-        event_sub
-            .subscribe(Box::new(author_from_user_handler))
-            .await?;
-
-        let reader_from_user_handler = ReaderFromUserHandler::new(self.reader_repo.clone());
-        event_sub
-            .subscribe(Box::new(reader_from_user_handler))
-            .await?;
-
-        let reader_handler =
-            InteractionHandler::new(self.reader_repo.clone(), self.publication_repo.clone());
-        event_sub.subscribe(Box::new(reader_handler)).await?;
-
-        Ok(())
     }
 
     pub fn event_pub(&self) -> &EPub {
@@ -125,5 +107,40 @@ where
     // Abstract services
     pub fn user_serv(&self) -> &dyn UserService {
         self.user_serv.as_ref()
+    }
+}
+
+#[async_trait]
+impl<EPub> Container for PublishingContainer<EPub>
+where
+    EPub: Sync + Send,
+{
+    async fn subscribe<ES>(&self, event_sub: &ES) -> Result<()>
+    where
+        ES: EventSubscriber + Sync + Send,
+    {
+        let author_from_user_handler = AuthorFromUserHandler::new(self.author_repo.clone());
+        event_sub
+            .subscribe(Box::new(author_from_user_handler))
+            .await?;
+
+        let reader_from_user_handler = ReaderFromUserHandler::new(self.reader_repo.clone());
+        event_sub
+            .subscribe(Box::new(reader_from_user_handler))
+            .await?;
+
+        let reader_handler =
+            InteractionHandler::new(self.reader_repo.clone(), self.publication_repo.clone());
+        event_sub.subscribe(Box::new(reader_handler)).await?;
+
+        Ok(())
+    }
+
+    async fn start(&self) -> Result<()> {
+        Ok(())
+    }
+
+    async fn stop(&self) -> Result<()> {
+        Ok(())
     }
 }

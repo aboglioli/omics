@@ -4,7 +4,7 @@ use serde_json::Value;
 
 use common::event::EventRepository;
 
-use crate::container::Container;
+use crate::container::MainContainer;
 use crate::error::PublicError;
 
 #[derive(Serialize)]
@@ -23,7 +23,7 @@ pub struct GetAllResponse {
 
 // GET /events
 #[get("")]
-async fn get(c: web::Data<Container>) -> impl Responder {
+async fn get(c: web::Data<MainContainer>) -> impl Responder {
     c.event_repo()
         .find_all()
         .await

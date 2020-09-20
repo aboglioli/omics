@@ -10,7 +10,7 @@ use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 
 use common::config::Config;
 
-use container::Container;
+use container::MainContainer;
 use handlers::{author, category, collection, event, file, publication, reader, role, user};
 
 async fn index() -> impl Responder {
@@ -24,7 +24,7 @@ async fn main() -> std::io::Result<()> {
     let config = Config::get();
 
     // Dependencies
-    let container = web::Data::new(Container::new().await);
+    let container = web::Data::new(MainContainer::new().await);
     if let Err(err) = container.subscribe().await {
         println!("Subscriptions: {}", err);
         return Ok(());

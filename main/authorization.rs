@@ -3,10 +3,10 @@ use actix_web::HttpRequest;
 use common::error::Error;
 use identity::domain::token::Token;
 
-use crate::container::Container;
+use crate::container::MainContainer;
 use crate::error::PublicError;
 
-pub async fn auth(req: &HttpRequest, c: &Container) -> Result<String, PublicError> {
+pub async fn auth(req: &HttpRequest, c: &MainContainer) -> Result<String, PublicError> {
     let auth_header = match req.headers().get("authorization") {
         Some(header) => {
             if let Ok(header) = header.to_str() {
