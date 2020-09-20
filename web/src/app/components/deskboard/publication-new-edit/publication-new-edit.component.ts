@@ -58,6 +58,7 @@ export class PublicationNewEditComponent implements OnInit {
   // Otros
   public ripplePortadaEnable = true;
   public isToEdit: boolean;
+  private publicationToEditId: string;
 
   public chipTagsKeysCodes: number[] = [ENTER, COMMA]; // Usado para los tags
 
@@ -124,10 +125,10 @@ export class PublicationNewEditComponent implements OnInit {
       this.activateRoute.params.subscribe(
         (params: any) => {
 
-          const publicationId = params.id;
+          this.publicationToEditId = params.id;
 
           // Si no existe el id, es una nueva publicación, sino se busca con el ID la publicación
-          if ( publicationId === undefined ) {
+          if ( this.publicationToEditId === undefined ) {
 
             this.spinnerService.hide();
             this.isToEdit = false;
@@ -136,7 +137,7 @@ export class PublicationNewEditComponent implements OnInit {
 
             this.spinnerService.hide();
             this.isToEdit = true;
-            this.getPublicationToEdit(publicationId);
+            this.getPublicationToEdit(this.publicationToEditId);
 
           }
 
@@ -338,32 +339,53 @@ export class PublicationNewEditComponent implements OnInit {
 
     this.spinnerService.show();
     const arrayPageObervables: Observable<any>[] = [];
+    let pagesUrl: IUpdatePagesCommand = {
+      pages: [] = []
+    };
 
-    console.log('TEST >>> ', 'PAges');
     this.pagesList.controls.forEach( (pageForm: FormGroup) => {
 
       const page = pageForm.get('image').value;
-      arrayPageObervables.push( this.fileServ.upload( page )  );
+      if ( page !== null ) {
+        arrayPageObervables.push( this.fileServ.upload( page )  );
+      } else {
+
+        pagesUrl.pages.push({
+          images:  [pageForm.get('url').value]
+        });
+
+
+      }
 
     });
 
-    forkJoin( arrayPageObervables ).subscribe( ( dataPage ) => {
+    // Si no se ha cargado una nueva imagen, ir directo a la carga de las págins sino esperar a que se asignen la url necesaria
+    if (  arrayPageObervables.length === 0 ) { // Nota: Esto solo sucede al editar y no cambiar página alguna
+      this.uploadPublicationEditPages(pagesUrl);
+    } else {
 
-      const pagesUrl: IUpdatePagesCommand = this.getUrlFromFileService(dataPage);
-      this.uploadPublicationPages(pagesUrl);
+      forkJoin( arrayPageObervables ).subscribe( ( dataPage ) => {
 
-    }, (error: Error) => {
 
-      console.error(error);
-      this.spinnerService.hide();
+        console.log( 'TEST DATAPAGE > ', dataPage  );
+        pagesUrl = this.getUrlFromFileService(dataPage);
+        this.uploadPublicationNewPages(pagesUrl);
 
-    } );
+      }, (error: Error) => {
+
+        console.error(error);
+        this.spinnerService.hide();
+
+      } );
+
+    }
 
 
   }
 
 
-  private uploadPublicationPages( pagesUrlToUpload: IUpdatePagesCommand ): void {
+  private uploadPublicationNewPages( pagesUrlToUpload: IUpdatePagesCommand ): void {
+
 
     const createSketch: ICreateCommand = {
 
@@ -388,8 +410,7 @@ export class PublicationNewEditComponent implements OnInit {
         this.publicationService.updatePages( idSketch, pagesUrlToUpload  ).subscribe(
           (resPagesUpload: any) => {
 
-            ( this.collectionArrayCheck.controls.length > 0  ) ?
-                this.assignCollectionToPublication(idSketch) : this.uploadPublicationFinish(idSketch);
+            this.assignCollectionToPublication(idSketch);
 
           },
           (error: Error) => {
@@ -412,23 +433,14 @@ export class PublicationNewEditComponent implements OnInit {
 
   }
 
-  private assignCollectionToPublication( idPublication: string ): void {
+  private uploadPublicationEditPages( pagesUrlToUpload: IUpdatePagesCommand ): void {
 
-    // Primero se crea una lista con todas los observables a usar para añadir la collección a la publicación creada
-    const categorySubscriptionsList: any[] = [];
+    // Subir las paginas
+    this.publicationService.updatePages( this.publicationToEditId, pagesUrlToUpload  ).subscribe(
+      (resPagesUpload: any) => {
 
-    this.collectionArrayCheck.controls.forEach( (collection: FormControl) => {
+        this.editCollectionToPublication(this.publicationToEditId);
 
-      categorySubscriptionsList.push( this.collectionService.addPublication( collection.value , idPublication ) );
-
-    } );
-
-    // Se realiza la subscripción de todas las colección al Id de publicación y si está correcto, se publica finalmente
-    forkJoin(  categorySubscriptionsList ).subscribe(
-      (data: any) => {
-
-        ( this.isToEdit ) ?
-          this.editPublicationFinish(idPublication) : this.uploadPublicationFinish(idPublication);
       },
       (error: Error) => {
 
@@ -441,7 +453,92 @@ export class PublicationNewEditComponent implements OnInit {
 
   }
 
-  private uploadPublicationFinish( idPublication: string ): void {
+
+  private assignCollectionToPublication( idPublication: string ): void {
+
+    if ( this.collectionArrayCheck.controls.length === 0 ) {
+
+      this.newPublicationFinish(idPublication);
+
+    } else {
+
+      // Primero se crea una lista con todas los observables a usar para añadir la collección a la publicación creada
+      const collectionSubscriptionsList: any[] = [];
+
+      this.collectionArrayCheck.controls.forEach( (collection: FormControl) => {
+
+        collectionSubscriptionsList.push( this.collectionService.addPublication( collection.value , idPublication ) );
+
+      } );
+
+      // Se realiza la subscripción de todas las colección al Id de publicación y si está correcto, se publica finalmente
+      forkJoin(  collectionSubscriptionsList ).subscribe(
+        (data: any) => {
+
+          ( this.isToEdit ) ?
+            this.newPublicationFinish(idPublication) : this.editPublicationFinish(idPublication);
+        },
+        (error: Error) => {
+
+          console.error(error);
+          this.spinnerService.hide();
+
+        }
+      );
+
+    }
+
+
+  }
+
+  private editCollectionToPublication( idPubcalition: string ): void {
+
+    /*
+      Se consiguen todas las colecciones que tiene la publicacíón a editar, si no tiene se
+    va a la función que asigna las mismas. Caso que tenga alguna se quitan las mismas de la publicación
+    antes de ir a asignarselas las que se seleccionaron al editar.
+
+      TODO: Seguramente hay una forma mejor de hacer esto, es lo que se me ocurrió.
+    */
+    let collectionToRemove: ICollection[] = [];
+
+    this.publicationService.getCollections( idPubcalition ).subscribe(
+      ( resCollection: IGetCollectionsResponse ) => {
+
+        collectionToRemove = resCollection.collections;
+
+        if ( collectionToRemove.length === 0 ) {
+          this.assignCollectionToPublication(idPubcalition);
+        } else {
+
+          const collectionRemoveSubscriptionList: any[] = [];
+          collectionToRemove.forEach( (collection: ICollection) => {
+
+            console.log( 'TEST >>', collection.id );
+            collectionRemoveSubscriptionList.push( this.collectionService.removePublication( collection.id, idPubcalition ) );
+
+          });
+
+          forkJoin( collectionRemoveSubscriptionList ).subscribe(
+
+            (res: any) => {
+              this.assignCollectionToPublication(idPubcalition);
+            },
+            (err: Error) => {
+              console.error(err);
+              this.spinnerService.hide();
+            }
+
+          );
+
+        }
+
+      }
+    );
+
+  }
+
+  private newPublicationFinish( idPublication: string ): void {
 
     // Realizar la publicación en sí con todos los datos necesarios.
     this.publicationService.publish( idPublication ).subscribe(
@@ -641,7 +738,7 @@ export class PublicationNewEditComponent implements OnInit {
       return this.fb.group({
 
         number: pageObject.number,
-        image: [ urlPage, Validators.required ], // TODO: Corroborar si esto hace falta
+        image: null, // TODO: Corroborar si esto hace falta
         thumbailImage: urlPage,
         url: urlPage
 
@@ -653,7 +750,7 @@ export class PublicationNewEditComponent implements OnInit {
       return this.fb.group({
 
         number: this.pagesList.length + 1,
-        image: [new FileReader(), Validators.required  ], // TODO: Corroborar si esto hace falta
+        image: [new FileReader(), Validators.required  ],
         thumbailImage: '',
         url: ''
 
