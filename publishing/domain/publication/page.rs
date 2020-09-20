@@ -17,10 +17,7 @@ impl Page {
     }
 
     pub fn with_images(number: u32, images: Vec<Image>) -> Result<Self> {
-        Ok(Page {
-            number,
-            images,
-        })
+        Ok(Page { number, images })
     }
 
     pub fn number(&self) -> u32 {

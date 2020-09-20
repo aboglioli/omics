@@ -57,7 +57,7 @@ mod tests {
 
     #[tokio::test]
     async fn publish() {
-        let c = mocks::inmem_container().await.unwrap();
+        let c = mocks::container();
         let uc = Publish::new(c.event_pub(), c.author_repo(), c.publication_repo());
 
         let mut author = mocks::user1().1;

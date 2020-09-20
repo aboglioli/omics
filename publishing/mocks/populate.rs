@@ -14,6 +14,17 @@ pub async fn populate<EPub>(c: &Container<EPub>) -> Result<()>
 where
     EPub: EventPublisher,
 {
+    // Categories
+    let category1_id = category::CategoryId::new("category-1")?;
+    let mut category1 =
+        category::Category::new(category1_id.clone(), category::Name::new("Category 1")?)?;
+    c.category_repo().save(&mut category1).await?;
+
+    let category2_id = category::CategoryId::new("category-2")?;
+    let mut category2 =
+        category::Category::new(category2_id.clone(), category::Name::new("Category 2")?)?;
+    c.category_repo().save(&mut category2).await?;
+
     // Users
     let user1_id = c.user_repo().next_id().await?;
     let mut user1 = user::User::new(user1_id.clone(), "user-1", "user")?;
@@ -31,7 +42,7 @@ where
         publication::Header::new(
             publication::Name::new("Publication 1")?,
             publication::Synopsis::new("Synopsis...")?,
-            category::CategoryId::new("adventure")?,
+            category1_id.clone(),
             vec![publication::Tag::new("Tag 1")?],
             publication::Image::new("http://domain.com/image.jpg")?,
         )?,
@@ -45,20 +56,18 @@ where
         publication::Header::new(
             publication::Name::new("Publication 2")?,
             publication::Synopsis::new("Synopsis...")?,
-            category::CategoryId::new("science-fiction")?,
+            category2_id.clone(),
             vec![publication::Tag::new("Tag 1")?],
             publication::Image::new("http://domain.com/image.jpg")?,
         )?,
     )?;
-    publication2.set_pages(vec![
-        publication::Page::with_images(
-            0,
-            vec![
-                publication::Image::new("http://domain.com/image.jpg")?,
-                publication::Image::new("http://domain.com/image.jpg")?,
-            ]
-        )?,
-    ])?;
+    publication2.set_pages(vec![publication::Page::with_images(
+        0,
+        vec![
+            publication::Image::new("http://domain.com/image.jpg")?,
+            publication::Image::new("http://domain.com/image.jpg")?,
+        ],
+    )?])?;
     publication2.publish()?;
     publication2.approve(
         user::UserId::new("00000000-0000-0000-0000-000000000001")?,
@@ -74,7 +83,7 @@ where
         publication::Header::new(
             publication::Name::new("Collection 1")?,
             publication::Synopsis::new("Synopsis...")?,
-            category::CategoryId::new("comedy")?,
+            category1_id.clone(),
             vec![publication::Tag::new("Tag 1")?],
             publication::Image::new("http://domain.com/image.jpg")?,
         )?,

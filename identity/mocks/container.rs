@@ -6,6 +6,7 @@ use crate::container::Container;
 use crate::infrastructure::persistence::inmem::{
     InMemRoleRepository, InMemTokenRepository, InMemUserRepository,
 };
+
 use crate::mocks::{FakePasswordHasher, FakeTokenEncoder};
 
 pub fn container() -> Container<FakeEventPublisher> {

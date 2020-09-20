@@ -151,7 +151,7 @@ mod tests {
 
     #[tokio::test]
     async fn owner_view_of_draft() {
-        let c = mocks::inmem_container().await.unwrap();
+        let c = mocks::container();
         let uc = GetById::new(
             c.event_pub(),
             c.author_repo(),
@@ -207,7 +207,7 @@ mod tests {
 
     #[tokio::test]
     async fn reader_view_of_draft() {
-        let c = mocks::inmem_container().await.unwrap();
+        let c = mocks::container();
         let uc = GetById::new(
             c.event_pub(),
             c.author_repo(),
@@ -247,7 +247,7 @@ mod tests {
 
     #[tokio::test]
     async fn reader_view_of_published() {
-        let c = mocks::inmem_container().await.unwrap();
+        let c = mocks::container();
         let uc = GetById::new(
             c.event_pub(),
             c.author_repo(),
@@ -297,7 +297,7 @@ mod tests {
 
     #[tokio::test]
     async fn invalid_id() {
-        let c = mocks::inmem_container().await.unwrap();
+        let c = mocks::container();
         let uc = GetById::new(
             c.event_pub(),
             c.author_repo(),
@@ -337,7 +337,7 @@ mod tests {
 
     #[tokio::test]
     async fn reader_interaction() {
-        let c = mocks::inmem_container().await.unwrap();
+        let c = mocks::container();
         let uc = GetById::new(
             c.event_pub(),
             c.author_repo(),

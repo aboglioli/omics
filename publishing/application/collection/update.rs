@@ -86,7 +86,7 @@ mod tests {
 
     #[tokio::test]
     async fn update() {
-        let c = mocks::inmem_container().await.unwrap();
+        let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.category_repo(), c.collection_repo());
 
         let author = mocks::user1().1;
@@ -123,7 +123,7 @@ mod tests {
 
     #[tokio::test]
     async fn published_publication() {
-        let c = mocks::inmem_container().await.unwrap();
+        let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.category_repo(), c.collection_repo());
 
         let author = mocks::user1().1;
@@ -155,7 +155,7 @@ mod tests {
 
     #[tokio::test]
     async fn not_owner() {
-        let c = mocks::inmem_container().await.unwrap();
+        let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.category_repo(), c.collection_repo());
 
         let author = mocks::user2().1;
@@ -182,7 +182,7 @@ mod tests {
 
     #[tokio::test]
     async fn non_existing_category() {
-        let c = mocks::inmem_container().await.unwrap();
+        let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.category_repo(), c.collection_repo());
 
         let author = mocks::user1().1;

@@ -230,7 +230,7 @@ mod tests {
     use common::config::Config;
     use tokio_postgres::NoTls;
 
-    use crate::mocks;
+    
 
     #[tokio::test]
     async fn all() {
@@ -255,6 +255,5 @@ mod tests {
         });
 
         let _repo = PostgresCollectionRepository::new(Arc::new(client));
-        let _c = mocks::inmem_container();
     }
 }

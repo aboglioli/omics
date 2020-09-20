@@ -116,7 +116,7 @@ mod tests {
 
     #[tokio::test]
     async fn valid() {
-        let c = mocks::inmem_container().await.unwrap();
+        let c = mocks::container();
         let uc = Create::new(
             c.event_pub(),
             c.author_repo(),
@@ -172,7 +172,7 @@ mod tests {
 
     #[tokio::test]
     async fn invalid_data() {
-        let c = mocks::inmem_container().await.unwrap();
+        let c = mocks::container();
         let uc = Create::new(
             c.event_pub(),
             c.author_repo(),
@@ -218,7 +218,7 @@ mod tests {
 
     #[tokio::test]
     async fn not_existing_category() {
-        let c = mocks::inmem_container().await.unwrap();
+        let c = mocks::container();
         let uc = Create::new(
             c.event_pub(),
             c.author_repo(),
