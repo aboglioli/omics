@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { forkJoin, Observable } from 'rxjs';
 import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
 import { MatCheckbox } from '@angular/material/checkbox';
@@ -16,7 +16,7 @@ import { IPublication } from '../../../domain/models/publication';
 import { IDropdownItem } from '../../../models/dropdown-item.interface';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
-import { PublicationService, IUpdatePagesCommand } from '../../../domain/services/publication.service';
+import { PublicationService, IUpdatePagesCommand, IGetByIdResponse } from '../../../domain/services/publication.service';
 import { ICreateCommand, CollectionService } from '../../../domain/services/collection.service';
 import { SweetAlertGenericMessageService } from '../../../services/sweet-alert-generic-message.service';
 
@@ -38,7 +38,6 @@ export class PublicationNewEditComponent implements OnInit {
 
   // Usados para Forms
   public formPublication: FormGroup;
-  public publicationNewObject: IPublication;
   public collectionList: IDropdownItem[];
   public portadaImage = {
     thumbail: null,
@@ -50,12 +49,14 @@ export class PublicationNewEditComponent implements OnInit {
 
   // Otros
   public ripplePortadaEnable = true;
-  pageList: IUpdatePagesCommand;
+  public pageList: IUpdatePagesCommand;
+  public isToEdit: boolean;
 
   public chipTagsKeysCodes: number[] = [ENTER, COMMA]; // Usado para los tags
 
   constructor(
     private router: Router,
+    private activateRoute: ActivatedRoute,
     private authService: AuthService,
     private fb: FormBuilder,
     private spinnerService: NgxSpinnerService,
@@ -63,7 +64,7 @@ export class PublicationNewEditComponent implements OnInit {
     private fileServ: FileService,
     private publicationService: PublicationService,
     private collectionService: CollectionService,
-    private sweetAlertGenericService: SweetAlertGenericMessageService
+    private sweetAlertGenericService: SweetAlertGenericMessageService,
   ) { }
 
   ngOnInit(): void {
@@ -113,13 +114,57 @@ export class PublicationNewEditComponent implements OnInit {
       this.collectionList = dataCollection;
       this.categoryList = dataCategory;
 
-      this.spinnerService.hide();
+      this.activateRoute.params.subscribe(
+        (params: any) => {
+
+          const publicationId = params.id;
+
+          // Si no existe el id, es una nueva publicación, sino se busca con el ID la publicación
+          if ( publicationId === undefined ) {
+
+            this.spinnerService.hide();
+            this.isToEdit = false;
+
+          } else {
+
+            this.spinnerService.hide();
+            this.isToEdit = true;
+            this.getPublicationToEdit(publicationId);
+
+          }
 
 
-      });
+        });
+
+    });
 
   }
 
+  private getPublicationToEdit( publicationId: string): void {
+
+    this.spinnerService.show();
+
+    this.publicationService.getById(publicationId).subscribe(
+      (res: IGetByIdResponse) => {
+
+        const publicationEdit: IPublication = res.publication;
+        console.log('TEST > ', publicationEdit);
+        this.spinnerService.hide();
+
+      },
+      (err: Error ) => {
+
+        console.error(err);
+        this.spinnerService.hide();
+
+      }
+    );
+
+
+
+  }
+
+  // Generales
   public uploadImagePortada(): void {
 
     // Crear elemento input de tipo 'file' para poder manejarlo desde el botón que lo llama

@@ -16,9 +16,20 @@
           Guardar Borrador
       </button>
 
-      <button mat-flat-button color="accent"  class="button-white-borders"
+      <button mat-flat-button color="accent"
+              class="button-white-borders"
               (click)="submitPublicationForm()">
-          Publicar
+
+        <span *ngIf="isToEdit !== undefined">
+          <span *ngIf="isToEdit">
+            Editar
+          </span>
+
+          <span *ngIf="!isToEdit">
+            Publicar
+          </span>
+        </span>
+
       </button>
 
 
