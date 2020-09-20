@@ -73,7 +73,7 @@ mod tests {
 
     #[tokio::test]
     async fn reject() {
-        let c = mocks::container();
+        let c = mocks::inmem_container().await.unwrap();
         let uc = Reject::new(c.event_pub(), c.publication_repo(), c.user_repo());
 
         let (mut user1, mut author1, mut reader1) = mocks::user1();

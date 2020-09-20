@@ -37,6 +37,12 @@ pub struct PostgresAuthorRepository {
     client: Arc<Client>,
 }
 
+impl PostgresAuthorRepository {
+    pub fn new(client: Arc<Client>) -> Self {
+        PostgresAuthorRepository { client }
+    }
+}
+
 #[async_trait]
 impl AuthorRepository for PostgresAuthorRepository {
     async fn find_all(&self) -> Result<Vec<Author>> {

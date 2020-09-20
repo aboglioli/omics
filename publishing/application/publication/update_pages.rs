@@ -80,7 +80,7 @@ mod tests {
 
     #[tokio::test]
     async fn valid() {
-        let c = mocks::container();
+        let c = mocks::inmem_container().await.unwrap();
         let uc = UpdatePages::new(c.event_pub(), c.publication_repo());
 
         let author = mocks::user1().1;
@@ -125,7 +125,7 @@ mod tests {
 
     #[tokio::test]
     async fn invalid() {
-        let c = mocks::container();
+        let c = mocks::inmem_container().await.unwrap();
         let uc = UpdatePages::new(c.event_pub(), c.publication_repo());
 
         let author = mocks::user1().1;

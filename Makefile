@@ -17,9 +17,6 @@ run:
 dependencies:
 	cargo update
 
-test:
-	cargo test --color always
-
 build: dependencies
 	cargo build --release
 
@@ -34,6 +31,9 @@ migrate:
 
 clean-db:
 	$(MAKE) -C $(SCRIPTS_DIR) clean-db
+
+test: clean-db migrate
+	cargo test --color always
 
 
 # ----------

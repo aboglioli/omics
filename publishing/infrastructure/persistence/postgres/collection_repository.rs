@@ -255,6 +255,6 @@ mod tests {
         });
 
         let _repo = PostgresCollectionRepository::new(Arc::new(client));
-        let _c = mocks::container();
+        let _c = mocks::inmem_container();
     }
 }

@@ -57,7 +57,7 @@ mod tests {
 
     #[tokio::test]
     async fn valid() {
-        let c = mocks::container();
+        let c = mocks::inmem_container().await.unwrap();
         let uc = Like::new(
             c.event_pub(),
             c.interaction_repo(),
@@ -88,7 +88,7 @@ mod tests {
 
     #[tokio::test]
     async fn not_published() {
-        let c = mocks::container();
+        let c = mocks::inmem_container().await.unwrap();
         let uc = Like::new(
             c.event_pub(),
             c.interaction_repo(),
@@ -112,7 +112,7 @@ mod tests {
 
     #[tokio::test]
     async fn invalid_ids() {
-        let c = mocks::container();
+        let c = mocks::inmem_container().await.unwrap();
         let uc = Like::new(
             c.event_pub(),
             c.interaction_repo(),

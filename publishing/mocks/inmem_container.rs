@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use common::mocks::FakeEventPublisher;
+use common::result::Result;
 use shared::infrastructure::persistence::inmem::InMemUserRepository;
 use shared::mocks::FakeUserService;
 
@@ -9,10 +10,10 @@ use crate::infrastructure::persistence::inmem::{
     InMemAuthorRepository, InMemCategoryRepository, InMemCollectionRepository,
     InMemInteractionRepository, InMemPublicationRepository, InMemReaderRepository,
 };
+use crate::mocks;
 
-#[allow(dead_code)]
-pub fn container() -> Container<FakeEventPublisher> {
-    Container::new(
+pub async fn inmem_container() -> Result<Container<FakeEventPublisher>> {
+    let container = Container::new(
         Arc::new(FakeEventPublisher::new()),
         Arc::new(InMemAuthorRepository::new()),
         Arc::new(InMemCategoryRepository::new()),
@@ -22,5 +23,9 @@ pub fn container() -> Container<FakeEventPublisher> {
         Arc::new(InMemReaderRepository::new()),
         Arc::new(InMemUserRepository::new()),
         Arc::new(FakeUserService::new()),
-    )
+    );
+
+    mocks::populate(&container).await?;
+
+    Ok(container)
 }

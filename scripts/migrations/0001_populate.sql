@@ -21,24 +21,44 @@ INSERT INTO users(
   created_at,
   updated_at,
   deleted_at
-) VALUES (
-  '00000000-0000-0000-0000-000000000001',
-  'local',
-  'admin',
-  'admin@omics.com',
-  '$2y$12$nPMNHiYhXb90lZTu0CX.2eY5RIQ/Uek28lCua23OIfkLhcjZtnIIO',
-  'Admin',
-  'Omics',
-  '1994-08-01 15:30:00',
-  'other',
-  'I am the administrator.',
-  'https://via.placeholder.com/200.jpg',
-  'admin',
-  NULL,
-  '2020-09-18 23:40:10',
-  NULL,
-  NULL
-);
+)
+VALUES
+  (
+    '00000000-0000-0000-0000-000000000001',
+    'local',
+    'admin-1',
+    'admin-1@omics.com',
+    '$2y$12$nPMNHiYhXb90lZTu0CX.2eY5RIQ/Uek28lCua23OIfkLhcjZtnIIO',
+    'Admin',
+    'Omics',
+    '1994-08-01 15:30:00',
+    'other',
+    'I am a administrator.',
+    'https://via.placeholder.com/200.jpg',
+    'admin',
+    NULL,
+    NOW(),
+    NULL,
+    NULL
+  ),
+  (
+    '00000000-0000-0000-0000-000000000002',
+    'local',
+    'content-manager-1',
+    'content-manager-1@omics.com',
+    '$2y$12$nPMNHiYhXb90lZTu0CX.2eY5RIQ/Uek28lCua23OIfkLhcjZtnIIO',
+    'Content Manager',
+    'Omics',
+    '1994-08-01 15:30:00',
+    'other',
+    'I am a content manager.',
+    'https://via.placeholder.com/200.jpg',
+    'content-manager',
+    NULL,
+    NOW(),
+    NULL,
+    NULL
+  );
 
 INSERT INTO categories(id, name, created_at)
 VALUES

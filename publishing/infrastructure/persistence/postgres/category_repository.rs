@@ -37,6 +37,12 @@ pub struct PostgresCategoryRepository {
     client: Arc<Client>,
 }
 
+impl PostgresCategoryRepository {
+    pub fn new(client: Arc<Client>) -> Self {
+        PostgresCategoryRepository { client }
+    }
+}
+
 #[async_trait]
 impl CategoryRepository for PostgresCategoryRepository {
     async fn find_all(&self) -> Result<Vec<Category>> {
