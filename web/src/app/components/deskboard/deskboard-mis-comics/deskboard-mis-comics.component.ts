@@ -32,7 +32,6 @@ export class DeskboardMisComicsComponent implements OnInit {
       (resData: IGetPublicationsResponse) => {
 
         this.publicationList = resData.publications;
-        console.log(this.publicationList);
 
         this.spinnerService.hide();
 

@@ -12,14 +12,21 @@ import { FileService } from '../../../domain/services/file.service';
 import { DropdownDataObrasService } from '../../../services/dropdown-data-obras.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 
-import { IPublication } from '../../../domain/models/publication';
+import { IPublication, IPage } from '../../../domain/models/publication';
 import { IDropdownItem } from '../../../models/dropdown-item.interface';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
-import { PublicationService, IUpdatePagesCommand, IGetByIdResponse } from '../../../domain/services/publication.service';
+import { PublicationService, IUpdatePagesCommand, IGetByIdResponse, IGetCollectionsResponse, IUpdateCommand } from '../../../domain/services/publication.service';
 import { ICreateCommand, CollectionService } from '../../../domain/services/collection.service';
 import { SweetAlertGenericMessageService } from '../../../services/sweet-alert-generic-message.service';
+import { ICollection } from '../../../domain/models/collection';
 
+export interface IPageForm {
+  number: number;
+  image: string;
+  thumbailImage: string;
+  url: string;
+}
 
 @Component({
   selector: 'app-publication-new-edit',
@@ -30,6 +37,7 @@ export class PublicationNewEditComponent implements OnInit {
 
   @ViewChild('formDataInvalid') private swalFormDataInvalid: SwalComponent;
   @ViewChild('formDataValid') private swalFormDataValid: SwalComponent;
+  @ViewChild('formEditValid') private swalFormEditValid: SwalComponent;
 
   // FontAwesome Icon
   public faPlus = faPlusCircle;
@@ -49,7 +57,6 @@ export class PublicationNewEditComponent implements OnInit {
 
   // Otros
   public ripplePortadaEnable = true;
-  public pageList: IUpdatePagesCommand;
   public isToEdit: boolean;
 
   public chipTagsKeysCodes: number[] = [ENTER, COMMA]; // Usado para los tags
@@ -147,9 +154,19 @@ export class PublicationNewEditComponent implements OnInit {
     this.publicationService.getById(publicationId).subscribe(
       (res: IGetByIdResponse) => {
 
-        const publicationEdit: IPublication = res.publication;
-        console.log('TEST > ', publicationEdit);
         this.spinnerService.hide();
+        const publicationEdit: IPublication = res.publication;
+        this.publicationService.getCollections(publicationId).subscribe(
+          (collectionRes: IGetCollectionsResponse) => {
+
+            this.setFormPublicationByObject(publicationEdit, collectionRes.collections);
+
+          },
+          (err: Error) => {
+            console.error(err);
+            this.spinnerService.hide();
+          }
+        );
 
       },
       (err: Error ) => {
@@ -160,10 +177,61 @@ export class PublicationNewEditComponent implements OnInit {
       }
     );
 
-
-
   }
 
+  private setFormPublicationByObject( publicationObject: IPublication, collectionList: ICollection[] ): void {
+
+    console.log('TEST > ', publicationObject);
+
+    // TODO: Esto habría que cambiarlo para que el tiempo que transcurra es cuando termine de renderizar las imagenes a mostrar
+    this.spinnerService.show();
+    setTimeout(() => {
+      this.spinnerService.hide();
+    }, 2000); // 5 segundos
+
+    this.formPublication.reset({
+
+      name: publicationObject.name,
+      cover: publicationObject.cover,
+      synopsis: publicationObject.synopsis,
+      category_id: publicationObject.category_id,
+    });
+
+    // Asignar las categorias
+    if ( collectionList.length > 0 ) {
+
+      collectionList.forEach( (collection: ICollection) => {
+
+        this.collectionArrayCheck.push(
+            new FormControl(collection.id)
+        );
+
+      });
+
+    }
+
+    // Manejo de portada
+    this.portadaImage.thumbail = publicationObject.cover;
+    this.portadaImage.url = publicationObject.cover;
+
+    // Asignar tags
+    publicationObject.tags.forEach( (tag: string) => {
+
+      this.tagsList.push(tag);
+
+    });
+
+    this.formPublication.get('tags').setValue(this.tagsList);
+
+    // Asignar pagesList
+    publicationObject.pages.forEach( ( page: IPage ) =>  {
+
+      const pageAux = this.newPage( page );
+      this.pagesList.push( pageAux );
+
+    });
+
+  }
   // Generales
   public uploadImagePortada(): void {
 
@@ -230,7 +298,6 @@ export class PublicationNewEditComponent implements OnInit {
   //#region Realizar publicación
   public  submitPublicationForm(): void {
 
-
     this.formPublication.get('tags').setValue(this.tagsList);
 
     // Reducir descripción los espacios vacios que pueda tener al final
@@ -272,6 +339,7 @@ export class PublicationNewEditComponent implements OnInit {
     this.spinnerService.show();
     const arrayPageObervables: Observable<any>[] = [];
 
+    console.log('TEST >>> ', 'PAges');
     this.pagesList.controls.forEach( (pageForm: FormGroup) => {
 
       const page = pageForm.get('image').value;
@@ -358,7 +426,9 @@ export class PublicationNewEditComponent implements OnInit {
     // Se realiza la subscripción de todas las colección al Id de publicación y si está correcto, se publica finalmente
     forkJoin(  categorySubscriptionsList ).subscribe(
       (data: any) => {
-        this.uploadPublicationFinish(idPublication);
+
+        ( this.isToEdit ) ?
+          this.editPublicationFinish(idPublication) : this.uploadPublicationFinish(idPublication);
       },
       (error: Error) => {
 
@@ -391,8 +461,40 @@ export class PublicationNewEditComponent implements OnInit {
 
   }
 
-  //#endregion
+  private editPublicationFinish( idPublication: string ): void {
 
+
+    const publicationUpdateCMD: IUpdateCommand = {
+
+      name: this.formPublication.get('name').value,
+      synopsis: this.formPublication.get('synopsis').value,
+      category_id: this.formPublication.get('category_id').value,
+      tags: this.formPublication.get('tags').value,
+      cover: this.formPublication.get('cover').value,
+
+    };
+
+
+
+    // Editar la publicación en sí con todos los datos necesarios.
+    this.publicationService.update( idPublication, publicationUpdateCMD ).subscribe(
+      (resEditPublish: any) => {
+
+        this.swalFormEditValid.fire();
+        this.spinnerService.hide();
+
+      },
+      (error: any) => {
+
+        console.error(error);
+        this.spinnerService.hide();
+
+      }
+    );
+
+  }
+
+  //#endregion
 
   // #region Dropdown Checkbox Collection
 
@@ -520,7 +622,6 @@ export class PublicationNewEditComponent implements OnInit {
 
     this.pagesList.removeAt( index );
 
-    // console.log('TEST> ', this.pagesList.value[i]);
 
     const listLength = this.pagesTotal;
     for ( let i = index; i < listLength; i++ ) {
@@ -531,16 +632,37 @@ export class PublicationNewEditComponent implements OnInit {
 
   }
 
-  public newPage(): FormGroup {
-    return this.fb.group({
+  private newPage( pageObject?: IPage ): FormGroup {
 
-      number: this.pagesList.length + 1,
-      image: [new FileReader(), Validators.required  ],
-      thumbailImage: '',
-      url: ''
+    if (  pageObject ) {
 
-    });
+      const urlPage = pageObject.images[0].url;
+
+      return this.fb.group({
+
+        number: pageObject.number,
+        image: [ urlPage, Validators.required ], // TODO: Corroborar si esto hace falta
+        thumbailImage: urlPage,
+        url: urlPage
+
+      });
+
+    }
+    else {
+
+      return this.fb.group({
+
+        number: this.pagesList.length + 1,
+        image: [new FileReader(), Validators.required  ], // TODO: Corroborar si esto hace falta
+        thumbailImage: '',
+        url: ''
+
+      });
+    }
+
   }
+
+
 
   public getUrlFromFileService( dataFilePageUploaded: any[] ): IUpdatePagesCommand {
 
@@ -561,8 +683,6 @@ export class PublicationNewEditComponent implements OnInit {
   }
 
   //#endregion
-
-
 
   // #region Getters
 

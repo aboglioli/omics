@@ -29,7 +29,6 @@ export class CatalogoComponent implements OnInit {
 
         this.publicationList = searchRes.publications;
         this.spinnerService.hide();
-        console.log(this.publicationList);
 
 
       },
