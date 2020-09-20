@@ -2,11 +2,18 @@ CREATE TABLE IF NOT EXISTS roles (
   id VARCHAR(255) PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
 
-  permissions JSONB,
-
   created_at TIMESTAMP WITH TIME ZONE NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE,
   deleted_at TIMESTAMP WITH TIME ZONE
+);
+
+CREATE TABLE IF NOT EXISTS permissions (
+  module VARCHAR(255) NOT NULL,
+  permissions VARCHAR(16) NOT NULL,
+  role_id VARCHAR(255) NOT NULL,
+
+  PRIMARY KEY(role_id, module),
+  FOREIGN KEY(role_id) REFERENCES roles(id)
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -60,8 +67,6 @@ CREATE TABLE IF NOT EXISTS collections (
   tags TEXT[] NOT NULL,
   cover VARCHAR(1024) NOT NULL,
 
-  items JSONB NOT NULL,
-
   created_at TIMESTAMP WITH TIME ZONE NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE,
   deleted_at TIMESTAMP WITH TIME ZONE,
@@ -83,10 +88,7 @@ CREATE TABLE IF NOT EXISTS publications (
 
   contract BOOLEAN DEFAULT FALSE,
 
-  statistics JSONB NOT NULL,
-  pages JSONB NOT NULL,
-
-  status_history JSONB NOT NULL,
+  statistics JSON,
 
   created_at TIMESTAMP WITH TIME ZONE NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE,
@@ -96,8 +98,55 @@ CREATE TABLE IF NOT EXISTS publications (
   FOREIGN KEY(category_id) REFERENCES categories(id)
 );
 
+CREATE TABLE IF NOT EXISTS collection_items (
+  collection_id UUID NOT NULL,
+  publication_id UUID NOT NULL,
+  datetime TIMESTAMP WITH TIME ZONE NOT NULL,
+
+  PRIMARY KEY(collection_id, publication_id),
+  FOREIGN KEY(collection_id) REFERENCES collections(id),
+  FOREIGN KEY(publication_id) REFERENCES publications(id)
+);
+
+CREATE TABLE IF NOT EXISTS pages (
+  publication_id UUID NOT NULL,
+  number INTEGER NOT NULL,
+
+  images VARCHAR(1024)[],
+
+  PRIMARY KEY(publication_id, number),
+  FOREIGN KEY(publication_id) REFERENCES publications(id)
+);
+
+CREATE TABLE IF NOT EXISTS statistics (
+  publication_id UUID PRIMARY KEY,
+
+  views INTEGER DEFAULT 0,
+  unique_views INTEGER DEFAULT 0,
+  readings INTEGER DEFAULT 0,
+  likes INTEGER DEFAULT 0,
+  reviews INTEGER DEFAULT 0,
+  stars REAL DEFAULT 0.0,
+
+  FOREIGN KEY(publication_id) REFERENCES publications(id)
+);
+
 CREATE TABLE IF NOT EXISTS publication_status (
   id VARCHAR(255) PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS publication_status_history (
+  id SERIAL PRIMARY KEY,
+  publication_id UUID NOT NULL,
+  status_id VARCHAR(255) NOT NULL,
+
+  admin_id UUID,
+  comment TEXT,
+  datetime TIMESTAMP WITH TIME ZONE NOT NULL,
+
+  FOREIGN KEY(publication_id) REFERENCES publications(id),
+  FOREIGN KEY(status_id) REFERENCES publication_status(id),
+  FOREIGN KEY(admin_id) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS views (

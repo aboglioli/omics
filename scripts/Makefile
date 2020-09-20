@@ -1,6 +1,9 @@
 test:
 	npm test
 
+api-populate:
+	npm run api-populate
+
 populate:
 	npm run populate
 

@@ -1,18 +1,23 @@
 use std::sync::Arc;
 
+use tokio_postgres::NoTls;
+
+use common::config::Config;
 use common::container::Container;
 use common::event::EventSubscriber;
 use common::infrastructure::event::{InMemEventBus, InMemEventRepository};
 use common::result::Result;
 use identity::container::IdentityContainer;
-use identity::infrastructure::persistence::inmem::{
-    InMemRoleRepository, InMemTokenRepository, InMemUserRepository,
+use identity::infrastructure::persistence::inmem::InMemTokenRepository;
+use identity::infrastructure::persistence::postgres::{
+    PostgresRoleRepository, PostgresUserRepository,
 };
 use identity::infrastructure::service::{BcryptHasher, JWTEncoder};
 use publishing::container::PublishingContainer;
-use publishing::infrastructure::persistence::inmem::{
-    InMemAuthorRepository, InMemCategoryRepository, InMemCollectionRepository,
-    InMemInteractionRepository, InMemPublicationRepository, InMemReaderRepository,
+
+use publishing::infrastructure::persistence::postgres::{
+    PostgresAuthorRepository, PostgresCategoryRepository, PostgresCollectionRepository,
+    PostgresInteractionRepository, PostgresPublicationRepository, PostgresReaderRepository,
 };
 use shared::container::SharedContainer;
 use shared::infrastructure::persistence::inmem::InMemUserRepository as SharedInMemUserRepository;
@@ -30,24 +35,46 @@ pub struct MainContainer {
 
 impl MainContainer {
     pub async fn new() -> Self {
+        let config = Config::get();
+        let (client, connection) = tokio_postgres::connect(
+            &format!(
+                "host={} user={} password={} dbname={}",
+                config.postgres_host(),
+                config.postgres_username(),
+                config.postgres_password(),
+                config.postgres_database()
+            ),
+            NoTls,
+        )
+        .await
+        .unwrap();
+
+        tokio::spawn(async move {
+            if let Err(err) = connection.await {
+                eprintln!("error: {}", err);
+            }
+        });
+
+        let client = Arc::new(client);
+
         // Common
         let event_bus = Arc::new(InMemEventBus::new());
         let event_repo = Arc::new(InMemEventRepository::new());
 
         // Identity
-        let i_role_repo = Arc::new(InMemRoleRepository::new());
+        let i_role_repo = Arc::new(PostgresRoleRepository::new(client.clone()));
         let i_token_repo = Arc::new(InMemTokenRepository::new());
-        let i_user_repo = Arc::new(InMemUserRepository::new());
+        let i_user_repo = Arc::new(PostgresUserRepository::new(client.clone()));
         let i_password_hasher = Arc::new(BcryptHasher::new());
         let i_token_enc = Arc::new(JWTEncoder::new());
 
         // Publishing
-        let p_author_repo = Arc::new(InMemAuthorRepository::new());
-        let p_category_repo = Arc::new(InMemCategoryRepository::new());
-        let p_collection_repo = Arc::new(InMemCollectionRepository::new());
-        let p_interaction_repo = Arc::new(InMemInteractionRepository::new());
-        let p_publication_repo = Arc::new(InMemPublicationRepository::new());
-        let p_reader_repo = Arc::new(InMemReaderRepository::new());
+        let p_author_repo = Arc::new(PostgresAuthorRepository::new(client.clone()));
+        let p_category_repo = Arc::new(PostgresCategoryRepository::new(client.clone()));
+        let p_collection_repo = Arc::new(PostgresCollectionRepository::new(client.clone()));
+        let p_interaction_repo = Arc::new(PostgresInteractionRepository::new(client.clone()));
+        let p_publication_repo = Arc::new(PostgresPublicationRepository::new(client.clone()));
+        let p_reader_repo = Arc::new(PostgresReaderRepository::new(client.clone()));
 
         // Shared
         let s_user_repo = Arc::new(SharedInMemUserRepository::new());

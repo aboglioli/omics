@@ -1,8 +1,10 @@
-use std::collections::HashMap;
+use std::str::FromStr;
 use std::sync::Arc;
 
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use tokio_postgres::row::Row;
 use tokio_postgres::Client;
 use uuid::Uuid;
@@ -16,26 +18,45 @@ use crate::domain::category::CategoryId;
 use crate::domain::collection::{Collection, CollectionId, CollectionRepository, Item};
 use crate::domain::publication::{Header, Image, Name, PublicationId, Synopsis, Tag};
 
-impl Item {
-    fn from_row(row: Row) -> Result<Self> {
-        let publication_id: Uuid = row.get("publication_id");
-        let date: DateTime<Utc> = row.get("datetime");
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ItemJson {
+    publication_id: String,
+    datetime: String,
+}
 
-        Ok(Item::build(
-            PublicationId::new(publication_id.to_string())?,
-            date,
-        ))
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ItemsJson {
+    items: Vec<ItemJson>,
+}
+
+impl ItemsJson {
+    fn to_items(self) -> Result<Vec<Item>> {
+        let mut items = Vec::new();
+        for item in self.items.into_iter() {
+            items.push(Item::build(
+                PublicationId::new(item.publication_id)?,
+                DateTime::from_str(&item.datetime).unwrap(),
+            ));
+        }
+
+        Ok(items)
+    }
+
+    fn from_items(items: &[Item]) -> Result<ItemsJson> {
+        let mut items_json = Vec::new();
+        for item in items.iter() {
+            items_json.push(ItemJson {
+                publication_id: item.publication_id().to_string(),
+                datetime: item.date().to_rfc3339(),
+            })
+        }
+
+        Ok(ItemsJson { items: items_json })
     }
 }
 
 impl Collection {
-    fn from_rows(rows: Vec<Row>) -> Result<Self> {
-        if rows.is_empty() {
-            return Err(Error::new("collection", "empty"));
-        }
-
-        let row = &rows[0];
-
+    fn from_row(row: Row) -> Result<Self> {
         let id: Uuid = row.get("id");
         let author_id: Uuid = row.get("author_id");
 
@@ -45,6 +66,10 @@ impl Collection {
         let tag_strs: Vec<String> = row.get("tags");
         let cover: String = row.get("cover");
 
+        let items: Value = row.get("items");
+        let items: ItemsJson = serde_json::from_value(items).unwrap();
+        let items = items.to_items()?;
+
         let created_at: DateTime<Utc> = row.get("created_at");
         let updated_at: Option<DateTime<Utc>> = row.get("updated_at");
         let deleted_at: Option<DateTime<Utc>> = row.get("deleted_at");
@@ -52,11 +77,6 @@ impl Collection {
         let mut tags = Vec::new();
         for tag in tag_strs.into_iter() {
             tags.push(Tag::new(tag)?);
-        }
-
-        let mut items = Vec::new();
-        for row in rows.into_iter() {
-            items.push(Item::from_row(row)?);
         }
 
         Ok(Collection::build(
@@ -94,31 +114,13 @@ impl CollectionRepository for PostgresCollectionRepository {
     async fn find_all(&self) -> Result<Vec<Collection>> {
         let rows = self
             .client
-            .query(
-                "SELECT * FROM collections
-                LEFT JOIN collection_items AS ci ON ci.collection_id = id",
-                &[],
-            )
+            .query("SELECT * FROM collections", &[])
             .await
             .map_err(|err| Error::not_found("collection").wrap_raw(err))?;
 
-        let mut collection_rows: HashMap<Uuid, Vec<Row>> = HashMap::new();
-        for row in rows.into_iter() {
-            let id: Uuid = row.get("id");
-            match collection_rows.get_mut(&id) {
-                Some(rows) => {
-                    rows.push(row);
-                }
-                None => {
-                    let rows = vec![row];
-                    collection_rows.insert(id, rows);
-                }
-            }
-        }
-
         let mut collections = Vec::new();
-        for (_, rows) in collection_rows.into_iter() {
-            collections.push(Collection::from_rows(rows)?);
+        for row in rows.into_iter() {
+            collections.push(Collection::from_row(row)?);
         }
 
         Ok(collections)
@@ -129,14 +131,13 @@ impl CollectionRepository for PostgresCollectionRepository {
             .client
             .query_one(
                 "SELECT * FROM collections
-                LEFT JOIN collection_items AS ci ON ci.collection_id = id
                 WHERE id = $1",
-                &[&id.value()],
+                &[&id.to_uuid()?],
             )
             .await
             .map_err(|err| Error::not_found("collection").wrap_raw(err))?;
 
-        Collection::from_rows(vec![row])
+        Collection::from_row(row)
     }
 
     async fn search(
@@ -159,6 +160,9 @@ impl CollectionRepository for PostgresCollectionRepository {
             .await
             .is_err();
 
+        let items = ItemsJson::from_items(collection.items())?;
+        let items = serde_json::to_value(items).unwrap();
+
         if create {
             self.client
                 .execute(
@@ -170,6 +174,7 @@ impl CollectionRepository for PostgresCollectionRepository {
                         category_id,
                         tags,
                         cover,
+                        items,
                         created_at,
                         updated_at,
                         deleted_at
@@ -187,6 +192,7 @@ impl CollectionRepository for PostgresCollectionRepository {
                             .map(|tag| tag.name())
                             .collect::<Vec<&str>>(),
                         &collection.header().cover().url(),
+                        &items,
                         &collection.base().created_at(),
                         &collection.base().updated_at(),
                         &collection.base().deleted_at(),
@@ -194,64 +200,9 @@ impl CollectionRepository for PostgresCollectionRepository {
                 )
                 .await
                 .map_err(|err| Error::new("collection", "create").wrap_raw(err))?;
-
-            for item in collection.items().iter() {
-                self.client
-                    .execute(
-                        "INSERT INTO collection_items(
-                            collection_id,
-                            publication_id,
-                            datetime
-                        ) VALUES (
-                            $1,
-                            $2,
-                            $3
-                        )",
-                        &[
-                            &collection.base().id().to_uuid()?,
-                            &item.publication_id().to_uuid()?,
-                            &item.date(),
-                        ],
-                    )
-                    .await
-                    .map_err(|err| Error::new("collection_item", "create").wrap_raw(err))?;
-            }
         } else {
         }
 
         Ok(())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    use common::config::Config;
-    use tokio_postgres::NoTls;
-
-    #[tokio::test]
-    async fn all() {
-        let config = Config::get();
-        let (client, connection) = tokio_postgres::connect(
-            &format!(
-                "host={} user={} password={} dbname={}",
-                config.postgres_host(),
-                config.postgres_username(),
-                config.postgres_password(),
-                config.postgres_database()
-            ),
-            NoTls,
-        )
-        .await
-        .unwrap();
-
-        tokio::spawn(async move {
-            if let Err(err) = connection.await {
-                eprintln!("error: {}", err);
-            }
-        });
-
-        let _repo = PostgresCollectionRepository::new(Arc::new(client));
     }
 }

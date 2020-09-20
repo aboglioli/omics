@@ -9,7 +9,7 @@ use uuid::Uuid;
 use common::error::Error;
 use common::model::AggregateRoot;
 use common::result::Result;
-use common::sql;
+use common::sql::where_builder::WhereBuilder;
 
 use crate::domain::author::AuthorId;
 use crate::domain::collection::CollectionId;
@@ -42,7 +42,7 @@ impl InteractionRepository for PostgresInteractionRepository {
         let reader_id = reader_id.map(|id| id.to_uuid()).transpose()?;
         let publication_id = publication_id.map(|id| id.to_uuid()).transpose()?;
 
-        let (sql, params) = sql::WhereBuilder::new()
+        let (sql, params) = WhereBuilder::new()
             .add_param_opt("reader_id = $$", &reader_id, reader_id.is_some())
             .add_param_opt(
                 "publication_id = $$",
@@ -96,7 +96,7 @@ impl InteractionRepository for PostgresInteractionRepository {
         let reader_id = reader_id.map(|id| id.to_uuid()).transpose()?;
         let publication_id = publication_id.map(|id| id.to_uuid()).transpose()?;
 
-        let (sql, params) = sql::WhereBuilder::new()
+        let (sql, params) = WhereBuilder::new()
             .add_param_opt("reader_id = $$", &reader_id, reader_id.is_some())
             .add_param_opt(
                 "publication_id = $$",
@@ -146,7 +146,7 @@ impl InteractionRepository for PostgresInteractionRepository {
         let reader_id = reader_id.map(|id| id.to_uuid()).transpose()?;
         let publication_id = publication_id.map(|id| id.to_uuid()).transpose()?;
 
-        let (sql, params) = sql::WhereBuilder::new()
+        let (sql, params) = WhereBuilder::new()
             .add_param_opt("reader_id = $$", &reader_id, reader_id.is_some())
             .add_param_opt(
                 "publication_id = $$",
@@ -196,7 +196,7 @@ impl InteractionRepository for PostgresInteractionRepository {
         let reader_id = reader_id.map(|id| id.to_uuid()).transpose()?;
         let publication_id = publication_id.map(|id| id.to_uuid()).transpose()?;
 
-        let (sql, params) = sql::WhereBuilder::new()
+        let (sql, params) = WhereBuilder::new()
             .add_param_opt("reader_id = $$", &reader_id, reader_id.is_some())
             .add_param_opt(
                 "publication_id = $$",
@@ -253,7 +253,7 @@ impl InteractionRepository for PostgresInteractionRepository {
         let reader_id = reader_id.map(|id| id.to_uuid()).transpose()?;
         let publication_id = publication_id.map(|id| id.to_uuid()).transpose()?;
 
-        let (sql, params) = sql::WhereBuilder::new()
+        let (sql, params) = WhereBuilder::new()
             .add_param_opt("reader_id = $$", &reader_id, reader_id.is_some())
             .add_param_opt(
                 "publication_id = $$",
@@ -303,7 +303,7 @@ impl InteractionRepository for PostgresInteractionRepository {
         let reader_id = reader_id.map(|id| id.to_uuid()).transpose()?;
         let collection_id = collection_id.map(|id| id.to_uuid()).transpose()?;
 
-        let (sql, params) = sql::WhereBuilder::new()
+        let (sql, params) = WhereBuilder::new()
             .add_param_opt("reader_id = $$", &reader_id, reader_id.is_some())
             .add_param_opt(
                 "collection_id = $$",
@@ -353,7 +353,7 @@ impl InteractionRepository for PostgresInteractionRepository {
         let reader_id = reader_id.map(|id| id.to_uuid()).transpose()?;
         let author_id = author_id.map(|id| id.to_uuid()).transpose()?;
 
-        let (sql, params) = sql::WhereBuilder::new()
+        let (sql, params) = WhereBuilder::new()
             .add_param_opt("reader_id = $$", &reader_id, reader_id.is_some())
             .add_param_opt("author_id = $$", &author_id, author_id.is_some())
             .add_param_opt("from >= $$", &from, from.is_some())

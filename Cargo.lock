@@ -560,6 +560,7 @@ dependencies = [
  "dotenv",
  "regex",
  "serde",
+ "serde_json",
  "tokio",
  "tokio-postgres",
  "uuid",
@@ -1277,6 +1278,7 @@ dependencies = [
  "serde_json",
  "shared",
  "tokio",
+ "tokio-postgres",
 ]
 
 [[package]]
@@ -1651,6 +1653,8 @@ dependencies = [
  "chrono",
  "fallible-iterator",
  "postgres-protocol",
+ "serde",
+ "serde_json",
  "uuid",
 ]
 

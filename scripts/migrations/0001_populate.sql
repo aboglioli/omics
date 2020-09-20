@@ -74,3 +74,10 @@ VALUES
   ('romance','Romance', NOW()),
   ('science-fiction','Ciencia Ficción', NOW()),
   ('thriller','Thriller', NOW());
+
+INSERT INTO publication_status(id)
+VALUES
+  ('draft'),
+  ('waiting-approval'),
+  ('published'),
+  ('rejected');

@@ -1,37 +1,26 @@
-const assert = require('assert').strict;
-const { req, sleep } = require('./request');
+const { v4: uuidv4 } = require('uuid');
+const client = require('./db');
 
 const rand = (min, max) => Math.floor(Math.random() * (max - min)) + min;
-
 const image = size => `https://via.placeholder.com/${size ? size : '256'}.jpg`;
-const password = 'P@asswd!';
+const password = '$2y$12$nPMNHiYhXb90lZTu0CX.2eY5RIQ/Uek28lCua23OIfkLhcjZtnIIO';
+const categories = [
+  'action',
+  'adventure',
+  'comedy',
+  'crime',
+  'drama',
+  'fantasy',
+  'historical',
+  'horror',
+  'mystery',
+  'romance',
+  'science-fiction',
+  'thriller',
+];
 
-const registerAndValidate = async cmd => {
-  const { data: { id: userId } } = await req.post('/register', cmd);
-
-  await sleep(100);
-  const event = (await req.lastEvent()).payload.Registered;
-
-  await req.get(`/users/${event.id}/validate/${event.validation_code}`);
-
-  return userId;
-};
-
-async function contentManager() {
-  await req.login('admin', password);
-
-  const contentManagerId = await registerAndValidate({
-    username: 'content-manager',
-    email: 'content-manager@omics.com',
-    password: 'P@asswd!',
-  });
-
-  await req.put(`/users/${contentManagerId}/role`, { role_id: 'content-manager' });
-
-  req.logout();
-}
-
-async function user({
+async function createUser({
+  userId,
   username,
   email,
   name,
@@ -39,149 +28,175 @@ async function user({
   birthdate,
   gender,
   biography,
+  profileImage,
+  createdAt,
 }) {
-  await registerAndValidate({
-    username,
-    email,
-    password,
-  });
-  await req.login(username, password);
-  await req.put('/users/me', {
-    name,
-    lastname,
-    birthdate,
-    gender,
-    biography,
-    profile_image: image(200),
-  });
+  await client.query(
+    `INSERT INTO users(
+      id,
+      provider,
+      username,
+      email,
+      password,
+      name,
+      lastname,
+      birthdate,
+      gender,
+      biography,
+      profile_image,
+      role_id,
+      created_at
+    ) VALUES (
+      $1,
+      $2,
+      $3,
+      $4,
+      $5,
+      $6,
+      $7,
+      $8,
+      $9,
+      $10,
+      $11,
+      $12,
+      $13
+    )`,
+    [
+      userId,
+      'local',
+      username,
+      email,
+      password,
+      name,
+      lastname,
+      birthdate,
+      gender,
+      biography,
+      profileImage,
+      'user',
+      createdAt,
+    ],
+  );
 }
 
-async function publication({
+async function createPublication({
+  publicationId,
+  authorId,
   name,
   synopsis,
   categoryId,
   tags,
-  pagesCount,
-  publish,
+  cover,
+  createdAt,
 }) {
-  const { data: { id: publicationId } } = await req.post('/publications', {
-    name,
-    synopsis,
-    category_id: categoryId,
-    tags,
-    cover: image(250),
-  });
-
-  if (publish) {
-    pagesCount += 1;
+  let pages = [];
+  for (let k = 0; k < 15; k++) {
+    pages.push({
+      number: k,
+      images: [{
+        url: image('663x1024'),
+      }],
+    });
   }
 
-  const pages = [];
-  for (let i = 0; i < pagesCount; i++) {
-    pages.push({ images: [image('663x1024')] });
-  }
-
-  await req.put(`/publications/${publicationId}/pages`, { pages });
-
-  if (publish) {
-    await req.post(`/publications/${publicationId}/publish`, {});
-  }
-}
-
-async function collection({
-  name,
-  synopsis,
-  categoryId,
-  tags,
-  publicationIds,
-}) {
-  const { data: { id: collectionId } } = await req.post('/collections', {
-    name,
-    synopsis,
-    category_id: categoryId,
-    tags,
-    cover: image(250),
-  });
-
-  for (const publicationId of publicationIds) {
-    await req.post(`/collections/${collectionId}/publication/${publicationId}`);
-  }
+  await client.query(
+    `INSERT INTO publications(
+      id,
+      author_id,
+      name,
+      synopsis,
+      category_id,
+      tags,
+      cover,
+      statistics,
+      status_history,
+      pages,
+      created_at
+    ) VALUES (
+      $1,
+      $2,
+      $3,
+      $4,
+      $5,
+      $6,
+      $7,
+      $8,
+      $9,
+      $10,
+      $11
+    )`,
+    [
+      publicationId,
+      authorId,
+      name,
+      synopsis,
+      categoryId,
+      tags,
+      cover,
+      {
+        views: rand(0, 1000),
+        unique_views: rand(0, 850),
+        readings: rand(0, 560),
+        likes: rand(0, 175),
+        reviews: rand(0, 85),
+        stars: rand(0, 51) / 10.0,
+      },
+      JSON.stringify([{
+        status: 'draft',
+        datetime: new Date(),
+      }, {
+        status: 'published',
+        admin_id: '00000000-0000-0000-0000-000000000002',
+        comment: 'Comment...',
+        datetime: new Date(),
+      }]),
+      JSON.stringify(pages),
+      createdAt,
+    ],
+  );
 }
 
 async function main() {
-  console.log('Populating...');
+  console.log('[ POPULATE ]');
+  client.connect();
+  console.log('Populating DB...');
 
   try {
-    await contentManager();
-
-    for (let i = 0; i < 5; i++) {
-      // User
-      await user({
+    for (let i = 0; i < 10; i++) {
+      const userId = uuidv4();
+      await createUser({
+        userId,
         username: `user-${i}`,
         email: `user-${i}@omics.com`,
         name: 'Name',
         lastname: 'Lastname',
-        birthdate: '1994-05-06T15:30:00Z',
-        gender: rand(0, 100) < 50 ? 'male' : 'female',
-        biography: 'My amazing biography...',
+        birthdate: '1994-08-01 15:30:00Z',
+        gender: 'male',
+        biography: 'My biography...',
+        profileImage: image(200),
+        createdAt: new Date(),
       });
 
-      // Publications
-      const publicationsCount = rand(1, 10);
-      const { data: { categories } } = await req.get('/categories');
+      for (let j = 0; j < 20; j++) {
+        const publicationId = uuidv4();
 
-      for (let i = 0; i < publicationsCount; i++) {
-        await publication({
-          name: `Publication ${i}`,
-          synopsis: 'An amazing description...',
-          categoryId: categories[rand(0, categories.length)].id,
-          tags: ['Tag 1', 'Tag 2'],
-          pagesCount: rand(0, 20),
-          publish: rand(0, 100) < 80,
-        });
-      }
-
-      // Collections
-      const { data: { publications } } = await req.get('/authors/me/publications');
-      const collectionsCount = rand(1, 4);
-      for (let i = 0; i < collectionsCount; i++) {
-        const publicationIds = [];
-        for (const publication of publications) {
-          if (rand(0, 100) < 40) {
-            publicationIds.push(publication.id);
-          }
-        }
-
-        await collection({
-          name: `Collection ${i}`,
-          synopsis: `This is a collection.`,
-          categoryId: categories[rand(0, categories.length)].id,
-          tags: ['Tag 2', 'Tag 3'],
-          publicationIds,
+        await createPublication({
+          publicationId,
+          authorId: userId,
+          name: `Publication ${i}-${j}`,
+          synopsis: 'Synopsis...',
+          categoryId: categories[rand(0, categories.length)],
+          tags: ['Tag 1' ,'Tag 2'],
+          cover: image(250),
+          createdAt: new Date(),
         });
       }
     }
-
-    await req.login('content-manager', password);
-    const { data: { publications: waitingApprovalPublications } } = await req.get('/publications?status=waiting-approval');
-    for (const publication of waitingApprovalPublications) {
-      const r = rand(0, 100);
-      if (r < 50) {
-        await req.post(`/publications/${publication.id}/approve`, { comment: 'Todo correcto' });
-      } else if (r < 70) {
-        await req.post(`/publications/${publication.id}/reject`, { comment: 'La obra puede resultar ofensiva' });
-      }
-    }
-
-    console.log('OK');
   } catch (err) {
-    if (err.config && err.response) {
-      console.log('Config:', err.config);
-      console.log('Status:', err.response.status);
-      console.log('Response:', err.response.data);
-    } else {
-      console.log(err)
-    }
+    console.log(err);
+  } finally {
+    console.log('READY');
+    client.end();
   }
 }
 

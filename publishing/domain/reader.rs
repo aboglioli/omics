@@ -34,6 +34,15 @@ impl Reader {
         })
     }
 
+    pub fn build(base: AggregateRoot<ReaderId>, subscribed: bool) -> Self {
+        Reader {
+            base,
+            events: Events::new(),
+            subscribed,
+            preferences: Preferences::default(),
+        }
+    }
+
     pub fn base(&self) -> &AggregateRoot<ReaderId> {
         &self.base
     }

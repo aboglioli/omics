@@ -1,4 +1,3 @@
-mod frame;
 mod header;
 mod image;
 mod name;
@@ -9,7 +8,6 @@ mod statistics_service;
 mod status;
 mod synopsis;
 mod tag;
-pub use frame::*;
 pub use header::*;
 pub use image::*;
 pub use name::*;

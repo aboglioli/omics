@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "api-populate": "node src/api-populate",
     "populate": "node src/populate",
     "migrate": "node src/migrate",
     "clean-db": "node src/clean-db",
@@ -17,6 +18,7 @@
   "dependencies": {
     "axios": "^0.20.0",
     "dotenv": "^8.2.0",
-    "pg": "^8.3.3"
+    "pg": "^8.3.3",
+    "uuid": "^8.3.0"
   }
 }

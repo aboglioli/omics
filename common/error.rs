@@ -185,6 +185,13 @@ impl cmp::PartialEq for Error {
     }
 }
 
+// Common errors
+impl From<serde_json::Error> for Error {
+    fn from(err: serde_json::Error) -> Self {
+        Error::new("json", "error").wrap_raw(err)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::error;

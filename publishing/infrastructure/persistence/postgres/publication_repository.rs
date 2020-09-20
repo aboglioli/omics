@@ -1,28 +1,177 @@
-use std::collections::HashMap;
+use std::str::FromStr;
 use std::sync::Arc;
 
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
+
+use serde::{Deserialize, Serialize};
+
 use tokio_postgres::row::Row;
 use tokio_postgres::Client;
 use uuid::Uuid;
 
 use common::error::Error;
-use common::model::AggregateRoot;
+use common::model::{AggregateRoot, StatusHistory, StatusItem};
 use common::result::Result;
+use shared::domain::user::UserId;
 
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
-use crate::domain::publication::{Publication, PublicationId, PublicationRepository, Header, Image, Name, PublicationId, Synopsis, Tag};
+use crate::domain::interaction::Comment;
+use crate::domain::publication::{
+    Header, Image, Name, Page, Publication, PublicationId, PublicationRepository, Statistics,
+    Status, Synopsis, Tag,
+};
 
-impl Publication {
-    fn from_rows(rows: Vec<Row>) -> Result<Self> {
-        if rows.is_empty() {
-            return Err(Error::not_found("publication"));
+#[derive(Debug, Serialize, Deserialize, Default)]
+struct StatisticsJson {
+    views: u32,
+    unique_views: u32,
+    readings: u32,
+    likes: u32,
+    reviews: u32,
+    stars: f32,
+}
+
+fn to_statistics(s: StatisticsJson) -> Result<Statistics> {
+    Statistics::new(
+        s.views,
+        s.unique_views,
+        s.readings,
+        s.likes,
+        s.reviews,
+        s.stars,
+    )
+}
+
+fn from_statistics(statistics: &Statistics) -> Result<StatisticsJson> {
+    Ok(StatisticsJson {
+        views: statistics.views(),
+        unique_views: statistics.unique_views(),
+        readings: statistics.readings(),
+        likes: statistics.likes(),
+        reviews: statistics.reviews(),
+        stars: statistics.stars(),
+    })
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct StatusItemJson {
+    status: String,
+    admin_id: Option<String>,
+    comment: Option<String>,
+    datetime: String,
+}
+
+fn to_status_history(vec: Vec<StatusItemJson>) -> Result<StatusHistory<Status>> {
+    let mut items = Vec::new();
+    for item in vec.into_iter() {
+        match item.status.as_ref() {
+            "draft" => {
+                items.push(StatusItem::build(
+                    Status::Draft,
+                    DateTime::from_str(&item.datetime).unwrap(),
+                ));
+            }
+            "waiting-approval" => {
+                items.push(StatusItem::build(
+                    Status::WaitingApproval,
+                    DateTime::from_str(&item.datetime).unwrap(),
+                ));
+            }
+            "published" => {
+                items.push(StatusItem::build(
+                    Status::Published {
+                        admin_id: UserId::new(item.admin_id.unwrap())?,
+                        comment: Comment::new(item.comment.unwrap())?,
+                    },
+                    DateTime::from_str(&item.datetime).unwrap(),
+                ));
+            }
+            "rejected" => {
+                items.push(StatusItem::build(
+                    Status::Rejected {
+                        admin_id: UserId::new(item.admin_id.unwrap())?,
+                        comment: Comment::new(item.comment.unwrap())?,
+                    },
+                    DateTime::from_str(&item.datetime).unwrap(),
+                ));
+            }
+            _ => return Err(Error::new("publication_status", "invalid")),
+        }
+    }
+
+    Ok(StatusHistory::build(items))
+}
+
+fn from_status_history(status_history: &StatusHistory<Status>) -> Result<Vec<StatusItemJson>> {
+    let mut items = Vec::new();
+    for item in status_history.history().iter() {
+        let mut item_json = StatusItemJson {
+            status: item.status().to_string(),
+            admin_id: None,
+            comment: None,
+            datetime: item.date().to_rfc3339(),
+        };
+
+        match item.status() {
+            Status::Published { admin_id, comment } | Status::Rejected { admin_id, comment } => {
+                item_json.admin_id = Some(admin_id.to_string());
+                item_json.comment = Some(comment.to_string());
+            }
+            _ => {}
         }
 
-        let row = &rows[0];
+        items.push(item_json);
+    }
 
+    Ok(items)
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct ImageJson {
+    url: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct PageJson {
+    number: u32,
+    images: Vec<ImageJson>,
+}
+
+fn to_pages(vec: Vec<PageJson>) -> Result<Vec<Page>> {
+    let mut pages = Vec::new();
+    for page_json in vec.into_iter() {
+        let mut images = Vec::new();
+        for image in page_json.images.into_iter() {
+            images.push(Image::new(image.url)?);
+        }
+
+        let page = Page::with_images(page_json.number, images)?;
+        pages.push(page);
+    }
+
+    Ok(pages)
+}
+
+fn from_pages(pages: &[Page]) -> Result<Vec<PageJson>> {
+    let mut items = Vec::new();
+    for page in pages.iter() {
+        items.push(PageJson {
+            number: page.number(),
+            images: page
+                .images()
+                .iter()
+                .map(|i| ImageJson { url: i.to_string() })
+                .collect(),
+        });
+    }
+
+    Ok(items)
+}
+
+impl Publication {
+    fn from_row(row: Row) -> Result<Self> {
         let id: Uuid = row.get("id");
         let author_id: Uuid = row.get("author_id");
 
@@ -34,12 +183,17 @@ impl Publication {
 
         let contract: bool = row.get("contract");
 
-        let views: u32 = row.get("views");
-        let unique_views: u32 = row.get("unique_views");
-        let readings: u32 = row.get("readings");
-        let likes: u32 = row.get("likes");
-        let reviews: u32 = row.get("reviews");
-        let stars: f32 = row.get("stars");
+        let statistics: StatisticsJson = serde_json::from_value(row.get("statistics"))?;
+        let statistics = to_statistics(statistics)?;
+
+        // let status_history: StatusHistoryJson = serde_json::from_value(row.get("status_history"))?;
+        let status_history: Vec<StatusItemJson> =
+            serde_json::from_value(row.get("status_history"))?;
+        let status_history = to_status_history(status_history)?;
+        // let status_history = status_history.to_status_history()?;
+
+        let pages: Vec<PageJson> = serde_json::from_value(row.get("pages"))?;
+        let pages = to_pages(pages)?;
 
         let created_at: DateTime<Utc> = row.get("created_at");
         let updated_at: Option<DateTime<Utc>> = row.get("updated_at");
@@ -50,14 +204,9 @@ impl Publication {
             tags.push(Tag::new(tag)?);
         }
 
-        let mut items = Vec::new();
-        for row in rows.into_iter() {
-            items.push(Item::from_row(row)?);
-        }
-
         Ok(Publication::build(
             AggregateRoot::build(
-                CollectionId::new(id.to_string())?,
+                PublicationId::new(id.to_string())?,
                 created_at,
                 updated_at,
                 deleted_at,
@@ -70,7 +219,10 @@ impl Publication {
                 tags,
                 Image::new(cover)?,
             )?,
-            items,
+            pages,
+            contract,
+            statistics,
+            status_history,
         ))
     }
 }
@@ -86,80 +238,65 @@ impl PostgresPublicationRepository {
 }
 
 #[async_trait]
-impl CollectionRepository for PostgresPublicationRepository {
-    async fn find_all(&self) -> Result<Vec<Collection>> {
+impl PublicationRepository for PostgresPublicationRepository {
+    async fn find_all(&self) -> Result<Vec<Publication>> {
         let rows = self
             .client
-            .query(
-                "SELECT * FROM collections
-                LEFT JOIN pages ON pages.publication_id = id
-                LEFT JOIN page_items ON page_items.publication_id",
-                &[],
-            )
+            .query("SELECT * FROM publications", &[])
             .await
-            .map_err(|err| Error::not_found("collection").wrap_raw(err))?;
+            .map_err(|err| Error::not_found("publications").wrap_raw(err))?;
 
-        let mut collection_rows: HashMap<Uuid, Vec<Row>> = HashMap::new();
+        let mut publications = Vec::new();
         for row in rows.into_iter() {
-            let id: Uuid = row.get("id");
-            match collection_rows.get_mut(&id) {
-                Some(rows) => {
-                    rows.push(row);
-                }
-                None => {
-                    let rows = vec![row];
-                    collection_rows.insert(id, rows);
-                }
-            }
+            publications.push(Publication::from_row(row)?);
         }
 
-        let mut collections = Vec::new();
-        for (_, rows) in collection_rows.into_iter() {
-            collections.push(Collection::from_rows(rows)?);
-        }
-
-        Ok(collections)
+        Ok(publications)
     }
 
-    async fn find_by_id(&self, id: &CollectionId) -> Result<Collection> {
+    async fn find_by_id(&self, id: &PublicationId) -> Result<Publication> {
         let row = self
             .client
             .query_one(
-                "SELECT * FROM collections
-                LEFT JOIN collection_items AS ci ON ci.collection_id = id
+                "SELECT * FROM publications
                 WHERE id = $1",
-                &[&id.value()],
+                &[&id.to_uuid()?],
             )
             .await
-            .map_err(|err| Error::not_found("collection").wrap_raw(err))?;
+            .map_err(|err| Error::not_found("publications").wrap_raw(err))?;
 
-        Collection::from_rows(vec![row])
+        Publication::from_row(row)
     }
 
     async fn search(
         &self,
         _author_id: Option<&AuthorId>,
         _category_id: Option<&CategoryId>,
-        _publication_id: Option<&PublicationId>,
+        _status: Option<&String>,
         _name: Option<&String>,
-    ) -> Result<Vec<Collection>> {
+    ) -> Result<Vec<Publication>> {
         self.find_all().await
     }
 
-    async fn save(&self, collection: &mut Collection) -> Result<()> {
+    async fn save(&self, publication: &mut Publication) -> Result<()> {
         let create = self
             .client
             .query_one(
-                "SELECT * FROM collections WHERE id = $1",
-                &[&collection.base().id().to_uuid()?],
+                "SELECT * FROM publications WHERE id = $1",
+                &[&publication.base().id().to_uuid()?],
             )
             .await
             .is_err();
 
+        let statistics = serde_json::to_value(from_statistics(publication.statistics())?)?;
+        let status_history =
+            serde_json::to_value(from_status_history(publication.status_history())?)?;
+        let pages = serde_json::to_value(from_pages(publication.pages())?)?;
+
         if create {
             self.client
                 .execute(
-                    "INSERT INTO collections(
+                    "INSERT INTO publications(
                         id,
                         author_id,
                         name,
@@ -167,52 +304,36 @@ impl CollectionRepository for PostgresPublicationRepository {
                         category_id,
                         tags,
                         cover,
+                        statistics,
+                        status_history,
+                        pages,
                         created_at,
                         updated_at,
                         deleted_at
                     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
                     &[
-                        &collection.base().id().to_uuid()?,
-                        &collection.author_id().to_uuid()?,
-                        &collection.header().name().value(),
-                        &collection.header().synopsis().value(),
-                        &collection.header().category_id().value(),
-                        &collection
+                        &publication.base().id().to_uuid()?,
+                        &publication.author_id().to_uuid()?,
+                        &publication.header().name().value(),
+                        &publication.header().synopsis().value(),
+                        &publication.header().category_id().value(),
+                        &publication
                             .header()
                             .tags()
                             .iter()
                             .map(|tag| tag.name())
                             .collect::<Vec<&str>>(),
-                        &collection.header().cover().url(),
-                        &collection.base().created_at(),
-                        &collection.base().updated_at(),
-                        &collection.base().deleted_at(),
+                        &statistics,
+                        &status_history,
+                        &pages,
+                        &publication.header().cover().url(),
+                        &publication.base().created_at(),
+                        &publication.base().updated_at(),
+                        &publication.base().deleted_at(),
                     ],
                 )
                 .await
-                .map_err(|err| Error::new("collection", "create").wrap_raw(err))?;
-
-            for item in collection.items().iter() {
-                self.client
-                    .execute(
-                        "INSERT INTO collection_items(
-                            collection_id,
-                            publication_id,
-                            datetime
-                        ) VALUES (
-                            $1,
-                            $2,
-                            $3
-                        )",
-                        &[
-                            &collection.base().id().to_uuid()?,
-                            &item.publication_id().to_uuid()?,
-                            &item.date(),
-                        ],
-                    )
-                    .await
-                    .map_err(|err| Error::new("collection_item", "create").wrap_raw(err))?;
-            }
+                .map_err(|err| Error::new("publication", "create").wrap_raw(err))?;
         } else {
         }
 

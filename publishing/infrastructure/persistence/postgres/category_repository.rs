@@ -64,7 +64,7 @@ impl CategoryRepository for PostgresCategoryRepository {
     async fn find_by_id(&self, id: &CategoryId) -> Result<Category> {
         let row = self
             .client
-            .query_one("SELECT * FROM categories WHERE id = $1", &[&id.value()])
+            .query_one("SELECT * FROM categories WHERE id = $1", &[&id.to_uuid()?])
             .await
             .map_err(|err| Error::not_found("category").wrap_raw(err))?;
 
