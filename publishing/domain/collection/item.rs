@@ -1,10 +1,11 @@
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 
 use common::result::Result;
 
 use crate::domain::publication::PublicationId;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Item {
     publication_id: PublicationId,
     date: DateTime<Utc>,

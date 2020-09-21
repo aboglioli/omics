@@ -4,7 +4,6 @@ use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use tokio_postgres::row::Row;
 use tokio_postgres::Client;
-use uuid::Uuid;
 
 use common::error::Error;
 use common::model::AggregateRoot;
@@ -14,7 +13,7 @@ use crate::domain::category::{Category, CategoryId, CategoryRepository, Name};
 
 impl Category {
     fn from_row(row: Row) -> Result<Self> {
-        let id: Uuid = row.get("id");
+        let id: String = row.get("id");
         let name: String = row.get("name");
 
         let created_at: DateTime<Utc> = row.get("created_at");
@@ -22,12 +21,7 @@ impl Category {
         let deleted_at: Option<DateTime<Utc>> = row.get("deleted_at");
 
         Ok(Category::build(
-            AggregateRoot::build(
-                CategoryId::new(id.to_string())?,
-                created_at,
-                updated_at,
-                deleted_at,
-            ),
+            AggregateRoot::build(CategoryId::new(id)?, created_at, updated_at, deleted_at),
             Name::new(name)?,
         ))
     }
@@ -64,7 +58,7 @@ impl CategoryRepository for PostgresCategoryRepository {
     async fn find_by_id(&self, id: &CategoryId) -> Result<Category> {
         let row = self
             .client
-            .query_one("SELECT * FROM categories WHERE id = $1", &[&id.to_uuid()?])
+            .query_one("SELECT * FROM categories WHERE id = $1", &[&id.value()])
             .await
             .map_err(|err| Error::not_found("category").wrap_raw(err))?;
 

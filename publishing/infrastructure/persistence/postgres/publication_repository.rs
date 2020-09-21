@@ -23,38 +23,6 @@ use crate::domain::publication::{
     Status, Synopsis, Tag,
 };
 
-#[derive(Debug, Serialize, Deserialize, Default)]
-struct StatisticsJson {
-    views: u32,
-    unique_views: u32,
-    readings: u32,
-    likes: u32,
-    reviews: u32,
-    stars: f32,
-}
-
-fn to_statistics(s: StatisticsJson) -> Result<Statistics> {
-    Statistics::new(
-        s.views,
-        s.unique_views,
-        s.readings,
-        s.likes,
-        s.reviews,
-        s.stars,
-    )
-}
-
-fn from_statistics(statistics: &Statistics) -> Result<StatisticsJson> {
-    Ok(StatisticsJson {
-        views: statistics.views(),
-        unique_views: statistics.unique_views(),
-        readings: statistics.readings(),
-        likes: statistics.likes(),
-        reviews: statistics.reviews(),
-        stars: statistics.stars(),
-    })
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 struct StatusItemJson {
     status: String,
@@ -128,48 +96,6 @@ fn from_status_history(status_history: &StatusHistory<Status>) -> Result<Vec<Sta
     Ok(items)
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-struct ImageJson {
-    url: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct PageJson {
-    number: u32,
-    images: Vec<ImageJson>,
-}
-
-fn to_pages(vec: Vec<PageJson>) -> Result<Vec<Page>> {
-    let mut pages = Vec::new();
-    for page_json in vec.into_iter() {
-        let mut images = Vec::new();
-        for image in page_json.images.into_iter() {
-            images.push(Image::new(image.url)?);
-        }
-
-        let page = Page::with_images(page_json.number, images)?;
-        pages.push(page);
-    }
-
-    Ok(pages)
-}
-
-fn from_pages(pages: &[Page]) -> Result<Vec<PageJson>> {
-    let mut items = Vec::new();
-    for page in pages.iter() {
-        items.push(PageJson {
-            number: page.number(),
-            images: page
-                .images()
-                .iter()
-                .map(|i| ImageJson { url: i.to_string() })
-                .collect(),
-        });
-    }
-
-    Ok(items)
-}
-
 impl Publication {
     fn from_row(row: Row) -> Result<Self> {
         let id: Uuid = row.get("id");
@@ -183,17 +109,13 @@ impl Publication {
 
         let contract: bool = row.get("contract");
 
-        let statistics: StatisticsJson = serde_json::from_value(row.get("statistics"))?;
-        let statistics = to_statistics(statistics)?;
+        let statistics: Statistics = serde_json::from_value(row.get("statistics"))?;
 
-        // let status_history: StatusHistoryJson = serde_json::from_value(row.get("status_history"))?;
         let status_history: Vec<StatusItemJson> =
             serde_json::from_value(row.get("status_history"))?;
         let status_history = to_status_history(status_history)?;
-        // let status_history = status_history.to_status_history()?;
 
-        let pages: Vec<PageJson> = serde_json::from_value(row.get("pages"))?;
-        let pages = to_pages(pages)?;
+        let pages: Vec<Page> = serde_json::from_value(row.get("pages"))?;
 
         let created_at: DateTime<Utc> = row.get("created_at");
         let updated_at: Option<DateTime<Utc>> = row.get("updated_at");
@@ -288,10 +210,10 @@ impl PublicationRepository for PostgresPublicationRepository {
             .await
             .is_err();
 
-        let statistics = serde_json::to_value(from_statistics(publication.statistics())?)?;
+        let statistics = serde_json::to_value(publication.statistics())?;
         let status_history =
             serde_json::to_value(from_status_history(publication.status_history())?)?;
-        let pages = serde_json::to_value(from_pages(publication.pages())?)?;
+        let pages = serde_json::to_value(publication.pages())?;
 
         if create {
             self.client

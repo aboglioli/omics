@@ -1,9 +1,11 @@
+use serde::{Deserialize, Serialize};
+
 use common::error::Error;
 use common::result::Result;
 
 use crate::domain::interaction::Stars;
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Statistics {
     views: u32,
     unique_views: u32,

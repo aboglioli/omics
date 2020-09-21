@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use std::hash::{Hash, Hasher};
 
 use uuid::Uuid;
@@ -5,7 +6,7 @@ use uuid::Uuid;
 use crate::error::Error;
 use crate::result::Result;
 
-#[derive(Debug, Clone, Eq)]
+#[derive(Debug, Clone, Eq, Serialize, Deserialize)]
 pub struct StringId {
     id: String,
 }

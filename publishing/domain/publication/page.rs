@@ -1,8 +1,10 @@
+use serde::{Deserialize, Serialize};
+
 use common::result::Result;
 
 use crate::domain::publication::Image;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Page {
     number: u32,
     images: Vec<Image>,

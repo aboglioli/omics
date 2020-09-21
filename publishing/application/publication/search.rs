@@ -95,7 +95,7 @@ impl<'a> Search<'a> {
                 publication_dto = publication_dto.author(AuthorDto::from(&user, &author));
             }
 
-            if include.has("author") {
+            if include.has("category") {
                 let category = self
                     .category_repo
                     .find_by_id(publication.header().category_id())

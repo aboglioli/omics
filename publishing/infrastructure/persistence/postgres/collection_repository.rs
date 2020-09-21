@@ -4,7 +4,6 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use tokio_postgres::row::Row;
 use tokio_postgres::Client;
 use uuid::Uuid;
@@ -66,9 +65,10 @@ impl Collection {
         let tag_strs: Vec<String> = row.get("tags");
         let cover: String = row.get("cover");
 
-        let items: Value = row.get("items");
-        let items: ItemsJson = serde_json::from_value(items).unwrap();
-        let items = items.to_items()?;
+        // let items: Value = row.get("items");
+        // let items: ItemsJson = serde_json::from_value(items).unwrap();
+        // let items = items.to_items()?;
+        let items: Vec<Item> = serde_json::from_value(row.get("items"))?;
 
         let created_at: DateTime<Utc> = row.get("created_at");
         let updated_at: Option<DateTime<Utc>> = row.get("updated_at");
