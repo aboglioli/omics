@@ -78,13 +78,12 @@ impl CategoryRepository for PostgresCategoryRepository {
         if create {
             self.client
                 .execute(
-                    "INSERT INTO categories(id, name, created_at, updated_at, deleted_at)",
+                    "INSERT INTO categories(id, name, created_at)
+                    VALUES($1, $2, $3)",
                     &[
                         &category.base().id().value(),
                         &category.name().value(),
                         &category.base().created_at(),
-                        &category.base().updated_at(),
-                        &category.base().deleted_at(),
                     ],
                 )
                 .await
@@ -94,8 +93,8 @@ impl CategoryRepository for PostgresCategoryRepository {
                 .execute(
                     "UPDATE categories
                     SET
-                        name = $2
-                        updated_at = $3
+                        name = $2,
+                        updated_at = $3,
                         deleted_at = $4
                     WHERE
                         id = $1",

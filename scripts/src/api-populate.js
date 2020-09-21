@@ -17,20 +17,6 @@ const registerAndValidate = async cmd => {
   return userId;
 };
 
-async function contentManager() {
-  await req.login('admin', password);
-
-  const contentManagerId = await registerAndValidate({
-    username: 'content-manager',
-    email: 'content-manager@omics.com',
-    password: 'P@asswd!',
-  });
-
-  await req.put(`/users/${contentManagerId}/role`, { role_id: 'content-manager' });
-
-  req.logout();
-}
-
 async function user({
   username,
   email,
@@ -112,8 +98,6 @@ async function main() {
   console.log('Populating...');
 
   try {
-    await contentManager();
-
     for (let i = 0; i < 5; i++) {
       // User
       await user({
@@ -162,7 +146,7 @@ async function main() {
       }
     }
 
-    await req.login('content-manager', password);
+    await req.login('content-manager-1', password);
     const { data: { publications: waitingApprovalPublications } } = await req.get('/publications?status=waiting-approval');
     for (const publication of waitingApprovalPublications) {
       const r = rand(0, 100);

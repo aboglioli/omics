@@ -40,7 +40,7 @@ impl<'a> WhereBuilder<'a> {
             params.push(p.param);
         }
 
-        (statements.join(" AND "), params)
+        (format!("WHERE {}", statements.join(" AND ")), params)
     }
 }
 

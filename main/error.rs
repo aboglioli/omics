@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use actix_web::{dev::HttpResponseBuilder, error, http::header, http::StatusCode, HttpResponse};
 use serde::Serialize;
 
+use common::config::Config;
 use common::error::{Error, ErrorKind};
 
 #[derive(Debug, Clone, Serialize)]
@@ -26,21 +27,27 @@ impl std::error::Error for PublicError {}
 
 impl From<Error> for PublicError {
     fn from(err: Error) -> Self {
-        if let ErrorKind::Internal = err.kind() {
-            return PublicError {
-                kind: ErrorKind::Application.to_string(),
-                code: "internal_server".to_owned(),
-                path: "error".to_owned(),
-                status: Some(500),
-                message: None,
-                context: HashMap::new(),
-                cause: None,
-            };
+        let config = Config::get();
+
+        if config.env() != "development" {
+            if let ErrorKind::Internal = err.kind() {
+                return PublicError {
+                    kind: ErrorKind::Application.to_string(),
+                    code: "internal_server".to_owned(),
+                    path: "error".to_owned(),
+                    status: Some(500),
+                    message: None,
+                    context: HashMap::new(),
+                    cause: None,
+                };
+            }
         }
 
         let cause = match err.cause() {
             Some(err) => {
-                if let ErrorKind::Application = err.kind() {
+                if config.env() == "development" {
+                    Some(Box::new(Self::from(err.clone())))
+                } else if let ErrorKind::Application = err.kind() {
                     Some(Box::new(Self::from(err.clone())))
                 } else {
                     None

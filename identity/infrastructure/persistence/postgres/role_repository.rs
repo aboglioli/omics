@@ -4,7 +4,6 @@ use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use tokio_postgres::row::Row;
 use tokio_postgres::Client;
-use uuid::Uuid;
 
 use common::error::Error;
 use common::model::AggregateRoot;

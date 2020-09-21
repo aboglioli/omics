@@ -55,10 +55,7 @@ impl InteractionRepository for PostgresInteractionRepository {
 
         let rows = self
             .client
-            .query(
-                &format!("SELECT * FROM views WHERE {}", sql) as &str,
-                &params,
-            )
+            .query(&format!("SELECT * FROM views {}", sql) as &str, &params)
             .await
             .map_err(|err| Error::not_found("view").wrap_raw(err))?;
 
@@ -109,10 +106,7 @@ impl InteractionRepository for PostgresInteractionRepository {
 
         let rows = self
             .client
-            .query(
-                &format!("SELECT * FROM readings WHERE {}", sql) as &str,
-                &params,
-            )
+            .query(&format!("SELECT * FROM readings {}", sql) as &str, &params)
             .await
             .map_err(|err| Error::not_found("reading").wrap_raw(err))?;
 
@@ -159,10 +153,7 @@ impl InteractionRepository for PostgresInteractionRepository {
 
         let rows = self
             .client
-            .query(
-                &format!("SELECT * FROM likes WHERE {}", sql) as &str,
-                &params,
-            )
+            .query(&format!("SELECT * FROM likes {}", sql) as &str, &params)
             .await
             .map_err(|err| Error::not_found("like").wrap_raw(err))?;
 
@@ -209,10 +200,7 @@ impl InteractionRepository for PostgresInteractionRepository {
 
         let rows = self
             .client
-            .query(
-                &format!("SELECT * FROM reviews WHERE {}", sql) as &str,
-                &params,
-            )
+            .query(&format!("SELECT * FROM reviews {}", sql) as &str, &params)
             .await
             .map_err(|err| Error::not_found("review").wrap_raw(err))?;
 
@@ -267,7 +255,7 @@ impl InteractionRepository for PostgresInteractionRepository {
         let rows = self
             .client
             .query(
-                &format!("SELECT * FROM publication_favorites WHERE {}", sql) as &str,
+                &format!("SELECT * FROM publication_favorites {}", sql) as &str,
                 &params,
             )
             .await
@@ -317,7 +305,7 @@ impl InteractionRepository for PostgresInteractionRepository {
         let rows = self
             .client
             .query(
-                &format!("SELECT * FROM collection_favorites WHERE {}", sql) as &str,
+                &format!("SELECT * FROM collection_favorites {}", sql) as &str,
                 &params,
             )
             .await
@@ -362,10 +350,7 @@ impl InteractionRepository for PostgresInteractionRepository {
 
         let rows = self
             .client
-            .query(
-                &format!("SELECT * FROM follows WHERE {}", sql) as &str,
-                &params,
-            )
+            .query(&format!("SELECT * FROM follows {}", sql) as &str, &params)
             .await
             .map_err(|err| Error::not_found("follow").wrap_raw(err))?;
 
@@ -425,6 +410,19 @@ impl InteractionRepository for PostgresInteractionRepository {
     }
 
     async fn save_like(&self, like: &mut Like) -> Result<()> {
+        if !self
+            .find_likes(
+                Some(like.base().id().reader_id()),
+                Some(like.base().id().publication_id()),
+                None,
+                None,
+            )
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("like", "already_exists"));
+        }
+
         self.client
             .execute(
                 "INSERT INTO likes(reader_id, publication_id, datetime)
@@ -442,6 +440,19 @@ impl InteractionRepository for PostgresInteractionRepository {
     }
 
     async fn save_review(&self, review: &mut Review) -> Result<()> {
+        if !self
+            .find_reviews(
+                Some(review.base().id().reader_id()),
+                Some(review.base().id().publication_id()),
+                None,
+                None,
+            )
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("review", "already_exists"));
+        }
+
         self.client
             .execute(
                 "INSERT INTO reviews(reader_id, publication_id, datetime, stars, comment)
@@ -461,6 +472,19 @@ impl InteractionRepository for PostgresInteractionRepository {
     }
 
     async fn save_publication_favorite(&self, favorite: &mut PublicationFavorite) -> Result<()> {
+        if !self
+            .find_publication_favorites(
+                Some(favorite.base().id().reader_id()),
+                Some(favorite.base().id().publication_id()),
+                None,
+                None,
+            )
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("favorite", "already_exists"));
+        }
+
         self.client
             .execute(
                 "INSERT INTO publication_favorites(reader_id, publication_id, datetime)
@@ -478,6 +502,19 @@ impl InteractionRepository for PostgresInteractionRepository {
     }
 
     async fn save_collection_favorite(&self, favorite: &mut CollectionFavorite) -> Result<()> {
+        if !self
+            .find_collection_favorites(
+                Some(favorite.base().id().reader_id()),
+                Some(favorite.base().id().collection_id()),
+                None,
+                None,
+            )
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("favorite", "already_exists"));
+        }
+
         self.client
             .execute(
                 "INSERT INTO collection_favorites(reader_id, collection_id, datetime)
@@ -495,6 +532,19 @@ impl InteractionRepository for PostgresInteractionRepository {
     }
 
     async fn save_follow(&self, follow: &mut Follow) -> Result<()> {
+        if !self
+            .find_follows(
+                Some(follow.base().id().reader_id()),
+                Some(follow.base().id().author_id()),
+                None,
+                None,
+            )
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("follow", "already_exists"));
+        }
+
         self.client
             .execute(
                 "INSERT INTO follows(reader_id, author_id, datetime)
@@ -506,7 +556,7 @@ impl InteractionRepository for PostgresInteractionRepository {
                 ],
             )
             .await
-            .map_err(|err| Error::new("collection_favorite", "create").wrap_raw(err))?;
+            .map_err(|err| Error::new("follow", "create").wrap_raw(err))?;
 
         Ok(())
     }

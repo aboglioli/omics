@@ -3,9 +3,7 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-
 use serde::{Deserialize, Serialize};
-
 use tokio_postgres::row::Row;
 use tokio_postgres::Client;
 use uuid::Uuid;
@@ -13,6 +11,7 @@ use uuid::Uuid;
 use common::error::Error;
 use common::model::{AggregateRoot, StatusHistory, StatusItem};
 use common::result::Result;
+use common::sql::where_builder::WhereBuilder;
 use identity::domain::user::UserId;
 
 use crate::domain::author::AuthorId;
@@ -192,12 +191,41 @@ impl PublicationRepository for PostgresPublicationRepository {
 
     async fn search(
         &self,
-        _author_id: Option<&AuthorId>,
-        _category_id: Option<&CategoryId>,
-        _status: Option<&String>,
-        _name: Option<&String>,
+        author_id: Option<&AuthorId>,
+        category_id: Option<&CategoryId>,
+        status: Option<&String>,
+        name: Option<&String>,
     ) -> Result<Vec<Publication>> {
-        self.find_all().await
+        let author_id = author_id.map(|id| id.to_uuid()).transpose()?;
+        let category_id = category_id.map(|id| id.to_uuid()).transpose()?;
+        let name = name.map(|name| format!("%{}%", name));
+
+        let (sql, params) = WhereBuilder::new()
+            .add_param_opt("author_id = $$", &author_id, author_id.is_some())
+            .add_param_opt("category_id = $$", &category_id, category_id.is_some())
+            .add_param_opt(
+                "status_history->-1->>'status' = $$",
+                &status,
+                status.is_some(),
+            )
+            .add_param_opt("name like $$", &name, name.is_some())
+            .build();
+
+        let rows = self
+            .client
+            .query(
+                &format!("SELECT * FROM publications {}", sql) as &str,
+                &params,
+            )
+            .await
+            .map_err(|err| Error::not_found("publication").wrap_raw(err))?;
+
+        let mut publications = Vec::new();
+        for row in rows.into_iter() {
+            publications.push(Publication::from_row(row)?);
+        }
+
+        Ok(publications)
     }
 
     async fn save(&self, publication: &mut Publication) -> Result<()> {
@@ -229,10 +257,8 @@ impl PublicationRepository for PostgresPublicationRepository {
                         statistics,
                         status_history,
                         pages,
-                        created_at,
-                        updated_at,
-                        deleted_at
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+                        created_at
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
                     &[
                         &publication.base().id().to_uuid()?,
                         &publication.author_id().to_uuid()?,
@@ -245,18 +271,53 @@ impl PublicationRepository for PostgresPublicationRepository {
                             .iter()
                             .map(|tag| tag.name())
                             .collect::<Vec<&str>>(),
+                        &publication.header().cover().url(),
                         &statistics,
                         &status_history,
                         &pages,
-                        &publication.header().cover().url(),
                         &publication.base().created_at(),
-                        &publication.base().updated_at(),
-                        &publication.base().deleted_at(),
                     ],
                 )
                 .await
                 .map_err(|err| Error::new("publication", "create").wrap_raw(err))?;
         } else {
+            self.client
+                .execute(
+                    "UPDATE publications
+                    SET
+                        name = $2,
+                        synopsis = $3,
+                        category_id = $4,
+                        tags = $5,
+                        cover = $6,
+                        statistics = $7,
+                        status_history = $8,
+                        pages = $9,
+                        updated_at = $10,
+                        deleted_at = $11
+                    WHERE
+                        id = $1",
+                    &[
+                        &publication.base().id().to_uuid()?,
+                        &publication.header().name().value(),
+                        &publication.header().synopsis().value(),
+                        &publication.header().category_id().value(),
+                        &publication
+                            .header()
+                            .tags()
+                            .iter()
+                            .map(|tag| tag.name())
+                            .collect::<Vec<&str>>(),
+                        &publication.header().cover().url(),
+                        &statistics,
+                        &status_history,
+                        &pages,
+                        &publication.base().updated_at(),
+                        &publication.base().deleted_at(),
+                    ],
+                )
+                .await
+                .map_err(|err| Error::new("publication", "update").wrap_raw(err))?;
         }
 
         Ok(())

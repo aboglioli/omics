@@ -56,54 +56,25 @@ impl ReaderRepository for PostgresReaderRepository {
     }
 
     async fn save(&self, reader: &mut Reader) -> Result<()> {
-        let create = self
-            .client
+        self.client
             .query_one(
                 "SELECT * FROM users WHERE id = $1",
                 &[&reader.base().id().to_uuid()?],
             )
             .await
-            .is_err();
+            .map_err(|err| Error::not_found("reader").wrap_raw(err))?;
 
-        if create {
-            self.client
-                .execute(
-                    "INSERT INTO users(
-                        id,
-                        subscribed,
-                        created_at,
-                        updated_at,
-                        deleted_at
-                    ) VALUES (
-                        $1,
-                        $2,
-                        $3,
-                        $4,
-                        $5
-                    )",
-                    &[
-                        &reader.base().id().to_uuid()?,
-                        &reader.is_subscribed(),
-                        &reader.base().created_at(),
-                        &reader.base().updated_at(),
-                        &reader.base().deleted_at(),
-                    ],
-                )
-                .await
-                .map_err(|err| Error::new("reader", "create").wrap_raw(err))?;
-        } else {
-            self.client
-                .execute(
-                    "UPDATE users
-                    SET
-                        subscribed = $2,
-                    WHERE
-                        id = $1",
-                    &[&reader.base().id().to_uuid()?, &reader.is_subscribed()],
-                )
-                .await
-                .map_err(|err| Error::new("reader", "update").wrap_raw(err))?;
-        }
+        self.client
+            .execute(
+                "UPDATE users
+                SET
+                    subscribed = $2,
+                WHERE
+                    id = $1",
+                &[&reader.base().id().to_uuid()?, &reader.is_subscribed()],
+            )
+            .await
+            .map_err(|err| Error::new("reader", "update").wrap_raw(err))?;
 
         Ok(())
     }

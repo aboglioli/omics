@@ -85,54 +85,25 @@ impl AuthorRepository for PostgresAuthorRepository {
     }
 
     async fn save(&self, author: &mut Author) -> Result<()> {
-        let create = self
-            .client
+        self.client
             .query_one(
                 "SELECT * FROM users WHERE id = $1",
                 &[&author.base().id().to_uuid()?],
             )
             .await
-            .is_err();
+            .map_err(|_err| Error::not_found("author"))?;
 
-        if create {
-            self.client
-                .execute(
-                    "INSERT INTO users(
-                        id,
-                        followers,
-                        created_at,
-                        updated_at,
-                        deleted_at
-                    ) VALUES (
-                        $1,
-                        $2,
-                        $3,
-                        $4,
-                        $5
-                    )",
-                    &[
-                        &author.base().id().to_uuid()?,
-                        &author.followers(),
-                        &author.base().created_at(),
-                        &author.base().updated_at(),
-                        &author.base().deleted_at(),
-                    ],
-                )
-                .await
-                .map_err(|err| Error::new("author", "create").wrap_raw(err))?;
-        } else {
-            self.client
-                .execute(
-                    "UPDATE users
-                    SET
-                        followers = $2,
-                    WHERE
-                        id = $1",
-                    &[&author.base().id().to_uuid()?, &author.followers()],
-                )
-                .await
-                .map_err(|err| Error::new("author", "update").wrap_raw(err))?;
-        }
+        self.client
+            .execute(
+                "UPDATE users
+                SET
+                    followers = $2
+                WHERE
+                    id = $1",
+                &[&author.base().id().to_uuid()?, &author.followers()],
+            )
+            .await
+            .map_err(|err| Error::new("author", "update").wrap_raw(err))?;
 
         Ok(())
     }

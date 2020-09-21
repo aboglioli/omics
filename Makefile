@@ -26,6 +26,9 @@ api-test:
 populate:
 	$(MAKE) -C $(SCRIPTS_DIR) populate
 
+api-populate:
+	$(MAKE) -C $(SCRIPTS_DIR) api-populate
+
 migrate:
 	$(MAKE) -C $(SCRIPTS_DIR) migrate
 

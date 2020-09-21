@@ -1,9 +1,8 @@
-use std::str::FromStr;
 use std::sync::Arc;
 
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+
 use tokio_postgres::row::Row;
 use tokio_postgres::Client;
 use uuid::Uuid;
@@ -17,43 +16,6 @@ use crate::domain::category::CategoryId;
 use crate::domain::collection::{Collection, CollectionId, CollectionRepository, Item};
 use crate::domain::publication::{Header, Image, Name, PublicationId, Synopsis, Tag};
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ItemJson {
-    publication_id: String,
-    datetime: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ItemsJson {
-    items: Vec<ItemJson>,
-}
-
-impl ItemsJson {
-    fn to_items(self) -> Result<Vec<Item>> {
-        let mut items = Vec::new();
-        for item in self.items.into_iter() {
-            items.push(Item::build(
-                PublicationId::new(item.publication_id)?,
-                DateTime::from_str(&item.datetime).unwrap(),
-            ));
-        }
-
-        Ok(items)
-    }
-
-    fn from_items(items: &[Item]) -> Result<ItemsJson> {
-        let mut items_json = Vec::new();
-        for item in items.iter() {
-            items_json.push(ItemJson {
-                publication_id: item.publication_id().to_string(),
-                datetime: item.date().to_rfc3339(),
-            })
-        }
-
-        Ok(ItemsJson { items: items_json })
-    }
-}
-
 impl Collection {
     fn from_row(row: Row) -> Result<Self> {
         let id: Uuid = row.get("id");
@@ -65,9 +27,6 @@ impl Collection {
         let tag_strs: Vec<String> = row.get("tags");
         let cover: String = row.get("cover");
 
-        // let items: Value = row.get("items");
-        // let items: ItemsJson = serde_json::from_value(items).unwrap();
-        // let items = items.to_items()?;
         let items: Vec<Item> = serde_json::from_value(row.get("items"))?;
 
         let created_at: DateTime<Utc> = row.get("created_at");
@@ -160,8 +119,10 @@ impl CollectionRepository for PostgresCollectionRepository {
             .await
             .is_err();
 
-        let items = ItemsJson::from_items(collection.items())?;
-        let items = serde_json::to_value(items).unwrap();
+        // let items = ItemsJson::from_items(collection.items())?;
+        // let items = serde_json::to_value(items).unwrap();
+
+        let items = serde_json::to_value(collection.items())?;
 
         if create {
             self.client
@@ -175,10 +136,8 @@ impl CollectionRepository for PostgresCollectionRepository {
                         tags,
                         cover,
                         items,
-                        created_at,
-                        updated_at,
-                        deleted_at
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+                        created_at
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
                     &[
                         &collection.base().id().to_uuid()?,
                         &collection.author_id().to_uuid()?,
@@ -194,13 +153,44 @@ impl CollectionRepository for PostgresCollectionRepository {
                         &collection.header().cover().url(),
                         &items,
                         &collection.base().created_at(),
-                        &collection.base().updated_at(),
-                        &collection.base().deleted_at(),
                     ],
                 )
                 .await
                 .map_err(|err| Error::new("collection", "create").wrap_raw(err))?;
         } else {
+            self.client
+                .execute(
+                    "UPDATE collections
+                    SET
+                        name = $2,
+                        synopsis = $3,
+                        category_id = $4,
+                        tags = $5,
+                        cover = $6,
+                        items = $7,
+                        updated_at = $8,
+                        deleted_at = $9
+                    WHERE
+                        id = $1",
+                    &[
+                        &collection.base().id().to_uuid()?,
+                        &collection.header().name().value(),
+                        &collection.header().synopsis().value(),
+                        &collection.header().category_id().value(),
+                        &collection
+                            .header()
+                            .tags()
+                            .iter()
+                            .map(|tag| tag.name())
+                            .collect::<Vec<&str>>(),
+                        &collection.header().cover().url(),
+                        &items,
+                        &collection.base().updated_at(),
+                        &collection.base().deleted_at(),
+                    ],
+                )
+                .await
+                .map_err(|err| Error::new("collection", "update").wrap_raw(err))?;
         }
 
         Ok(())
