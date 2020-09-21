@@ -1,7 +1,6 @@
 use serde::Serialize;
 
 use common::result::Result;
-use shared::domain::user::UserRepository;
 
 use crate::application::dtos::{AuthorDto, ReaderAuthorInteractionDto};
 use crate::domain::author::{AuthorId, AuthorRepository};
@@ -17,19 +16,16 @@ pub struct GetByIdResponse {
 pub struct GetById<'a> {
     author_repo: &'a dyn AuthorRepository,
     interaction_repo: &'a dyn InteractionRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> GetById<'a> {
     pub fn new(
         author_repo: &'a dyn AuthorRepository,
         interaction_repo: &'a dyn InteractionRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         GetById {
             author_repo,
             interaction_repo,
-            user_repo,
         }
     }
 
@@ -40,7 +36,6 @@ impl<'a> GetById<'a> {
     ) -> Result<GetByIdResponse> {
         let author_id = AuthorId::new(author_id)?;
         let author = self.author_repo.find_by_id(&author_id).await?;
-        let user = self.user_repo.find_by_id(&author_id).await?;
 
         let reader_interaction_dto = if let Some(auth_id) = auth_id {
             if auth_id != author_id.value() {
@@ -59,7 +54,7 @@ impl<'a> GetById<'a> {
         };
 
         Ok(GetByIdResponse {
-            author: AuthorDto::from(&user, &author),
+            author: AuthorDto::from(&author),
             reader: reader_interaction_dto,
         })
     }

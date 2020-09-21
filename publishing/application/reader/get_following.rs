@@ -17,19 +17,16 @@ pub struct GetFollowingResponse {
 pub struct GetFollowing<'a> {
     author_repo: &'a dyn AuthorRepository,
     interaction_repo: &'a dyn InteractionRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> GetFollowing<'a> {
     pub fn new(
         author_repo: &'a dyn AuthorRepository,
         interaction_repo: &'a dyn InteractionRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         GetFollowing {
             author_repo,
             interaction_repo,
-            user_repo,
         }
     }
 
@@ -50,11 +47,7 @@ impl<'a> GetFollowing<'a> {
                 .author_repo
                 .find_by_id(follow.base().id().author_id())
                 .await?;
-            let user = self
-                .user_repo
-                .find_by_id(follow.base().id().author_id())
-                .await?;
-            author_dtos.push(AuthorDto::from(&user, &author));
+            author_dtos.push(AuthorDto::from(&author));
         }
 
         Ok(GetFollowingResponse {

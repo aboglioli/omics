@@ -15,6 +15,14 @@ use crate::domain::author::{Author, AuthorId, AuthorRepository};
 impl Author {
     fn from_row(row: Row) -> Result<Self> {
         let id: Uuid = row.get("id");
+
+        let username: String = row.get("username");
+
+        let name: Option<String> = row.get("name");
+        let lastname: Option<String> = row.get("lastname");
+        let biography: Option<String> = row.get("biography");
+        let profile_image: Option<String> = row.get("profile_image");
+
         let followers: i32 = row.get("followers");
 
         let created_at: DateTime<Utc> = row.get("created_at");
@@ -28,6 +36,11 @@ impl Author {
                 updated_at,
                 deleted_at,
             ),
+            username,
+            name,
+            lastname,
+            biography,
+            profile_image,
             followers as u32,
         ))
     }
@@ -113,16 +126,9 @@ impl AuthorRepository for PostgresAuthorRepository {
                     "UPDATE users
                     SET
                         followers = $2,
-                        updated_at = $3,
-                        deleted_at = $4
                     WHERE
                         id = $1",
-                    &[
-                        &author.base().id().to_uuid()?,
-                        &author.followers(),
-                        &author.base().updated_at(),
-                        &author.base().deleted_at(),
-                    ],
+                    &[&author.base().id().to_uuid()?, &author.followers()],
                 )
                 .await
                 .map_err(|err| Error::new("author", "update").wrap_raw(err))?;

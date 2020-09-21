@@ -123,9 +123,8 @@ impl<'a> GetById<'a> {
         };
 
         if include.has("author") {
-            let user = self.user_repo.find_by_id(publication.author_id()).await?;
             let author = self.author_repo.find_by_id(publication.author_id()).await?;
-            publication_dto = publication_dto.author(AuthorDto::from(&user, &author));
+            publication_dto = publication_dto.author(AuthorDto::from(&author));
         }
 
         if include.has("category") {

@@ -24,7 +24,6 @@ pub struct GetById<'a> {
     author_repo: &'a dyn AuthorRepository,
     category_repo: &'a dyn CategoryRepository,
     collection_repo: &'a dyn CollectionRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> GetById<'a> {
@@ -32,13 +31,11 @@ impl<'a> GetById<'a> {
         author_repo: &'a dyn AuthorRepository,
         category_repo: &'a dyn CategoryRepository,
         collection_repo: &'a dyn CollectionRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         GetById {
             author_repo,
             category_repo,
             collection_repo,
-            user_repo,
         }
     }
 
@@ -55,9 +52,8 @@ impl<'a> GetById<'a> {
         let mut collection_dto = CollectionDto::from(&collection);
 
         if include.has("author") {
-            let user = self.user_repo.find_by_id(collection.author_id()).await?;
             let author = self.author_repo.find_by_id(collection.author_id()).await?;
-            collection_dto = collection_dto.author(AuthorDto::from(&user, &author));
+            collection_dto = collection_dto.author(AuthorDto::from(&author));
         }
 
         if include.has("category") {

@@ -25,7 +25,6 @@ pub struct GetFavorites<'a> {
     collection_repo: &'a dyn CollectionRepository,
     interaction_repo: &'a dyn InteractionRepository,
     publication_repo: &'a dyn PublicationRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> GetFavorites<'a> {
@@ -35,7 +34,6 @@ impl<'a> GetFavorites<'a> {
         collection_repo: &'a dyn CollectionRepository,
         interaction_repo: &'a dyn InteractionRepository,
         publication_repo: &'a dyn PublicationRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         GetFavorites {
             author_repo,
@@ -43,7 +41,6 @@ impl<'a> GetFavorites<'a> {
             collection_repo,
             interaction_repo,
             publication_repo,
-            user_repo,
         }
     }
 
@@ -82,8 +79,7 @@ impl<'a> GetFavorites<'a> {
 
             if include.has("author") {
                 let author = self.author_repo.find_by_id(publication.author_id()).await?;
-                let user = self.user_repo.find_by_id(publication.author_id()).await?;
-                publication_dto = publication_dto.author(AuthorDto::from(&user, &author));
+                publication_dto = publication_dto.author(AuthorDto::from(&author));
             }
 
             if include.has("category") {
@@ -107,8 +103,7 @@ impl<'a> GetFavorites<'a> {
 
             if include.has("author") {
                 let author = self.author_repo.find_by_id(collection.author_id()).await?;
-                let user = self.user_repo.find_by_id(collection.author_id()).await?;
-                collection_dto = collection_dto.author(AuthorDto::from(&user, &author));
+                collection_dto = collection_dto.author(AuthorDto::from(&author));
             }
 
             if include.has("category") {

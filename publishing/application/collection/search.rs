@@ -27,7 +27,6 @@ pub struct Search<'a> {
     author_repo: &'a dyn AuthorRepository,
     category_repo: &'a dyn CategoryRepository,
     collection_repo: &'a dyn CollectionRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Search<'a> {
@@ -35,13 +34,11 @@ impl<'a> Search<'a> {
         author_repo: &'a dyn AuthorRepository,
         category_repo: &'a dyn CategoryRepository,
         collection_repo: &'a dyn CollectionRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         Search {
             author_repo,
             category_repo,
             collection_repo,
-            user_repo,
         }
     }
 
@@ -70,9 +67,8 @@ impl<'a> Search<'a> {
             let mut collection_dto = CollectionDto::from(collection);
 
             if include.has("author") {
-                let user = self.user_repo.find_by_id(collection.author_id()).await?;
                 let author = self.author_repo.find_by_id(collection.author_id()).await?;
-                collection_dto = collection_dto.author(AuthorDto::from(&user, &author));
+                collection_dto = collection_dto.author(AuthorDto::from(&author));
             }
 
             if include.has("category") {

@@ -30,11 +30,11 @@ async fn main() -> std::io::Result<()> {
         return Ok(());
     }
 
-    if config.env() == "development" {
-        if let Err(err) = development::populate(&container).await {
-            println!("{:?}", err);
-        }
-    }
+    // if config.env() == "development" {
+    //     if let Err(err) = development::populate(&container).await {
+    //         println!("{:?}", err);
+    //     }
+    // }
 
     println!("Listening on {} ({})", config.port(), config.env());
 

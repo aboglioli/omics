@@ -47,19 +47,17 @@ pub struct AuthorDto {
 }
 
 impl AuthorDto {
-    pub fn from(user: &User, author: &Author) -> Self {
+    pub fn from(author: &Author) -> Self {
         AuthorDto {
             id: author.base().id().to_string(),
-            username: user.username().to_string(),
-            name: user.name().map(|name| name.to_string()),
-            lastname: user.lastname().map(|lastname| lastname.to_string()),
-            biography: user.biography().map(|biography| biography.to_string()),
-            profile_image: user
-                .profile_image()
-                .map(|profile_image| profile_image.to_string()),
+            username: author.username().to_string(),
+            name: author.name().cloned(),
+            lastname: author.lastname().cloned(),
+            biography: author.biography().cloned(),
+            profile_image: author.profile_image().cloned(),
             followers: author.followers(),
-            created_at: user.base().created_at().to_rfc3339(),
-            updated_at: user.base().updated_at().map(|d| d.to_rfc3339()),
+            created_at: author.base().created_at().to_rfc3339(),
+            updated_at: author.base().updated_at().map(|d| d.to_rfc3339()),
         }
     }
 }
@@ -314,26 +312,16 @@ impl From<&Preferences> for PreferencesDto {
 #[derive(Serialize)]
 pub struct ReaderDto {
     pub id: String,
-    pub username: String,
-    pub name: Option<String>,
-    pub lastname: Option<String>,
     pub subscribed: bool,
     pub preferences: Option<PreferencesDto>,
-    pub created_at: String,
-    pub updated_at: Option<String>,
 }
 
 impl ReaderDto {
-    pub fn from(user: &User, reader: &Reader) -> Self {
+    pub fn from(reader: &Reader) -> Self {
         ReaderDto {
             id: reader.base().id().to_string(),
-            username: user.username().to_string(),
-            name: user.name().map(|name| name.to_string()),
-            lastname: user.name().map(|lastname| lastname.to_string()),
             subscribed: reader.is_subscribed(),
             preferences: None,
-            created_at: user.base().created_at().to_rfc3339(),
-            updated_at: user.base().updated_at().map(|d| d.to_rfc3339()),
         }
     }
 }

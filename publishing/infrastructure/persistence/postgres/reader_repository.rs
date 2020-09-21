@@ -97,16 +97,9 @@ impl ReaderRepository for PostgresReaderRepository {
                     "UPDATE users
                     SET
                         subscribed = $2,
-                        updated_at = $3,
-                        deleted_at = $4
                     WHERE
                         id = $1",
-                    &[
-                        &reader.base().id().to_uuid()?,
-                        &reader.is_subscribed(),
-                        &reader.base().updated_at(),
-                        &reader.base().deleted_at(),
-                    ],
+                    &[&reader.base().id().to_uuid()?, &reader.is_subscribed()],
                 )
                 .await
                 .map_err(|err| Error::new("reader", "update").wrap_raw(err))?;
