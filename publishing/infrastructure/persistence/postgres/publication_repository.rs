@@ -198,7 +198,6 @@ impl PublicationRepository for PostgresPublicationRepository {
     ) -> Result<Vec<Publication>> {
         let author_id = author_id.map(|id| id.to_uuid()).transpose()?;
         let category_id = category_id.map(|id| id.to_uuid()).transpose()?;
-        let name = name.map(|name| format!("%{}%", name));
 
         let (sql, params) = WhereBuilder::new()
             .add_param_opt("author_id = $$", &author_id, author_id.is_some())
@@ -208,7 +207,11 @@ impl PublicationRepository for PostgresPublicationRepository {
                 &status,
                 status.is_some(),
             )
-            .add_param_opt("name like $$", &name, name.is_some())
+            .add_param_opt(
+                "LOWER(name) LIKE '%' || LOWER($$) || '%'",
+                &name,
+                name.is_some(),
+            )
             .build();
 
         let rows = self

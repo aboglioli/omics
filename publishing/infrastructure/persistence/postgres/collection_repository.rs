@@ -2,7 +2,6 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-
 use tokio_postgres::row::Row;
 use tokio_postgres::Client;
 use uuid::Uuid;
@@ -10,6 +9,7 @@ use uuid::Uuid;
 use common::error::Error;
 use common::model::AggregateRoot;
 use common::result::Result;
+use common::sql::where_builder::WhereBuilder;
 
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
@@ -99,14 +99,55 @@ impl CollectionRepository for PostgresCollectionRepository {
         Collection::from_row(row)
     }
 
+    // SELECT *
+    // FROM mytable
+    // WHERE EXISTS (
+    //     SELECT TRUE
+    //     FROM jsonb_array_elements(data->'tags') x
+    //     WHERE x->>'name' IN ('tag2', 'tag3')
+    // )
     async fn search(
         &self,
-        _author_id: Option<&AuthorId>,
-        _category_id: Option<&CategoryId>,
-        _publication_id: Option<&PublicationId>,
-        _name: Option<&String>,
+        author_id: Option<&AuthorId>,
+        category_id: Option<&CategoryId>,
+        publication_id: Option<&PublicationId>,
+        name: Option<&String>,
     ) -> Result<Vec<Collection>> {
-        self.find_all().await
+        let author_id = author_id.map(|id| id.to_uuid()).transpose()?;
+        let category_id = category_id.map(|id| id.value());
+        let publication_id = publication_id.map(|id| id.value());
+
+        let (sql, params) = WhereBuilder::new()
+            .add_param_opt("author_id = $$", &author_id, author_id.is_some())
+            .add_param_opt("category_id = $$", &category_id, category_id.is_some())
+            .add_param_opt(
+                "to_json(array(select jsonb_array_elements(items)->'publication_id'->>'id'))::jsonb
+                    ?| array[$$]",
+                &publication_id,
+                publication_id.is_some(),
+            )
+            .add_param_opt(
+                "LOWER(name) LIKE '%' || LOWER($$) || '%'",
+                &name,
+                name.is_some(),
+            )
+            .build();
+
+        let rows = self
+            .client
+            .query(
+                &format!("SELECT * FROM collections {}", sql) as &str,
+                &params,
+            )
+            .await
+            .map_err(|err| Error::not_found("collection").wrap_raw(err))?;
+
+        let mut collections = Vec::new();
+        for row in rows.into_iter() {
+            collections.push(Collection::from_row(row)?);
+        }
+
+        Ok(collections)
     }
 
     async fn save(&self, collection: &mut Collection) -> Result<()> {
@@ -118,9 +159,6 @@ impl CollectionRepository for PostgresCollectionRepository {
             )
             .await
             .is_err();
-
-        // let items = ItemsJson::from_items(collection.items())?;
-        // let items = serde_json::to_value(items).unwrap();
 
         let items = serde_json::to_value(collection.items())?;
 
