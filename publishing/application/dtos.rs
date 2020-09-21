@@ -1,7 +1,6 @@
 use serde::Serialize;
 
 use common::model::StatusItem;
-use shared::domain::user::User;
 
 use crate::domain::author::Author;
 use crate::domain::category::Category;

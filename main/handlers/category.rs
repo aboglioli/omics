@@ -84,7 +84,6 @@ async fn get_collections(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
         c.publishing.collection_repo(),
-        c.publishing.user_repo(),
     )
     .exec(
         auth_id,

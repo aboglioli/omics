@@ -14,13 +14,13 @@ use crate::domain::role::{Role, RoleId, RoleRepository};
 
 impl Role {
     fn from_row(row: Row) -> Result<Self> {
-        let id: Uuid = row.get("id");
+        let id: String = row.get("id");
         let name: String = row.get("name");
 
         let created_at: DateTime<Utc> = row.get("created_at");
 
         Ok(Role::build(
-            AggregateRoot::build(RoleId::new(id.to_string())?, created_at, None, None),
+            AggregateRoot::build(RoleId::new(id)?, created_at, None, None),
             name,
         ))
     }

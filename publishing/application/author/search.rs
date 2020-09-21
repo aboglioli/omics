@@ -26,7 +26,7 @@ impl<'a> Search<'a> {
     pub async fn exec(
         &self,
         _auth_id: Option<String>,
-        cmd: SearchCommand,
+        _cmd: SearchCommand,
     ) -> Result<SearchResponse> {
         let authors = self.author_repo.find_all().await?;
 

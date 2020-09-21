@@ -1,4 +1,5 @@
-use shared::domain::user::{User, UserId};
+use identity::domain::user::User;
+use identity::mocks;
 
 use crate::domain::author::{Author, AuthorId};
 use crate::domain::category::{Category, CategoryId, Name as CategoryName};
@@ -96,29 +97,28 @@ pub fn empty_collection1() -> Collection {
 
 pub fn content_manager1() -> (User, Author, Reader) {
     (
-        User::new(
-            UserId::new("content-manager-1").unwrap(),
+        mocks::admin1(),
+        Author::new(
+            AuthorId::new("content-manager-1").unwrap(),
             "content-manager-1",
-            "content-manager",
         )
         .unwrap(),
-        Author::new(AuthorId::new("content-manager-1").unwrap()).unwrap(),
         Reader::new(ReaderId::new("content-manager-1").unwrap()).unwrap(),
     )
 }
 
 pub fn user1() -> (User, Author, Reader) {
     (
-        User::new(UserId::new("user-1").unwrap(), "user-1", "user").unwrap(),
-        Author::new(AuthorId::new("user-1").unwrap()).unwrap(),
+        mocks::user1(),
+        Author::new(AuthorId::new("user-1").unwrap(), "user-1").unwrap(),
         Reader::new(ReaderId::new("user-1").unwrap()).unwrap(),
     )
 }
 
 pub fn user2() -> (User, Author, Reader) {
     (
-        User::new(UserId::new("user-2").unwrap(), "user-2", "user").unwrap(),
-        Author::new(AuthorId::new("user-2").unwrap()).unwrap(),
+        mocks::user2(),
+        Author::new(AuthorId::new("user-2").unwrap(), "user-2").unwrap(),
         Reader::new(ReaderId::new("user-2").unwrap()).unwrap(),
     )
 }

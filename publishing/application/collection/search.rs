@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 
 use common::request::Include;
 use common::result::Result;
-use shared::domain::user::UserRepository;
 
 use crate::application::dtos::{AuthorDto, CategoryDto, CollectionDto};
 use crate::domain::author::{AuthorId, AuthorRepository};

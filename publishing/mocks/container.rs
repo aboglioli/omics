@@ -2,8 +2,7 @@ use std::sync::Arc;
 
 use common::mocks::FakeEventPublisher;
 
-use shared::infrastructure::persistence::inmem::InMemUserRepository;
-use shared::mocks::FakeUserService;
+use identity::infrastructure::persistence::inmem::InMemUserRepository;
 
 use crate::container::PublishingContainer;
 use crate::infrastructure::persistence::inmem::{
@@ -21,6 +20,5 @@ pub fn container() -> PublishingContainer<FakeEventPublisher> {
         Arc::new(InMemPublicationRepository::new()),
         Arc::new(InMemReaderRepository::new()),
         Arc::new(InMemUserRepository::new()),
-        Arc::new(FakeUserService::new()),
     )
 }

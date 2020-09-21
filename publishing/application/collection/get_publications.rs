@@ -2,7 +2,7 @@ use serde::Serialize;
 
 use common::request::Include;
 use common::result::Result;
-use shared::domain::user::{UserId, UserRepository};
+use identity::domain::user::{UserId, UserRepository};
 
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};
 use crate::domain::author::AuthorRepository;

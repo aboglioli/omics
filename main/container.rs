@@ -14,21 +14,16 @@ use identity::infrastructure::persistence::postgres::{
 };
 use identity::infrastructure::service::{BcryptHasher, JWTEncoder};
 use publishing::container::PublishingContainer;
-
 use publishing::infrastructure::persistence::postgres::{
     PostgresAuthorRepository, PostgresCategoryRepository, PostgresCollectionRepository,
     PostgresInteractionRepository, PostgresPublicationRepository, PostgresReaderRepository,
 };
-use shared::container::SharedContainer;
-use shared::infrastructure::persistence::inmem::InMemUserRepository as SharedInMemUserRepository;
 
 use crate::development::EventLogger;
-use crate::infrastructure::shared::LocalUserService;
 
 pub struct MainContainer {
     pub event_bus: Arc<InMemEventBus>,
     pub event_repo: Arc<InMemEventRepository>,
-    pub shared: SharedContainer<InMemEventBus>,
     pub identity: IdentityContainer<InMemEventBus>,
     pub publishing: PublishingContainer<InMemEventBus>,
 }
@@ -76,16 +71,12 @@ impl MainContainer {
         let p_publication_repo = Arc::new(PostgresPublicationRepository::new(client.clone()));
         let p_reader_repo = Arc::new(PostgresReaderRepository::new(client.clone()));
 
-        // Shared
-        let s_user_repo = Arc::new(SharedInMemUserRepository::new());
-        let s_user_serv = Arc::new(LocalUserService::new(i_user_repo.clone()));
-
         // Containers
         let identity = IdentityContainer::new(
             event_bus.clone(),
             i_role_repo,
             i_token_repo,
-            i_user_repo,
+            i_user_repo.clone(),
             i_password_hasher,
             i_token_enc,
         );
@@ -98,16 +89,12 @@ impl MainContainer {
             p_interaction_repo,
             p_publication_repo,
             p_reader_repo,
-            s_user_repo.clone(),
-            s_user_serv.clone(),
+            i_user_repo.clone(),
         );
-
-        let shared = SharedContainer::new(event_bus.clone(), s_user_repo, s_user_serv);
 
         MainContainer {
             event_bus,
             event_repo,
-            shared,
             identity,
             publishing,
         }
@@ -117,7 +104,6 @@ impl MainContainer {
         let event_logger = EventLogger::new(self.event_repo.clone());
         self.event_bus.subscribe(Box::new(event_logger)).await?;
 
-        self.shared.subscribe(self.event_bus.as_ref()).await?;
         self.identity.subscribe(self.event_bus.as_ref()).await?;
         self.publishing.subscribe(self.event_bus.as_ref()).await?;
 

@@ -2,7 +2,6 @@ use serde::Serialize;
 
 use common::error::Error;
 use common::result::Result;
-use shared::domain::user::UserRepository;
 
 use crate::application::dtos::AuthorDto;
 use crate::domain::author::AuthorRepository;

@@ -1,6 +1,6 @@
 use common::error::Error;
 use common::result::Result;
-use shared::domain::user::UserId;
+use identity::domain::user::UserId;
 
 use crate::domain::interaction::Comment;
 

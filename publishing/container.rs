@@ -5,10 +5,8 @@ use async_trait::async_trait;
 use common::container::Container;
 use common::event::{EventPublisher, EventSubscriber};
 use common::result::Result;
-use shared::domain::user::{UserRepository, UserService};
+use identity::domain::user::UserRepository;
 
-use crate::application::author::AuthorFromUserHandler;
-use crate::application::reader::{InteractionHandler, ReaderFromUserHandler};
 use crate::domain::author::AuthorRepository;
 use crate::domain::category::CategoryRepository;
 use crate::domain::collection::CollectionRepository;
@@ -28,8 +26,6 @@ pub struct PublishingContainer<EPub> {
     user_repo: Arc<dyn UserRepository>,
 
     statistics_serv: Arc<StatisticsService>,
-
-    user_serv: Arc<dyn UserService>,
 }
 
 impl<EPub> PublishingContainer<EPub>
@@ -46,7 +42,6 @@ where
         publication_repo: Arc<dyn PublicationRepository>,
         reader_repo: Arc<dyn ReaderRepository>,
         user_repo: Arc<dyn UserRepository>,
-        user_serv: Arc<dyn UserService>,
     ) -> Self {
         let statistics_serv = Arc::new(StatisticsService::new(interaction_repo.clone()));
 
@@ -62,8 +57,6 @@ where
             user_repo,
 
             statistics_serv,
-
-            user_serv,
         }
     }
 
@@ -103,11 +96,6 @@ where
     pub fn statistics_serv(&self) -> &StatisticsService {
         &self.statistics_serv
     }
-
-    // Abstract services
-    pub fn user_serv(&self) -> &dyn UserService {
-        self.user_serv.as_ref()
-    }
 }
 
 #[async_trait]
@@ -115,23 +103,23 @@ impl<EPub> Container for PublishingContainer<EPub>
 where
     EPub: Sync + Send,
 {
-    async fn subscribe<ES>(&self, event_sub: &ES) -> Result<()>
+    async fn subscribe<ES>(&self, _event_sub: &ES) -> Result<()>
     where
         ES: EventSubscriber + Sync + Send,
     {
-        let author_from_user_handler = AuthorFromUserHandler::new(self.author_repo.clone());
-        event_sub
-            .subscribe(Box::new(author_from_user_handler))
-            .await?;
-
-        let reader_from_user_handler = ReaderFromUserHandler::new(self.reader_repo.clone());
-        event_sub
-            .subscribe(Box::new(reader_from_user_handler))
-            .await?;
-
-        let reader_handler =
-            InteractionHandler::new(self.reader_repo.clone(), self.publication_repo.clone());
-        event_sub.subscribe(Box::new(reader_handler)).await?;
+        // let author_from_user_handler = AuthorFromUserHandler::new(self.author_repo.clone());
+        // event_sub
+        //     .subscribe(Box::new(author_from_user_handler))
+        //     .await?;
+        //
+        // let reader_from_user_handler = ReaderFromUserHandler::new(self.reader_repo.clone());
+        // event_sub
+        //     .subscribe(Box::new(reader_from_user_handler))
+        //     .await?;
+        //
+        // let reader_handler =
+        //     InteractionHandler::new(self.reader_repo.clone(), self.publication_repo.clone());
+        // event_sub.subscribe(Box::new(reader_handler)).await?;
 
         Ok(())
     }

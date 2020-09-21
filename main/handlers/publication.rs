@@ -300,15 +300,11 @@ async fn get_reviews(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
-    GetReviews::new(
-        c.publishing.interaction_repo(),
-        c.publishing.reader_repo(),
-        c.publishing.user_repo(),
-    )
-    .exec(auth_id, path.into_inner())
-    .await
-    .map(|res| HttpResponse::Ok().json(res))
-    .map_err(PublicError::from)
+    GetReviews::new(c.publishing.interaction_repo(), c.publishing.reader_repo())
+        .exec(auth_id, path.into_inner())
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
 }
 
 #[get("/{publication_id}/collections")]
@@ -324,7 +320,6 @@ async fn get_collections(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
         c.publishing.collection_repo(),
-        c.publishing.user_repo(),
     )
     .exec(
         auth_id,

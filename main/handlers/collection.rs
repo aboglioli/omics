@@ -43,7 +43,6 @@ async fn search(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
         c.publishing.collection_repo(),
-        c.publishing.user_repo(),
     )
     .exec(auth_id, cmd.into_inner(), include.into_inner().into())
     .await
@@ -64,7 +63,6 @@ async fn get_by_id(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
         c.publishing.collection_repo(),
-        c.publishing.user_repo(),
     )
     .exec(auth_id, path.into_inner(), include.into_inner().into())
     .await

@@ -13,7 +13,7 @@ use uuid::Uuid;
 use common::error::Error;
 use common::model::{AggregateRoot, StatusHistory, StatusItem};
 use common::result::Result;
-use shared::domain::user::UserId;
+use identity::domain::user::UserId;
 
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;

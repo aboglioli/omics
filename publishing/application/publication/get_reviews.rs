@@ -1,7 +1,6 @@
 use serde::Serialize;
 
 use common::result::Result;
-use shared::domain::user::UserRepository;
 
 use crate::application::dtos::{ReaderDto, ReviewDto};
 use crate::domain::interaction::InteractionRepository;
@@ -16,19 +15,16 @@ pub struct GetReviewsResponse {
 pub struct GetReviews<'a> {
     interaction_repo: &'a dyn InteractionRepository,
     reader_repo: &'a dyn ReaderRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> GetReviews<'a> {
     pub fn new(
         interaction_repo: &'a dyn InteractionRepository,
         reader_repo: &'a dyn ReaderRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         GetReviews {
             interaction_repo,
             reader_repo,
-            user_repo,
         }
     }
 
@@ -48,8 +44,7 @@ impl<'a> GetReviews<'a> {
                 .reader_repo
                 .find_by_id(review.base().id().reader_id())
                 .await?;
-            let user = self.user_repo.find_by_id(reader.base().id()).await?;
-            review_dtos.push(ReviewDto::from(review).reader(ReaderDto::from(&user, &reader)));
+            review_dtos.push(ReviewDto::from(review).reader(ReaderDto::from(&reader)));
         }
 
         Ok(GetReviewsResponse {
