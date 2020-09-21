@@ -16,7 +16,7 @@ import { IPublication, IPage } from '../../../domain/models/publication';
 import { IDropdownItem } from '../../../models/dropdown-item.interface';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
-import { PublicationService, IUpdatePagesCommand, IGetByIdResponse, IGetCollectionsResponse, IUpdateCommand } from '../../../domain/services/publication.service';
+import { PublicationService, IUpdatePagesCommand, IGetByIdResponse, IGetCollectionsResponse, IUpdateCommand, IReadResponse } from '../../../domain/services/publication.service';
 import { ICreateCommand, CollectionService } from '../../../domain/services/collection.service';
 import { SweetAlertGenericMessageService } from '../../../services/sweet-alert-generic-message.service';
 import { ICollection } from '../../../domain/models/collection';
@@ -25,6 +25,11 @@ export interface IPageForm {
   number: number;
   image: string;
   thumbailImage: string;
+  url: string;
+}
+
+export interface IPageAndNumber {
+  number: number;
   url: string;
 }
 
@@ -108,9 +113,6 @@ export class PublicationNewEditComponent implements OnInit {
   public setSubscriptionData(): void {
 
     this.spinnerService.show();
-    setTimeout(() => {
-      this.spinnerService.hide();
-    }, 20000); // 20 segundos de espera máxima TODO: Agregar mensaje de error de pasar mucho tiempo
 
     const observableList =  [
         this.dropdownDataObrasService.getAllCollectionDropdownDataById( this.authService.getIdUser() ),
@@ -328,8 +330,17 @@ export class PublicationNewEditComponent implements OnInit {
 
     } else {
 
-      ( this.pagesTotal > 0  ) ?
-        this.newPublication() : this.sweetAlertGenericService.showAlertError( 'No hay páginas cargadas a la colección.' );
+      if (  this.pagesTotal > 0 ) {
+
+        this.spinnerService.show();
+        ( this.isToEdit ) ? this.editPublication() : this.newPublication();
+
+      } else {
+
+        this.sweetAlertGenericService.showAlertError( 'No hay páginas cargadas a la colección.' );
+
+      }
+
 
     }
 
@@ -337,7 +348,6 @@ export class PublicationNewEditComponent implements OnInit {
 
   private newPublication(): void {
 
-    this.spinnerService.show();
     const arrayPageObervables: Observable<any>[] = [];
     let pagesUrl: IUpdatePagesCommand = {
       pages: [] = []
@@ -346,30 +356,139 @@ export class PublicationNewEditComponent implements OnInit {
     this.pagesList.controls.forEach( (pageForm: FormGroup) => {
 
       const page = pageForm.get('image').value;
-      if ( page !== null ) {
-        arrayPageObervables.push( this.fileServ.upload( page )  );
-      } else {
 
-        pagesUrl.pages.push({
-          images:  [pageForm.get('url').value]
+      arrayPageObervables.push( this.fileServ.upload( page )  );
+
+
+    });
+
+    forkJoin( arrayPageObervables ).subscribe( ( dataPage ) => {
+
+      console.log( 'TEST DATAPAGE > ', dataPage  );
+      pagesUrl = this.getUrlFromFileService(dataPage);
+      this.uploadPublicationNewPages(pagesUrl);
+
+    }, (error: Error) => {
+
+      console.error(error);
+      this.spinnerService.hide();
+
+    } );
+
+
+
+  }
+
+  private editPublication(): void {
+
+    // #region Crear un arreglo de páginas con el total que existen y asignarles un número
+    const pagesOrderByNumberList: IPageAndNumber[] = [];
+
+    for ( let i = 0; i < this.pagesTotal; i++ ) {
+
+      pagesOrderByNumberList.push({
+        number: i + 1,
+        url: null
+      });
+
+    }
+
+    // #endregion
+
+    // #region Obtener primero todos los que no se modificaron (se asignan nomas con las del número que corresponde)
+    this.pagesList.controls.forEach( (pageForm: FormGroup) => {
+
+      const isNewPage = pageForm.get('image').value; // Si es nulo, es una página no actualizada...sino es nueva.
+
+      if (  !isNewPage ) {
+
+        const oldPage = pageForm.value as IPageForm;
+
+        pagesOrderByNumberList.map( page => {
+
+          if ( page.number === oldPage.number ) {
+
+            page.url = oldPage.url;
+
+          }
+
         });
-
 
       }
 
     });
 
+    //#endregion
+
+    //#region  Obtener todas las páginas nuevas
+    const arrayNewPageObervables: Observable<any>[] = [];
+    let pagesUrl: IUpdatePagesCommand = {
+      pages: [] = []
+    };
+
+    this.pagesList.controls.forEach( (pageForm: FormGroup) => {
+
+      const page = pageForm.get('image').value;
+
+      // No es nulo el campo 'image' => es una página cargada nueva
+      if ( page ) {
+        arrayNewPageObervables.push( this.fileServ.upload( page )  );
+      }
+
+    });
+
+
     // Si no se ha cargado una nueva imagen, ir directo a la carga de las págins sino esperar a que se asignen la url necesaria
-    if (  arrayPageObervables.length === 0 ) { // Nota: Esto solo sucede al editar y no cambiar página alguna
+    if ( arrayNewPageObervables.length === 0 ) {
+
+      // << Sin paginas nuevas >>
+      pagesOrderByNumberList.forEach( (page: IPageAndNumber) => {
+
+        pagesUrl.pages.push({
+          images: [page.url]
+        });
+
+      });
+
       this.uploadPublicationEditPages(pagesUrl);
+
     } else {
 
-      forkJoin( arrayPageObervables ).subscribe( ( dataPage ) => {
+      console.log('CON PÁGINAS NUEVAS >>>>>>>>>>>>>>');
+
+      // << Con páginas nuevas >>
+      let auxPagesNewUrl: IUpdatePagesCommand = {
+        pages: [] = []
+      };
+
+      // #region Obtener los url de las nuevas páginas
+      forkJoin( arrayNewPageObervables ).subscribe( ( dataPage ) => {
+
+        auxPagesNewUrl = this.getUrlFromFileService(dataPage);
+
+        console.log('TEST > ', auxPagesNewUrl.pages);
+
+        // #region Asignar los url obtenidos, en orden, en los espacios sin url creados en el arreglo anteriormente
+
+        auxPagesNewUrl.pages.forEach( (pageNew: any) => {
+
+          pagesOrderByNumberList.find( page => !page.url ).url = pageNew.images[0];
+
+        });
 
 
-        console.log( 'TEST DATAPAGE > ', dataPage  );
-        pagesUrl = this.getUrlFromFileService(dataPage);
-        this.uploadPublicationNewPages(pagesUrl);
+        // #endregion
+
+        // --> Enviar para colocarlos en una publicación ya existente
+        pagesOrderByNumberList.forEach( (page: IPageAndNumber) => {
+
+          pagesUrl.pages.push({
+            images: [page.url]
+          });
+
+        });
+
+        this.uploadPublicationEditPages(pagesUrl);
 
       }, (error: Error) => {
 
@@ -380,9 +499,9 @@ export class PublicationNewEditComponent implements OnInit {
 
     }
 
+    //#endregion
 
   }
-
 
   private uploadPublicationNewPages( pagesUrlToUpload: IUpdatePagesCommand ): void {
 
@@ -458,7 +577,8 @@ export class PublicationNewEditComponent implements OnInit {
 
     if ( this.collectionArrayCheck.controls.length === 0 ) {
 
-      this.newPublicationFinish(idPublication);
+      ( this.isToEdit ) ?
+        this.editPublicationFinish(idPublication) : this.newPublicationFinish(idPublication) ;
 
     } else {
 
@@ -476,7 +596,8 @@ export class PublicationNewEditComponent implements OnInit {
         (data: any) => {
 
           ( this.isToEdit ) ?
-            this.newPublicationFinish(idPublication) : this.editPublicationFinish(idPublication);
+            this.editPublicationFinish(idPublication) : this.newPublicationFinish(idPublication) ;
+
         },
         (error: Error) => {
 
@@ -737,7 +858,7 @@ export class PublicationNewEditComponent implements OnInit {
 
       return this.fb.group({
 
-        number: pageObject.number,
+        number: (pageObject.number) + 1,
         image: null, // TODO: Corroborar si esto hace falta
         thumbailImage: urlPage,
         url: urlPage
