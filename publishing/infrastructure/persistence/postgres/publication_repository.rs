@@ -197,7 +197,7 @@ impl PublicationRepository for PostgresPublicationRepository {
         name: Option<&String>,
     ) -> Result<Vec<Publication>> {
         let author_id = author_id.map(|id| id.to_uuid()).transpose()?;
-        let category_id = category_id.map(|id| id.to_uuid()).transpose()?;
+        let category_id = category_id.map(|id| id.value());
 
         let (sql, params) = WhereBuilder::new()
             .add_param_opt("author_id = $$", &author_id, author_id.is_some())

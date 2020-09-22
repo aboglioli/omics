@@ -13,6 +13,7 @@ use publishing::domain::publication::PublicationRepository;
 
 use crate::application::author::ApprovedRejectedPublicationHandler;
 use crate::application::notification::NotificationHandler;
+use crate::application::user::RegisteredHandler;
 
 use crate::domain::email::EmailService;
 use crate::domain::notification::NotificationRepository;
@@ -98,9 +99,8 @@ where
     where
         ES: EventSubscriber + Sync + Send,
     {
-        // TODO: activate!!
-        // let registered_handler = RegisteredHandler::new(self.email_serv.clone());
-        // event_sub.subscribe(Box::new(registered_handler)).await?;
+        let registered_handler = RegisteredHandler::new(self.email_serv.clone());
+        event_sub.subscribe(Box::new(registered_handler)).await?;
 
         let approved_rejected_publication_handler = ApprovedRejectedPublicationHandler::new(
             self.publication_repo.clone(),
