@@ -1,6 +1,7 @@
 export * from './author';
 export * from './category';
 export * from './collection';
+export * from './notification';
 export * from './publication';
 export * from './reader';
 export * from './review';

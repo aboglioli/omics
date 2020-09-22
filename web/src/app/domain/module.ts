@@ -9,6 +9,7 @@ import { CollectionService } from './services/collection.service';
 import { ConfigService } from './services/config.service';
 import { FileService } from './services/file.service';
 import { IdentityService } from './services/identity.service';
+import { NotificationService } from './services/notification.service';
 import { PublicationService } from './services/publication.service';
 import { ReaderService } from './services/reader.service';
 
@@ -25,6 +26,7 @@ import { ReaderService } from './services/reader.service';
     ConfigService,
     FileService,
     IdentityService,
+    NotificationService,
     PublicationService,
     ReaderService,
 
