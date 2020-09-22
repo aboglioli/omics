@@ -41,10 +41,62 @@ div.page {
 
     display: flex;
     align-items: center;
+    justify-content: space-between;
 
-    padding: 0.25em 0.25em;
+    padding: 0.25em 1em;
+
+    .title {
+      margin: 0px;
+    }
+
+    .bottom-nav {
+
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+
+
+    }
+
+    .option-menu {
+
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+
+      button {
+        margin: 0em 1em;
+      }
+
+    }
 
   }
 
+
+}
+
+
+// General
+button {
+
+  color: white;
+  height: 75%;
+  margin: 0em 0.5em;
+
+  &:focus {
+    outline: none;
+  }
+
+
+  fa-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      color: $omics-neon-pink;
+    }
+
+  }
 
 }

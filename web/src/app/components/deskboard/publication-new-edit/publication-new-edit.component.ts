@@ -20,7 +20,6 @@ import { PublicationService, IUpdatePagesCommand, IGetByIdResponse, IGetCollecti
 import { ICreateCommand, CollectionService } from '../../../domain/services/collection.service';
 import { SweetAlertGenericMessageService } from '../../../services/sweet-alert-generic-message.service';
 import { ICollection } from '../../../domain/models/collection';
-import { InvokeFunctionExpr } from '@angular/compiler';
 
 export interface IPageForm {
   number: number;

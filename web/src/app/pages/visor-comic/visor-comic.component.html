@@ -8,7 +8,7 @@
     </span>
 
     <span *ngIf="pagesList">
-      <img [src]="pagesList[0].images[0].url" alt="test-image">
+      <img [src]="pageToShow" alt="test-image">
     </span>
 
   </div>
@@ -17,7 +17,62 @@
 
   <div class="footer-page">
 
-    <p>Título > {{ publicationToShow.name }}</p>
+    <h2 class="title" style="flex: 1">
+      {{ publicationToShow.name }}
+    </h2>
+
+    <div class="bottom-nav" style="flex: 1">
+
+
+      <!-- Ir a página anterior -->
+      <button mat-icon-button  (click)="setCurrentPage( pageCurrent - 1 )">
+        <fa-icon [icon]="faLeft" size="2x"></fa-icon>
+      </button>
+
+      <!-- Indicador de página -->
+      <h2 style="margin: 0;">
+       {{ pageCurrent + 1 }} / {{ pagesTotal }}
+      </h2>
+
+      <!-- Ir a página siguiente -->
+      <button mat-icon-button  (click)="setCurrentPage( pageCurrent + 1 )">
+        <fa-icon [icon]="faRight" size="2x"></fa-icon>
+      </button>
+
+    </div>
+
+    <div class="option-menu" style="flex: 1">
+
+      <!-- Donar -->
+      <button *ngIf="readerInfo"
+              mat-icon-button (click)="onDonar()">
+        <fa-icon [icon]="faDonar" size="2x"></fa-icon>
+      </button>
+
+      <!-- Favorito -->
+      <button *ngIf="readerInfo"
+              mat-icon-button (click)="onFavorito()">
+        <fa-icon [icon]="faFavorito" size="2x"></fa-icon>
+      </button>
+
+      <!-- Like -->
+      <button *ngIf="readerInfo"
+              mat-icon-button (click)="onLike()">
+        <fa-icon [icon]="faLike" size="2x"></fa-icon>
+      </button>
+
+      <!-- Comentarios -->
+      <button *ngIf="readerInfo"
+              mat-icon-button (click)="onComentarios()">
+        <fa-icon [icon]="faComentario" size="2x"></fa-icon>
+      </button>
+
+      <!-- Info -->
+      <button mat-icon-button (click)="onInfo()">
+        <fa-icon [icon]="faInfo" size="2x"></fa-icon>
+      </button>
+
+    </div>
 
   </div>
 
