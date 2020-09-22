@@ -1,7 +1,8 @@
 use async_trait::async_trait;
 use lettre::message::header::ContentType;
+use lettre::message::{Message, SinglePart};
 use lettre::transport::smtp::authentication::Credentials;
-use lettre::{Message, SmtpTransport, Transport};
+use lettre::{SmtpTransport, Transport};
 
 use common::config::Config;
 use common::result::Result;
@@ -21,24 +22,23 @@ impl EmailService for GmailService {
     async fn send(&self, email: &Email) -> Result<()> {
         let config = Config::get();
 
-        let _to_address = email.to();
-
-        let smtp_username = config.smtp_email();
-
         let email = Message::builder()
             .from(
-                format!("Equipo de Omics <{}>", smtp_username)
+                format!("Equipo de Omics <{}>", config.smtp_email())
                     .parse()
                     .unwrap(),
             )
             .to(format!("{} <{}>", email.to(), email.to()).parse().unwrap())
             .subject(email.title())
-            .header(ContentType::html())
-            .body(email.body())
+            .singlepart(
+                SinglePart::builder()
+                    .header(ContentType::html())
+                    .body(email.body()),
+            )
             .unwrap();
 
         let creds = Credentials::new(
-            smtp_username.to_string(),
+            config.smtp_email().to_string(),
             config.smtp_password().to_string(),
         );
 

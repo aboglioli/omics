@@ -668,7 +668,7 @@ impl InteractionRepository for PostgresInteractionRepository {
 
         self.client
             .execute(
-                "DELETE FROM collection_favorites WHERE reader_id = $1 AND author_id = $2",
+                "DELETE FROM follows WHERE reader_id = $1 AND author_id = $2",
                 &[&reader_id.to_uuid()?, &author_id.to_uuid()?],
             )
             .await
