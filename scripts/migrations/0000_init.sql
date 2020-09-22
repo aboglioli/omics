@@ -1,3 +1,13 @@
+CREATE TABLE IF NOT EXISTS events (
+  id UUID PRIMARY KEY,
+
+  topic VARCHAR(255) NOT NULL,
+  code VARCHAR(255) NOT NULL,
+  timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
+
+  payload JSONB NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS roles (
   id VARCHAR(255) PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
@@ -24,7 +34,7 @@ CREATE TABLE IF NOT EXISTS users (
   biography TEXT,
   profile_image VARCHAR(1024),
 
-  role_id VARCHAR(255) NOT NULL,
+  role_id VARCHAR(255) REFERENCES roles(id) ON DELETE CASCADE,
 
   validation_code VARCHAR(255),
 
@@ -33,9 +43,7 @@ CREATE TABLE IF NOT EXISTS users (
 
   created_at TIMESTAMP WITH TIME ZONE NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE,
-  deleted_at TIMESTAMP WITH TIME ZONE,
-
-  FOREIGN KEY(role_id) REFERENCES roles(id)
+  deleted_at TIMESTAMP WITH TIME ZONE
 );
 
 CREATE TABLE IF NOT EXISTS categories (
@@ -52,11 +60,11 @@ CREATE TABLE IF NOT EXISTS categories (
 CREATE TABLE IF NOT EXISTS collections (
   id UUID PRIMARY KEY,
 
-  author_id UUID NOT NULL,
+  author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 
   name VARCHAR(255) NOT NULL,
   synopsis TEXT NOT NULL,
-  category_id VARCHAR(255) NOT NULL,
+  category_id VARCHAR(255) NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
   tags TEXT[] NOT NULL,
   cover VARCHAR(1024) NOT NULL,
 
@@ -64,20 +72,17 @@ CREATE TABLE IF NOT EXISTS collections (
 
   created_at TIMESTAMP WITH TIME ZONE NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE,
-  deleted_at TIMESTAMP WITH TIME ZONE,
-
-  FOREIGN KEY(author_id) REFERENCES users(id),
-  FOREIGN KEY(category_id) REFERENCES categories(id)
+  deleted_at TIMESTAMP WITH TIME ZONE
 );
 
 CREATE TABLE IF NOT EXISTS publications (
   id UUID PRIMARY KEY,
 
-  author_id UUID NOT NULL,
+  author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 
   name VARCHAR(255) NOT NULL,
   synopsis TEXT NOT NULL,
-  category_id VARCHAR(255) NOT NULL,
+  category_id VARCHAR(255) NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
   tags TEXT[] NOT NULL,
   cover VARCHAR(1024) NOT NULL,
 
@@ -90,10 +95,7 @@ CREATE TABLE IF NOT EXISTS publications (
 
   created_at TIMESTAMP WITH TIME ZONE NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE,
-  deleted_at TIMESTAMP WITH TIME ZONE,
-
-  FOREIGN KEY(author_id) REFERENCES users(id),
-  FOREIGN KEY(category_id) REFERENCES categories(id)
+  deleted_at TIMESTAMP WITH TIME ZONE
 );
 
 CREATE TABLE IF NOT EXISTS publication_status (
@@ -103,94 +105,71 @@ CREATE TABLE IF NOT EXISTS publication_status (
 CREATE TABLE IF NOT EXISTS views (
   id SERIAL PRIMARY KEY,
 
-  reader_id UUID NOT NULL,
-  publication_id UUID NOT NULL,
+  reader_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  publication_id UUID NOT NULL REFERENCES publications(id) ON DELETE CASCADE,
   datetime TIMESTAMP WITH TIME ZONE NOT NULL,
 
-  is_unique BOOLEAN DEFAULT FALSE,
-
-  FOREIGN KEY(reader_id) REFERENCES users(id),
-  FOREIGN KEY(publication_id) REFERENCES publications(id)
+  is_unique BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS readings (
   id SERIAL PRIMARY KEY,
 
-  reader_id UUID NOT NULL,
-  publication_id UUID NOT NULL,
-  datetime TIMESTAMP WITH TIME ZONE NOT NULL,
-
-  FOREIGN KEY(reader_id) REFERENCES users(id),
-  FOREIGN KEY(publication_id) REFERENCES publications(id)
+  reader_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  publication_id UUID NOT NULL REFERENCES publications(id) ON DELETE CASCADE,
+  datetime TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS likes (
   id SERIAL PRIMARY KEY,
 
-  reader_id UUID NOT NULL,
-  publication_id UUID NOT NULL,
-  datetime TIMESTAMP WITH TIME ZONE NOT NULL,
-
-  FOREIGN KEY(reader_id) REFERENCES users(id),
-  FOREIGN KEY(publication_id) REFERENCES publications(id)
+  reader_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  publication_id UUID NOT NULL REFERENCES publications(id) ON DELETE CASCADE,
+  datetime TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS reviews (
   id SERIAL PRIMARY KEY,
 
-  reader_id UUID NOT NULL,
-  publication_id UUID NOT NULL,
+  reader_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  publication_id UUID NOT NULL REFERENCES publications(id) ON DELETE CASCADE,
   datetime TIMESTAMP WITH TIME ZONE NOT NULL,
 
   stars SMALLINT DEFAULT 0,
-  comment TEXT NOT NULL,
-
-  FOREIGN KEY(reader_id) REFERENCES users(id),
-  FOREIGN KEY(publication_id) REFERENCES publications(id)
+  comment TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS publication_favorites (
   id SERIAL PRIMARY KEY,
 
-  reader_id UUID NOT NULL,
-  publication_id UUID NOT NULL,
-  datetime TIMESTAMP WITH TIME ZONE NOT NULL,
-
-  FOREIGN KEY(reader_id) REFERENCES users(id),
-  FOREIGN KEY(publication_id) REFERENCES publications(id)
+  reader_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  publication_id UUID NOT NULL REFERENCES publications(id) ON DELETE CASCADE,
+  datetime TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS collection_favorites (
   id SERIAL PRIMARY KEY,
 
-  reader_id UUID NOT NULL,
-  collection_id UUID NOT NULL,
-  datetime TIMESTAMP WITH TIME ZONE NOT NULL,
-
-  FOREIGN KEY(reader_id) REFERENCES users(id),
-  FOREIGN KEY(collection_id) REFERENCES collections(id)
+  reader_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  collection_id UUID NOT NULL REFERENCES collections(id) ON DELETE CASCADE,
+  datetime TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS follows (
   id SERIAL PRIMARY KEY,
 
-  reader_id UUID NOT NULL,
-  author_id UUID NOT NULL,
-  datetime TIMESTAMP WITH TIME ZONE NOT NULL,
-
-  FOREIGN KEY(reader_id) REFERENCES users(id),
-  FOREIGN KEY(author_id) REFERENCES users(id)
+  reader_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  datetime TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS notifications (
   id UUID PRIMARY KEY,
 
-  user_id UUID NOT NULL,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   code VARCHAR(255) NOT NULL,
   body JSONB NOT NULL,
   read BOOLEAN DEFAULT FALSE,
 
-  datetime TIMESTAMP WITH TIME ZONE NOT NULL,
-
-  FOREIGN KEY(user_id) REFERENCES users(id)
+  datetime TIMESTAMP WITH TIME ZONE NOT NULL
 )

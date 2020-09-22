@@ -32,7 +32,9 @@ impl<'a> Delete<'a> {
 
         publication.delete()?;
 
-        self.publication_repo.save(&mut publication).await?;
+        self.publication_repo
+            .delete(publication.base().id())
+            .await?;
 
         self.event_pub
             .publish_all(publication.events().to_vec()?)

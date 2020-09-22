@@ -38,7 +38,7 @@ impl<'a> Delete<'a> {
             .await?;
         category.delete()?;
 
-        self.category_repo.save(&mut category).await?;
+        self.category_repo.delete(category.base().id()).await?;
 
         self.event_pub
             .publish_all(category.events().to_vec()?)

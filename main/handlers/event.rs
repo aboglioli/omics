@@ -1,5 +1,6 @@
 use actix_web::{get, web, HttpResponse, Responder};
-use serde::Serialize;
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use common::event::EventRepository;
@@ -16,6 +17,14 @@ pub struct PublicEvent {
     pub payload: Value,
 }
 
+#[derive(Deserialize)]
+pub struct SearchCommand {
+    pub topic: Option<String>,
+    pub code: Option<String>,
+    pub from: Option<DateTime<Utc>>,
+    pub to: Option<DateTime<Utc>>,
+}
+
 #[derive(Serialize)]
 pub struct GetAllResponse {
     pub events: Vec<PublicEvent>,
@@ -23,9 +32,15 @@ pub struct GetAllResponse {
 
 // GET /events
 #[get("")]
-async fn get(c: web::Data<MainContainer>) -> impl Responder {
+async fn get(cmd: web::Query<SearchCommand>, c: web::Data<MainContainer>) -> impl Responder {
     c.event_repo()
-        .find_all()
+        .search(
+            None,
+            cmd.topic.as_ref(),
+            cmd.code.as_ref(),
+            cmd.from.as_ref(),
+            cmd.to.as_ref(),
+        )
         .await
         .map(|events| {
             events

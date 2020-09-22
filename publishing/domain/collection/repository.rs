@@ -25,4 +25,6 @@ pub trait CollectionRepository: Sync + Send {
     ) -> Result<Vec<Collection>>;
 
     async fn save(&self, collection: &mut Collection) -> Result<()>;
+
+    async fn delete(&self, id: &CollectionId) -> Result<()>;
 }

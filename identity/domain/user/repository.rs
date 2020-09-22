@@ -19,4 +19,6 @@ pub trait UserRepository: Sync + Send {
     async fn find_by_role_id(&self, role_id: &RoleId) -> Result<Vec<User>>;
 
     async fn save(&self, user: &mut User) -> Result<()>;
+
+    async fn delete(&self, id: &UserId) -> Result<()>;
 }

@@ -14,4 +14,6 @@ pub trait ReaderRepository: Sync + Send {
     async fn find_by_id(&self, id: &ReaderId) -> Result<Reader>;
 
     async fn save(&self, reader: &mut Reader) -> Result<()>;
+
+    async fn delete(&self, id: &ReaderId) -> Result<()>;
 }

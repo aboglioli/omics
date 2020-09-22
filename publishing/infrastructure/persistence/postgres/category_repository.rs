@@ -111,4 +111,17 @@ impl CategoryRepository for PostgresCategoryRepository {
 
         Ok(())
     }
+
+    async fn delete(&self, id: &CategoryId) -> Result<()> {
+        self.client
+            .execute(
+                "DELETE FROM categories
+                WHERE id = $1",
+                &[&id.value()],
+            )
+            .await
+            .map_err(|err| Error::new("category", "delete").wrap_raw(err))?;
+
+        Ok(())
+    }
 }

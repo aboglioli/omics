@@ -15,4 +15,6 @@ pub trait AuthorRepository: Sync + Send {
     async fn find_by_id(&self, id: &AuthorId) -> Result<Author>;
 
     async fn save(&self, author: &mut Author) -> Result<()>;
+
+    async fn delete(&self, id: &AuthorId) -> Result<()>;
 }

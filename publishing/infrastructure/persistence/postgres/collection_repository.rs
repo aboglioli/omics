@@ -233,4 +233,17 @@ impl CollectionRepository for PostgresCollectionRepository {
 
         Ok(())
     }
+
+    async fn delete(&self, id: &CollectionId) -> Result<()> {
+        self.client
+            .execute(
+                "DELETE FROM collections
+                WHERE id = $1",
+                &[&id.to_uuid()?],
+            )
+            .await
+            .map_err(|err| Error::new("collection", "delete").wrap_raw(err))?;
+
+        Ok(())
+    }
 }

@@ -5,7 +5,7 @@ use tokio_postgres::NoTls;
 use common::config::Config;
 use common::container::Container;
 use common::event::EventSubscriber;
-use common::infrastructure::event::{InMemEventBus, InMemEventRepository};
+use common::infrastructure::event::{InMemEventBus, PostgresEventRepository};
 use common::result::Result;
 use identity::container::IdentityContainer;
 use identity::infrastructure::persistence::inmem::InMemTokenRepository;
@@ -26,7 +26,7 @@ use crate::development::EventLogger;
 
 pub struct MainContainer {
     pub event_bus: Arc<InMemEventBus>,
-    pub event_repo: Arc<InMemEventRepository>,
+    pub event_repo: Arc<PostgresEventRepository>,
     pub identity: IdentityContainer<InMemEventBus>,
     pub publishing: PublishingContainer<InMemEventBus>,
     pub notification: NotificationContainer<InMemEventBus>,
@@ -58,7 +58,7 @@ impl MainContainer {
 
         // Common
         let event_bus = Arc::new(InMemEventBus::new());
-        let event_repo = Arc::new(InMemEventRepository::new());
+        let event_repo = Arc::new(PostgresEventRepository::new(client.clone()));
 
         // Identity
         let i_role_repo = Arc::new(PostgresRoleRepository::new(client.clone()));
@@ -136,7 +136,7 @@ impl MainContainer {
         &self.event_bus
     }
 
-    pub fn event_repo(&self) -> &InMemEventRepository {
+    pub fn event_repo(&self) -> &PostgresEventRepository {
         &self.event_repo
     }
 }

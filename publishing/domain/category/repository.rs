@@ -15,4 +15,6 @@ pub trait CategoryRepository: Sync + Send {
     async fn find_by_id(&self, id: &CategoryId) -> Result<Category>;
 
     async fn save(&self, category: &mut Category) -> Result<()>;
+
+    async fn delete(&self, id: &CategoryId) -> Result<()>;
 }

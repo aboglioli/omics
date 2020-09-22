@@ -43,4 +43,8 @@ impl ReaderRepository for InMemReaderRepository {
             self.cache.delete(reader.base().id()).await
         }
     }
+
+    async fn delete(&self, id: &ReaderId) -> Result<()> {
+        self.cache.delete(id).await
+    }
 }

@@ -78,4 +78,17 @@ impl ReaderRepository for PostgresReaderRepository {
 
         Ok(())
     }
+
+    async fn delete(&self, id: &ReaderId) -> Result<()> {
+        self.client
+            .execute(
+                "DELETE FROM users
+                WHERE id = $1",
+                &[&id.to_uuid()?],
+            )
+            .await
+            .map_err(|err| Error::new("reader", "delete").wrap_raw(err))?;
+
+        Ok(())
+    }
 }

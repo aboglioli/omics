@@ -32,7 +32,7 @@ impl<'a> Delete<'a> {
 
         collection.delete()?;
 
-        self.collection_repo.save(&mut collection).await?;
+        self.collection_repo.delete(collection.base().id()).await?;
 
         self.event_pub
             .publish_all(collection.events().to_vec()?)

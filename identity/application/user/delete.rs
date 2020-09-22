@@ -31,7 +31,7 @@ impl<'a> Delete<'a> {
 
         user.delete()?;
 
-        self.user_repo.save(&mut user).await?;
+        self.user_repo.delete(user.base().id()).await?;
 
         self.event_pub.publish_all(user.events().to_vec()?).await?;
 

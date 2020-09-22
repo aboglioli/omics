@@ -89,4 +89,8 @@ impl PublicationRepository for InMemPublicationRepository {
             self.cache.delete(publication.base().id()).await
         }
     }
+
+    async fn delete(&self, id: &PublicationId) -> Result<()> {
+        self.cache.delete(id).await
+    }
 }

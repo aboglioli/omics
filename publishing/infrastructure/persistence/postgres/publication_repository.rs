@@ -325,4 +325,17 @@ impl PublicationRepository for PostgresPublicationRepository {
 
         Ok(())
     }
+
+    async fn delete(&self, id: &PublicationId) -> Result<()> {
+        self.client
+            .execute(
+                "DELETE FROM publications
+                WHERE id = $1",
+                &[&id.to_uuid()?],
+            )
+            .await
+            .map_err(|err| Error::new("publication", "delete").wrap_raw(err))?;
+
+        Ok(())
+    }
 }

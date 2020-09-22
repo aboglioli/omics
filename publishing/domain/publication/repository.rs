@@ -24,4 +24,6 @@ pub trait PublicationRepository: Sync + Send {
     ) -> Result<Vec<Publication>>;
 
     async fn save(&self, publication: &mut Publication) -> Result<()>;
+
+    async fn delete(&self, id: &PublicationId) -> Result<()>;
 }

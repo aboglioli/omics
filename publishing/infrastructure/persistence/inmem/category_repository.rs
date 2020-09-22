@@ -47,4 +47,8 @@ impl CategoryRepository for InMemCategoryRepository {
             self.cache.delete(category.base().id()).await
         }
     }
+
+    async fn delete(&self, id: &CategoryId) -> Result<()> {
+        self.cache.delete(id).await
+    }
 }

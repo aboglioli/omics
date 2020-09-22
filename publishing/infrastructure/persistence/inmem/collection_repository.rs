@@ -98,4 +98,8 @@ impl CollectionRepository for InMemCollectionRepository {
             self.cache.delete(collection.base().id()).await
         }
     }
+
+    async fn delete(&self, id: &CollectionId) -> Result<()> {
+        self.cache.delete(id).await
+    }
 }

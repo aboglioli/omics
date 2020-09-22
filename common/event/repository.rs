@@ -6,10 +6,11 @@ use crate::result::Result;
 
 #[async_trait]
 pub trait EventRepository: Sync + Send {
-    async fn find_all(&self) -> Result<Vec<Event>>;
-    async fn find_after_id(&self, id: &EventId) -> Result<Vec<Event>>;
-    async fn find_from_date(
+    async fn search(
         &self,
+        after_id: Option<&EventId>,
+        topic: Option<&String>,
+        code: Option<&String>,
         from: Option<&DateTime<Utc>>,
         to: Option<&DateTime<Utc>>,
     ) -> Result<Vec<Event>>;

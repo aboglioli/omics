@@ -47,4 +47,8 @@ impl AuthorRepository for InMemAuthorRepository {
             self.cache.delete(author.base().id()).await
         }
     }
+
+    async fn delete(&self, id: &AuthorId) -> Result<()> {
+        self.cache.delete(id).await
+    }
 }

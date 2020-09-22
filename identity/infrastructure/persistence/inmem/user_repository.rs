@@ -67,6 +67,10 @@ impl UserRepository for InMemUserRepository {
             self.cache.delete(user.base().id()).await
         }
     }
+
+    async fn delete(&self, id: &UserId) -> Result<()> {
+        self.cache.delete(id).await
+    }
 }
 
 #[cfg(test)]
