@@ -19,17 +19,7 @@
       <button mat-flat-button color="accent"
               class="button-white-borders"
               (click)="submitPublicationForm()">
-
-        <span *ngIf="isToEdit !== undefined">
-          <span *ngIf="isToEdit">
-            Editar
-          </span>
-
-          <span *ngIf="!isToEdit">
             Publicar
-          </span>
-        </span>
-
       </button>
 
 
@@ -356,10 +346,17 @@
   (confirm)="backToDeskboard()">
 </swal>
 
-<swal #formEditValid
-  title="Publicación Editada"
-  text="¡Se ha actualizado correctamente!"
+<swal #formSketchValid
+  title="Publicación Guardada"
+  text="¡Se ha guardado el borrador correctamente!"
   icon="success"
   [focusConfirm]="true">
 </swal>
 
+<swal #formEditPublishValid
+  title="Nueva revisión pendiente"
+  text="¡Se ha actualizado y enviado correctamente!"
+  icon="success"
+  [focusConfirm]="true"
+  (confirm)="backToDeskboard()">
+</swal>

@@ -20,6 +20,7 @@ import { PublicationService, IUpdatePagesCommand, IGetByIdResponse, IGetCollecti
 import { ICreateCommand, CollectionService } from '../../../domain/services/collection.service';
 import { SweetAlertGenericMessageService } from '../../../services/sweet-alert-generic-message.service';
 import { ICollection } from '../../../domain/models/collection';
+import { InvokeFunctionExpr } from '@angular/compiler';
 
 export interface IPageForm {
   number: number;
@@ -42,7 +43,8 @@ export class PublicationNewEditComponent implements OnInit {
 
   @ViewChild('formDataInvalid') private swalFormDataInvalid: SwalComponent;
   @ViewChild('formDataValid') private swalFormDataValid: SwalComponent;
-  @ViewChild('formEditValid') private swalFormEditValid: SwalComponent;
+  @ViewChild('formSketchValid') private swalFormSketchValid: SwalComponent;
+  @ViewChild('formEditPublishValid') private swalFormEditPublishValid: SwalComponent;
 
   // FontAwesome Icon
   public faPlus = faPlusCircle;
@@ -62,7 +64,8 @@ export class PublicationNewEditComponent implements OnInit {
 
   // Otros
   public ripplePortadaEnable = true;
-  public isToEdit: boolean;
+  private isToEdit: boolean;
+  private isToSketch: boolean;
   private publicationToEditId: string;
 
   public chipTagsKeysCodes: number[] = [ENTER, COMMA]; // Usado para los tags
@@ -81,6 +84,8 @@ export class PublicationNewEditComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+
+    this.isToSketch = false;
 
     this.authService.authStart();
     this.buildForms();
@@ -183,8 +188,6 @@ export class PublicationNewEditComponent implements OnInit {
   }
 
   private setFormPublicationByObject( publicationObject: IPublication, collectionList: ICollection[] ): void {
-
-    console.log('TEST > ', publicationObject);
 
     // TODO: Esto habría que cambiarlo para que el tiempo que transcurra es cuando termine de renderizar las imagenes a mostrar
     this.spinnerService.show();
@@ -290,16 +293,16 @@ export class PublicationNewEditComponent implements OnInit {
 
   }
 
-  //#region Realizar borrador
-
   public guardarBorrador(): void {
-    this.sweetAlertGenericService.showUnderConstrucction();
+
+    this.isToSketch = true;
+    this.submitPublicationForm();
+
   }
 
-  //#endregion
 
   //#region Realizar publicación
-  public  submitPublicationForm(): void {
+  public submitPublicationForm(): void {
 
     this.formPublication.get('tags').setValue(this.tagsList);
 
@@ -311,7 +314,15 @@ export class PublicationNewEditComponent implements OnInit {
 
     if ( this.formPublication.invalid ) {
 
-      this.swalFormDataInvalid.fire();
+      if ( this.formPublication.get('cover').invalid ) {
+
+        this.sweetAlertGenericService.showAlertError('Se requiere una portada para crear la publicación');
+
+      } else {
+
+        this.swalFormDataInvalid.fire();
+
+      }
 
       return Object.values( this.formPublication.controls ).forEach( control => {
 
@@ -330,10 +341,16 @@ export class PublicationNewEditComponent implements OnInit {
 
     } else {
 
-      if (  this.pagesTotal > 0 ) {
+      if ( this.pagesTotal > 0 || this.isToSketch ) {
 
         this.spinnerService.show();
-        ( this.isToEdit ) ? this.editPublication() : this.newPublication();
+
+        if ( this.isToEdit ) {
+          (this.pagesTotal > 0) ? this.editPublication() : this.editCollectionToPublication(this.publicationToEditId);
+        } else {
+          (this.pagesTotal > 0) ? this.newPublication() : this.uploadPublicationNewPages();
+        }
+
 
       } else {
 
@@ -358,7 +375,6 @@ export class PublicationNewEditComponent implements OnInit {
       const page = pageForm.get('image').value;
 
       arrayPageObervables.push( this.fileServ.upload( page )  );
-
 
     });
 
@@ -422,7 +438,7 @@ export class PublicationNewEditComponent implements OnInit {
 
     //#region  Obtener todas las páginas nuevas
     const arrayNewPageObervables: Observable<any>[] = [];
-    let pagesUrl: IUpdatePagesCommand = {
+    const pagesUrl: IUpdatePagesCommand = {
       pages: [] = []
     };
 
@@ -454,8 +470,6 @@ export class PublicationNewEditComponent implements OnInit {
 
     } else {
 
-      console.log('CON PÁGINAS NUEVAS >>>>>>>>>>>>>>');
-
       // << Con páginas nuevas >>
       let auxPagesNewUrl: IUpdatePagesCommand = {
         pages: [] = []
@@ -465,8 +479,6 @@ export class PublicationNewEditComponent implements OnInit {
       forkJoin( arrayNewPageObervables ).subscribe( ( dataPage ) => {
 
         auxPagesNewUrl = this.getUrlFromFileService(dataPage);
-
-        console.log('TEST > ', auxPagesNewUrl.pages);
 
         // #region Asignar los url obtenidos, en orden, en los espacios sin url creados en el arreglo anteriormente
 
@@ -503,8 +515,7 @@ export class PublicationNewEditComponent implements OnInit {
 
   }
 
-  private uploadPublicationNewPages( pagesUrlToUpload: IUpdatePagesCommand ): void {
-
+  private uploadPublicationNewPages( pagesUrlToUpload?: IUpdatePagesCommand ): void {
 
     const createSketch: ICreateCommand = {
 
@@ -516,6 +527,7 @@ export class PublicationNewEditComponent implements OnInit {
 
     };
 
+
     this.publicationService.create( createSketch ).subscribe(
 
       // Se crea primero el borrador - TODO: Llamar a la función de creador borrador con una condición si luego publicar
@@ -523,22 +535,29 @@ export class PublicationNewEditComponent implements OnInit {
 
         const idSketch = resSketch.id;
 
-        console.log('ID PUB: ', resSketch);
+        // Si solo se quería generar el nuevo id, se saltea el paso de asignar las páginas
 
-        // Subir las paginas
-        this.publicationService.updatePages( idSketch, pagesUrlToUpload  ).subscribe(
-          (resPagesUpload: any) => {
+        if ( !pagesUrlToUpload ) {
 
-            this.assignCollectionToPublication(idSketch);
+          this.assignCollectionToPublication(idSketch);
 
-          },
-          (error: Error) => {
+        } else {
 
-            console.error(error);
-            this.spinnerService.hide();
+          // Subir las paginas
+          this.publicationService.updatePages( idSketch, pagesUrlToUpload  ).subscribe(
+            (resPagesUpload: any) => {
 
-          }
-        );
+              this.assignCollectionToPublication(idSketch);
+
+            },
+            (error: Error) => {
+
+              console.error(error);
+              this.spinnerService.hide();
+
+            }
+          );
+        }
 
       },
       (error: Error) => {
@@ -577,7 +596,7 @@ export class PublicationNewEditComponent implements OnInit {
 
     if ( this.collectionArrayCheck.controls.length === 0 ) {
 
-      ( this.isToEdit ) ?
+      ( this.isToEdit || this.isToSketch ) ?
         this.editPublicationFinish(idPublication) : this.newPublicationFinish(idPublication) ;
 
     } else {
@@ -595,7 +614,7 @@ export class PublicationNewEditComponent implements OnInit {
       forkJoin(  collectionSubscriptionsList ).subscribe(
         (data: any) => {
 
-          ( this.isToEdit ) ?
+          ( this.isToEdit || this.isToSketch ) ?
             this.editPublicationFinish(idPublication) : this.newPublicationFinish(idPublication) ;
 
         },
@@ -665,7 +684,17 @@ export class PublicationNewEditComponent implements OnInit {
     this.publicationService.publish( idPublication ).subscribe(
       (resPublish: any) => {
 
-        this.swalFormDataValid.fire();
+        // Decidir es por edición (en ese caso: nueva publicaicón o borrador) o publicación totalmente nueva
+        if ( this.isToEdit ) {
+
+          this.swalFormEditPublishValid.fire();
+
+        } else {
+
+          this.swalFormDataValid.fire();
+
+        }
+
         this.spinnerService.hide();
 
       },
@@ -692,14 +721,22 @@ export class PublicationNewEditComponent implements OnInit {
 
     };
 
-
-
     // Editar la publicación en sí con todos los datos necesarios.
     this.publicationService.update( idPublication, publicationUpdateCMD ).subscribe(
       (resEditPublish: any) => {
 
-        this.swalFormEditValid.fire();
-        this.spinnerService.hide();
+        if ( this.isToSketch ) {
+
+          this.swalFormSketchValid.fire();
+          this.isToSketch = false; // Por si luego desea publicar (puede volver a guardarlo como borrador)
+
+          this.spinnerService.hide();
+
+        } else {
+
+          this.newPublicationFinish(idPublication);
+
+        }
 
       },
       (error: any) => {
@@ -945,6 +982,7 @@ export class PublicationNewEditComponent implements OnInit {
 
     } )[0].name;
   }
+
 
 
   //#endregion
