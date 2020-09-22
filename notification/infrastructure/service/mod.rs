@@ -1,2 +1,2 @@
-mod email_service;
-pub use email_service::*;
+mod gmail_service;
+pub use gmail_service::*;

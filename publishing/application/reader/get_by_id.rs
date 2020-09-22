@@ -1,6 +1,5 @@
 use common::error::Error;
 use common::result::Result;
-use identity::domain::user::UserRepository;
 
 use crate::application::dtos::ReaderDto;
 use crate::domain::reader::{ReaderId, ReaderRepository};

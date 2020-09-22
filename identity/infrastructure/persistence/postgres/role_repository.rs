@@ -103,10 +103,3 @@ impl RoleRepository for PostgresRoleRepository {
         Ok(())
     }
 }
-
-#[cfg(test)]
-mod tests {
-
-    #[tokio::test]
-    async fn all() {}
-}

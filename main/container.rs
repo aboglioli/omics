@@ -13,6 +13,8 @@ use identity::infrastructure::persistence::postgres::{
     PostgresRoleRepository, PostgresUserRepository,
 };
 use identity::infrastructure::service::{BcryptHasher, JWTEncoder};
+use notification::container::NotificationContainer;
+use notification::infrastructure::service::GmailService;
 use publishing::container::PublishingContainer;
 use publishing::infrastructure::persistence::postgres::{
     PostgresAuthorRepository, PostgresCategoryRepository, PostgresCollectionRepository,
@@ -26,6 +28,7 @@ pub struct MainContainer {
     pub event_repo: Arc<InMemEventRepository>,
     pub identity: IdentityContainer<InMemEventBus>,
     pub publishing: PublishingContainer<InMemEventBus>,
+    pub notification: NotificationContainer<InMemEventBus>,
 }
 
 impl MainContainer {
@@ -71,6 +74,9 @@ impl MainContainer {
         let p_publication_repo = Arc::new(PostgresPublicationRepository::new(client.clone()));
         let p_reader_repo = Arc::new(PostgresReaderRepository::new(client.clone()));
 
+        // Notification
+        let n_email_serv = Arc::new(GmailService::new());
+
         // Containers
         let identity = IdentityContainer::new(
             event_bus.clone(),
@@ -92,11 +98,14 @@ impl MainContainer {
             i_user_repo.clone(),
         );
 
+        let notification = NotificationContainer::new(event_bus.clone(), n_email_serv);
+
         MainContainer {
             event_bus,
             event_repo,
             identity,
             publishing,
+            notification,
         }
     }
 
@@ -106,6 +115,7 @@ impl MainContainer {
 
         self.identity.subscribe(self.event_bus.as_ref()).await?;
         self.publishing.subscribe(self.event_bus.as_ref()).await?;
+        self.notification.subscribe(self.event_bus.as_ref()).await?;
 
         Ok(())
     }

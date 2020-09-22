@@ -36,11 +36,12 @@ impl<'a> Unlike<'a> {
         let reader_id = ReaderId::new(auth_id)?;
         let reader = self.reader_repo.find_by_id(&reader_id).await?;
 
-        publication.unlike(&reader)?;
-
         self.interaction_repo
             .delete_like(&reader_id, &publication_id)
             .await?;
+
+        publication.unlike(&reader)?;
+
         self.publication_repo.save(&mut publication).await?;
 
         self.event_pub

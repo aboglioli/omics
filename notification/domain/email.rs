@@ -14,4 +14,16 @@ impl Email {
     pub fn new(to: String, title: String, body: String) -> Result<Self> {
         Ok(Email { to, title, body })
     }
+
+    pub fn to(&self) -> &str {
+        &self.to
+    }
+
+    pub fn title(&self) -> &str {
+        &self.title
+    }
+
+    pub fn body(&self) -> &str {
+        &self.body
+    }
 }

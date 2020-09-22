@@ -100,7 +100,7 @@ impl AuthorRepository for PostgresAuthorRepository {
                     followers = $2
                 WHERE
                     id = $1",
-                &[&author.base().id().to_uuid()?, &author.followers()],
+                &[&author.base().id().to_uuid()?, &(author.followers() as i32)],
             )
             .await
             .map_err(|err| Error::new("author", "update").wrap_raw(err))?;

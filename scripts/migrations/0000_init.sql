@@ -181,3 +181,7 @@ CREATE TABLE IF NOT EXISTS follows (
   FOREIGN KEY(reader_id) REFERENCES users(id),
   FOREIGN KEY(author_id) REFERENCES users(id)
 );
+
+CREATE TABLE IF NOT EXISTS notifications (
+
+)

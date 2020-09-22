@@ -210,7 +210,7 @@ impl InteractionRepository for PostgresInteractionRepository {
             let publication_id: Uuid = row.get("publication_id");
             let datetime: DateTime<Utc> = row.get("datetime");
 
-            let stars: u32 = row.get("stars");
+            let stars: i16 = row.get("stars");
             let comment: String = row.get("comment");
 
             reviews.push(Review::build(
@@ -461,7 +461,7 @@ impl InteractionRepository for PostgresInteractionRepository {
                     &review.base().id().reader_id().to_uuid()?,
                     &review.base().id().publication_id().to_uuid()?,
                     &review.base().created_at(),
-                    &(review.stars().value() as u32),
+                    &(review.stars().value() as i16),
                     &review.comment().value(),
                 ],
             )
@@ -566,6 +566,14 @@ impl InteractionRepository for PostgresInteractionRepository {
         reader_id: &ReaderId,
         publication_id: &PublicationId,
     ) -> Result<()> {
+        if self
+            .find_likes(Some(reader_id), Some(publication_id), None, None)
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("like", "not_found"));
+        }
+
         self.client
             .execute(
                 "DELETE FROM likes WHERE reader_id = $1 AND publication_id = $2",
@@ -582,6 +590,14 @@ impl InteractionRepository for PostgresInteractionRepository {
         reader_id: &ReaderId,
         publication_id: &PublicationId,
     ) -> Result<()> {
+        if self
+            .find_reviews(Some(reader_id), Some(publication_id), None, None)
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("review", "not_found"));
+        }
+
         self.client
             .execute(
                 "DELETE FROM reviews WHERE reader_id = $1 AND publication_id = $2",
@@ -598,6 +614,14 @@ impl InteractionRepository for PostgresInteractionRepository {
         reader_id: &ReaderId,
         publication_id: &PublicationId,
     ) -> Result<()> {
+        if self
+            .find_publication_favorites(Some(reader_id), Some(publication_id), None, None)
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("favorite", "not_found"));
+        }
+
         self.client
             .execute(
                 "DELETE FROM publication_favorites WHERE reader_id = $1 AND publication_id = $2",
@@ -614,6 +638,14 @@ impl InteractionRepository for PostgresInteractionRepository {
         reader_id: &ReaderId,
         collection_id: &CollectionId,
     ) -> Result<()> {
+        if self
+            .find_collection_favorites(Some(reader_id), Some(collection_id), None, None)
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("favorite", "not_found"));
+        }
+
         self.client
             .execute(
                 "DELETE FROM collection_favorites WHERE reader_id = $1 AND collection_id = $2",
@@ -626,6 +658,14 @@ impl InteractionRepository for PostgresInteractionRepository {
     }
 
     async fn delete_follow(&self, reader_id: &ReaderId, author_id: &AuthorId) -> Result<()> {
+        if self
+            .find_follows(Some(reader_id), Some(author_id), None, None)
+            .await?
+            .is_empty()
+        {
+            return Err(Error::new("follow", "not_found"));
+        }
+
         self.client
             .execute(
                 "DELETE FROM collection_favorites WHERE reader_id = $1 AND author_id = $2",

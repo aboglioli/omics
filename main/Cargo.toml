@@ -16,11 +16,12 @@ publishing = { path = "../publishing" }
 
 [dependencies]
 common = { path = "../common" }
-shared = { path = "../shared" }
 file = { path = "../file" }
 identity = { path = "../identity" }
+notification = { path = "../notification" }
 payment = { path = "../payment" }
 publishing = { path = "../publishing" }
+shared = { path = "../shared" }
 
 actix-cors = "0.3"
 actix-multipart="0.3"

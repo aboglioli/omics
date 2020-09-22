@@ -5,6 +5,7 @@ use std::env;
 
 use dotenv::dotenv;
 
+#[derive(Debug, Clone)]
 pub struct Config {
     port: u16,
     env: String,

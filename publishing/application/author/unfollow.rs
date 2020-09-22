@@ -39,11 +39,12 @@ impl<'a> Unfollow<'a> {
             .find_by_id(&AuthorId::new(author_id)?)
             .await?;
 
-        author.unfollow(&reader)?;
-
         self.interaction_repo
             .delete_follow(reader.base().id(), author.base().id())
             .await?;
+
+        author.unfollow(&reader)?;
+
         self.author_repo.save(&mut author).await?;
 
         self.event_pub
