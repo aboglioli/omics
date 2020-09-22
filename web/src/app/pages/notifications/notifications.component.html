@@ -1,0 +1,24 @@
+<div class="notifications-container">
+  <div class="side"></div>
+
+  <div class="center">
+    <div class="header">
+      <h1>NOTIFICACIONES</h1>
+    </div>
+
+    <div class="body">
+      <div class="notification" *ngIf="notifications.length === 0">
+        Sin notificaciones recientes.
+      </div>
+
+      <div *ngFor="let notification of notifications">
+        <div
+          [class]="'notification ' + getClass(notification)"
+          [innerHTML]="makeText(notification)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="side"></div>
+</div>

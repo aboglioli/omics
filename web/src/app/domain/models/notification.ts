@@ -16,6 +16,15 @@ export interface INotificationBody {
   reader_lastname?: string;
 }
 
+/**
+ * Notifications:
+ * - welcome
+ * - new-publication-from-followed-author
+ * - publication-approved
+ * - publication-rejected
+ * - publication-liked
+ * - author-followed
+ */
 export interface INotification {
   id: string;
   user_id: string;

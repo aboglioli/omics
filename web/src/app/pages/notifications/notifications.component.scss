@@ -1,0 +1,60 @@
+.notifications-container {
+  min-height: calc(100vh - 4.6em);
+  display: flex;
+  flex-direction: row;
+
+  .side {
+    flex: 1;
+    background-image: url(/assets/images/banners/rightBanner.jpg);
+    opacity: 0.25;
+  }
+
+  .center {
+    flex: 4;
+    display: flex;
+    flex-direction: column;
+    padding: 0px;
+    color: white;
+    background-color: #1B6485;
+
+    .header {
+      min-height: 70px;
+      background-color: #201D2E;
+      padding: 0.25em 1em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      h1 {
+        font-style: italic;
+        font-weight: bolder;
+        margin: 0px;
+      }
+    }
+
+    .body {
+      color: white;
+
+      .notification {
+        padding: 1rem;
+        margin: 0.5rem;
+      }
+
+      .read {
+        border: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      .unread {
+        background-color: rgba(30, 19, 78, 0.25);
+      }
+
+      .unread.green {
+        background-color: rgba(19, 169, 28, 0.25);
+      }
+
+      .unread.red {
+        background-color: rgba(255, 29, 46, 0.25);
+      }
+    }
+  }
+}

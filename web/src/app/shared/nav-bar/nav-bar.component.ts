@@ -71,8 +71,7 @@ export class NavBarComponent implements OnInit {
   //#region User Actions
   public showNotifications(): void {
 
-    // TODO: Agregar sistema de notificaciones como otro componente interno
-    this.sweetAlertGenericService.showUnderConstrucction();
+    this.router.navigate(['/notifications']);
 
   }
 

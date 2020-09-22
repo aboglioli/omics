@@ -45,6 +45,7 @@ import { UnderConstructionComponent } from './shared/under-construction/under-co
 import { DeskboardMisComicsComponent } from './components/deskboard/deskboard-mis-comics/deskboard-mis-comics.component';
 import { PublicationNewEditComponent } from './components/deskboard/publication-new-edit/publication-new-edit.component';
 import { PublicationCardManagerComponent } from './components/publication-card-type/publication-card/publication-card-manager.component';
+import { NotificationsComponent } from './pages/notifications/notifications.component';
 // --->
 
 // Development
@@ -92,6 +93,7 @@ import { PublicationCardReaderComponent } from './components/publication-card-ty
     PasswordForgotComponent,
     PasswordRewriteComponent,
     PublicationCardManagerComponent,
+    NotificationsComponent,
 
     DevelopmentComponent,
     DevUploadFileComponent,
