@@ -104,6 +104,15 @@ impl<'a> GetById<'a> {
                     .get_history(Some(&reader_id), Some(&publication_id), None, None)
                     .await?;
 
+                let in_favorites = !self.interaction_repo.find_publication_favorites(
+                    Some(&reader_id),
+                    Some(&publication_id),
+                    None,
+                    None,
+                )
+                .await?
+                .is_empty();
+
                 (
                     PublicationDto::from(&publication),
                     Some(ReaderPublicationInteractionDto::new(
@@ -111,6 +120,7 @@ impl<'a> GetById<'a> {
                         reader_statistics.readings() > 0,
                         reader_statistics.likes() > 0,
                         reader_statistics.reviews() > 0,
+                        in_favorites,
                     )),
                 )
             }

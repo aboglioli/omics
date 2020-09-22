@@ -13,7 +13,7 @@ div.card-box {
 
   width: 180px;
   height: 180px;
-  position: relative;
+  // position: relative;
 
   img {
     height: 100%;
@@ -31,9 +31,24 @@ div.card-box {
   align-items: center;
   text-decoration: none;
 
+  // img {
+  //   width: 180px;
+  //   height: 180px;
+  // }
+
   .cover {
     height: 200px;
     width: 200px;
+    min-height: 200px;
+    min-width: 200px;
+    max-height: 200px;
+    max-width: 200px;
+
+    img {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+    }
   }
 
   .text {

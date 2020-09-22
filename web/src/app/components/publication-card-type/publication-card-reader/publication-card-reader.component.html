@@ -1,18 +1,20 @@
-<div *ngIf="publication">
+  <div *ngIf="publication">
 
-  <div class="publication">
-    <div class="text">
-      <span class="name">{{publication.name}}</span>
+    <div class="publication">
+      <div class="text">
+        <span class="name">{{publication.name}}</span>
+      </div>
+
+      <div class="cover">
+        <img [src]="publication.cover" alt="Thumbail image" >
+      </div>
+
+      <div class="text">
+        <span class="views">
+          {{publication.statistics.views}} visualizaciones
+        </span>
+      </div>
     </div>
 
-    <img [src]="publication.cover" alt="Thumbail image" >
 
-    <div class="text">
-      <span class="views">
-        {{publication.statistics.views}} visualizaciones
-      </span>
-    </div>
   </div>
-
-
-</div>

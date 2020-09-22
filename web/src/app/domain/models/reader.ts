@@ -19,6 +19,7 @@ export interface IReaderPublicationInteraction {
   read: boolean;
   liked: boolean;
   reviewed: boolean;
+  in_favorites: boolean;
 }
 
 export interface IReaderAuthorInteraction {

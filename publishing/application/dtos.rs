@@ -338,15 +338,17 @@ pub struct ReaderPublicationInteractionDto {
     pub read: bool,
     pub liked: bool,
     pub reviewed: bool,
+    pub in_favorites: bool,
 }
 
 impl ReaderPublicationInteractionDto {
-    pub fn new(viewed: bool, read: bool, liked: bool, reviewed: bool) -> Self {
+    pub fn new(viewed: bool, read: bool, liked: bool, reviewed: bool, in_favorites: bool) -> Self {
         ReaderPublicationInteractionDto {
             viewed,
             read,
             liked,
             reviewed,
+            in_favorites,
         }
     }
 }
