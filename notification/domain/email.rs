@@ -11,8 +11,12 @@ pub struct Email {
 }
 
 impl Email {
-    pub fn new(to: String, title: String, body: String) -> Result<Self> {
-        Ok(Email { to, title, body })
+    pub fn new<S: Into<String>>(to: S, title: S, body: S) -> Result<Self> {
+        Ok(Email {
+            to: to.into(),
+            title: title.into(),
+            body: body.into(),
+        })
     }
 
     pub fn to(&self) -> &str {

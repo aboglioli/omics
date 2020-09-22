@@ -5,10 +5,10 @@ use async_trait::async_trait;
 use common::event::{Event, EventHandler};
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
-use publishing::domain::author::AuthorRepository;
+use publishing::domain::author::{AuthorId, AuthorRepository};
 use publishing::domain::collection::CollectionRepository;
 use publishing::domain::interaction::InteractionRepository;
-use publishing::domain::publication::PublicationRepository;
+use publishing::domain::publication::{PublicationId, PublicationRepository};
 use shared::event::{PublicationEvent, UserEvent};
 
 use crate::domain::notification::{Body, Notification, NotificationRepository};
@@ -48,6 +48,14 @@ impl EventHandler for NotificationHandler {
         ".*"
     }
 
+    // Notifications:
+    // - reader: Welcome
+    // - reader: New publication from followed author
+    // - author: Approved publication
+    // - author: Rejected publication
+    // - author: Publication liked
+    // - author: Publication reviewed
+    // - reader: Publication published
     async fn handle(&mut self, event: &Event) -> Result<bool> {
         match event.topic() {
             "user" => {
@@ -84,7 +92,101 @@ impl EventHandler for NotificationHandler {
                 let event: PublicationEvent = serde_json::from_slice(event.payload())?;
 
                 match event {
-                    PublicationEvent::Published { id: _, .. } => {}
+                    PublicationEvent::Published {
+                        id,
+                        author_id,
+                        name,
+                        ..
+                    } => {
+                        let author_id = AuthorId::new(author_id)?;
+                        let author = self.author_repo.find_by_id(&author_id).await?;
+                        let follows = self
+                            .interaction_repo
+                            .find_follows(None, Some(&author_id), None, None)
+                            .await?;
+
+                        let mut body = Body::new()
+                            .author(author.base().id().value(), author.username())
+                            .publication(id.clone(), name.clone());
+
+                        if author.name().is_some() && author.lastname().is_some() {
+                            body = body
+                                .author_name(author.name().unwrap(), author.lastname().unwrap());
+                        }
+
+                        // Notify readers of followed author
+                        for follow in follows.into_iter() {
+                            let reader_id = follow.base().id().reader_id();
+
+                            let mut notification = Notification::new(
+                                self.notification_repo.next_id().await?,
+                                reader_id.clone(),
+                                "new-publication-from-followed-author",
+                                body.clone(),
+                            )?;
+
+                            self.notification_repo.save(&mut notification).await?;
+                        }
+
+                        // Notify author of approved publication
+                        let body = Body::new().publication(id, name);
+
+                        let mut notification = Notification::new(
+                            self.notification_repo.next_id().await?,
+                            author_id,
+                            "publication-approved",
+                            body,
+                        )?;
+
+                        self.notification_repo.save(&mut notification).await?;
+                    }
+                    PublicationEvent::Rejected { id } => {
+                        let publication_id = PublicationId::new(id)?;
+                        let publication = self.publication_repo.find_by_id(&publication_id).await?;
+
+                        let body = Body::new().publication(
+                            publication.base().id().value(),
+                            publication.header().name().value(),
+                        );
+
+                        let mut notification = Notification::new(
+                            self.notification_repo.next_id().await?,
+                            publication.author_id().clone(),
+                            "publication-rejected",
+                            body,
+                        )?;
+
+                        self.notification_repo.save(&mut notification).await?;
+                    }
+                    PublicationEvent::Liked {
+                        reader_id,
+                        publication_id,
+                    } => {
+                        let reader_id = UserId::new(reader_id)?;
+                        let reader = self.user_repo.find_by_id(&reader_id).await?;
+
+                        let publication_id = PublicationId::new(publication_id)?;
+                        let publication = self.publication_repo.find_by_id(&publication_id).await?;
+
+                        let body = Body::new()
+                            .reader(
+                                reader.base().id().value(),
+                                reader.identity().username().value(),
+                            )
+                            .publication(
+                                publication.base().id().value(),
+                                publication.header().name().value(),
+                            );
+
+                        let mut notification = Notification::new(
+                            self.notification_repo.next_id().await?,
+                            publication.author_id().clone(),
+                            "publication-liked",
+                            body,
+                        )?;
+
+                        self.notification_repo.save(&mut notification).await?;
+                    }
                     _ => return Ok(false),
                 }
             }

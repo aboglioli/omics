@@ -11,6 +11,7 @@ use publishing::domain::collection::CollectionRepository;
 use publishing::domain::interaction::InteractionRepository;
 use publishing::domain::publication::PublicationRepository;
 
+use crate::application::author::ApprovedRejectedPublicationHandler;
 use crate::application::notification::NotificationHandler;
 
 use crate::domain::email::EmailService;
@@ -100,6 +101,15 @@ where
         // TODO: activate!!
         // let registered_handler = RegisteredHandler::new(self.email_serv.clone());
         // event_sub.subscribe(Box::new(registered_handler)).await?;
+
+        let approved_rejected_publication_handler = ApprovedRejectedPublicationHandler::new(
+            self.publication_repo.clone(),
+            self.user_repo.clone(),
+            self.email_serv.clone(),
+        );
+        event_sub
+            .subscribe(Box::new(approved_rejected_publication_handler))
+            .await?;
 
         let notification_handler = NotificationHandler::new(
             self.author_repo.clone(),

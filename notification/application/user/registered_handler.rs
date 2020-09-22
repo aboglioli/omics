@@ -30,13 +30,13 @@ impl EventHandler for RegisteredHandler {
         match event {
             UserEvent::Registered {
                 id,
-                username: _,
+                username,
                 email,
                 validation_code,
             } => {
                 let email = Email::new(
                     email,
-                    "Bienvenido".to_owned(),
+                    format!("Bienvenido {}", username),
                     format!(
                         r#"
                         <p>
