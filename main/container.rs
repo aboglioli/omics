@@ -14,6 +14,7 @@ use identity::infrastructure::persistence::postgres::{
 };
 use identity::infrastructure::service::{BcryptHasher, JWTEncoder};
 use notification::container::NotificationContainer;
+use notification::infrastructure::persistence::postgres::PostgresNotificationRepository;
 use notification::infrastructure::service::GmailService;
 use publishing::container::PublishingContainer;
 use publishing::infrastructure::persistence::postgres::{
@@ -75,6 +76,7 @@ impl MainContainer {
         let p_reader_repo = Arc::new(PostgresReaderRepository::new(client.clone()));
 
         // Notification
+        let n_notification_repo = Arc::new(PostgresNotificationRepository::new(client.clone()));
         let n_email_serv = Arc::new(GmailService::new());
 
         // Containers
@@ -98,7 +100,8 @@ impl MainContainer {
             i_user_repo.clone(),
         );
 
-        let notification = NotificationContainer::new(event_bus.clone(), n_email_serv);
+        let notification =
+            NotificationContainer::new(event_bus.clone(), n_notification_repo, n_email_serv);
 
         MainContainer {
             event_bus,

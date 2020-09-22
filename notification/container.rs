@@ -8,9 +8,12 @@ use common::result::Result;
 
 use crate::application::user::RegisteredHandler;
 use crate::domain::email::EmailService;
+use crate::domain::notification::NotificationRepository;
 
 pub struct NotificationContainer<EPub> {
     event_pub: Arc<EPub>,
+
+    notification_repo: Arc<dyn NotificationRepository>,
 
     email_serv: Arc<dyn EmailService>,
 }
@@ -19,15 +22,24 @@ impl<EPub> NotificationContainer<EPub>
 where
     EPub: EventPublisher,
 {
-    pub fn new(event_pub: Arc<EPub>, email_serv: Arc<dyn EmailService>) -> Self {
+    pub fn new(
+        event_pub: Arc<EPub>,
+        notification_repo: Arc<dyn NotificationRepository>,
+        email_serv: Arc<dyn EmailService>,
+    ) -> Self {
         NotificationContainer {
             event_pub,
+            notification_repo,
             email_serv,
         }
     }
 
     pub fn event_pub(&self) -> &EPub {
         &self.event_pub
+    }
+
+    pub fn notification_repo(&self) -> &dyn NotificationRepository {
+        self.notification_repo.as_ref()
     }
 
     pub fn email_serv(&self) -> &dyn EmailService {

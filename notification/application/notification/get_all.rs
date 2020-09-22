@@ -4,7 +4,7 @@ use common::result::Result;
 use identity::domain::user::UserId;
 
 use crate::application::dtos::NotificationDto;
-use crate::domain::notification::{NotificationRepository};
+use crate::domain::notification::NotificationRepository;
 
 #[derive(Serialize)]
 pub struct GetAllResponse {

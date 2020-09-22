@@ -13,7 +13,10 @@ identity = { path = "../identity" }
 shared = { path = "../shared" }
 
 async-trait = "0.1.36"
+chrono = "0.4"
 lettre = "0.10.0-alpha.2"
 mime = "0.3.16"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+tokio-postgres = { version = "0.5", features = ["with-chrono-0_4", "with-uuid-0_8", "with-serde_json-1"] }
+uuid = { version = "0.8.1", features = ["serde", "v4"] }

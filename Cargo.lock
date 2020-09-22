@@ -1485,6 +1485,7 @@ name = "notification"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "chrono",
  "common",
  "identity",
  "lettre",
@@ -1492,6 +1493,8 @@ dependencies = [
  "serde",
  "serde_json",
  "shared",
+ "tokio-postgres",
+ "uuid",
 ]
 
 [[package]]
