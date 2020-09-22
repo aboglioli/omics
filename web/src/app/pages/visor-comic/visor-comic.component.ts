@@ -109,7 +109,29 @@ export class VisorComicComponent implements OnInit {
   }
 
   public onFavorito(): void {
-    this.sweetAlertGenericService.showUnderConstrucction();
+
+    console.log(this.readerInfo.in_favorites);
+
+    if ( !this.readerInfo.in_favorites  ) {
+
+      this.publicationService.addToFavorites( this.publicationId ).subscribe(
+        (res: any) =>  {
+
+          this.readerInfo.in_favorites = true;
+        }
+      );
+
+    } else {
+
+      this.publicationService.removeFromFavorites( this.publicationId ).subscribe(
+        (res: any) => {
+          this.readerInfo.in_favorites = false;
+        }
+      );
+
+    }
+
+
   }
 
   public onLike(): void {
