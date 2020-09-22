@@ -91,7 +91,7 @@ impl AuthorRepository for PostgresAuthorRepository {
                 &[&author.base().id().to_uuid()?],
             )
             .await
-            .map_err(|_err| Error::not_found("author"))?;
+            .map_err(|err| Error::not_found("author").wrap_raw(err))?;
 
         self.client
             .execute(

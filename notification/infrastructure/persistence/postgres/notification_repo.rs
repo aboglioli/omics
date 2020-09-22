@@ -9,6 +9,7 @@ use uuid::Uuid;
 use common::error::Error;
 use common::model::AggregateRoot;
 use common::result::Result;
+use common::sql::where_builder::WhereBuilder;
 use identity::domain::user::UserId;
 
 use crate::domain::notification::{Body, Notification, NotificationId, NotificationRepository};
@@ -44,16 +45,22 @@ impl PostgresNotificationRepository {
 
 #[async_trait]
 impl NotificationRepository for PostgresNotificationRepository {
-    async fn find_by_user_id(&self, id: &UserId, _read: Option<bool>) -> Result<Vec<Notification>> {
+    async fn find_by_user_id(&self, id: &UserId, read: Option<bool>) -> Result<Vec<Notification>> {
+        let user_id = id.to_uuid()?;
+
+        let (sql, params) = WhereBuilder::new()
+            .add_param("user_id = $$", &user_id)
+            .add_param_opt("read = $$", &read, read.is_some())
+            .build();
+
         let rows = self
             .client
             .query(
-                "SELET * FROM notifications
-                WHERE user_id = $1",
-                &[&id.to_uuid()?],
+                &format!("SELET * FROM notifications {}", sql) as &str,
+                &params,
             )
             .await
-            .map_err(|_err| Error::not_found("notification"))?;
+            .map_err(|err| Error::not_found("notification").wrap_raw(err))?;
 
         let mut notifications = Vec::new();
         for row in rows.into_iter() {
