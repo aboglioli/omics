@@ -1,6 +1,12 @@
 <div class="authors-container">
   <a class="author" [href]="'/profile/' + author.id" *ngFor="let author of authors">
-    <img class="profile-image" [src]="author.profile_image" />
+
+    <span *ngIf="author.profile_image">
+      <img class="profile-image" [src]="author.profile_image" />
+    </span>
+    <span *ngIf="!author.profile_image">
+      <img src="assets/images/generic/avatar196x196.jpg">
+    </span>
 
     <div class="text">
       <span class="username">{{author.username}}</span>

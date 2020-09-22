@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { IPublication } from 'src/app/domain/models';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 import { IStatus } from '../../../domain/models/publication';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-publication-card-author',
@@ -20,6 +21,8 @@ export class PublicationCardAuthorComponent implements OnInit {
 
   constructor(
     private sweetAlertGenericService: SweetAlertGenericMessageService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
@@ -31,7 +34,7 @@ export class PublicationCardAuthorComponent implements OnInit {
   public goToEdit(): void {
 
     // TODO: Agregar para ver la publicación
-    this.sweetAlertGenericService.showUnderConstrucction();
+    this.router.navigate([`publication/edit/${this.publication.id}`], { relativeTo: this.activatedRoute });
 
   }
 
