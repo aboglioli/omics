@@ -1,4 +1,4 @@
-use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse, Responder};
+use actix_web::{http, delete, get, post, put, web, HttpRequest, HttpResponse, Responder};
 
 use common::request::IncludeParams;
 use identity::application::user::{
@@ -170,7 +170,14 @@ async fn validate(
     Validate::new(c.identity.event_pub(), c.identity.user_repo())
         .exec(path.0, path.1)
         .await
-        .map(|res| HttpResponse::Ok().json(res))
+        .map(|res| HttpResponse::Ok()
+            .header(http::header::LOCATION, "http://localhost:4200")
+            .content_type("text/html")
+            .body(r#"
+                Bienvenido. Tu cuenta ha sido verificada.
+                <a href="http://localhost:4200/">Continua</a>.
+            "#)
+        )
         .map_err(PublicError::from)
 }
 

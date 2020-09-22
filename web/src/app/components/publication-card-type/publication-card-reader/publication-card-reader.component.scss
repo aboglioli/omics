@@ -22,3 +22,33 @@ div.card-box {
   }
 
 }
+
+.publication {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+
+  .cover {
+    height: 200px;
+    width: 200px;
+  }
+
+  .text {
+    margin: 0.5rem 0;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+
+    .name {
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .views {
+      color: #aaa;
+    }
+  }
+}
