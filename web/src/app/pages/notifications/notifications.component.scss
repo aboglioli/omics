@@ -1,3 +1,5 @@
+@import "src/scss/vars";
+
 .notifications-container {
   min-height: calc(100vh - 4.6em);
   display: flex;
@@ -40,12 +42,15 @@
         margin: 0.5rem;
 
         a {
-          color: #000 !important;
+          color: $omics-neon-pink !important;
+          font-weight: bolder;
         }
       }
 
       .read {
-        border: 1px solid rgba(0, 0, 0, 0.1);
+        border: 1px solid (0, 0, 0, 0.1);
+
+        background-color: $omics-background-menu;
       }
 
       .unread {
