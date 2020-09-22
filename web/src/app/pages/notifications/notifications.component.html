@@ -13,8 +13,54 @@
 
       <div *ngFor="let notification of notifications">
         <div
-          [class]="'notification ' + getClass(notification)"
-          [innerHTML]="makeText(notification)">
+          [ngSwitch]="notification.code"
+          [class]="'notification ' + getClass(notification)">
+
+          <div *ngSwitchCase="welcome">
+            Bienvenido a <b>Omics</b>
+          </div>
+
+          <div *ngSwitchCase="'new-publication-from-followed-author'">
+            El author
+              <a [href]="'/profile/' + notification.body.author_id">
+                {{notification.body.author_username}}
+              </a>
+            , a quien sigues, publicó una nueva obra que podría interesarte:
+              <a [href]="'/read/' + notification.body.publication_id">
+                {{notification.body.publication_name}}
+              </a>.
+          </div>
+
+          <div *ngSwitchCase="'publication-approved'">
+            ¡Tu publicación
+            <a href="/deskboard">
+              {{notification.body.publication_name}}
+            </a>
+            fue <b>aprobada</b>!<br>
+            De ahora en más aparecerá en el catálogo.
+          </div>
+
+          <div *ngSwitchCase="'publication-rejected'">
+            Lo sentimos. Tu publicación
+            <a href="/deskboard">
+              {{notification.body.publication_name}}
+            </a>
+            fue <b>rechazada</b>.
+          </div>
+
+          <div *ngSwitchCase="'publication-liked'">
+            La publicación
+            <a href="/deskboard">
+              {{notification.body.publication_name}}
+            </a>
+            recibió un <b>like</b> del usuario
+            <b>{{notification.body.reader_username}}</b>
+          </div>
+
+          <div *ngSwitchCase="'author-followed'">
+            El usuario <b>{{notification.body.reader_username}}</b> comenzó a seguirte.
+          </div>
+
         </div>
       </div>
     </div>
