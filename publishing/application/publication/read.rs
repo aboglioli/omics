@@ -2,6 +2,7 @@ use serde::Serialize;
 
 use common::event::EventPublisher;
 use common::result::Result;
+use identity::domain::user::UserRepository;
 
 use crate::application::dtos::PageDto;
 use crate::domain::interaction::InteractionRepository;
@@ -20,6 +21,7 @@ pub struct Read<'a> {
     interaction_repo: &'a dyn InteractionRepository,
     publication_repo: &'a dyn PublicationRepository,
     reader_repo: &'a dyn ReaderRepository,
+    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Read<'a> {
@@ -28,12 +30,14 @@ impl<'a> Read<'a> {
         interaction_repo: &'a dyn InteractionRepository,
         publication_repo: &'a dyn PublicationRepository,
         reader_repo: &'a dyn ReaderRepository,
+        user_repo: &'a dyn UserRepository,
     ) -> Self {
         Read {
             event_pub,
             interaction_repo,
             publication_repo,
             reader_repo,
+            user_repo,
         }
     }
 
@@ -44,7 +48,13 @@ impl<'a> Read<'a> {
         let reader_id = ReaderId::new(auth_id)?;
         let reader = self.reader_repo.find_by_id(&reader_id).await?;
 
-        if publication.author_id() != &reader_id {
+        let is_content_manager = if let Ok(user) = self.user_repo.find_by_id(&reader_id).await {
+            user.is_content_manager()
+        } else {
+            false
+        };
+
+        if publication.author_id() != &reader_id && !is_content_manager {
             let mut reading = publication.read(&reader)?;
 
             self.interaction_repo.save_reading(&mut reading).await?;
@@ -76,6 +86,7 @@ mod tests {
             c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
+            c.user_repo(),
         );
 
         let mut reader = mocks::user2().2;
@@ -107,6 +118,7 @@ mod tests {
             c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
+            c.user_repo(),
         );
 
         let mut reader = mocks::user2().2;
@@ -131,6 +143,7 @@ mod tests {
             c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
+            c.user_repo(),
         );
 
         let mut reader = mocks::user1().2;
