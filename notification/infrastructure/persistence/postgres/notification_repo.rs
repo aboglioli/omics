@@ -56,7 +56,7 @@ impl NotificationRepository for PostgresNotificationRepository {
         let rows = self
             .client
             .query(
-                &format!("SELET * FROM notifications {}", sql) as &str,
+                &format!("SELECT * FROM notifications {}", sql) as &str,
                 &params,
             )
             .await

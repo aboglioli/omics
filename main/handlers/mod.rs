@@ -3,6 +3,7 @@ pub mod category;
 pub mod collection;
 pub mod event;
 pub mod file;
+pub mod notification;
 pub mod publication;
 pub mod reader;
 pub mod role;

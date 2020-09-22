@@ -4,6 +4,7 @@ pub use body::*;
 pub use repository::*;
 
 use common::model::{AggregateRoot, StringId};
+use common::result::Result;
 use identity::domain::user::UserId;
 
 pub type NotificationId = StringId;
@@ -18,14 +19,19 @@ pub struct Notification {
 }
 
 impl Notification {
-    pub fn new<S: Into<String>>(id: NotificationId, user_id: UserId, code: S, body: Body) -> Self {
-        Notification {
+    pub fn new<S: Into<String>>(
+        id: NotificationId,
+        user_id: UserId,
+        code: S,
+        body: Body,
+    ) -> Result<Self> {
+        Ok(Notification {
             base: AggregateRoot::new(id),
             user_id,
             code: code.into(),
             body,
             read: false,
-        }
+        })
     }
 
     pub fn build(

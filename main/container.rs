@@ -91,17 +91,25 @@ impl MainContainer {
 
         let publishing = PublishingContainer::new(
             event_bus.clone(),
-            p_author_repo,
-            p_category_repo,
-            p_collection_repo,
-            p_interaction_repo,
-            p_publication_repo,
-            p_reader_repo,
+            p_author_repo.clone(),
+            p_category_repo.clone(),
+            p_collection_repo.clone(),
+            p_interaction_repo.clone(),
+            p_publication_repo.clone(),
+            p_reader_repo.clone(),
             i_user_repo.clone(),
         );
 
-        let notification =
-            NotificationContainer::new(event_bus.clone(), n_notification_repo, n_email_serv);
+        let notification = NotificationContainer::new(
+            event_bus.clone(),
+            p_author_repo.clone(),
+            p_collection_repo.clone(),
+            p_interaction_repo.clone(),
+            n_notification_repo,
+            p_publication_repo.clone(),
+            i_user_repo.clone(),
+            n_email_serv,
+        );
 
         MainContainer {
             event_bus,

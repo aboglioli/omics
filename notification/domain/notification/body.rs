@@ -9,10 +9,12 @@ pub struct Body {
     collection_name: Option<String>,
 
     author_id: Option<String>,
+    author_username: Option<String>,
     author_name: Option<String>,
     author_lastname: Option<String>,
 
     reader_id: Option<String>,
+    reader_username: Option<String>,
     reader_name: Option<String>,
     reader_lastname: Option<String>,
 }
@@ -34,25 +36,25 @@ impl Body {
         self
     }
 
-    pub fn author<S: Into<String>>(
-        mut self,
-        author_id: S,
-        author_name: S,
-        author_lastname: S,
-    ) -> Self {
+    pub fn author<S: Into<String>>(mut self, author_id: S, author_username: S) -> Self {
         self.author_id = Some(author_id.into());
+        self.author_username = Some(author_username.into());
+        self
+    }
+
+    pub fn author_name<S: Into<String>>(mut self, author_name: S, author_lastname: S) -> Self {
         self.author_name = Some(author_name.into());
         self.author_lastname = Some(author_lastname.into());
         self
     }
 
-    pub fn reader<S: Into<String>>(
-        mut self,
-        reader_id: S,
-        reader_name: S,
-        reader_lastname: S,
-    ) -> Self {
+    pub fn reader<S: Into<String>>(mut self, reader_id: S, reader_username: S) -> Self {
         self.reader_id = Some(reader_id.into());
+        self.reader_username = Some(reader_username.into());
+        self
+    }
+
+    pub fn reader_name<S: Into<String>>(mut self, reader_name: S, reader_lastname: S) -> Self {
         self.reader_name = Some(reader_name.into());
         self.reader_lastname = Some(reader_lastname.into());
         self
