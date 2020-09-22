@@ -204,6 +204,7 @@ async fn read(
         c.publishing.interaction_repo(),
         c.publishing.publication_repo(),
         c.publishing.reader_repo(),
+        c.publishing.user_repo(),
     )
     .exec(auth_id, path.into_inner())
     .await
