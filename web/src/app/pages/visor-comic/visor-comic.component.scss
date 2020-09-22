@@ -94,6 +94,10 @@ button {
     justify-content: center;
 
     &:hover {
+      border-bottom: 2px solid $omics-neon-pink;
+    }
+
+    &.liked {
       color: $omics-neon-pink;
     }
 

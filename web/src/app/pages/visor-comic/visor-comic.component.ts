@@ -113,7 +113,26 @@ export class VisorComicComponent implements OnInit {
   }
 
   public onLike(): void {
-    this.sweetAlertGenericService.showUnderConstrucction();
+
+    if (   this.readerInfo.liked  ) {
+
+      this.publicationService.unlike( this.publicationId ).subscribe(
+        (res: any) =>  {
+
+          this.readerInfo.liked = false;
+        }
+      );
+
+    } else {
+
+      this.publicationService.like( this.publicationId ).subscribe(
+        (res: any) => {
+          this.readerInfo.liked = true;
+        }
+      );
+
+    }
+
   }
 
   public onComentarios(): void {
@@ -122,7 +141,7 @@ export class VisorComicComponent implements OnInit {
 
   public onInfo(): void {
 
-    this.publicationService.like( this.publicationId );
+    this.sweetAlertGenericService.showUnderConstrucction();
 
   }
 

@@ -58,7 +58,8 @@
       <!-- Like -->
       <button *ngIf="readerInfo"
               mat-icon-button (click)="onLike()">
-        <fa-icon [icon]="faLike" size="2x"></fa-icon>
+        <fa-icon  [icon]="faLike" size="2x"
+                  [ngClass]="{'liked': readerInfo.liked}"></fa-icon>
       </button>
 
       <!-- Comentarios -->
