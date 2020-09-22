@@ -58,6 +58,26 @@ impl EventHandler for RegisteredHandler {
 
                 self.email_serv.send(&email).await?;
             }
+            UserEvent::PasswordRecoveryRequested { id, temp_password, email } => {
+                let email = Email::new(
+                    email,
+                    "Recuperar contraseña".to_owned(),
+                    format!(
+                        r#"
+                        <p>
+                            <b>Hola</b>.
+                        </p>
+                        <p>
+                            Recupera tu contraseña desde el siguiente
+                            <a href="http://localhost:4200/home/{}/recover-password/{}">enlace</a>.
+                        </p>
+                        "#,
+                        id, temp_password,
+                    ),
+                )?;
+
+                self.email_serv.send(&email).await?;
+            }
             _ => return Ok(false),
         }
 

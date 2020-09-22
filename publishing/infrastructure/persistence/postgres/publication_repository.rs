@@ -217,7 +217,12 @@ impl PublicationRepository for PostgresPublicationRepository {
         let rows = self
             .client
             .query(
-                &format!("SELECT * FROM publications {}", sql) as &str,
+                &format!(
+                    "SELECT * FROM publications
+                    {}
+                    ORDER BY statistics->'views' DESC, created_at DESC" ,
+                    sql,
+                ) as &str,
                 &params,
             )
             .await

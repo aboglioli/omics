@@ -1,5 +1,18 @@
-<div class="card-box" *ngIf="publication">
+<div *ngIf="publication">
 
-  <img [src]="publication.cover" alt="Thumbail image" >
+  <div class="publication">
+    <div class="text">
+      <span class="name">{{publication.name}}</span>
+    </div>
+
+    <img [src]="publication.cover" alt="Thumbail image" >
+
+    <div class="text">
+      <span class="views">
+        {{publication.statistics.views}} visualizaciones
+      </span>
+    </div>
+  </div>
+
 
 </div>

@@ -1,5 +1,9 @@
 # All
 
+## Right now
+- [x] Redirect after user validation.
+- [x] Recover password: send email.
+
 ## Urgent
 - [x] Publication status should be an object in DTO to show comments.
 - [x] Get collections that a publication is in.
