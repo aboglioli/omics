@@ -61,8 +61,7 @@ impl AuthorRepository for PostgresAuthorRepository {
     async fn find_all(&self) -> Result<Vec<Author>> {
         let rows = self
             .client
-            .query(
-                "SELECT * FROM users ORDER BY followers DESC", &[])
+            .query("SELECT * FROM users ORDER BY followers DESC", &[])
             .await
             .map_err(|err| Error::not_found("author").wrap_raw(err))?;
 

@@ -220,7 +220,7 @@ impl PublicationRepository for PostgresPublicationRepository {
                 &format!(
                     "SELECT * FROM publications
                     {}
-                    ORDER BY statistics->'views' DESC, created_at DESC" ,
+                    ORDER BY statistics->'views' DESC, created_at DESC",
                     sql,
                 ) as &str,
                 &params,

@@ -32,7 +32,9 @@ impl<'a> Search<'a> {
 
         let mut author_dtos = Vec::new();
         for author in authors.into_iter() {
-            if author.username().starts_with("admin") || author.username().starts_with("content-manager") {
+            if author.username().starts_with("admin")
+                || author.username().starts_with("content-manager")
+            {
                 continue;
             }
 

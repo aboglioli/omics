@@ -104,14 +104,11 @@ impl<'a> GetById<'a> {
                     .get_history(Some(&reader_id), Some(&publication_id), None, None)
                     .await?;
 
-                let in_favorites = !self.interaction_repo.find_publication_favorites(
-                    Some(&reader_id),
-                    Some(&publication_id),
-                    None,
-                    None,
-                )
-                .await?
-                .is_empty();
+                let in_favorites = !self
+                    .interaction_repo
+                    .find_publication_favorites(Some(&reader_id), Some(&publication_id), None, None)
+                    .await?
+                    .is_empty();
 
                 (
                     PublicationDto::from(&publication),

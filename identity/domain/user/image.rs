@@ -1,4 +1,3 @@
-
 use common::result::Result;
 
 #[derive(Debug, Clone)]

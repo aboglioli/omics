@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-
 use common::result::Result;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
