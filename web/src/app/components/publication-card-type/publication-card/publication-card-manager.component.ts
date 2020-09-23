@@ -28,7 +28,7 @@ export class PublicationCardManagerComponent implements OnInit {
   public goToPublication(): void {
 
     // TODO: Agregar para ver la publicación
-    this.sweetAlertGenericService.showUnderConstrucction();
+    this.router.navigate( [`/read/${this.publication.id}`] );
 
   }
 

@@ -63,7 +63,6 @@ export class VisorComicComponent implements OnInit {
 
           this.publicationToShow = resPub.publication;
           this.readerInfo = resPub.reader;
-          console.log(resPub);
 
           this.publicationId = params.id;
           this.publicationService.read( this.publicationId ).subscribe(
@@ -109,8 +108,6 @@ export class VisorComicComponent implements OnInit {
   }
 
   public onFavorito(): void {
-
-    console.log(this.readerInfo.in_favorites);
 
     if ( !this.readerInfo.in_favorites  ) {
 
