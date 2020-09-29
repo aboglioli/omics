@@ -5,7 +5,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ValidadoresCustomService } from 'src/app/services/validadores-custom.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { IdentityService } from 'src/app/domain/services/identity.service';
-import { IChangePasswordCommand } from '../../../domain/services/identity.service';
+import { IChangePasswordCommand } from '../../../../domain/services/identity.service';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { Router } from '@angular/router';
 

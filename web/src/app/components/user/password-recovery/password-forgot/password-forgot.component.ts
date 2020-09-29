@@ -3,7 +3,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { faTimesCircle, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
-import { IdentityService, IRecoverPasswordCommand } from '../../../domain/services/identity.service';
+import { IdentityService, IRecoverPasswordCommand } from '../../../../domain/services/identity.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({

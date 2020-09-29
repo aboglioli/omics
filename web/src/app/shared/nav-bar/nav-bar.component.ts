@@ -2,11 +2,11 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { faBars, faBell } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { LoginRegisterComponent } from '../../components/login-register/login-register.component';
 import { AuthService } from 'src/app/domain/services/auth.service';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 import { IdentityService } from 'src/app/domain/services/identity.service';
 import { IUser } from 'src/app/domain/models';
+import { LoginRegisterComponent } from 'src/app/components/user/login-register/login-register.component';
 
 @Component({
   selector: 'app-nav-bar',
@@ -30,7 +30,6 @@ export class NavBarComponent implements OnInit {
   constructor(  private router: Router,
                 private authService: AuthService,
                 private dialog: MatDialog,
-                private sweetAlertGenericService: SweetAlertGenericMessageService,
                 private identifyService: IdentityService ) {
 
 

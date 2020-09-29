@@ -23,7 +23,7 @@ import { AngularBootstrapModule } from './auxiliar-modules//angular-bootstrap.mo
 // Componentes
 import { HomeComponent } from './pages/home/home.component';
 import { AboutComponent } from './pages/about/about.component';
-import { LoginRegisterComponent } from './components/login-register/login-register.component';
+import { LoginRegisterComponent } from './components/user/login-register/login-register.component';
 import { VisorComicComponent } from './pages/visor-comic/visor-comic.component';
 import { FavoritosComponent } from './pages/favoritos/favoritos.component';
 import { PerfilComponent } from './pages/perfil/perfil.component';
@@ -35,9 +35,9 @@ import { DashboardGestionAdminComponent } from './pages/dashboard-gestion-admin/
 import { DashboardGestionContratosPublicacionesComponent } from './pages/dashboard-gestion-contratos-publicaciones/dashboard-gestion-contratos-publicaciones.component';
 import { DashboardReglasNegociosComponent } from './pages/dashboard-reglas-negocios/dashboard-reglas-negocios.component';
 import { CatalogoComponent } from './pages/catalogo/catalogo.component';
-import { RealizarAnalisisComponent } from './components/realizar-analisis/realizar-analisis.component';
+import { RealizarAnalisisComponent } from './components/publication/realizar-analisis/realizar-analisis.component';
 import { ColeccionInfoComponent } from './pages/coleccion-info/coleccion-info.component';
-import { ComicInfoComponent } from './components/comic-info/comic-info.component';
+import { PublicationInfoComponent } from './components/publication/publication-info/publication-info.component';
 import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
 import { SideNavMenuMainComponent } from './shared/side-nav-menu-main/side-nav-menu-main.component';
 import { AutoresComponent } from './pages/autores/autores.component';
@@ -55,11 +55,11 @@ import { DevNewPublicationComponent } from './pages/development/new-publication/
 
 // Domain
 import { DomainModule } from './domain/module';
-import { PasswordForgotComponent } from './components/password-recovery/password-forgot/password-forgot.component';
-import { PasswordRewriteComponent } from './components/password-recovery/password-rewrite/password-rewrite.component';
+import { PasswordForgotComponent } from './components/user/password-recovery/password-forgot/password-forgot.component';
+import { PasswordRewriteComponent } from './components/user/password-recovery/password-rewrite/password-rewrite.component';
 import { SideNavMenuUserComponent } from './shared/side-nav-menu-user/side-nav-menu-user.component';
 import { PerfilEditarComponent } from './pages/perfil-editar/perfil-editar.component';
-import { PublicationApproveRejectMotiveComponent } from './components/publication-approve-reject-motive/publication-approve-reject-motive.component';
+import { PublicationApproveRejectMotiveComponent } from './components/dashboard/publication-approve-reject-motive/publication-approve-reject-motive.component';
 import { PublicationCardAuthorComponent } from './components/publication-card-type/publication-card-author/publication-card-author.component';
 import { PublicationCardReaderComponent } from './components/publication-card-type/publication-card-reader/publication-card-reader.component';
 
@@ -83,7 +83,7 @@ import { PublicationCardReaderComponent } from './components/publication-card-ty
     CatalogoComponent,
     RealizarAnalisisComponent,
     ColeccionInfoComponent,
-    ComicInfoComponent,
+    PublicationInfoComponent,
     NavBarComponent,
     SideNavMenuMainComponent,
     AutoresComponent,

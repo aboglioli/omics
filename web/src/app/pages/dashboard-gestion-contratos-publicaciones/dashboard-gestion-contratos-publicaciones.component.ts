@@ -5,8 +5,8 @@ import { IPublication } from '../../domain/models';
 import { PublicationService } from '../../domain/services/publication.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { MatDialog } from '@angular/material/dialog';
-import { PublicationApproveRejectMotiveComponent } from '../../components/publication-approve-reject-motive/publication-approve-reject-motive.component';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
+import { PublicationApproveRejectMotiveComponent } from 'src/app/components/dashboard/publication-approve-reject-motive/publication-approve-reject-motive.component';
 
 @Component({
   selector: 'app-dashboard-gestion-contratos-publicaciones',

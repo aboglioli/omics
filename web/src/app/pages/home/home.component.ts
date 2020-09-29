@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { PasswordRewriteComponent } from '../../components/password-recovery/password-rewrite/password-rewrite.component';
+import { PasswordRewriteComponent } from '../../components/user/password-recovery/password-rewrite/password-rewrite.component';
 
 @Component({
   selector: 'app-home',
