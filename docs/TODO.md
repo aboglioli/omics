@@ -1,5 +1,17 @@
 # All
 
+# Catalog
+Catálogo endpoint:
+- Más vistas
+- Nuevas (últimas)
+- Más likeadas
+- Mejor calificadas
+- Recomendadas
+
+Filtros:
+- Desde
+- Hast
+
 ## Right now
 - [x] Redirect after user validation.
 - [x] Recover password: send email.
@@ -39,7 +51,7 @@
 
 - [ ] Create Author from UserService when a new publication is created.
 - [ ] Make /events accessible only in development env.
-- [ ] If request is a GET and an error occurs, a 404 error should be returned.
+- [x] If request is a GET and an error occurs, a 404 error should be returned.
 - [ ] Use username as user id too.
 - [ ] Add 'username' as ID of user.
 - [ ] Search by tags for publications and collections.

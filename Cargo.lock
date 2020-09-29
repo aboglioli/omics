@@ -1622,6 +1622,8 @@ dependencies = [
  "async-trait",
  "chrono",
  "common",
+ "identity",
+ "publishing",
  "serde",
  "tokio",
  "uuid",

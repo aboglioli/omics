@@ -13,8 +13,11 @@ pub trait ContractRepository: Sync + Send {
     }
 
     async fn find_by_id(&self, contract_id: &ContractId) -> Result<Contract>;
-    async fn find_by_publication_id(&self, publication_id: &PublicationId) -> Result<Contract>;
-    async fn find_by_status(&self, status: &str) -> Result<Vec<Contract>>;
+    async fn search(
+        &self,
+        publication_id: Option<&PublicationId>,
+        status: Option<&String>,
+    ) -> Result<Vec<Contract>>;
 
     async fn save(&self, contract: &mut Contract) -> Result<()>;
 }

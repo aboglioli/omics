@@ -1,9 +1,5 @@
-mod days;
-mod discount;
 mod price;
 mod repository;
-pub use days::*;
-pub use discount::*;
 pub use price::*;
 pub use repository::*;
 

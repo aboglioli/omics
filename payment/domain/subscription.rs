@@ -1,8 +1,6 @@
-mod payment;
 mod plan;
 mod repository;
 mod status;
-pub use self::payment::*;
 pub use plan::*;
 pub use repository::*;
 pub use status::*;
@@ -11,8 +9,9 @@ use common::error::Error;
 
 use common::model::{AggregateRoot, StatusHistory, StringId};
 use common::result::Result;
+use identity::domain::user::UserId;
 
-use crate::domain::user::UserId;
+use crate::domain::payment::Payment;
 
 pub type SubscriptionId = StringId;
 
@@ -21,7 +20,7 @@ pub struct Subscription {
     base: AggregateRoot<SubscriptionId>,
     user_id: UserId,
     plan: SubscriptionPlan,
-    payments: Vec<SubscriptionPayment>,
+    payments: Vec<Payment>,
     status_history: StatusHistory<Status>,
 }
 
@@ -32,7 +31,7 @@ impl Subscription {
             user_id,
             plan,
             payments: Vec::new(),
-            status_history: StatusHistory::new(Status::WaitingPayment),
+            status_history: StatusHistory::new(Status::init()),
         })
     }
 
@@ -44,7 +43,7 @@ impl Subscription {
         &self.plan
     }
 
-    pub fn payments(&self) -> &[SubscriptionPayment] {
+    pub fn payments(&self) -> &[Payment] {
         &self.payments
     }
 
@@ -61,22 +60,18 @@ impl Subscription {
             }
     }
 
-    pub fn set_plan(&mut self, plan: SubscriptionPlan) {
-        self.plan = plan;
-    }
-
     pub fn require_payment(&mut self) -> Result<()> {
         if self.is_active() {
             return Err(Error::new("subscription", "already_paid"));
         }
 
-        let status = self.status_history.current().prepare_for_payment()?;
+        let status = self.status_history.current().wait_for_payment()?;
         self.status_history.add_status(status);
 
         Ok(())
     }
 
-    pub fn pay(&mut self, payment: SubscriptionPayment) -> Result<()> {
+    pub fn pay(&mut self, payment: Payment) -> Result<()> {
         let status = self.status_history.current().pay()?;
         self.status_history.add_status(status);
 
@@ -90,66 +85,64 @@ impl Subscription {
 mod tests {
     use super::*;
 
-    use crate::mocks;
     use chrono::{Duration, TimeZone, Utc};
+
+    use crate::domain::plan::{Plan, PlanId, Price};
+    use crate::domain::payment::{Payment, PaymentId, Amount};
+    use crate::mocks;
+
+    fn subscription(sub_id: &str, user_id: &str, plan_id: &str, plan_price: f64) -> Subscription {
+        Subscription::new(
+            SubscriptionId::new(sub_id).unwrap(),
+            UserId::new(user_id).unwrap(),
+            SubscriptionPlan::new(
+                Plan::new(
+                    PlanId::new(plan_id).unwrap(),
+                    Price::new(plan_price).unwrap(),
+                )
+                .unwrap(),
+            )
+            .unwrap(),
+        )
+        .unwrap()
+    }
+
+    fn payment(payment_id: &str, amount: f64) -> Payment {
+        Payment::new(
+            PaymentId::new(payment_id).unwrap(),
+            Amount::new(amount).unwrap(),
+        ).unwrap()
+    }
 
     #[test]
     fn create() {
-        let subscription = mocks::subscription1();
-        assert_eq!(subscription.plan().price(), 120.0);
+        let subscription = subscription("sub-1", "user-1", "plan-1", 45.0);
+        assert_eq!(subscription.plan().price(), 45.0);
         assert_eq!(subscription.payments().len(), 0);
-        assert_eq!(
-            subscription.status_history().current().to_string(),
-            "waiting-payment"
-        );
+        assert_eq!(subscription.status_history().current().to_string(), "waiting-payment");
         assert_eq!(subscription.is_active(), false);
     }
 
     #[test]
     fn free_plan() {
-        let mut subscription = mocks::subscription3();
-
-        let payment1 = mocks::payment1(0.0, Utc::now());
-        let payment1 = SubscriptionPayment::new(payment1).unwrap();
-        assert!(subscription.pay(payment1).is_ok());
-
+        let subscription = subscription("sub-1", "user-1", "plan-1", 0.0);
+        assert_eq!(subscription.plan().price(), 0.0);
+        assert_eq!(subscription.payments().len(), 0);
+        assert_eq!(subscription.status_history().current().to_string(), "active");
         assert_eq!(subscription.is_active(), true);
     }
 
     #[test]
-    fn unnecessary_payment() {
-        let mut subscription = mocks::subscription1();
+    fn add_payment() {
+        let mut subscription = subscription("sub-1", "user-1", "plan-1", 75.0);
+        assert_eq!(subscription.payments().len(), 0);
 
-        let now = Utc::now() - Duration::days(15);
-        let payment1 = mocks::payment1(150.0, now);
-        let payment1 = SubscriptionPayment::new(payment1).unwrap();
-        assert!(subscription.pay(payment1).is_ok());
+        let mut payment = payment("payment-1", 85.0);
+        assert!(subscription.add_payment(payment).is_err());
 
-        let payment2 = mocks::payment1(150.0, Utc::now());
-        let payment2 = SubscriptionPayment::new(payment2).unwrap();
-        assert!(subscription.require_payment().is_err());
-        assert!(subscription.pay(payment2).is_err());
-    }
+        let mut payment = payment("payment-1", 75.0);
+        assert!(subscription.add_payment(payment).is_ok());
 
-    #[test]
-    fn payment() {
-        let mut subscription = mocks::subscription1();
-
-        let payment1 = mocks::payment1(150.0, Utc.ymd(2020, 7, 2).and_hms(16, 0, 0));
-        let payment1 = SubscriptionPayment::new(payment1).unwrap();
-        assert!(subscription.pay(payment1).is_ok());
-
-        let payment2 = mocks::payment1(150.0, Utc.ymd(2020, 8, 2).and_hms(16, 0, 0));
-        let payment2 = SubscriptionPayment::new(payment2).unwrap();
-        assert!(subscription.require_payment().is_ok());
-        assert!(subscription.pay(payment2.clone()).is_ok());
-        assert!(subscription.pay(payment2).is_err());
-        assert_eq!(subscription.is_active(), false);
-
-        let payment3 = mocks::payment1(150.0, Utc.ymd(2020, 9, 2).and_hms(16, 0, 0));
-        let payment3 = SubscriptionPayment::new(payment3).unwrap();
-        assert!(subscription.require_payment().is_ok());
-        assert!(subscription.pay(payment3).is_ok());
-        assert_eq!(subscription.is_active(), true);
+        assert_eq!(subscription.status_history().current().to_string(), "active");
     }
 }

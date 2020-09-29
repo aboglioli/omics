@@ -9,6 +9,8 @@ path = "lib.rs"
 
 [dependencies]
 common = { path = "../common" }
+identity = { path = "../identity" }
+publishing = { path = "../publishing" }
 
 async-trait = "0.1.36"
 chrono = "0.4"

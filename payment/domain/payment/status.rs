@@ -21,6 +21,10 @@ impl ToString for Status {
 }
 
 impl Status {
+    pub fn init() -> Self {
+        Status::WaitingPayment
+    }
+
     pub fn pay(&self) -> Result<Self> {
         match self {
             Status::WaitingPayment => Ok(Status::Paid),

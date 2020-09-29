@@ -3,6 +3,8 @@ mod status;
 pub use amount::*;
 pub use status::*;
 
+use chrono::{Duration, Utc};
+
 use common::model::{AggregateRoot, StatusHistory, StringId};
 use common::result::Result;
 
@@ -48,9 +50,33 @@ impl Payment {
         &self.status_history
     }
 
+    pub fn is_current(&self) -> bool {
+        let status_item = self.status_history.current_item();
+
+        matches!(status_item.status(), Status::Paid)
+            && status_item.date() + Duration::days(30) > Utc::now()
+    }
+
     pub fn pay(&mut self) -> Result<()> {
         let status = self.status_history.current().pay()?;
         self.status_history.add_status(status);
+        self.base.update();
+
+        Ok(())
+    }
+
+    pub fn reject(&mut self) -> Result<()> {
+        let status = self.status_history.current().reject()?;
+        self.status_history.add_status(status);
+        self.base.update();
+
+        Ok(())
+    }
+
+    pub fn cancel(&mut self) -> Result<()> {
+        let status = self.status_history.current().cancel()?;
+        self.status_history.add_status(status);
+        self.base.update();
 
         Ok(())
     }
