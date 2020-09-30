@@ -8,6 +8,7 @@ use crate::domain::payment::{Amount, Kind, Payment};
 use crate::domain::plan::{Plan, PlanId, Price};
 use crate::domain::subscription::{Subscription, SubscriptionId};
 
+#[allow(dead_code)]
 pub fn subscription(sub_id: &str, user_id: &str, plan_id: &str, plan_price: f64) -> Subscription {
     Subscription::new(
         SubscriptionId::new(sub_id).unwrap(),
@@ -21,6 +22,7 @@ pub fn subscription(sub_id: &str, user_id: &str, plan_id: &str, plan_price: f64)
     .unwrap()
 }
 
+#[allow(dead_code)]
 pub fn payment(kind: &str, amount: f64, _date: DateTime<Utc>) -> Payment {
     Payment::new(Kind::from_str(kind).unwrap(), Amount::new(amount).unwrap()).unwrap()
 }

@@ -1,7 +1,7 @@
 use crate::event::{Event, ToEvent};
 use crate::result::Result;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Events<E> {
     events: Vec<E>,
 }

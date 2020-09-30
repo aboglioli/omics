@@ -41,6 +41,12 @@ impl S3FileUploader {
     }
 }
 
+impl Default for S3FileUploader {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[async_trait]
 impl FileUploader for S3FileUploader {
     async fn upload(&self, temp_file: TempFile) -> Result<UploadedFile> {

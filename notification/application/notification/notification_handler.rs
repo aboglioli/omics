@@ -6,7 +6,6 @@ use common::event::{Event, EventHandler};
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
 use publishing::domain::author::{AuthorId, AuthorRepository};
-use publishing::domain::collection::CollectionRepository;
 use publishing::domain::interaction::InteractionRepository;
 use publishing::domain::publication::{PublicationId, PublicationRepository};
 use shared::event::{AuthorEvent, PublicationEvent, UserEvent};
@@ -15,7 +14,6 @@ use crate::domain::notification::{Body, Notification, NotificationRepository};
 
 pub struct NotificationHandler {
     author_repo: Arc<dyn AuthorRepository>,
-    collection_repo: Arc<dyn CollectionRepository>,
     interaction_repo: Arc<dyn InteractionRepository>,
     notification_repo: Arc<dyn NotificationRepository>,
     publication_repo: Arc<dyn PublicationRepository>,
@@ -25,7 +23,6 @@ pub struct NotificationHandler {
 impl NotificationHandler {
     pub fn new(
         author_repo: Arc<dyn AuthorRepository>,
-        collection_repo: Arc<dyn CollectionRepository>,
         interaction_repo: Arc<dyn InteractionRepository>,
         notification_repo: Arc<dyn NotificationRepository>,
         publication_repo: Arc<dyn PublicationRepository>,
@@ -33,7 +30,6 @@ impl NotificationHandler {
     ) -> Self {
         NotificationHandler {
             author_repo,
-            collection_repo,
             interaction_repo,
             notification_repo,
             publication_repo,

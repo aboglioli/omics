@@ -52,23 +52,23 @@ impl User {
             Provider::from_str(&provider)?,
             Username::new(username)?,
             Email::new(email)?,
-            password.map(|p| Password::new(p)).transpose()?,
+            password.map(Password::new).transpose()?,
         )?;
 
         let person = if name.is_some() && lastname.is_some() {
             Some(Person::new(
                 Fullname::new(name.unwrap(), lastname.unwrap())?,
-                birthdate.map(|b| Birthdate::new(b)).transpose()?,
+                birthdate.map(Birthdate::new).transpose()?,
                 gender.map(|g| Gender::from_str(&g)).transpose()?,
-                biography.map(|b| Biography::new(b)).transpose()?,
-                profile_image.map(|pi| Image::new(pi)).transpose()?,
+                biography.map(Biography::new).transpose()?,
+                profile_image.map(Image::new).transpose()?,
             )?)
         } else {
             None
         };
 
         let role_id = RoleId::new(role_id)?;
-        let validation = validation_code.map(|c| Validation::build(c));
+        let validation = validation_code.map(Validation::build);
 
         Ok(User::build(agg_root, identity, person, role_id, validation))
     }

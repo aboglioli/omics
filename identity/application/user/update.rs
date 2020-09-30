@@ -60,15 +60,9 @@ impl<'a> Update<'a> {
             .map(|gender| Gender::from_str(&gender))
             .transpose()?;
 
-        let biography = cmd
-            .biography
-            .map(|biography| Biography::new(biography))
-            .transpose()?;
+        let biography = cmd.biography.map(Biography::new).transpose()?;
 
-        let profile_image = cmd
-            .profile_image
-            .map(|image| Image::new(image))
-            .transpose()?;
+        let profile_image = cmd.profile_image.map(Image::new).transpose()?;
 
         let person = Person::new(
             Fullname::new(cmd.name, cmd.lastname)?,

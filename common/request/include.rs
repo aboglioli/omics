@@ -22,7 +22,7 @@ impl Include {
         let mut fields = HashMap::new();
 
         let field_strs: Vec<String> = include
-            .split(",")
+            .split(',')
             .map(|field| field.trim().to_lowercase())
             .filter(|field| !field.is_empty())
             .collect();
@@ -38,11 +38,11 @@ impl Include {
         self.fields.get(field).is_some()
     }
 
-    pub fn add<S: Into<String>>(mut self, field: S) -> Self {
+    pub fn add_field<S: Into<String>>(mut self, field: S) -> Self {
         let field = field.into().trim().to_lowercase();
 
         if !field.is_empty() {
-            self.fields.insert(field.into(), true);
+            self.fields.insert(field, true);
         }
 
         self

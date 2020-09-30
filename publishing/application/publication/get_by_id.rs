@@ -35,6 +35,7 @@ pub struct GetById<'a> {
 }
 
 impl<'a> GetById<'a> {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         event_pub: &'a dyn EventPublisher,
         author_repo: &'a dyn AuthorRepository,
@@ -189,7 +190,7 @@ mod tests {
             .exec(
                 Some(reader1.base().id().to_string()),
                 publication.base().id().to_string(),
-                Include::default().add("author").add("category"),
+                Include::default().add_field("author").add_field("category"),
             )
             .await
             .unwrap();
@@ -285,7 +286,7 @@ mod tests {
             .exec(
                 Some(reader2.base().id().to_string()),
                 publication.base().id().to_string(),
-                Include::default().add("author").add("category"),
+                Include::default().add_field("author").add_field("category"),
             )
             .await
             .unwrap();

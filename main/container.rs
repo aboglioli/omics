@@ -76,7 +76,7 @@ impl MainContainer {
         let p_reader_repo = Arc::new(PostgresReaderRepository::new(client.clone()));
 
         // Notification
-        let n_notification_repo = Arc::new(PostgresNotificationRepository::new(client.clone()));
+        let n_notification_repo = Arc::new(PostgresNotificationRepository::new(client));
         let n_email_serv = Arc::new(GmailService::new());
 
         // Containers
@@ -92,22 +92,22 @@ impl MainContainer {
         let publishing = PublishingContainer::new(
             event_bus.clone(),
             p_author_repo.clone(),
-            p_category_repo.clone(),
+            p_category_repo,
             p_collection_repo.clone(),
             p_interaction_repo.clone(),
             p_publication_repo.clone(),
-            p_reader_repo.clone(),
+            p_reader_repo,
             i_user_repo.clone(),
         );
 
         let notification = NotificationContainer::new(
             event_bus.clone(),
-            p_author_repo.clone(),
-            p_collection_repo.clone(),
-            p_interaction_repo.clone(),
+            p_author_repo,
+            p_collection_repo,
+            p_interaction_repo,
             n_notification_repo,
-            p_publication_repo.clone(),
-            i_user_repo.clone(),
+            p_publication_repo,
+            i_user_repo,
             n_email_serv,
         );
 

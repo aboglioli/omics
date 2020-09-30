@@ -1,4 +1,4 @@
-use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse, Responder};
+use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 
 use notification::application::notification::{FilterCommand, GetAll, MarkAllAsRead};
 

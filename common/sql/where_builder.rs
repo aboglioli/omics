@@ -5,6 +5,7 @@ pub struct NamedParam<'a> {
     param: &'a (dyn ToSql + Sync),
 }
 
+#[derive(Default)]
 pub struct WhereBuilder<'a> {
     params: Vec<NamedParam<'a>>,
 }
@@ -59,7 +60,7 @@ mod tests {
             .add_param("param_5 like '%$$%'", &"string")
             .build();
 
-        assert_eq!(sql, "param_1 = $1 AND param_2 = $2 AND param_3 = $3 AND param_4 >= $4 AND param_5 like '%$5%'");
+        assert_eq!(sql, "WHERE param_1 = $1 AND param_2 = $2 AND param_3 = $3 AND param_4 >= $4 AND param_5 like '%$5%'");
         assert_eq!(params.len(), 5);
     }
 
@@ -76,7 +77,7 @@ mod tests {
 
         assert_eq!(
             sql,
-            "param_2 = $1 AND param_4 >= $2 AND param_5 like '%$3%'"
+            "WHERE param_2 = $1 AND param_4 >= $2 AND param_5 like '%$3%'"
         );
         assert_eq!(params.len(), 3);
     }

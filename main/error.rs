@@ -129,7 +129,7 @@ mod tests {
     }
 
     #[test]
-    fn without_internal_errors() {
+    fn with_internal_error() {
         let err = err();
 
         let public_err = PublicError::from(err);
@@ -141,6 +141,6 @@ mod tests {
         assert_eq!(two.kind, "application");
         assert_eq!(two.path, "two");
         assert_eq!(two.code, "two");
-        assert!(two.cause.is_none());
+        assert!(two.cause.is_some());
     }
 }

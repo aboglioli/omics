@@ -10,13 +10,11 @@ impl Biography {
     pub fn new<S: Into<String>>(biography: S) -> Result<Self> {
         let biography = biography.into();
 
-        if biography.len() < 1 {
-            return Err(Error::new("biography", "too_short"));
+        if biography.is_empty() {
+            return Err(Error::new("biography", "empty"));
         }
 
-        Ok(Biography {
-            biography: biography.into(),
-        })
+        Ok(Biography { biography })
     }
 
     pub fn value(&self) -> &str {

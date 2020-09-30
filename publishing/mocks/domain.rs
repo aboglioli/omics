@@ -10,12 +10,13 @@ use crate::domain::publication::{
 };
 use crate::domain::reader::{Reader, ReaderId};
 
+#[allow(dead_code)]
 pub fn publication1() -> Publication {
     let author_id = user1().0.base().id().clone();
 
     let mut publication = Publication::new(
         PublicationId::new("#publication01").unwrap(),
-        author_id.clone(),
+        author_id,
         Header::new(
             Name::new("Publication 01").unwrap(),
             Synopsis::new("Synopsis...").unwrap(),
@@ -46,6 +47,7 @@ pub fn publication1() -> Publication {
     publication
 }
 
+#[allow(dead_code)]
 pub fn published_publication1() -> Publication {
     let mut publication = publication1();
 
@@ -79,6 +81,7 @@ pub fn published_publication1() -> Publication {
     publication
 }
 
+#[allow(dead_code)]
 pub fn empty_collection1() -> Collection {
     Collection::new(
         CollectionId::new("#collection01").unwrap(),
@@ -95,6 +98,7 @@ pub fn empty_collection1() -> Collection {
     .unwrap()
 }
 
+#[allow(dead_code)]
 pub fn content_manager1() -> (User, Author, Reader) {
     (
         mocks::admin1(),
@@ -107,6 +111,7 @@ pub fn content_manager1() -> (User, Author, Reader) {
     )
 }
 
+#[allow(dead_code)]
 pub fn user1() -> (User, Author, Reader) {
     (
         mocks::user1(),
@@ -115,6 +120,7 @@ pub fn user1() -> (User, Author, Reader) {
     )
 }
 
+#[allow(dead_code)]
 pub fn user2() -> (User, Author, Reader) {
     (
         mocks::user2(),
@@ -123,6 +129,7 @@ pub fn user2() -> (User, Author, Reader) {
     )
 }
 
+#[allow(dead_code)]
 pub fn category1() -> Category {
     Category::new(
         CategoryId::new("#category01").unwrap(),
@@ -131,6 +138,7 @@ pub fn category1() -> Category {
     .unwrap()
 }
 
+#[allow(dead_code)]
 pub fn category2() -> Category {
     Category::new(
         CategoryId::new("#category02").unwrap(),
