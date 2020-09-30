@@ -12,6 +12,7 @@ use common::result::Result;
 use identity::domain::user::UserId;
 
 use crate::domain::payment::Payment;
+use crate::domain::plan::Plan;
 
 pub type SubscriptionId = StringId;
 
@@ -25,7 +26,9 @@ pub struct Subscription {
 }
 
 impl Subscription {
-    pub fn new(id: SubscriptionId, user_id: UserId, plan: SubscriptionPlan) -> Result<Self> {
+    pub fn new(id: SubscriptionId, user_id: UserId, plan: Plan) -> Result<Self> {
+        let plan = SubscriptionPlan::new(plan)?;
+
         Ok(Subscription {
             base: AggregateRoot::new(id),
             user_id,
@@ -71,7 +74,7 @@ impl Subscription {
         Ok(())
     }
 
-    pub fn pay(&mut self, payment: Payment) -> Result<()> {
+    pub fn add_payment(&mut self, payment: Payment) -> Result<()> {
         let status = self.status_history.current().pay()?;
         self.status_history.add_status(status);
 
@@ -83,66 +86,52 @@ impl Subscription {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    
 
-    use chrono::{Duration, TimeZone, Utc};
+    
 
-    use crate::domain::plan::{Plan, PlanId, Price};
-    use crate::domain::payment::{Payment, PaymentId, Amount};
+    use chrono::Utc;
+
     use crate::mocks;
-
-    fn subscription(sub_id: &str, user_id: &str, plan_id: &str, plan_price: f64) -> Subscription {
-        Subscription::new(
-            SubscriptionId::new(sub_id).unwrap(),
-            UserId::new(user_id).unwrap(),
-            SubscriptionPlan::new(
-                Plan::new(
-                    PlanId::new(plan_id).unwrap(),
-                    Price::new(plan_price).unwrap(),
-                )
-                .unwrap(),
-            )
-            .unwrap(),
-        )
-        .unwrap()
-    }
-
-    fn payment(payment_id: &str, amount: f64) -> Payment {
-        Payment::new(
-            PaymentId::new(payment_id).unwrap(),
-            Amount::new(amount).unwrap(),
-        ).unwrap()
-    }
 
     #[test]
     fn create() {
-        let subscription = subscription("sub-1", "user-1", "plan-1", 45.0);
+        let subscription = mocks::subscription("sub-1", "user-1", "plan-1", 45.0);
         assert_eq!(subscription.plan().price(), 45.0);
         assert_eq!(subscription.payments().len(), 0);
-        assert_eq!(subscription.status_history().current().to_string(), "waiting-payment");
+        assert_eq!(
+            subscription.status_history().current().to_string(),
+            "waiting-payment"
+        );
         assert_eq!(subscription.is_active(), false);
     }
 
     #[test]
     fn free_plan() {
-        let subscription = subscription("sub-1", "user-1", "plan-1", 0.0);
+        let subscription = mocks::subscription("sub-1", "user-1", "plan-1", 0.0);
         assert_eq!(subscription.plan().price(), 0.0);
         assert_eq!(subscription.payments().len(), 0);
-        assert_eq!(subscription.status_history().current().to_string(), "active");
+        assert_eq!(
+            subscription.status_history().current().to_string(),
+            "active"
+        );
         assert_eq!(subscription.is_active(), true);
     }
 
     #[test]
     fn add_payment() {
-        let mut subscription = subscription("sub-1", "user-1", "plan-1", 75.0);
+        let mut subscription = mocks::subscription("sub-1", "user-1", "plan-1", 75.0);
         assert_eq!(subscription.payments().len(), 0);
 
-        let mut payment = payment("payment-1", 85.0);
+        let payment = mocks::payment("income", 85.0, Utc::now());
         assert!(subscription.add_payment(payment).is_err());
 
-        let mut payment = payment("payment-1", 75.0);
+        let payment = mocks::payment("income", 75.0, Utc::now());
         assert!(subscription.add_payment(payment).is_ok());
 
-        assert_eq!(subscription.status_history().current().to_string(), "active");
+        assert_eq!(
+            subscription.status_history().current().to_string(),
+            "active"
+        );
     }
 }

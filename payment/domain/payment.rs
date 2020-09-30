@@ -1,83 +1,70 @@
 mod amount;
-mod status;
+mod kind;
 pub use amount::*;
-pub use status::*;
+pub use kind::*;
 
-use chrono::{Duration, Utc};
+use chrono::{DateTime, Duration, Utc};
 
-use common::model::{AggregateRoot, StatusHistory, StringId};
 use common::result::Result;
-
-pub type PaymentId = StringId;
 
 #[derive(Debug, Clone)]
 pub struct Payment {
-    base: AggregateRoot<PaymentId>,
+    kind: Kind,
     amount: Amount,
-    status_history: StatusHistory<Status>,
+    date: DateTime<Utc>,
 }
 
 impl Payment {
-    pub fn new(id: PaymentId, amount: Amount) -> Result<Self> {
+    pub fn new(kind: Kind, amount: Amount) -> Result<Self> {
         Ok(Payment {
-            base: AggregateRoot::new(id),
+            kind,
             amount,
-            status_history: StatusHistory::new(Status::WaitingPayment),
+            date: Utc::now(),
         })
     }
 
-    pub fn build(
-        base: AggregateRoot<PaymentId>,
-        amount: Amount,
-        status_history: StatusHistory<Status>,
-    ) -> Self {
-        Payment {
-            base,
-            amount,
-            status_history,
-        }
+    pub fn build(kind: Kind, amount: Amount, date: DateTime<Utc>) -> Self {
+        Payment { kind, amount, date }
     }
 
-    pub fn base(&self) -> &AggregateRoot<PaymentId> {
-        &self.base
+    pub fn kind(&self) -> &Kind {
+        &self.kind
     }
 
     pub fn amount(&self) -> &Amount {
         &self.amount
     }
 
-    pub fn status_history(&self) -> &StatusHistory<Status> {
-        &self.status_history
+    pub fn date(&self) -> &DateTime<Utc> {
+        &self.date
     }
 
     pub fn is_current(&self) -> bool {
-        let status_item = self.status_history.current_item();
-
-        matches!(status_item.status(), Status::Paid)
-            && status_item.date() + Duration::days(30) > Utc::now()
+        self.date + Duration::days(30) > Utc::now()
     }
+}
 
-    pub fn pay(&mut self) -> Result<()> {
-        let status = self.status_history.current().pay()?;
-        self.status_history.add_status(status);
-        self.base.update();
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-        Ok(())
-    }
+    #[test]
+    fn is_current() {
+        let payment = Payment::build(Kind::Income, Amount::new(45.0).unwrap(), Utc::now());
+        assert!(payment.is_current());
 
-    pub fn reject(&mut self) -> Result<()> {
-        let status = self.status_history.current().reject()?;
-        self.status_history.add_status(status);
-        self.base.update();
+        let payment = Payment::build(
+            Kind::Income,
+            Amount::new(45.0).unwrap(),
+            Utc::now() - Duration::days(15),
+        );
+        assert!(payment.is_current());
 
-        Ok(())
-    }
-
-    pub fn cancel(&mut self) -> Result<()> {
-        let status = self.status_history.current().cancel()?;
-        self.status_history.add_status(status);
-        self.base.update();
-
-        Ok(())
+        let payment = Payment::build(
+            Kind::Income,
+            Amount::new(45.0).unwrap(),
+            Utc::now() - Duration::days(45),
+        );
+        assert!(!payment.is_current());
     }
 }

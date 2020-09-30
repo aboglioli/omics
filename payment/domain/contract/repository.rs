@@ -2,9 +2,9 @@ use async_trait::async_trait;
 use uuid::Uuid;
 
 use common::result::Result;
+use publishing::domain::publication::PublicationId;
 
 use crate::domain::contract::{Contract, ContractId};
-use crate::domain::publication::PublicationId;
 
 #[async_trait]
 pub trait ContractRepository: Sync + Send {
