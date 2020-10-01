@@ -4,10 +4,12 @@ div.deskboard-body {
   display: flex;
   flex-direction: row;
 
+  // Pantalla chica
   @media screen and (min-width: $break-small) {
     min-height: calc(100vh - 4.6em);
   }
 
+  // Pantalla grande
   @media screen and (max-width: $break-small) {
     min-height: 100vh;
   }

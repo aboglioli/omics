@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { ReaderService } from '../../domain/services/reader.service';
 import { AuthService } from '../../domain/services/auth.service';
 import { IPublication } from '../../domain/models';
+import { PublicationInfoComponent } from 'src/app/components/publication/publication-info/publication-info.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-favoritos',
@@ -16,7 +18,7 @@ export class FavoritosComponent implements OnInit {
   constructor(
     private readerService: ReaderService,
     private authService: AuthService,
-    private router: Router,
+    private dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
@@ -32,9 +34,17 @@ export class FavoritosComponent implements OnInit {
     );
   }
 
-  public goToObra( idObra: string ): void {
+  public showPublicationInfo( idObra: string ): void {
 
-    this.router.navigate( [`/read/${idObra}`] );
+    const dialogRef = this.dialog.open(
+      PublicationInfoComponent,
+      {
+        panelClass: 'info-publication',
+        data: {
+          idPublication: idObra
+        }
+      }
+    );
 
   }
 

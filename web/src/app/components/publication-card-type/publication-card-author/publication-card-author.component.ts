@@ -3,6 +3,9 @@ import { IPublication } from 'src/app/domain/models';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 import { IStatus } from '../../../domain/models/publication';
 import { Router, ActivatedRoute } from '@angular/router';
+import { faEdit, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { PublicationInfoComponent } from '../../publication/publication-info/publication-info.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-publication-card-author',
@@ -12,6 +15,10 @@ import { Router, ActivatedRoute } from '@angular/router';
 export class PublicationCardAuthorComponent implements OnInit {
 
   @Input() publication: IPublication;
+
+  // Font Awseome icons
+  public faEdit = faEdit;
+  public faInfo = faInfoCircle;
 
   public statusToShow = {
     msg: '',
@@ -23,6 +30,7 @@ export class PublicationCardAuthorComponent implements OnInit {
     private sweetAlertGenericService: SweetAlertGenericMessageService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
+    private dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
@@ -106,6 +114,21 @@ export class PublicationCardAuthorComponent implements OnInit {
       }
 
     }
+
+  }
+
+  public onOpenInfo(): void {
+
+    const dialogRef = this.dialog.open(
+      PublicationInfoComponent,
+      {
+        panelClass: 'info-publication',
+        data: {
+          idPublication: this.publication.id,
+          showRead: true
+        }
+      }
+    );
 
   }
 

@@ -1,3 +1,5 @@
+import { IReview } from './review';
+
 export interface IPreferences {
   categories: string[];
   publications: string[];
@@ -19,6 +21,7 @@ export interface IReaderPublicationInteraction {
   read: boolean;
   liked: boolean;
   reviewed: boolean;
+  review: IReview;
   in_favorites: boolean;
 }
 

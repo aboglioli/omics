@@ -61,7 +61,7 @@ export class DeskboardGeneralComponent implements OnInit {
 
   private checkWidthScreen(): void {
 
-    this.breakpointObserver.observe(['(max-width: 900px)']).subscribe(
+    this.breakpointObserver.observe(['(max-width: 950px)']).subscribe(
       (result: any) => {
 
         this.isBigScreen = (result.matches) ? false : true;

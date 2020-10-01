@@ -1,0 +1,215 @@
+@import "src/scss/vars";
+
+div.panel-box {
+
+  color: white;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+
+
+  // Pantalla grande
+  @media screen and (min-width: $break-small) {
+    height: 90vh;
+    max-height: 600px;
+  }
+
+  // Pantalla chica
+  @media screen and (max-width: $break-small) {
+    height: 100vh;
+  }
+
+
+  .header {
+    width: 100%;
+    padding: 10px;
+    background-color: $omics-background-flat;
+  }
+
+  .date-published {
+    margin: 0px;
+    height: 100%;
+    align-self: center;
+    font-size: 1.1rem;
+  }
+
+  div.button-top-menu {
+
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    padding: 5px;
+
+    button {
+      margin: 0px;
+      outline: none;
+    }
+
+  }
+
+  div.body {
+
+    display: flex;
+    flex: 1;
+    overflow-y: auto;
+
+    // Pantalla grande
+    @media screen and (min-width: $break-small) {
+      flex-direction: row;
+    }
+
+    // Pantalla chica
+    @media screen and (max-width: $break-small) {
+      flex-direction: column;
+    }
+
+    width: 100%;
+    background-image: url('/assets/images/patterns/blackWhitePattern.jpg');
+
+    div.side {
+
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+
+      &.opacity-background {
+        background-color: rgba($color: $omics-background-flat, $alpha: 0.6);
+      }
+
+      &.description-box {
+        background-color: $omics-background-menu;
+      }
+
+    }
+
+
+  }
+
+
+  .multiple-option-menu {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    min-height: 50px;
+
+    flex: 0.1;
+
+    background-color: rgba($color: $omics-background-flat, $alpha: 0.75);
+  }
+
+  .comment-box {
+    flex: 1;
+  }
+
+
+  div.small-padding {
+    padding: 8px;
+  }
+
+  div.column-direction-by-size {
+
+    display: flex;
+
+    // Pantalla grande
+    @media screen and (min-width: $break-small) {
+      flex-direction: column;
+    }
+
+    // Pantalla chica
+    @media screen and (max-width: $break-small) {
+      flex-direction: column-reverse;
+    }
+
+  }
+
+  div.fila {
+
+    display: flex;
+    flex-direction: row;
+
+    &.all-width {
+      justify-content: space-between;
+    }
+
+    &.center-align {
+      align-items: center;
+    }
+
+    &.padding-side {
+      padding: 0px 5px;
+    }
+
+  }
+
+  .author-name {
+
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+
+      img {
+        border-color: $omics-neon-pink;
+      }
+    }
+
+  }
+
+  img.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 24px;
+
+    border-style: solid;
+    border-width: 2px;
+
+  }
+
+}
+
+
+// General
+button.option-item {
+
+  color: white;
+  height: 75%;
+  margin: 0em 0.5em;
+
+  &:focus {
+    outline: none;
+  }
+
+  fa-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      border-bottom: 2px solid $omics-neon-pink;
+    }
+
+    &.selected {
+      color: $omics-neon-pink;
+    }
+
+  }
+
+}
+
+button.button-white-borders {
+
+  color: white;
+  border-color: white;
+
+  &:hover {
+    box-shadow: 0px 0px 6px 2px $omics-aqua-button
+  }
+
+}
+
+h3 {
+  margin: 10px 0px;
+  letter-spacing: 10px;
+  font-weight: bolder;
+}

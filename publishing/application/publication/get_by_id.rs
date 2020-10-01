@@ -7,7 +7,7 @@ use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
 
 use crate::application::dtos::{
-    AuthorDto, CategoryDto, PublicationDto, ReaderPublicationInteractionDto,
+    AuthorDto, CategoryDto, PublicationDto, ReaderPublicationInteractionDto, ReviewDto,
 };
 use crate::domain::author::AuthorRepository;
 use crate::domain::category::CategoryRepository;
@@ -105,21 +105,33 @@ impl<'a> GetById<'a> {
                     .get_history(Some(&reader_id), Some(&publication_id), None, None)
                     .await?;
 
+                let reviews = self
+                    .interaction_repo
+                    .find_reviews(Some(&reader_id), Some(&publication_id), None, None)
+                    .await?;
+
                 let in_favorites = !self
                     .interaction_repo
                     .find_publication_favorites(Some(&reader_id), Some(&publication_id), None, None)
                     .await?
                     .is_empty();
 
+                let mut reader_interaction_dto = ReaderPublicationInteractionDto::new(
+                    reader_statistics.views() > 0,
+                    reader_statistics.readings() > 0,
+                    reader_statistics.likes() > 0,
+                    reader_statistics.reviews() > 0,
+                    in_favorites,
+                );
+
+                if !reviews.is_empty() {
+                    reader_interaction_dto =
+                        reader_interaction_dto.review(ReviewDto::from(&reviews[0]));
+                }
+
                 (
                     PublicationDto::from(&publication),
-                    Some(ReaderPublicationInteractionDto::new(
-                        reader_statistics.views() > 0,
-                        reader_statistics.readings() > 0,
-                        reader_statistics.likes() > 0,
-                        reader_statistics.reviews() > 0,
-                        in_favorites,
-                    )),
+                    Some(reader_interaction_dto),
                 )
             }
         } else {

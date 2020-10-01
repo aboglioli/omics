@@ -2,16 +2,16 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { faTimesCircle, faChevronCircleRight, faChevronCircleDown, faEnvelopeSquare, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
-import { ValidadoresCustomService } from '../../services/validadores-custom.service';
+import { ValidadoresCustomService } from '../../../services/validadores-custom.service';
 import { Router } from '@angular/router';
 import {  IdentityService, IRegisterCommand, IRegisterResponse,
-          ILoginCommand, ILoginResponse } from '../../domain/services/identity.service';
+          ILoginCommand, ILoginResponse } from '../../../domain/services/identity.service';
 import { AuthService } from 'src/app/domain/services/auth.service';
 import { PasswordForgotComponent } from '../password-recovery/password-forgot/password-forgot.component';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import Swal from 'sweetalert2';
-import { IUser } from '../../domain/models/user';
+import { IUser } from 'src/app/domain/models';
 
 @Component({
   selector: 'app-login-register',

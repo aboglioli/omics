@@ -1,4 +1,4 @@
-@import "../../../scss/vars";
+@import "../../../../scss/vars";
 
 .mat-dialog-title {
 
@@ -135,6 +135,6 @@ button {
 
 }
 
-.myapp-no-padding-dialog .mat-dialog-container {
+.no-padding-dialog .mat-dialog-container {
   padding: 0;
 }

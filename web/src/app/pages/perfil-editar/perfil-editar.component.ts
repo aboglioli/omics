@@ -7,11 +7,11 @@ import { IdentityService, IUpdateCommandUser } from '../../domain/services/ident
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { FileService } from 'src/app/domain/services/file.service';
 import { MatDialog } from '@angular/material/dialog';
-import { PasswordRewriteComponent } from 'src/app/components/password-recovery/password-rewrite/password-rewrite.component';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { PasswordRewriteComponent } from 'src/app/components/user/password-recovery/password-rewrite/password-rewrite.component';
 
 @Component({
   selector: 'app-perfil-editar',
@@ -211,12 +211,12 @@ export class PerfilEditarComponent implements OnInit {
             title: 'Actualizado',
             text: 'Los datos fueron actualizados exitosamente'
           }).then(  (result) => {
-    
+
             this.router.navigate([`/profile/${ this.userId}`]);
-      
+
           });
 
-          
+
           this.spinnerService.hide();
 
         },

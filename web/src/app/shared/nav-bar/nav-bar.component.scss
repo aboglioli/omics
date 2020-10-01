@@ -1,4 +1,4 @@
-@import "src/scss/vars";
+@import 'src/scss/vars';
 
 mat-toolbar {
 
@@ -47,10 +47,12 @@ mat-toolbar {
       width: auto;
       height: 100%;
 
+      // pantalla chica
       @media screen and (min-width: $break-small) {
         max-height: 60px;
       }
 
+      // pantalla grande
       @media screen and (max-width: $break-small) {
         max-height: 40px;
       }
