@@ -338,6 +338,7 @@ pub struct ReaderPublicationInteractionDto {
     pub read: bool,
     pub liked: bool,
     pub reviewed: bool,
+    pub review: Option<ReviewDto>,
     pub in_favorites: bool,
 }
 
@@ -348,8 +349,14 @@ impl ReaderPublicationInteractionDto {
             read,
             liked,
             reviewed,
+            review: None,
             in_favorites,
         }
+    }
+
+    pub fn review(mut self, review: ReviewDto) -> Self {
+        self.review = Some(review);
+        self
     }
 }
 
