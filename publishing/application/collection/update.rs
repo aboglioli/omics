@@ -89,14 +89,20 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.category_repo(), c.collection_repo());
 
-        let author = mocks::user1().1;
-        let mut collection = mocks::empty_collection1();
+        let mut collection = mocks::collection(
+            "#collection01",
+            "#user01",
+            "Name",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "cover.jpg",
+        );
         c.collection_repo().save(&mut collection).await.unwrap();
-        let mut category = mocks::category2();
+        let mut category = mocks::category("#category02", "Category 2");
         c.category_repo().save(&mut category).await.unwrap();
 
         uc.exec(
-            author.base().id().to_string(),
+            "#user01".to_owned(),
             collection.base().id().to_string(),
             UpdateCommand {
                 name: "New name".to_owned(),
@@ -111,7 +117,7 @@ mod tests {
 
         let collection = c
             .collection_repo()
-            .find_by_id(&collection.base().id())
+            .find_by_id(collection.base().id())
             .await
             .unwrap();
         assert_eq!(collection.header().name().value(), "New name");
@@ -122,51 +128,25 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn published_publication() {
-        let c = mocks::container();
-        let uc = Update::new(c.event_pub(), c.category_repo(), c.collection_repo());
-
-        let author = mocks::user1().1;
-        let mut collection = mocks::empty_collection1();
-        c.collection_repo().save(&mut collection).await.unwrap();
-        let mut category = mocks::category2();
-        c.category_repo().save(&mut category).await.unwrap();
-
-        uc.exec(
-            author.base().id().to_string(),
-            collection.base().id().to_string(),
-            UpdateCommand {
-                name: "New name".to_owned(),
-                synopsis: "New synopsis...".to_owned(),
-                category_id: category.base().id().to_string(),
-                tags: vec!["New tag".to_owned()],
-                cover: "domain.com/new-cover.jpg".to_owned(),
-            },
-        )
-        .await
-        .unwrap();
-
-        let _collection = c
-            .collection_repo()
-            .find_by_id(&collection.base().id())
-            .await
-            .unwrap();
-    }
-
-    #[tokio::test]
     async fn not_owner() {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.category_repo(), c.collection_repo());
 
-        let author = mocks::user2().1;
-        let mut collection = mocks::empty_collection1();
+        let mut collection = mocks::collection(
+            "#collection01",
+            "#user01",
+            "User",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "cover.jpg",
+        );
         c.collection_repo().save(&mut collection).await.unwrap();
-        let mut category = mocks::category2();
+        let mut category = mocks::category("#category02", "Category 2");
         c.category_repo().save(&mut category).await.unwrap();
 
         assert!(uc
             .exec(
-                author.base().id().to_string(),
+                "#user01".to_owned(),
                 collection.base().id().to_string(),
                 UpdateCommand {
                     name: "New name".to_owned(),
@@ -185,14 +165,20 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.category_repo(), c.collection_repo());
 
-        let author = mocks::user1().1;
-        let mut collection = mocks::empty_collection1();
+        let mut collection = mocks::collection(
+            "#collection01",
+            "#user01",
+            "User",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "cover.jpg",
+        );
         c.collection_repo().save(&mut collection).await.unwrap();
-        let category = mocks::category2();
+        let category = mocks::category("#category02", "Category 2");
 
         assert!(uc
             .exec(
-                author.base().id().to_string(),
+                "#user01".to_owned(),
                 collection.base().id().to_string(),
                 UpdateCommand {
                     name: "New name".to_owned(),

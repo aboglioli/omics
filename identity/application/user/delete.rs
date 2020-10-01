@@ -50,7 +50,16 @@ mod tests {
         let c = mocks::container();
         let uc = Delete::new(c.event_pub(), c.user_repo());
 
-        let mut user = mocks::validated_user1();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            true,
+            None,
+            None,
+            "user",
+        );
         c.user_repo().save(&mut user).await.unwrap();
 
         let user_id = user.base().id().to_string();
@@ -58,17 +67,5 @@ mod tests {
         assert!(uc.exec(user_id.clone(), user_id).await.is_err());
 
         assert_eq!(c.event_pub().events().await.len(), 1);
-    }
-
-    #[tokio::test]
-    async fn not_validated() {
-        let c = mocks::container();
-        let uc = Delete::new(c.event_pub(), c.user_repo());
-
-        let mut user = mocks::user1();
-        c.user_repo().save(&mut user).await.unwrap();
-
-        let user_id = user.base().id().to_string();
-        assert!(uc.exec(user_id.clone(), user_id).await.is_err());
     }
 }

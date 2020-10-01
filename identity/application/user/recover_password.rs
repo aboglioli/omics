@@ -62,10 +62,9 @@ mod tests {
         let c = mocks::container();
         let uc = RecoverPassword::new(c.event_pub(), c.user_repo(), c.user_serv());
 
-        let user = mocks::user1();
         assert!(uc
             .exec(RecoverPasswordCommand {
-                email: user.identity().email().to_string(),
+                email: "non-existing@omics.com".to_owned(),
             })
             .await
             .is_err())
@@ -76,7 +75,16 @@ mod tests {
         let c = mocks::container();
         let uc = RecoverPassword::new(c.event_pub(), c.user_repo(), c.user_serv());
 
-        let mut user = mocks::user1();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            true,
+            None,
+            None,
+            "user",
+        );
         let old_password = user.identity().password().unwrap().to_string();
         c.user_repo().save(&mut user).await.unwrap();
 
@@ -90,6 +98,6 @@ mod tests {
         let user = c.user_repo().find_by_id(&user.base().id()).await.unwrap();
         assert_ne!(user.identity().password().unwrap().value(), old_password);
 
-        assert_eq!(c.event_pub().events().await.len(), 1);
+        assert!(!c.event_pub().events().await.is_empty());
     }
 }

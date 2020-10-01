@@ -60,9 +60,19 @@ mod tests {
         let c = mocks::container();
         let uc = Publish::new(c.event_pub(), c.author_repo(), c.publication_repo());
 
-        let mut author = mocks::user1().1;
+        let mut author = mocks::author("#user01", "user");
         c.author_repo().save(&mut author).await.unwrap();
-        let mut publication = mocks::publication1();
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            false,
+            false,
+        );
         c.publication_repo().save(&mut publication).await.unwrap();
 
         uc.exec(

@@ -75,7 +75,16 @@ mod tests {
         let c = mocks::container();
         let serv = c.authentication_serv();
 
-        let mut user = mocks::validated_user1();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            true,
+            None,
+            None,
+            "user",
+        );
         c.user_repo().save(&mut user).await.unwrap();
 
         let (_, token) = serv

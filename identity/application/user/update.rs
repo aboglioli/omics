@@ -93,12 +93,10 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.user_repo());
 
-        let user = mocks::user1();
-
         assert!(uc
             .exec(
-                user.base().id().to_string(),
-                user.base().id().to_string(),
+                "user-1".to_owned(),
+                "user-1".to_owned(),
                 UpdateCommand {
                     name: "Name".to_owned(),
                     lastname: "Lastname".to_owned(),
@@ -117,7 +115,16 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.user_repo());
 
-        let mut user = mocks::user1();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            true,
+            None,
+            None,
+            "user",
+        );
         c.user_repo().save(&mut user).await.unwrap();
 
         assert!(uc
@@ -206,7 +213,16 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.user_repo());
 
-        let mut user = mocks::user1();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            true,
+            None,
+            None,
+            "user",
+        );
         c.user_repo().save(&mut user).await.unwrap();
 
         assert!(uc

@@ -35,7 +35,16 @@ mod tests {
     async fn authorize() {
         let c = mocks::container();
 
-        let mut user = mocks::validated_user1();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            true,
+            None,
+            None,
+            "user",
+        );
         c.user_repo().save(&mut user).await.unwrap();
 
         let mut data = Data::new();

@@ -124,9 +124,9 @@ mod tests {
             c.publication_repo(),
         );
 
-        let mut author = mocks::user1().1;
+        let mut author = mocks::author("#user01", "user-1");
         c.author_repo().save(&mut author).await.unwrap();
-        let mut category = mocks::category1();
+        let mut category = mocks::category("#category01", "Category 1");
         c.category_repo().save(&mut category).await.unwrap();
 
         let res = uc
@@ -167,7 +167,7 @@ mod tests {
         assert_eq!(publication.header().synopsis().value(), "Synopsis...");
         assert_eq!(publication.pages().len(), 2);
 
-        assert!(c.event_pub().events().await.len() > 0);
+        assert!(!c.event_pub().events().await.is_empty());
     }
 
     #[tokio::test]
@@ -180,9 +180,9 @@ mod tests {
             c.publication_repo(),
         );
 
-        let mut author = mocks::user1().1;
+        let mut author = mocks::author("#user01", "user-1");
         c.author_repo().save(&mut author).await.unwrap();
-        let mut category = mocks::category1();
+        let mut category = mocks::category("#category01", "Category 1");
         c.category_repo().save(&mut category).await.unwrap();
 
         assert!(uc
@@ -226,9 +226,8 @@ mod tests {
             c.publication_repo(),
         );
 
-        let mut author = mocks::user1().1;
+        let mut author = mocks::author("#user01", "user-1");
         c.author_repo().save(&mut author).await.unwrap();
-        let category = mocks::category1();
 
         assert!(uc
             .exec(
@@ -236,7 +235,7 @@ mod tests {
                 CreateCommand {
                     name: "Publication 1".to_owned(),
                     synopsis: "Synopsis...".to_owned(),
-                    category_id: category.base().id().to_string(),
+                    category_id: "#category01".to_owned(),
                     tags: vec!["Tag 1".to_owned()],
                     cover: "cover.com/cover.jpg".to_owned(),
                     pages: None,

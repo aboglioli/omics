@@ -89,9 +89,19 @@ mod tests {
             c.user_repo(),
         );
 
-        let mut reader = mocks::user2().2;
+        let mut reader = mocks::reader("#user02");
         c.reader_repo().save(&mut reader).await.unwrap();
-        let mut publication = mocks::published_publication1();
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            true,
+            true,
+        );
         c.publication_repo().save(&mut publication).await.unwrap();
 
         uc.exec(
@@ -107,7 +117,7 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(publication.statistics().readings(), 1);
-        assert!(c.event_pub().events().await.len() > 0);
+        assert!(!c.event_pub().events().await.is_empty());
     }
 
     #[tokio::test]
@@ -121,9 +131,19 @@ mod tests {
             c.user_repo(),
         );
 
-        let mut reader = mocks::user2().2;
+        let mut reader = mocks::reader("#user02");
         c.reader_repo().save(&mut reader).await.unwrap();
-        let mut publication = mocks::publication1();
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            false,
+            false,
+        );
         c.publication_repo().save(&mut publication).await.unwrap();
 
         assert!(uc
@@ -146,9 +166,19 @@ mod tests {
             c.user_repo(),
         );
 
-        let mut reader = mocks::user1().2;
+        let mut reader = mocks::reader("#user01");
         c.reader_repo().save(&mut reader).await.unwrap();
-        let mut publication = mocks::published_publication1();
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            true,
+            true,
+        );
         c.publication_repo().save(&mut publication).await.unwrap();
 
         assert!(uc

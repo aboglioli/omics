@@ -68,6 +68,8 @@ impl<'a> Approve<'a> {
 mod tests {
     use super::*;
 
+    use identity::mocks as identity_mocks;
+
     use crate::domain::publication::Status;
     use crate::mocks;
 
@@ -76,20 +78,33 @@ mod tests {
         let c = mocks::container();
         let uc = Approve::new(c.event_pub(), c.publication_repo(), c.user_repo());
 
-        let (mut user1, mut author1, mut reader1) = mocks::user1();
-        c.user_repo().save(&mut user1).await.unwrap();
-        c.author_repo().save(&mut author1).await.unwrap();
-        c.reader_repo().save(&mut reader1).await.unwrap();
+        let mut user = identity_mocks::user(
+            "#content-manager01",
+            "content-manager-1",
+            "content-manager@omics.com",
+            "P@sswd!",
+            true,
+            None,
+            None,
+            "content-manager",
+        );
+        c.user_repo().save(&mut user).await.unwrap();
 
-        let (mut cm, _, _) = mocks::content_manager1();
-        c.user_repo().save(&mut cm).await.unwrap();
-
-        let mut publication = mocks::publication1();
-        publication.publish().unwrap();
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            true,
+            false,
+        );
         c.publication_repo().save(&mut publication).await.unwrap();
 
         uc.exec(
-            cm.base().id().to_string(),
+            user.base().id().to_string(),
             publication.base().id().to_string(),
             ApproveCommand {
                 comment: "All is OK".to_owned(),
@@ -100,7 +115,7 @@ mod tests {
 
         let publication = c
             .publication_repo()
-            .find_by_id(&publication.base().id())
+            .find_by_id(publication.base().id())
             .await
             .unwrap();
         assert_eq!(
@@ -109,7 +124,7 @@ mod tests {
         );
 
         if let Status::Published { admin_id, comment } = publication.status_history().current() {
-            assert_eq!(admin_id, cm.base().id());
+            assert_eq!(admin_id, user.base().id());
             assert_eq!(comment.value(), "All is OK");
         }
     }

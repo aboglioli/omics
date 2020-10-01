@@ -53,21 +53,24 @@ mod tests {
         let c = mocks::container();
         let uc = Delete::new(c.event_pub(), c.collection_repo());
 
-        let author = mocks::user1().1;
-        let mut collection = mocks::empty_collection1();
+        let mut collection = mocks::collection(
+            "#collection01",
+            "#user01",
+            "User",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "cover.jpg",
+        );
         c.collection_repo().save(&mut collection).await.unwrap();
 
         assert!(uc
-            .exec(
-                author.base().id().to_string(),
-                collection.base().id().to_string()
-            )
+            .exec("#user01".to_owned(), collection.base().id().to_string())
             .await
             .is_ok());
 
         assert!(c
             .collection_repo()
-            .find_by_id(&collection.base().id())
+            .find_by_id(collection.base().id())
             .await
             .is_err());
     }
@@ -77,15 +80,18 @@ mod tests {
         let c = mocks::container();
         let uc = Delete::new(c.event_pub(), c.collection_repo());
 
-        let author = mocks::user1().1;
-        let mut collection = mocks::empty_collection1();
+        let mut collection = mocks::collection(
+            "#collection01",
+            "#user01",
+            "User",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "cover.jpg",
+        );
         c.collection_repo().save(&mut collection).await.unwrap();
 
         assert!(uc
-            .exec(
-                author.base().id().to_string(),
-                "#invalid-collection".to_owned()
-            )
+            .exec("#user01".to_owned(), "#invalid-collection".to_owned())
             .await
             .is_err());
         assert!(uc

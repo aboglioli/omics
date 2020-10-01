@@ -64,7 +64,16 @@ mod tests {
         let c = mocks::container();
         let uc = Login::new(c.event_pub(), c.authentication_serv());
 
-        let mut user = mocks::user1();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            false,
+            None,
+            None,
+            "user",
+        );
         c.user_repo().save(&mut user).await.unwrap();
 
         assert!(uc
@@ -81,7 +90,16 @@ mod tests {
         let c = mocks::container();
         let uc = Login::new(c.event_pub(), c.authentication_serv());
 
-        let mut user = mocks::validated_user1();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            true,
+            None,
+            None,
+            "user",
+        );
         c.user_repo().save(&mut user).await.unwrap();
 
         let res = uc
