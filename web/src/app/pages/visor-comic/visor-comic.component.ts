@@ -7,6 +7,8 @@ import { faChevronLeft, faChevronRight, faMoneyBillAlt, faBookmark, faInfoCircle
 import { ActivatedRoute } from '@angular/router';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 import { IReaderPublicationInteraction } from '../../domain/models/reader';
+import { PublicationInfoComponent } from 'src/app/components/publication/publication-info/publication-info.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-visor-comic',
@@ -42,6 +44,7 @@ export class VisorComicComponent implements OnInit {
     private publicationService: PublicationService,
     private activateRoute: ActivatedRoute,
     private sweetAlertGenericService: SweetAlertGenericMessageService,
+    private dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
@@ -160,7 +163,16 @@ export class VisorComicComponent implements OnInit {
 
   public onInfo(): void {
 
-    this.sweetAlertGenericService.showUnderConstrucction();
+    const dialogRef = this.dialog.open(
+      PublicationInfoComponent,
+      {
+        panelClass: 'info-publication',
+        data: {
+          idPublication: this.publicationId,
+          showRead: false
+        }
+      }
+    );
 
   }
 

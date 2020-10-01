@@ -1,7 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { IPublication } from '../../../domain/models/publication';
 import { Router } from '@angular/router';
-import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
+import { PublicationInfoComponent } from '../../publication/publication-info/publication-info.component';
+import { MatDialog } from '@angular/material/dialog';
 
 
 @Component({
@@ -10,11 +11,12 @@ import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-ge
   styleUrls: ['./publication-card-manager.component.scss']
 })
 export class PublicationCardManagerComponent implements OnInit {
+
   @Input() publication: IPublication;
 
   constructor(
     private router: Router,
-    private sweetAlertGenericService: SweetAlertGenericMessageService,
+    private dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {}
@@ -25,10 +27,18 @@ export class PublicationCardManagerComponent implements OnInit {
 
   }
 
-  public goToPublication(): void {
+  public onOpenInfo(): void {
 
-    // TODO: Agregar para ver la publicación
-    this.router.navigate( [`/read/${this.publication.id}`] );
+    const dialogRef = this.dialog.open(
+      PublicationInfoComponent,
+      {
+        panelClass: 'info-publication',
+        data: {
+          idPublication: this.publication.id,
+          showRead: true
+        }
+      }
+    );
 
   }
 

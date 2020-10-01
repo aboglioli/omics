@@ -62,6 +62,7 @@ import { PerfilEditarComponent } from './pages/perfil-editar/perfil-editar.compo
 import { PublicationApproveRejectMotiveComponent } from './components/dashboard/publication-approve-reject-motive/publication-approve-reject-motive.component';
 import { PublicationCardAuthorComponent } from './components/publication-card-type/publication-card-author/publication-card-author.component';
 import { PublicationCardReaderComponent } from './components/publication-card-type/publication-card-reader/publication-card-reader.component';
+import { TruncateStringPipe } from './pipes/truncate-string.pipe';
 
 
 @NgModule({
@@ -102,7 +103,8 @@ import { PublicationCardReaderComponent } from './components/publication-card-ty
     PerfilEditarComponent,
     PublicationApproveRejectMotiveComponent,
     PublicationCardAuthorComponent,
-    PublicationCardReaderComponent
+    PublicationCardReaderComponent,
+    TruncateStringPipe
   ],
   imports: [
     BrowserModule,
