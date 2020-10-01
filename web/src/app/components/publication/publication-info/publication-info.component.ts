@@ -31,6 +31,7 @@ export class PublicationInfoComponent implements OnInit {
   public faVistas = faEye;
   public faStarFill = faStar;
 
+  public ratingPublication = 0;
   public publication: IPublication;
   public readerInfo: IReaderPublicationInteraction;
 
@@ -142,6 +143,12 @@ export class PublicationInfoComponent implements OnInit {
       );
 
     }
+
+  }
+
+  public addReview(ratinSelected: number): void {
+
+    console.log(ratinSelected);
 
   }
 

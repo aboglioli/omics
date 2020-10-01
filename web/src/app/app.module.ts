@@ -15,6 +15,7 @@ import { ChartsModule } from 'ng2-charts';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { BarRatingModule } from 'ngx-bar-rating';
 
 // Modulos auxiliares
 import { MaterialModule } from './auxiliar-modules/material.module';
@@ -63,6 +64,7 @@ import { PublicationApproveRejectMotiveComponent } from './components/dashboard/
 import { PublicationCardAuthorComponent } from './components/publication-card-type/publication-card-author/publication-card-author.component';
 import { PublicationCardReaderComponent } from './components/publication-card-type/publication-card-reader/publication-card-reader.component';
 import { TruncateStringPipe } from './pipes/truncate-string.pipe';
+import { PublicationReviewAddComponent } from './components/publication/publication-review-add/publication-review-add.component';
 
 
 @NgModule({
@@ -104,7 +106,8 @@ import { TruncateStringPipe } from './pipes/truncate-string.pipe';
     PublicationApproveRejectMotiveComponent,
     PublicationCardAuthorComponent,
     PublicationCardReaderComponent,
-    TruncateStringPipe
+    TruncateStringPipe,
+    PublicationReviewAddComponent
   ],
   imports: [
     BrowserModule,
@@ -119,6 +122,7 @@ import { TruncateStringPipe } from './pipes/truncate-string.pipe';
     FontAwesomeModule,
     NgxSpinnerModule,
     SweetAlert2Module.forRoot(),
+    BarRatingModule,
 
     // Custom modules
     DomainModule,

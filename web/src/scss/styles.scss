@@ -3,6 +3,8 @@
 @import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
 @import "./vars";
 @import '~bootstrap/scss/bootstrap'; /* Importing Bootstrap SCSS file. */
+@import '~ngx-bar-rating/themes/br-stars-theme';
+@import '~ngx-bar-rating/themes/br-bootstrap-theme';
 
 // Estilos generales
 html, body {
