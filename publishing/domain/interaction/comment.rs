@@ -1,7 +1,9 @@
+use serde::{Deserialize, Serialize};
+
 use common::error::Error;
 use common::result::Result;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Comment {
     comment: String,
 }

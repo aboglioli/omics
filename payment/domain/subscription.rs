@@ -285,4 +285,26 @@ mod tests {
 
         assert!(!subscription.events().to_vec().unwrap().is_empty());
     }
+
+    #[test]
+    fn change_plan() {
+        let mut subscription = mocks::subscription("sub-1", "user-1", "plan-1", 0.0);
+        assert!(subscription
+            .add_payment(Payment::new(Kind::Income, Amount::new(50.0).unwrap()).unwrap())
+            .is_err());
+
+        assert!(subscription
+            .change_plan(mocks::plan("plan-2", 45.0))
+            .is_ok());
+
+        assert!(subscription
+            .add_payment(Payment::new(Kind::Income, Amount::new(50.0).unwrap()).unwrap())
+            .is_err());
+        assert!(subscription
+            .add_payment(Payment::new(Kind::Income, Amount::new(45.0).unwrap()).unwrap())
+            .is_ok());
+        assert!(subscription
+            .add_payment(Payment::new(Kind::Income, Amount::new(45.0).unwrap()).unwrap())
+            .is_err());
+    }
 }

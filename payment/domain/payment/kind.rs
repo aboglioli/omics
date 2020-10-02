@@ -7,7 +7,7 @@ use common::result::Result;
 pub enum Kind {
     Income,
     Outcome,
-    Transfer
+    Transfer,
 }
 
 impl ToString for Kind {

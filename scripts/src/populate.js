@@ -242,15 +242,23 @@ async function main() {
           if (rand(0, 100) < 60) {
             statusHistory.push({
               status: 'published',
-              admin_id: '00000000-0000-0000-0000-000000000002',
-              comment: 'Todo está perfecto.',
+              admin_id: {
+                id: '00000000-0000-0000-0000-000000000002',
+              },
+              comment: {
+                comment: 'Todo está perfecto.',
+              },
               datetime: new Date(),
             });
           } else if (rand(0, 100) < 40) {
             statusHistory.push({
-              status: 'published',
-              admin_id: '00000000-0000-0000-0000-000000000002',
-              comment: 'Tiene contenido que puede resultar ofensivo a los pandas.',
+              status: 'rejected',
+              admin_id: {
+                id: '00000000-0000-0000-0000-000000000002'
+              },
+              comment: {
+                comment: 'Tiene contenido que puede resultar ofensivo a los pandas.'
+              },
               datetime: new Date(),
             });
           }

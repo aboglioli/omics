@@ -1,10 +1,11 @@
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 
 use common::result::Result;
 
 use crate::domain::plan::{Plan, PlanId};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SubscriptionPlan {
     plan_id: PlanId,
     price: f64,

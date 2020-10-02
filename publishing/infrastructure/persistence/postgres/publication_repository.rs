@@ -78,7 +78,7 @@ fn from_status_history(status_history: &StatusHistory<Status>) -> Result<Vec<Sta
             status: item.status().to_string(),
             admin_id: None,
             comment: None,
-            datetime: item.date().to_rfc3339(),
+            datetime: item.datetime().to_rfc3339(),
         };
 
         match item.status() {
@@ -110,9 +110,11 @@ impl Publication {
 
         let statistics: Statistics = serde_json::from_value(row.get("statistics"))?;
 
-        let status_history: Vec<StatusItemJson> =
+        // let status_history: Vec<StatusItemJson> =
+        //     serde_json::from_value(row.get("status_history"))?;
+        // let status_history = to_status_history(status_history)?;
+        let status_items: Vec<StatusItem<Status>> =
             serde_json::from_value(row.get("status_history"))?;
-        let status_history = to_status_history(status_history)?;
 
         let pages: Vec<Page> = serde_json::from_value(row.get("pages"))?;
 
@@ -143,7 +145,7 @@ impl Publication {
             pages,
             contract,
             statistics,
-            status_history,
+            StatusHistory::build(status_items),
         ))
     }
 }
