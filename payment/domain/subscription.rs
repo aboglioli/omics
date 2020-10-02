@@ -225,6 +225,17 @@ mod tests {
             .is_ok());
         assert!(!subscription.is_active());
 
+        assert!(subscription.require_payment().is_ok());
+        assert!(subscription.require_payment().is_err());
+
+        assert!(subscription
+            .add_payment(Payment::build(
+                Kind::Income,
+                Amount::new(50.0).unwrap(),
+                Utc::now() - Duration::days(70),
+            ))
+            .is_err());
+
         assert!(subscription
             .add_payment(Payment::build(
                 Kind::Income,
@@ -242,6 +253,16 @@ mod tests {
             ))
             .is_ok());
         assert!(subscription.is_active());
+
+        assert!(subscription
+            .add_payment(Payment::build(
+                Kind::Income,
+                Amount::new(50.0).unwrap(),
+                Utc::now(),
+            ))
+            .is_err());
+
+        assert!(subscription.require_payment().is_err());
 
         assert_eq!(subscription.payments().len(), 3);
 
