@@ -6,10 +6,10 @@ pub use repository::*;
 pub use status::*;
 
 use common::error::Error;
-
-use common::model::{AggregateRoot, StatusHistory, StringId};
+use common::model::{AggregateRoot, Events, StatusHistory, StringId};
 use common::result::Result;
 use identity::domain::user::UserId;
+use shared::event::SubscriptionEvent;
 
 use crate::domain::payment::Payment;
 use crate::domain::plan::Plan;
@@ -19,6 +19,7 @@ pub type SubscriptionId = StringId;
 #[derive(Debug, Clone)]
 pub struct Subscription {
     base: AggregateRoot<SubscriptionId>,
+    events: Events<SubscriptionEvent>,
     user_id: UserId,
     plan: SubscriptionPlan,
     payments: Vec<Payment>,
@@ -28,18 +29,43 @@ pub struct Subscription {
 impl Subscription {
     pub fn new(id: SubscriptionId, user_id: UserId, plan: Plan) -> Result<Self> {
         let plan = SubscriptionPlan::new(plan)?;
+        let mut status_history = StatusHistory::new(Status::init());
 
-        Ok(Subscription {
+        if plan.price() == 0.0 {
+            let status = status_history.current().pay()?;
+            status_history.add_status(status);
+        }
+
+        let mut subscription = Subscription {
             base: AggregateRoot::new(id),
+            events: Events::new(),
             user_id,
             plan,
             payments: Vec::new(),
-            status_history: StatusHistory::new(Status::init()),
-        })
+            status_history,
+        };
+
+        subscription
+            .events
+            .record_event(SubscriptionEvent::Created {
+                id: subscription.base().id().to_string(),
+                user_id: subscription.user_id().to_string(),
+                plan_id: subscription.plan().plan_id().to_string(),
+            });
+
+        Ok(subscription)
     }
 
     pub fn base(&self) -> &AggregateRoot<SubscriptionId> {
         &self.base
+    }
+
+    pub fn events(&self) -> &Events<SubscriptionEvent> {
+        &self.events
+    }
+
+    pub fn user_id(&self) -> &UserId {
+        &self.user_id
     }
 
     pub fn plan(&self) -> &SubscriptionPlan {
@@ -55,12 +81,28 @@ impl Subscription {
     }
 
     pub fn is_active(&self) -> bool {
+        if self.plan().price() == 0.0 {
+            return true;
+        }
+
         matches!(self.status_history.current(), Status::Active)
             && if let Some(payment) = self.payments.last() {
-                payment.is_current()
+                payment.is_current(30)
             } else {
                 false
             }
+    }
+
+    pub fn change_plan(&mut self, plan: Plan) -> Result<()> {
+        let plan = SubscriptionPlan::new(plan)?;
+        self.plan = plan;
+
+        self.events.record_event(SubscriptionEvent::PlanChanged {
+            id: self.base().id().to_string(),
+            plan_id: self.plan().plan_id().to_string(),
+        });
+
+        Ok(())
     }
 
     pub fn require_payment(&mut self) -> Result<()> {
@@ -71,14 +113,47 @@ impl Subscription {
         let status = self.status_history.current().wait_for_payment()?;
         self.status_history.add_status(status);
 
+        self.events
+            .record_event(SubscriptionEvent::PaymentRequired {
+                id: self.base().id().to_string(),
+            });
+
         Ok(())
     }
 
     pub fn add_payment(&mut self, payment: Payment) -> Result<()> {
+        if self.is_active() {
+            return Err(Error::new("subscription", "already_paid"));
+        }
+
+        if self.plan.price() != payment.amount().value() {
+            return Err(Error::new("subscription", "payment_differente_to_plan"));
+        }
+
         let status = self.status_history.current().pay()?;
         self.status_history.add_status(status);
 
+        let amount = payment.amount().value();
+
         self.payments.push(payment);
+
+        self.events.record_event(SubscriptionEvent::PaymentAdded {
+            id: self.base().id().to_string(),
+            amount,
+        });
+
+        Ok(())
+    }
+
+    pub fn disable(&mut self) -> Result<()> {
+        let status = self.status_history.current().close()?;
+        self.status_history.add_status(status);
+
+        self.base.delete();
+
+        self.events.record_event(SubscriptionEvent::Disabled {
+            id: self.base().id().to_string(),
+        });
 
         Ok(())
     }
@@ -86,8 +161,11 @@ impl Subscription {
 
 #[cfg(test)]
 mod tests {
-    use chrono::Utc;
+    use super::*;
 
+    use chrono::{Duration, Utc};
+
+    use crate::domain::payment::{Amount, Kind};
     use crate::mocks;
 
     #[test]
@@ -100,6 +178,8 @@ mod tests {
             "waiting-payment"
         );
         assert_eq!(subscription.is_active(), false);
+
+        assert!(!subscription.events().to_vec().unwrap().is_empty());
     }
 
     #[test]
@@ -129,5 +209,42 @@ mod tests {
             subscription.status_history().current().to_string(),
             "active"
         );
+
+        assert!(!subscription.events().to_vec().unwrap().is_empty());
+    }
+
+    #[test]
+    fn subscription_status_from_payments() {
+        let mut subscription = mocks::subscription("sub-1", "user-1", "plan-1", 75.0);
+        assert!(subscription
+            .add_payment(Payment::build(
+                Kind::Income,
+                Amount::new(75.0).unwrap(),
+                Utc::now() - Duration::days(70),
+            ))
+            .is_ok());
+        assert!(!subscription.is_active());
+
+        assert!(subscription
+            .add_payment(Payment::build(
+                Kind::Income,
+                Amount::new(75.0).unwrap(),
+                Utc::now() - Duration::days(40),
+            ))
+            .is_ok());
+        assert!(!subscription.is_active());
+
+        assert!(subscription
+            .add_payment(Payment::build(
+                Kind::Income,
+                Amount::new(75.0).unwrap(),
+                Utc::now() - Duration::days(10),
+            ))
+            .is_ok());
+        assert!(subscription.is_active());
+
+        assert_eq!(subscription.payments().len(), 3);
+
+        assert!(!subscription.events().to_vec().unwrap().is_empty());
     }
 }

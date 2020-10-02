@@ -12,10 +12,6 @@ Filtros:
 - Desde
 - Hast
 
-## Right now
-- [x] Redirect after user validation.
-- [x] Recover password: send email.
-
 ## Urgent
 - [x] Publication status should be an object in DTO to show comments.
 - [x] Get collections that a publication is in.
@@ -48,6 +44,8 @@ Filtros:
 - [x] Separate events from AggregateRoot.
 - [x] Move publishing::UserService to shared crate.
 - [x] Add entpoint for /publications/:id/collections (collections having the given publication).
+- [x] Redirect after user validation.
+- [x] Recover password: send email.
 
 - [ ] Create Author from UserService when a new publication is created.
 - [ ] Make /events accessible only in development env.
@@ -59,6 +57,7 @@ Filtros:
 - [ ] Allow change 'username' and 'email' in IdentityService.
 - [ ] Merge 'code' with 'topic' in Event.
 - [ ] Add Uuid as base id (StringId for string id only).
+- [ ] Add timestamps to events.
 
 # Progress
 

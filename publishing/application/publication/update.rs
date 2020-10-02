@@ -172,7 +172,7 @@ mod tests {
             publication.status_history().current(),
             Status::Draft
         ));
-        assert_eq!(publication.pages().len(), 3);
+        assert_eq!(publication.pages().len(), 2);
 
         assert!(!c.event_pub().events().await.is_empty());
     }

@@ -101,7 +101,6 @@ mod tests {
             true,
             false,
         );
-        publication.publish().unwrap();
         c.publication_repo().save(&mut publication).await.unwrap();
 
         uc.exec(

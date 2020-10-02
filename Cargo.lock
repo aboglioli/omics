@@ -1625,6 +1625,7 @@ dependencies = [
  "identity",
  "publishing",
  "serde",
+ "shared",
  "tokio",
  "uuid",
 ]

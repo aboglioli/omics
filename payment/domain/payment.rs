@@ -39,8 +39,8 @@ impl Payment {
         &self.date
     }
 
-    pub fn is_current(&self) -> bool {
-        self.date + Duration::days(30) > Utc::now()
+    pub fn is_current(&self, days: i64) -> bool {
+        self.date + Duration::days(days) > Utc::now()
     }
 }
 
@@ -51,20 +51,20 @@ mod tests {
     #[test]
     fn is_current() {
         let payment = Payment::build(Kind::Income, Amount::new(45.0).unwrap(), Utc::now());
-        assert!(payment.is_current());
+        assert!(payment.is_current(30));
 
         let payment = Payment::build(
             Kind::Income,
             Amount::new(45.0).unwrap(),
             Utc::now() - Duration::days(15),
         );
-        assert!(payment.is_current());
+        assert!(payment.is_current(30));
 
         let payment = Payment::build(
             Kind::Income,
             Amount::new(45.0).unwrap(),
             Utc::now() - Duration::days(45),
         );
-        assert!(!payment.is_current());
+        assert!(!payment.is_current(30));
     }
 }

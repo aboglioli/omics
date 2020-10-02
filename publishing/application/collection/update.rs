@@ -146,7 +146,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                "#user01".to_owned(),
+                "#user02".to_owned(),
                 collection.base().id().to_string(),
                 UpdateCommand {
                     name: "New name".to_owned(),

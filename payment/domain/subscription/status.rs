@@ -3,7 +3,7 @@ use common::result::Result;
 
 #[derive(Debug, Clone)]
 pub enum Status {
-    WaitingPayment,
+    WaitingForPayment,
     Active,
     Inactive,
 }
@@ -11,7 +11,7 @@ pub enum Status {
 impl ToString for Status {
     fn to_string(&self) -> String {
         match self {
-            Status::WaitingPayment => "waiting-payment".to_owned(),
+            Status::WaitingForPayment => "waiting-payment".to_owned(),
             Status::Active => "active".to_owned(),
             Status::Inactive => "inactive".to_owned(),
         }
@@ -20,27 +20,26 @@ impl ToString for Status {
 
 impl Status {
     pub fn init() -> Self {
-        Status::WaitingPayment
+        Status::WaitingForPayment
     }
 
     pub fn wait_for_payment(&self) -> Result<Self> {
         match self {
-            Status::Active => Ok(Status::WaitingPayment),
+            Status::Active => Ok(Status::WaitingForPayment),
             _ => Err(Error::new("subscription", "not_active")),
         }
     }
 
     pub fn pay(&self) -> Result<Self> {
         match self {
-            Status::WaitingPayment => Ok(Status::Active),
+            Status::WaitingForPayment | Status::Active => Ok(Status::Active),
             _ => Err(Error::new("subscription", "not_waiting_payment")),
         }
     }
 
     pub fn close(&self) -> Result<Self> {
         match self {
-            Status::Active => Ok(Status::Inactive),
-            _ => Err(Error::new("subscription", "not_active")),
+            _ => Ok(Status::Inactive),
         }
     }
 }
