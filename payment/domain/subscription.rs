@@ -56,6 +56,23 @@ impl Subscription {
         Ok(subscription)
     }
 
+    pub fn build(
+        base: AggregateRoot<SubscriptionId>,
+        user_id: UserId,
+        plan: SubscriptionPlan,
+        payments: Vec<Payment>,
+        status_history: StatusHistory<Status>,
+    ) -> Self {
+        Subscription {
+            base,
+            events: Events::new(),
+            user_id,
+            plan,
+            payments,
+            status_history,
+        }
+    }
+
     pub fn base(&self) -> &AggregateRoot<SubscriptionId> {
         &self.base
     }

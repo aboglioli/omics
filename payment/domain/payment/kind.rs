@@ -7,6 +7,7 @@ use common::result::Result;
 pub enum Kind {
     Income,
     Outcome,
+    Transfer
 }
 
 impl ToString for Kind {
@@ -14,6 +15,7 @@ impl ToString for Kind {
         match self {
             Kind::Income => "income".to_owned(),
             Kind::Outcome => "outcome".to_owned(),
+            Kind::Transfer => "transfer".to_owned(),
         }
     }
 }
@@ -24,6 +26,7 @@ impl FromStr for Kind {
         match s {
             "income" => Ok(Kind::Income),
             "outcome" => Ok(Kind::Outcome),
+            "transfer" => Ok(Kind::Transfer),
             _ => Err(Error::not_found("kind")),
         }
     }

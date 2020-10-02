@@ -58,6 +58,7 @@ Filtros:
 - [ ] Merge 'code' with 'topic' in Event.
 - [ ] Add Uuid as base id (StringId for string id only).
 - [ ] Add timestamps to events.
+- [ ] Improve enum serializatiion/deserialization.
 
 # Progress
 
