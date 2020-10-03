@@ -37,7 +37,7 @@ impl FromStr for Birthdate {
     fn from_str(s: &str) -> Result<Self> {
         Self::new(
             DateTime::parse_from_rfc3339(s)
-                .map(|datetime| DateTime::<Utc>::from(datetime))
+                .map(DateTime::<Utc>::from)
                 .map_err(|err| Error::bad_format("birthdate").wrap_raw(err))?,
         )
     }

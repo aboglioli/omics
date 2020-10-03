@@ -33,30 +33,28 @@ pub async fn extract_payload(payload: &mut Multipart) -> Result<(Bytes, Vec<Temp
             while let Some(chunk) = field.next().await {
                 data = chunk.map_err(|_| Error::new("data", "read"))?;
             }
-        } else {
-            if let Some(filename) = content_disposition.get_filename() {
-                if !filename.ends_with("jpg")
-                    && !filename.ends_with("jpeg")
-                    && !filename.ends_with("png")
-                {
-                    return Err(Error::new("file", "wrong_extension"));
-                }
-
-                let file = TempFile::new(sanitize_filename::sanitize(&filename));
-                let path = file.path().to_owned();
-                let mut f = web::block(move || File::create(path))
-                    .await
-                    .map_err(|err| Error::new("file", "create").wrap_raw(err))?;
-
-                while let Some(chunk) = field.next().await {
-                    let data = chunk.map_err(|_| Error::new("chunk", "read"))?;
-                    f = web::block(move || f.write_all(&data).map(|_| f))
-                        .await
-                        .map_err(|err| Error::new("file", "write").wrap_raw(err))?;
-                }
-
-                files.push(file.clone());
+        } else if let Some(filename) = content_disposition.get_filename() {
+            if !filename.ends_with("jpg")
+                && !filename.ends_with("jpeg")
+                && !filename.ends_with("png")
+            {
+                return Err(Error::new("file", "wrong_extension"));
             }
+
+            let file = TempFile::new(sanitize_filename::sanitize(&filename));
+            let path = file.path().to_owned();
+            let mut f = web::block(move || File::create(path))
+                .await
+                .map_err(|err| Error::new("file", "create").wrap_raw(err))?;
+
+            while let Some(chunk) = field.next().await {
+                let data = chunk.map_err(|_| Error::new("chunk", "read"))?;
+                f = web::block(move || f.write_all(&data).map(|_| f))
+                    .await
+                    .map_err(|err| Error::new("file", "write").wrap_raw(err))?;
+            }
+
+            files.push(file.clone());
         }
     }
 

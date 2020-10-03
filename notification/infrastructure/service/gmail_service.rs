@@ -9,6 +9,7 @@ use common::result::Result;
 
 use crate::domain::email::{Email, EmailService};
 
+#[derive(Default)]
 pub struct GmailService;
 
 impl GmailService {

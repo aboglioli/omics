@@ -1,5 +1,4 @@
-use identity::domain::user::User;
-use identity::mocks;
+use identity::domain::user::UserId;
 
 use crate::domain::author::{Author, AuthorId};
 use crate::domain::category::{Category, CategoryId, Name as CategoryName};
@@ -10,131 +9,93 @@ use crate::domain::publication::{
 };
 use crate::domain::reader::{Reader, ReaderId};
 
-pub fn publication1() -> Publication {
-    let author_id = user1().0.base().id().clone();
-
+pub fn publication(
+    publication_id: &str,
+    author_id: &str,
+    name: &str,
+    category_id: &str,
+    tags: Vec<&str>,
+    cover_url: &str,
+    pages_count: u32,
+    published: bool,
+    approved: bool,
+) -> Publication {
     let mut publication = Publication::new(
-        PublicationId::new("#publication01").unwrap(),
-        author_id.clone(),
+        PublicationId::new(publication_id).unwrap(),
+        AuthorId::new(author_id).unwrap(),
         Header::new(
-            Name::new("Publication 01").unwrap(),
+            Name::new(name).unwrap(),
             Synopsis::new("Synopsis...").unwrap(),
-            category1().base().id().clone(),
-            vec![Tag::new("Tag 1").unwrap(), Tag::new("Tag 2").unwrap()],
-            Image::new("domain.com/image.jpg").unwrap(),
+            CategoryId::new(category_id).unwrap(),
+            tags.into_iter().map(|t| Tag::new(t).unwrap()).collect(),
+            Image::new(cover_url).unwrap(),
         )
         .unwrap(),
     )
     .unwrap();
 
-    let mut page_1 = Page::new(0).unwrap();
-    page_1
-        .set_images(vec![
-            Image::new("domain.com/p1_image1.jpg").unwrap(),
-            Image::new("domain.com/p1_image2.jpg").unwrap(),
-        ])
-        .unwrap();
-    let mut page_2 = Page::new(1).unwrap();
-    page_2
-        .set_images(vec![
-            Image::new("domain.com/p2_image1.jpg").unwrap(),
-            Image::new("domain.com/p2_image2.jpg").unwrap(),
-        ])
-        .unwrap();
-    publication.set_pages(vec![page_1, page_2]).unwrap();
+    let mut pages = Vec::new();
+    for i in 0..pages_count {
+        let mut page = Page::new(i).unwrap();
+        page.set_images(vec![Image::new("domain.com/image1.jpg").unwrap()])
+            .unwrap();
+        pages.push(page);
+    }
+    publication.set_pages(pages).unwrap();
+
+    if published {
+        publication.publish().unwrap();
+
+        if approved {
+            publication
+                .approve(
+                    UserId::new("content-manager-1").unwrap(),
+                    Comment::new("Comment...").unwrap(),
+                )
+                .unwrap();
+        }
+    }
 
     publication
 }
 
-pub fn published_publication1() -> Publication {
-    let mut publication = publication1();
-
-    let mut page1 = Page::new(2).unwrap();
-    page1
-        .set_images(vec![
-            Image::new("domain.com/img1.jpg").unwrap(),
-            Image::new("domain.com/img2.jpg").unwrap(),
-            Image::new("domain.com/img3.jpg").unwrap(),
-        ])
-        .unwrap();
-
-    let mut page2 = Page::new(3).unwrap();
-    page2
-        .set_images(vec![
-            Image::new("domain.com/img4.jpg").unwrap(),
-            Image::new("domain.com/img5.jpg").unwrap(),
-        ])
-        .unwrap();
-
-    let _author_id = publication.author_id().clone();
-    publication.set_pages(vec![page1, page2]).unwrap();
-
-    publication.publish().unwrap();
-    publication
-        .approve(
-            content_manager1().0.base().id().clone(),
-            Comment::new("comment").unwrap(),
-        )
-        .unwrap();
-    publication
-}
-
-pub fn empty_collection1() -> Collection {
-    Collection::new(
-        CollectionId::new("#collection01").unwrap(),
-        user1().0.base().id().clone(),
+pub fn collection(
+    collection_id: &str,
+    author_id: &str,
+    name: &str,
+    category_id: &str,
+    tags: Vec<&str>,
+    cover_url: &str,
+) -> Collection {
+    let collection = Collection::new(
+        CollectionId::new(collection_id).unwrap(),
+        AuthorId::new(author_id).unwrap(),
         Header::new(
-            Name::new("Collection 01").unwrap(),
+            Name::new(name).unwrap(),
             Synopsis::new("Synopsis...").unwrap(),
-            category1().base().id().clone(),
-            vec![Tag::new("Tag 1").unwrap(), Tag::new("Tag 2").unwrap()],
-            Image::new("domain.com/image.jpg").unwrap(),
+            CategoryId::new(category_id).unwrap(),
+            tags.into_iter().map(|t| Tag::new(t).unwrap()).collect(),
+            Image::new(cover_url).unwrap(),
         )
         .unwrap(),
     )
-    .unwrap()
+    .unwrap();
+
+    collection
 }
 
-pub fn content_manager1() -> (User, Author, Reader) {
-    (
-        mocks::admin1(),
-        Author::new(
-            AuthorId::new("content-manager-1").unwrap(),
-            "content-manager-1",
-        )
-        .unwrap(),
-        Reader::new(ReaderId::new("content-manager-1").unwrap()).unwrap(),
-    )
-}
-
-pub fn user1() -> (User, Author, Reader) {
-    (
-        mocks::user1(),
-        Author::new(AuthorId::new("user-1").unwrap(), "user-1").unwrap(),
-        Reader::new(ReaderId::new("user-1").unwrap()).unwrap(),
-    )
-}
-
-pub fn user2() -> (User, Author, Reader) {
-    (
-        mocks::user2(),
-        Author::new(AuthorId::new("user-2").unwrap(), "user-2").unwrap(),
-        Reader::new(ReaderId::new("user-2").unwrap()).unwrap(),
-    )
-}
-
-pub fn category1() -> Category {
+pub fn category(id: &str, name: &str) -> Category {
     Category::new(
-        CategoryId::new("#category01").unwrap(),
-        CategoryName::new("Category 01").unwrap(),
+        CategoryId::new(id).unwrap(),
+        CategoryName::new(name).unwrap(),
     )
     .unwrap()
 }
 
-pub fn category2() -> Category {
-    Category::new(
-        CategoryId::new("#category02").unwrap(),
-        CategoryName::new("Category 02").unwrap(),
-    )
-    .unwrap()
+pub fn author(id: &str, username: &str) -> Author {
+    Author::new(AuthorId::new(id).unwrap(), username).unwrap()
+}
+
+pub fn reader(id: &str) -> Reader {
+    Reader::new(ReaderId::new(id).unwrap()).unwrap()
 }

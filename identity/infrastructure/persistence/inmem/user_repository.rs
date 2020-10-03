@@ -94,19 +94,16 @@ mod tests {
     #[tokio::test]
     async fn find_by_id() {
         let repo = InMemUserRepository::new();
-        let mut user = mocks::user1();
-        user.set_person(
-            Person::new(
-                Fullname::new("Name", "Lastname").unwrap(),
-                None,
-                None,
-                None,
-                None,
-            )
-            .unwrap(),
-        )
-        .unwrap();
-
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            true,
+            Some("Name"),
+            Some("Lastname"),
+            "user",
+        );
         repo.save(&mut user).await.unwrap();
         assert!(repo.find_by_id(&user.base().id()).await.is_ok());
         assert!(user.person().is_some());

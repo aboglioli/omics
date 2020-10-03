@@ -35,6 +35,7 @@ impl<EPub> NotificationContainer<EPub>
 where
     EPub: EventPublisher,
 {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         event_pub: Arc<EPub>,
         author_repo: Arc<dyn AuthorRepository>,
@@ -113,7 +114,6 @@ where
 
         let notification_handler = NotificationHandler::new(
             self.author_repo.clone(),
-            self.collection_repo.clone(),
             self.interaction_repo.clone(),
             self.notification_repo.clone(),
             self.publication_repo.clone(),

@@ -108,9 +108,6 @@ mod tests {
         let c = mocks::container();
         let uc = Register::new(c.event_pub(), c.user_repo(), c.user_serv());
 
-        let mut user = mocks::user1();
-        c.user_repo().save(&mut user).await.unwrap();
-
         assert!(uc
             .exec(RegisterCommand {
                 username: "us".to_owned(),
@@ -144,7 +141,16 @@ mod tests {
         let c = mocks::container();
         let uc = Register::new(c.event_pub(), c.user_repo(), c.user_serv());
 
-        let mut user = mocks::user1();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            true,
+            None,
+            None,
+            "user",
+        );
         c.user_repo().save(&mut user).await.unwrap();
 
         assert!(uc

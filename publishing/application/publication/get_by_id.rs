@@ -35,6 +35,7 @@ pub struct GetById<'a> {
 }
 
 impl<'a> GetById<'a> {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         event_pub: &'a dyn EventPublisher,
         author_repo: &'a dyn AuthorRepository,
@@ -165,7 +166,29 @@ impl<'a> GetById<'a> {
 mod tests {
     use super::*;
 
+    use identity::domain::user::User;
+    use identity::mocks as identity_mocks;
+
+    use crate::domain::author::Author;
+    use crate::domain::reader::Reader;
     use crate::mocks;
+
+    fn user(index: u32) -> (User, Author, Reader) {
+        (
+            identity_mocks::user(
+                &format!("#user0{}", index),
+                &format!("user-{}", index),
+                &format!("user-{}@omics.com", index),
+                "P@asswd!",
+                true,
+                Some("Name"),
+                Some("Lastname"),
+                "user",
+            ),
+            mocks::author(&format!("#user0{}", index), &format!("user-{}", index)),
+            mocks::reader(&format!("#user0{}", index)),
+        )
+    }
 
     #[tokio::test]
     async fn owner_view_of_draft() {
@@ -181,27 +204,37 @@ mod tests {
             c.statistics_serv(),
         );
 
-        let (mut user1, mut author1, mut reader1) = mocks::user1();
+        let (mut user1, mut author1, mut reader1) = user(1);
         c.user_repo().save(&mut user1).await.unwrap();
         c.author_repo().save(&mut author1).await.unwrap();
         c.reader_repo().save(&mut reader1).await.unwrap();
 
-        let (mut user2, mut author2, mut reader2) = mocks::user2();
+        let (mut user2, mut author2, mut reader2) = user(2);
         c.user_repo().save(&mut user2).await.unwrap();
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 
-        let mut category = mocks::category1();
+        let mut category = mocks::category("#category01", "Category 1");
         c.category_repo().save(&mut category).await.unwrap();
 
-        let mut publication = mocks::publication1();
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            false,
+            false,
+        );
         c.publication_repo().save(&mut publication).await.unwrap();
 
         let res = uc
             .exec(
                 Some(reader1.base().id().to_string()),
                 publication.base().id().to_string(),
-                Include::default().add("author").add("category"),
+                Include::default().add_field("author").add_field("category"),
             )
             .await
             .unwrap();
@@ -237,20 +270,30 @@ mod tests {
             c.statistics_serv(),
         );
 
-        let (mut user1, mut author1, mut reader1) = mocks::user1();
+        let (mut user1, mut author1, mut reader1) = user(1);
         c.user_repo().save(&mut user1).await.unwrap();
         c.author_repo().save(&mut author1).await.unwrap();
         c.reader_repo().save(&mut reader1).await.unwrap();
 
-        let (mut user2, mut author2, mut reader2) = mocks::user2();
+        let (mut user2, mut author2, mut reader2) = user(2);
         c.user_repo().save(&mut user2).await.unwrap();
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 
-        let mut category = mocks::category1();
+        let mut category = mocks::category("#category01", "Category 1");
         c.category_repo().save(&mut category).await.unwrap();
 
-        let mut publication = mocks::publication1();
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            false,
+            false,
+        );
         c.publication_repo().save(&mut publication).await.unwrap();
 
         assert!(uc
@@ -277,27 +320,37 @@ mod tests {
             c.statistics_serv(),
         );
 
-        let (mut user1, mut author1, mut reader1) = mocks::user1();
+        let (mut user1, mut author1, mut reader1) = user(1);
         c.user_repo().save(&mut user1).await.unwrap();
         c.author_repo().save(&mut author1).await.unwrap();
         c.reader_repo().save(&mut reader1).await.unwrap();
 
-        let (mut user2, mut author2, mut reader2) = mocks::user2();
+        let (mut user2, mut author2, mut reader2) = user(2);
         c.user_repo().save(&mut user2).await.unwrap();
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 
-        let mut category = mocks::category1();
+        let mut category = mocks::category("#category01", "Category 1");
         c.category_repo().save(&mut category).await.unwrap();
 
-        let mut publication = mocks::published_publication1();
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            true,
+            true,
+        );
         c.publication_repo().save(&mut publication).await.unwrap();
 
         let res = uc
             .exec(
                 Some(reader2.base().id().to_string()),
                 publication.base().id().to_string(),
-                Include::default().add("author").add("category"),
+                Include::default().add_field("author").add_field("category"),
             )
             .await
             .unwrap();
@@ -327,20 +380,30 @@ mod tests {
             c.statistics_serv(),
         );
 
-        let (mut user1, mut author1, mut reader1) = mocks::user1();
+        let (mut user1, mut author1, mut reader1) = user(1);
         c.user_repo().save(&mut user1).await.unwrap();
         c.author_repo().save(&mut author1).await.unwrap();
         c.reader_repo().save(&mut reader1).await.unwrap();
 
-        let (mut user2, mut author2, mut reader2) = mocks::user2();
+        let (mut user2, mut author2, mut reader2) = user(2);
         c.user_repo().save(&mut user2).await.unwrap();
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 
-        let mut category = mocks::category1();
+        let mut category = mocks::category("#category01", "Category 1");
         c.category_repo().save(&mut category).await.unwrap();
 
-        let mut publication = mocks::published_publication1();
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            true,
+            true,
+        );
         c.publication_repo().save(&mut publication).await.unwrap();
 
         assert!(uc
@@ -367,20 +430,30 @@ mod tests {
             c.statistics_serv(),
         );
 
-        let (mut user1, mut author1, mut reader1) = mocks::user1();
+        let (mut user1, mut author1, mut reader1) = user(1);
         c.user_repo().save(&mut user1).await.unwrap();
         c.author_repo().save(&mut author1).await.unwrap();
         c.reader_repo().save(&mut reader1).await.unwrap();
 
-        let (mut user2, mut author2, mut reader2) = mocks::user2();
+        let (mut user2, mut author2, mut reader2) = user(2);
         c.user_repo().save(&mut user2).await.unwrap();
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 
-        let mut category = mocks::category1();
+        let mut category = mocks::category("#category01", "Category 1");
         c.category_repo().save(&mut category).await.unwrap();
 
-        let mut publication = mocks::published_publication1();
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            true,
+            true,
+        );
         c.publication_repo().save(&mut publication).await.unwrap();
 
         let mut like = publication.like(&reader2).unwrap();

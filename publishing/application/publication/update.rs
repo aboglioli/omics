@@ -117,14 +117,23 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.category_repo(), c.publication_repo());
 
-        let author = mocks::user1().1;
-        let mut publication = mocks::publication1();
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            false,
+            false,
+        );
         c.publication_repo().save(&mut publication).await.unwrap();
-        let mut category = mocks::category2();
+        let mut category = mocks::category("#category02", "Category 2");
         c.category_repo().save(&mut category).await.unwrap();
 
         uc.exec(
-            author.base().id().to_string(),
+            "#user01".to_owned(),
             publication.base().id().to_string(),
             UpdateCommand {
                 name: "New name".to_owned(),
@@ -153,7 +162,7 @@ mod tests {
 
         let publication = c
             .publication_repo()
-            .find_by_id(&publication.base().id())
+            .find_by_id(publication.base().id())
             .await
             .unwrap();
         assert_eq!(publication.header().name().value(), "New name");
@@ -165,7 +174,7 @@ mod tests {
         ));
         assert_eq!(publication.pages().len(), 2);
 
-        assert!(c.event_pub().events().await.len() > 0);
+        assert!(!c.event_pub().events().await.is_empty());
     }
 
     #[tokio::test]
@@ -173,14 +182,23 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.category_repo(), c.publication_repo());
 
-        let author = mocks::user1().1;
-        let mut publication = mocks::published_publication1();
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            true,
+            true,
+        );
         c.publication_repo().save(&mut publication).await.unwrap();
-        let mut category = mocks::category2();
+        let mut category = mocks::category("#category02", "Category 2");
         c.category_repo().save(&mut category).await.unwrap();
 
         uc.exec(
-            author.base().id().to_string(),
+            "#user01".to_owned(),
             publication.base().id().to_string(),
             UpdateCommand {
                 name: "New name".to_owned(),
@@ -196,7 +214,7 @@ mod tests {
 
         let publication = c
             .publication_repo()
-            .find_by_id(&publication.base().id())
+            .find_by_id(publication.base().id())
             .await
             .unwrap();
         assert!(matches!(
@@ -210,15 +228,24 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.category_repo(), c.publication_repo());
 
-        let author = mocks::user2().1;
-        let mut publication = mocks::publication1();
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            false,
+            false,
+        );
         c.publication_repo().save(&mut publication).await.unwrap();
-        let mut category = mocks::category2();
+        let mut category = mocks::category("#category02", "Category 2");
         c.category_repo().save(&mut category).await.unwrap();
 
         assert!(uc
             .exec(
-                author.base().id().to_string(),
+                "#user02".to_owned(),
                 publication.base().id().to_string(),
                 UpdateCommand {
                     name: "New name".to_owned(),
@@ -238,19 +265,27 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.category_repo(), c.publication_repo());
 
-        let author = mocks::user1().1;
-        let mut publication = mocks::publication1();
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            false,
+            false,
+        );
         c.publication_repo().save(&mut publication).await.unwrap();
-        let category = mocks::category2();
 
         assert!(uc
             .exec(
-                author.base().id().to_string(),
+                "#user01".to_owned(),
                 publication.base().id().to_string(),
                 UpdateCommand {
                     name: "New name".to_owned(),
                     synopsis: "New synopsis...".to_owned(),
-                    category_id: category.base().id().to_string(),
+                    category_id: "#category02".to_owned(),
                     tags: vec!["New tag".to_owned()],
                     cover: "domain.com/new-cover.jpg".to_owned(),
                     pages: None,

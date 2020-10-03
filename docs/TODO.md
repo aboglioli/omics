@@ -1,8 +1,16 @@
 # All
 
-## Right now
-- [x] Redirect after user validation.
-- [x] Recover password: send email.
+# Catalog
+Catálogo endpoint:
+- Más vistas
+- Nuevas (últimas)
+- Más likeadas
+- Mejor calificadas
+- Recomendadas
+
+Filtros:
+- Desde
+- Hast
 
 ## Urgent
 - [x] Publication status should be an object in DTO to show comments.
@@ -36,10 +44,12 @@
 - [x] Separate events from AggregateRoot.
 - [x] Move publishing::UserService to shared crate.
 - [x] Add entpoint for /publications/:id/collections (collections having the given publication).
+- [x] Redirect after user validation.
+- [x] Recover password: send email.
 
 - [ ] Create Author from UserService when a new publication is created.
 - [ ] Make /events accessible only in development env.
-- [ ] If request is a GET and an error occurs, a 404 error should be returned.
+- [x] If request is a GET and an error occurs, a 404 error should be returned.
 - [ ] Use username as user id too.
 - [ ] Add 'username' as ID of user.
 - [ ] Search by tags for publications and collections.
@@ -47,6 +57,8 @@
 - [ ] Allow change 'username' and 'email' in IdentityService.
 - [ ] Merge 'code' with 'topic' in Event.
 - [ ] Add Uuid as base id (StringId for string id only).
+- [ ] Add timestamps to events.
+- [ ] Improve enum serializatiion/deserialization.
 
 # Progress
 

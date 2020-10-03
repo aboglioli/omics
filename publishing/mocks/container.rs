@@ -10,6 +10,7 @@ use crate::infrastructure::persistence::inmem::{
     InMemInteractionRepository, InMemPublicationRepository, InMemReaderRepository,
 };
 
+#[allow(dead_code)]
 pub fn container() -> PublishingContainer<FakeEventPublisher> {
     PublishingContainer::new(
         Arc::new(FakeEventPublisher::new()),

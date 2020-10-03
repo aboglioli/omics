@@ -55,15 +55,21 @@ mod tests {
         let c = mocks::container();
         let uc = Delete::new(c.event_pub(), c.publication_repo());
 
-        let author = mocks::user1().1;
-        let mut publication = mocks::publication1();
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            false,
+            false,
+        );
         c.publication_repo().save(&mut publication).await.unwrap();
 
         assert!(uc
-            .exec(
-                author.base().id().to_string(),
-                publication.base().id().to_string()
-            )
+            .exec("#user01".to_owned(), publication.base().id().to_string())
             .await
             .is_ok());
 
@@ -79,15 +85,21 @@ mod tests {
         let c = mocks::container();
         let uc = Delete::new(c.event_pub(), c.publication_repo());
 
-        let author = mocks::user1().1;
-        let mut publication = mocks::publication1();
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            false,
+            false,
+        );
         c.publication_repo().save(&mut publication).await.unwrap();
 
         assert!(uc
-            .exec(
-                author.base().id().to_string(),
-                "#invalid-publication".to_owned()
-            )
+            .exec("#user01".to_owned(), "#invalid-publication".to_owned())
             .await
             .is_err());
         assert!(uc

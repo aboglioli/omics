@@ -35,7 +35,7 @@ migrate:
 clean-db:
 	$(MAKE) -C $(SCRIPTS_DIR) clean-db
 
-test: clean-db migrate
+test:
 	cargo test --color always
 
 

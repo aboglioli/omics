@@ -492,18 +492,30 @@ impl Publication {
 mod tests {
     use super::*;
 
+    use identity::domain::user::UserId;
+
     use crate::mocks;
 
     #[test]
     fn create() {
-        let publication = mocks::publication1();
+        let publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            false,
+            false,
+        );
 
         assert_eq!(publication.base().id().value(), "#publication01");
         assert_eq!(publication.header().name().value(), "Publication 01");
         assert_eq!(publication.header().synopsis().value(), "Synopsis...");
         assert_eq!(publication.header().category_id().value(), "#category01");
         assert_eq!(publication.header().tags().len(), 2);
-        assert!(publication.events().to_vec().unwrap().len() > 0);
+        assert!(!publication.events().to_vec().unwrap().is_empty());
         assert!(matches!(
             publication.status_history().current(),
             Status::Draft
@@ -512,19 +524,28 @@ mod tests {
 
     #[test]
     fn status() {
-        let mut publication = mocks::publication1();
-        let cm1 = mocks::content_manager1().0;
-
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            false,
+            false,
+        );
+        let content_manager_id = UserId::new("content-manager-1").unwrap();
         let comment = Comment::new("comment").unwrap();
 
         assert!(publication.make_draft().is_ok());
         assert!(publication.make_draft().is_ok());
 
         assert!(publication
-            .approve(cm1.base().id().clone(), comment.clone())
+            .approve(content_manager_id.clone(), comment.clone())
             .is_err());
         assert!(publication
-            .reject(cm1.base().id().clone(), comment.clone())
+            .reject(content_manager_id.clone(), comment.clone())
             .is_err());
 
         assert!(publication.publish().is_ok());
@@ -534,7 +555,7 @@ mod tests {
         ));
 
         assert!(publication
-            .approve(cm1.base().id().clone(), comment.clone())
+            .approve(content_manager_id.clone(), comment.clone())
             .is_ok());
         assert!(matches!(publication.status_history().current(), Status::Published { .. }));
         assert!(publication.publish().is_err());
@@ -547,7 +568,7 @@ mod tests {
         assert!(publication.publish().is_ok());
 
         assert!(publication
-            .reject(cm1.base().id().clone(), comment.clone())
+            .reject(content_manager_id.clone(), comment.clone())
             .is_ok());
         assert!(matches!(publication.status_history().current(), Status::Rejected { .. }));
         assert!(publication.publish().is_err());
@@ -561,9 +582,29 @@ mod tests {
 
     #[test]
     fn interaction_with_draft_publication() {
-        let mut publication = mocks::publication1();
-        let reader = mocks::user1().2;
-
+        let _publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            false,
+            false,
+        );
+        let reader = mocks::reader("#user01");
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            false,
+            false,
+        );
         let comment = Comment::new("comment").unwrap();
         let stars = Stars::new(5).unwrap();
 
@@ -578,8 +619,18 @@ mod tests {
 
     #[test]
     fn interaction_with_published_publication() {
-        let mut publication = mocks::published_publication1();
-        let reader = mocks::user1().2;
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            true,
+            true,
+        );
+        let reader = mocks::reader("#user01");
         let comment = Comment::new("comment").unwrap();
         let stars = Stars::new(5).unwrap();
 

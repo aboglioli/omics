@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+use common::error::Error;
 use common::result::Result;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -11,11 +12,12 @@ impl Image {
     pub fn new<S: Into<String>>(url: S) -> Result<Self> {
         let url = url.into();
 
-        // if !url.ends_with(".jpg") && !url.ends_with(".jpeg") && !url.ends_with(".png") {
-        //     return Err(Error::new("image", "wrong_extension"));
-        // }
+        // TODO: check
+        if !url.ends_with(".jpg") && !url.ends_with(".jpeg") && !url.ends_with(".png") {
+            return Err(Error::new("image", "wrong_extension"));
+        }
 
-        Ok(Image { url: url.into() })
+        Ok(Image { url })
     }
 
     pub fn url(&self) -> &str {

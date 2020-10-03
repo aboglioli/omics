@@ -83,12 +83,21 @@ mod tests {
         let c = mocks::container();
         let uc = UpdatePages::new(c.event_pub(), c.publication_repo());
 
-        let author = mocks::user1().1;
-        let mut publication = mocks::publication1();
+        let mut publication = mocks::publication(
+            "#publication01",
+            "#user01",
+            "Publication 01",
+            "#category01",
+            vec!["Tag 1", "Tag 2"],
+            "domain.com/cover.jpg",
+            3,
+            false,
+            false,
+        );
         c.publication_repo().save(&mut publication).await.unwrap();
 
         uc.exec(
-            author.base().id().to_string(),
+            "#user01".to_owned(),
             publication.base().id().to_string(),
             UpdatePagesCommand {
                 pages: vec![
@@ -115,7 +124,7 @@ mod tests {
 
         let publication = c
             .publication_repo()
-            .find_by_id(&publication.base().id())
+            .find_by_id(publication.base().id())
             .await
             .unwrap();
         assert_eq!(publication.pages().len(), 3);
@@ -128,11 +137,9 @@ mod tests {
         let c = mocks::container();
         let uc = UpdatePages::new(c.event_pub(), c.publication_repo());
 
-        let author = mocks::user1().1;
-
         assert!(uc
             .exec(
-                author.base().id().to_string(),
+                "#user01".to_owned(),
                 "#invalid".to_owned(),
                 UpdatePagesCommand {
                     pages: vec![

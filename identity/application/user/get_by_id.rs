@@ -55,7 +55,16 @@ mod tests {
         let c = mocks::container();
         let uc = GetById::new(c.role_repo(), c.user_repo());
 
-        let mut user = mocks::user1();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            true,
+            None,
+            None,
+            "user",
+        );
         c.user_repo().save(&mut user).await.unwrap();
 
         let id = user.base().id().to_string();
@@ -69,16 +78,21 @@ mod tests {
         let c = mocks::container();
         let uc = GetById::new(c.role_repo(), c.user_repo());
 
-        let mut user = mocks::user1();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            true,
+            None,
+            None,
+            "user",
+        );
         c.user_repo().save(&mut user).await.unwrap();
 
         let id = user.base().id().to_string();
         assert!(uc
-            .exec(
-                mocks::user2().base().id().to_string(),
-                id,
-                Include::default()
-            )
+            .exec("user-2".to_owned(), id, Include::default())
             .await
             .is_err());
     }
@@ -88,9 +102,28 @@ mod tests {
         let c = mocks::container();
         let uc = GetById::new(c.role_repo(), c.user_repo());
 
-        let mut user = mocks::user1();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            true,
+            None,
+            None,
+            "user",
+        );
         c.user_repo().save(&mut user).await.unwrap();
-        let mut admin = mocks::admin1();
+
+        let mut admin = mocks::user(
+            "admin-1",
+            "admin",
+            "admin@omics.com",
+            "P@asswd!",
+            true,
+            None,
+            None,
+            "admin",
+        );
         c.user_repo().save(&mut admin).await.unwrap();
 
         assert!(uc
@@ -108,7 +141,16 @@ mod tests {
         let c = mocks::container();
         let uc = GetById::new(c.role_repo(), c.user_repo());
 
-        let mut user = mocks::user1();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            true,
+            None,
+            None,
+            "user",
+        );
         c.user_repo().save(&mut user).await.unwrap();
 
         let id = user.base().id().to_string();
@@ -123,8 +165,16 @@ mod tests {
         let c = mocks::container();
         let uc = GetById::new(c.role_repo(), c.user_repo());
 
-        let mut user = mocks::user1();
-        user.set_person(mocks::person1()).unwrap();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            true,
+            Some("Name"),
+            Some("Lastname"),
+            "user",
+        );
         c.user_repo().save(&mut user).await.unwrap();
 
         let id = user.base().id().to_string();

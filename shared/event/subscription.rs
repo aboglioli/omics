@@ -1,32 +1,50 @@
-use chrono::{DateTime, Utc};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+
+use common::event::{Event, ToEvent};
+use common::result::Result;
 
 #[derive(Serialize, Deserialize, Debug)]
-pub enum ContractEvent {
-    Requested {
+pub enum SubscriptionEvent {
+    Created {
         id: String,
-        publication_id: String,
-        author_id: String,
-        timestamp: DateTime<Utc>,
+        user_id: String,
+        plan_id: String,
     },
-    Approved {
+    PlanChanged {
         id: String,
-        publication_id: String,
-        author_id: String,
-        content_manager_id: String,
-        timestamp: DateTime<Utc>,
+        plan_id: String,
     },
-    Rejected {
+    PaymentRequired {
         id: String,
-        publication_id: String,
-        author_id: String,
-        content_manager_id: String,
-        timestamp: DateTime<Utc>,
     },
-    Cancelled {
+    PaymentAdded {
         id: String,
-        publication_id: String,
-        author_id: String,
-        timestamp: DateTime<Utc>,
+        amount: f64,
     },
+    Disabled {
+        id: String,
+    },
+}
+
+impl ToString for SubscriptionEvent {
+    fn to_string(&self) -> String {
+        match self {
+            SubscriptionEvent::Created { .. } => "created".to_owned(),
+            SubscriptionEvent::PlanChanged { .. } => "plan-changed".to_owned(),
+            SubscriptionEvent::PaymentRequired { .. } => "payment-required".to_owned(),
+            SubscriptionEvent::PaymentAdded { .. } => "payment-added".to_owned(),
+            SubscriptionEvent::Disabled { .. } => "disabled".to_owned(),
+        }
+    }
+}
+
+impl ToEvent for SubscriptionEvent {
+    fn to_event(&self) -> Result<Event> {
+        let payload = serde_json::to_vec(self)?;
+        Ok(Event::new(
+            "subscription".to_owned(),
+            self.to_string(),
+            payload,
+        ))
+    }
 }

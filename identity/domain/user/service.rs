@@ -87,8 +87,6 @@ impl UserService {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     use crate::mocks;
 
     #[tokio::test]
@@ -96,7 +94,16 @@ mod tests {
         let c = mocks::container();
         let serv = c.user_serv();
 
-        let mut user = mocks::user1();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            true,
+            None,
+            None,
+            "user",
+        );
         c.user_repo().save(&mut user).await.unwrap();
 
         assert!(serv
@@ -122,7 +129,16 @@ mod tests {
         let c = mocks::container();
         let serv = c.user_serv();
 
-        let mut user = mocks::user1();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            true,
+            None,
+            None,
+            "user",
+        );
         c.user_repo().save(&mut user).await.unwrap();
 
         assert!(serv

@@ -122,7 +122,7 @@ impl From<&StatusItem<Status>> for PublicationStatusDto {
 
         let mut dto = PublicationStatusDto {
             status: status.to_string(),
-            changed_at: status_item.date().to_rfc3339(),
+            changed_at: status_item.datetime().to_rfc3339(),
             changed_by: None,
             comment: None,
         };

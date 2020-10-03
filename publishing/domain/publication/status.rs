@@ -1,14 +1,21 @@
+use serde::{Deserialize, Serialize};
+
 use common::error::Error;
 use common::result::Result;
 use identity::domain::user::UserId;
 
 use crate::domain::interaction::Comment;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "status")]
 pub enum Status {
+    #[serde(rename = "draft")]
     Draft,
+    #[serde(rename = "waiting-approval")]
     WaitingApproval,
+    #[serde(rename = "published")]
     Published { admin_id: UserId, comment: Comment },
+    #[serde(rename = "rejected")]
     Rejected { admin_id: UserId, comment: Comment },
 }
 

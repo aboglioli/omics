@@ -44,7 +44,16 @@ mod tests {
         let c = mocks::container();
         let uc = Validate::new(c.event_pub(), c.user_repo());
 
-        let mut user = mocks::user1();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            false,
+            None,
+            None,
+            "user",
+        );
         c.user_repo().save(&mut user).await.unwrap();
 
         assert!(uc
@@ -58,7 +67,16 @@ mod tests {
         let c = mocks::container();
         let uc = Validate::new(c.event_pub(), c.user_repo());
 
-        let mut user = mocks::user1();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            false,
+            None,
+            None,
+            "user",
+        );
         c.user_repo().save(&mut user).await.unwrap();
         assert!(!user.is_validated());
 

@@ -74,7 +74,7 @@ impl CollectionRepository for InMemCollectionRepository {
                         }
                     }
 
-                    return false;
+                    false
                 })
                 .collect();
         }

@@ -60,15 +60,9 @@ impl<'a> Update<'a> {
             .map(|gender| Gender::from_str(&gender))
             .transpose()?;
 
-        let biography = cmd
-            .biography
-            .map(|biography| Biography::new(biography))
-            .transpose()?;
+        let biography = cmd.biography.map(Biography::new).transpose()?;
 
-        let profile_image = cmd
-            .profile_image
-            .map(|image| Image::new(image))
-            .transpose()?;
+        let profile_image = cmd.profile_image.map(Image::new).transpose()?;
 
         let person = Person::new(
             Fullname::new(cmd.name, cmd.lastname)?,
@@ -99,12 +93,10 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.user_repo());
 
-        let user = mocks::user1();
-
         assert!(uc
             .exec(
-                user.base().id().to_string(),
-                user.base().id().to_string(),
+                "user-1".to_owned(),
+                "user-1".to_owned(),
                 UpdateCommand {
                     name: "Name".to_owned(),
                     lastname: "Lastname".to_owned(),
@@ -123,7 +115,16 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.user_repo());
 
-        let mut user = mocks::user1();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            true,
+            None,
+            None,
+            "user",
+        );
         c.user_repo().save(&mut user).await.unwrap();
 
         assert!(uc
@@ -212,7 +213,16 @@ mod tests {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.user_repo());
 
-        let mut user = mocks::user1();
+        let mut user = mocks::user(
+            "user-1",
+            "username",
+            "user@omics.com",
+            "P@asswd!",
+            true,
+            None,
+            None,
+            "user",
+        );
         c.user_repo().save(&mut user).await.unwrap();
 
         assert!(uc
