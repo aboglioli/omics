@@ -1,9 +1,9 @@
-use std::str::FromStr;
+
 use std::sync::Arc;
 
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+
 use tokio_postgres::row::Row;
 use tokio_postgres::Client;
 use uuid::Uuid;
@@ -12,11 +12,11 @@ use common::error::Error;
 use common::model::{AggregateRoot, StatusHistory, StatusItem};
 use common::result::Result;
 use common::sql::where_builder::WhereBuilder;
-use identity::domain::user::UserId;
+
 
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
-use crate::domain::interaction::Comment;
+
 use crate::domain::publication::{
     Header, Image, Name, Page, Publication, PublicationId, PublicationRepository, Statistics,
     Status, Synopsis, Tag,
@@ -37,7 +37,8 @@ impl Publication {
 
         let statistics: Statistics = serde_json::from_value(row.get("statistics"))?;
 
-        let status_items: Vec<StatusItem<Status>> = serde_json::from_value(row.get("status_history"))?;
+        let status_items: Vec<StatusItem<Status>> =
+            serde_json::from_value(row.get("status_history"))?;
 
         let pages: Vec<Page> = serde_json::from_value(row.get("pages"))?;
 
