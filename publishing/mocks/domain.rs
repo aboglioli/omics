@@ -19,6 +19,7 @@ pub fn publication(
     pages_count: u32,
     published: bool,
     approved: bool,
+    contract: bool,
 ) -> Publication {
     let mut publication = Publication::new(
         PublicationId::new(publication_id).unwrap(),
@@ -53,6 +54,10 @@ pub fn publication(
                     Comment::new("Comment...").unwrap(),
                 )
                 .unwrap();
+
+            if contract {
+                publication.add_contract().unwrap();
+            }
         }
     }
 

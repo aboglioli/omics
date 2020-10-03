@@ -1,12 +1,19 @@
+use serde::{Deserialize, Serialize};
+
 use common::error::Error;
 use common::result::Result;
 use identity::domain::user::UserId;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "status")]
 pub enum Status {
+    #[serde(rename = "requested")]
     Requested,
+    #[serde(rename = "approved")]
     Approved { admin_id: UserId },
+    #[serde(rename = "rejected")]
     Rejected { admin_id: UserId },
+    #[serde(rename = "cancelled")]
     Cancelled,
 }
 

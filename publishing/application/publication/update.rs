@@ -127,6 +127,7 @@ mod tests {
             3,
             false,
             false,
+            false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
         let mut category = mocks::category("#category02", "Category 2");
@@ -192,6 +193,7 @@ mod tests {
             3,
             true,
             true,
+            false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
         let mut category = mocks::category("#category02", "Category 2");
@@ -238,6 +240,7 @@ mod tests {
             3,
             false,
             false,
+            false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
         let mut category = mocks::category("#category02", "Category 2");
@@ -273,6 +276,7 @@ mod tests {
             vec!["Tag 1", "Tag 2"],
             "domain.com/cover.jpg",
             3,
+            false,
             false,
             false,
         );

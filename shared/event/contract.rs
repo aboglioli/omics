@@ -3,8 +3,6 @@ use serde::{Deserialize, Serialize};
 use common::event::{Event, ToEvent};
 use common::result::Result;
 
-use crate::util;
-
 #[derive(Serialize, Deserialize, Debug)]
 pub enum ContractEvent {
     Requested {
@@ -15,19 +13,16 @@ pub enum ContractEvent {
     Approved {
         id: String,
         publication_id: String,
-        author_id: String,
-        content_manager_id: String,
+        admin_id: String,
     },
     Rejected {
         id: String,
         publication_id: String,
-        author_id: String,
-        content_manager_id: String,
+        admin_id: String,
     },
     Cancelled {
         id: String,
         publication_id: String,
-        author_id: String,
     },
 }
 
@@ -44,8 +39,7 @@ impl ToString for ContractEvent {
 
 impl ToEvent for ContractEvent {
     fn to_event(&self) -> Result<Event> {
-        let payload = util::serialize(&self, "contract")?;
-
+        let payload = serde_json::to_vec(self)?;
         Ok(Event::new("contract".to_owned(), self.to_string(), payload))
     }
 }

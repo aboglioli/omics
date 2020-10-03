@@ -114,6 +114,11 @@ impl Subscription {
         let plan = SubscriptionPlan::new(plan)?;
         self.plan = plan;
 
+        if self.plan.price() == 0.0 {
+            let status = self.status_history.current().pay()?;
+            self.status_history.add_status(status);
+        }
+
         self.events.record_event(SubscriptionEvent::PlanChanged {
             id: self.base().id().to_string(),
             plan_id: self.plan().plan_id().to_string(),
@@ -144,7 +149,7 @@ impl Subscription {
         }
 
         if self.plan.price() != payment.amount().value() {
-            return Err(Error::new("subscription", "payment_differente_to_plan"));
+            return Err(Error::new("subscription", "invalid_payment_amount"));
         }
 
         let status = self.status_history.current().pay()?;
@@ -192,7 +197,7 @@ mod tests {
         assert_eq!(subscription.payments().len(), 0);
         assert_eq!(
             subscription.status_history().current().to_string(),
-            "waiting-payment"
+            "waiting-for-payment"
         );
         assert_eq!(subscription.is_active(), false);
 

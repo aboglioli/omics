@@ -17,7 +17,7 @@ pub enum Status {
 impl ToString for Status {
     fn to_string(&self) -> String {
         match self {
-            Status::WaitingForPayment => "waiting-payment".to_owned(),
+            Status::WaitingForPayment => "waiting-for-payment".to_owned(),
             Status::Active => "active".to_owned(),
             Status::Inactive => "inactive".to_owned(),
         }

@@ -89,7 +89,7 @@ impl PublicationRepository for PostgresPublicationRepository {
             .client
             .query("SELECT * FROM publications", &[])
             .await
-            .map_err(|err| Error::not_found("publications").wrap_raw(err))?;
+            .map_err(|err| Error::not_found("publication").wrap_raw(err))?;
 
         let mut publications = Vec::new();
         for row in rows.into_iter() {
@@ -108,7 +108,7 @@ impl PublicationRepository for PostgresPublicationRepository {
                 &[&id.to_uuid()?],
             )
             .await
-            .map_err(|err| Error::not_found("publications").wrap_raw(err))?;
+            .map_err(|err| Error::not_found("publication").wrap_raw(err))?;
 
         Publication::from_row(row)
     }

@@ -20,4 +20,6 @@ pub trait SubscriptionRepository: Sync + Send {
     ) -> Result<Vec<Subscription>>;
 
     async fn save(&self, subscription: &mut Subscription) -> Result<()>;
+
+    async fn delete(&self, id: &SubscriptionId) -> Result<()>;
 }

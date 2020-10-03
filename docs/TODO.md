@@ -57,8 +57,10 @@ Filtros:
 - [ ] Allow change 'username' and 'email' in IdentityService.
 - [ ] Merge 'code' with 'topic' in Event.
 - [ ] Add Uuid as base id (StringId for string id only).
-- [ ] Add timestamps to events.
-- [ ] Improve enum serializatiion/deserialization.
+- [x] Add timestamps to events.
+- [x] Improve enum serializatiion/deserialization.
+- [ ] Replace rename of each enum for serde by rename_all = "kebab-case".
+- [ ] Serialize directly (without util) in shared::event.
 
 # Progress
 

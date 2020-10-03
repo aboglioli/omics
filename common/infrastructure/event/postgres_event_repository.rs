@@ -42,7 +42,15 @@ impl EventRepository for PostgresEventRepository {
 
         let rows = self
             .client
-            .query(&format!("SELECT * FROM events {}", sql) as &str, &params)
+            .query(
+                &format!(
+                    "SELECT * FROM events
+                    {}
+                    ORDER BY timestamp ASC",
+                    sql,
+                ) as &str,
+                &params,
+            )
             .await
             .map_err(|err| Error::not_found("event").wrap_raw(err))?;
 

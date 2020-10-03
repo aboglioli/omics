@@ -100,6 +100,7 @@ mod tests {
             3,
             true,
             false,
+            false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
 

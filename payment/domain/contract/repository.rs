@@ -20,4 +20,6 @@ pub trait ContractRepository: Sync + Send {
     ) -> Result<Vec<Contract>>;
 
     async fn save(&self, contract: &mut Contract) -> Result<()>;
+
+    async fn delete(&self, id: &ContractId) -> Result<()>;
 }

@@ -65,6 +65,7 @@ mod tests {
             3,
             false,
             false,
+            false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
 
@@ -93,6 +94,7 @@ mod tests {
             vec!["Tag 1", "Tag 2"],
             "domain.com/cover.jpg",
             3,
+            false,
             false,
             false,
         );

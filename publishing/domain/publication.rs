@@ -177,6 +177,22 @@ impl Publication {
         Ok(())
     }
 
+    pub fn set_statistics(&mut self, statistics: Statistics) -> Result<()> {
+        self.statistics = statistics;
+        self.events
+            .record_event(PublicationEvent::StatisticsUpdated {
+                id: self.base().id().to_string(),
+                views: self.statistics().views(),
+                unique_views: self.statistics().unique_views(),
+                readings: self.statistics().readings(),
+                likes: self.statistics().likes(),
+                reviews: self.statistics().reviews(),
+                stars: self.statistics().stars(),
+            });
+
+        Ok(())
+    }
+
     pub fn view(&mut self, reader: &Reader, unique: bool) -> Result<View> {
         if !self.is_published() {
             return Err(Error::new("publication", "not_published"));
@@ -508,6 +524,7 @@ mod tests {
             3,
             false,
             false,
+            false,
         );
 
         assert_eq!(publication.base().id().value(), "#publication01");
@@ -532,6 +549,7 @@ mod tests {
             vec!["Tag 1", "Tag 2"],
             "domain.com/cover.jpg",
             3,
+            false,
             false,
             false,
         );
@@ -592,6 +610,7 @@ mod tests {
             3,
             false,
             false,
+            false,
         );
         let reader = mocks::reader("#user01");
         let mut publication = mocks::publication(
@@ -602,6 +621,7 @@ mod tests {
             vec!["Tag 1", "Tag 2"],
             "domain.com/cover.jpg",
             3,
+            false,
             false,
             false,
         );
@@ -629,6 +649,7 @@ mod tests {
             3,
             true,
             true,
+            false,
         );
         let reader = mocks::reader("#user01");
         let comment = Comment::new("comment").unwrap();
