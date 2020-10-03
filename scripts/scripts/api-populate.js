@@ -1,5 +1,6 @@
 const assert = require('assert').strict;
-const { req, sleep } = require('./request');
+const { req } = require('../core/request');
+const { sleep } = require('../core/utils');
 
 const rand = (min, max) => Math.floor(Math.random() * (max - min)) + min;
 

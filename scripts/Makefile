@@ -1,6 +1,3 @@
-test:
-	npm test
-
 api-populate:
 	npm run api-populate
 
@@ -12,3 +9,6 @@ migrate:
 
 clean-db:
 	npm run clean-db
+
+test:
+	npm test

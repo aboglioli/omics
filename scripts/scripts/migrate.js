@@ -1,6 +1,6 @@
 const fs = require('fs');
-const client = require('./db');
-const config = require('./config');
+const { client } = require('../core/db');
+const config = require('../core/config');
 
 async function main() {
   console.log('[ MIGRATE ]');
@@ -11,13 +11,13 @@ async function main() {
     let files = fs.readdirSync(config.migrations_dir);
 
     await client.query(`
-      CREATE TABLE IF NOT EXISTS Migrations (
+      CREATE TABLE IF NOT EXISTS migrations (
         file VARCHAR(255) PRIMARY KEY,
         datetime TIMESTAMP NOT NULL
       );
     `);
 
-    const res = await client.query('SELECT * FROM Migrations');
+    const res = await client.query('SELECT * FROM migrations');
     const existingFiles = res.rows.map(row => row.file);
 
     for (const file of files) {
@@ -35,7 +35,7 @@ async function main() {
 
       await client.query(content);
       await client.query(
-        'INSERT INTO Migrations(file, datetime) VALUES($1, $2)',
+        'INSERT INTO migrations(file, datetime) VALUES($1, $2)',
         [file, new Date()],
       );
 

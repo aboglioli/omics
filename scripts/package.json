@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "api-populate": "node src/api-populate",
-    "populate": "node src/populate",
-    "migrate": "node src/migrate",
-    "clean-db": "node src/clean-db",
-    "test": "jest"
+    "api-populate": "node scripts/api-populate",
+    "populate": "node scripts/populate",
+    "migrate": "node scripts/migrate",
+    "clean-db": "node scripts/clean-db",
+    "test": "jest tests"
   },
   "author": "Alan Boglioli <alan.boglioli@gmail.com>",
   "license": "MIT",

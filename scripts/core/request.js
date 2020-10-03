@@ -1,11 +1,5 @@
 const axios = require('axios');
 
-const sleep = ms => new Promise((resolve, _) => {
-  setTimeout(() => {
-    resolve();
-  }, ms);
-});
-
 const baseUrl = 'http://localhost:3000/api';
 
 const readUrl = (url = '') =>
@@ -109,6 +103,5 @@ const req = new Request();
 
 module.exports = {
   Request,
-  sleep,
   req,
 };
