@@ -1,4 +1,3 @@
-
 use std::sync::Arc;
 
 use async_trait::async_trait;
@@ -12,7 +11,6 @@ use common::error::Error;
 use common::model::{AggregateRoot, StatusHistory, StatusItem};
 use common::result::Result;
 use common::sql::where_builder::WhereBuilder;
-
 
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;

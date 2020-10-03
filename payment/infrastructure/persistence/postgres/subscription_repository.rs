@@ -9,10 +9,14 @@ use tokio_postgres::Client;
 use uuid::Uuid;
 
 use common::error::Error;
+use common::model::{StatusHistory, StatusItem};
 use common::result::Result;
 use identity::domain::user::UserId;
 
-use crate::domain::subscription::{Subscription, SubscriptionId, SubscriptionRepository};
+use crate::domain::payment::Payment;
+use crate::domain::subscription::{
+    Status, Subscription, SubscriptionId, SubscriptionPlan, SubscriptionRepository,
+};
 
 impl Subscription {
     fn from_row(row: Row) -> Result<Self> {
@@ -27,16 +31,16 @@ impl Subscription {
         let deleted_at: Option<DateTime<Utc>> = row.get("deleted_at");
 
         Ok(Subscription::build(
-                AggregateRoot::build(
-                    SubscriptionId::new(id.to_string())?,
-                    created_at,
-                    updated_at,
-                    deleted_at,
-                ),
-                UserId::new(user_id.to_string())?,
-                plan,
-                payments,
-                StatusHistory::build(status_history),
+            AggregateRoot::build(
+                SubscriptionId::new(id.to_string())?,
+                created_at,
+                updated_at,
+                deleted_at,
+            ),
+            UserId::new(user_id.to_string())?,
+            plan,
+            payments,
+            StatusHistory::build(status_history),
         ))
     }
 }

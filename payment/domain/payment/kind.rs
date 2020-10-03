@@ -1,12 +1,17 @@
 use std::str::FromStr;
 
+use serde::{Deserialize, Serialize};
+
 use common::error::Error;
 use common::result::Result;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Kind {
+    #[serde(rename = "income")]
     Income,
+    #[serde(rename = "outcome")]
     Outcome,
+    #[serde(rename = "transfer")]
     Transfer,
 }
 

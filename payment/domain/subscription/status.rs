@@ -1,10 +1,16 @@
+use serde::{Deserialize, Serialize};
+
 use common::error::Error;
 use common::result::Result;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "status")]
 pub enum Status {
+    #[serde(rename = "waiting-for-payment")]
     WaitingForPayment,
+    #[serde(rename = "active")]
     Active,
+    #[serde(rename = "inactive")]
     Inactive,
 }
 
