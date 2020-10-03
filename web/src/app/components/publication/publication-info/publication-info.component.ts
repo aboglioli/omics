@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { faTimesCircle, faBookmark, faMoneyBillAlt, faHeart, faEye, faStar } from '@fortawesome/free-solid-svg-icons';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
-import { PublicationService } from '../../../domain/services/publication.service';
+import { IGetReviewsResponse, PublicationService } from '../../../domain/services/publication.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { IGetByIdResponse } from '../../../domain/services/publication.service';
 import { IPublication } from '../../../domain/models/publication';
@@ -10,6 +10,7 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 import { Router } from '@angular/router';
 import { PublicationReviewAddComponent } from '../publication-review-add/publication-review-add.component';
+import { IReview } from '../../../domain/models/review';
 
 export interface DialogData {
   idPublication: string;
@@ -36,6 +37,8 @@ export class PublicationInfoComponent implements OnInit {
   private oldRatingPublication = this.ratingPublication;
   public publication: IPublication;
   public readerInfo: IReaderPublicationInteraction;
+
+  public reviewList: IReview[];
 
   public isBigScreen = true;
   public isReadButtonVisible: boolean;
@@ -70,20 +73,41 @@ export class PublicationInfoComponent implements OnInit {
     this.publicationService.getById( this.data.idPublication,  'author, category').subscribe(
       (resPub: IGetByIdResponse ) => {
 
-        console.log('TEST > ', resPub);
+        // console.log('TEST > ', resPub);
+
+        //#region Obtener info general de la publicación
         this.publication = resPub.publication;
         this.readerInfo = resPub.reader;
         this.totalLikes = this.publication.statistics.likes;
 
         if ( this.readerInfo  ) {
-
           this.ratingPublication = (this.readerInfo.review) ? this.readerInfo.review.stars : 0;
-
         }
 
         this.oldRatingPublication = this.ratingPublication;
 
-        this.spinnerService.hide();
+        //#endregion
+
+        //#region Obtener información de reviews de esta publicación
+        this.publicationService.getReviews( this.data.idPublication ).subscribe(
+          ( resReviews: IGetReviewsResponse ) => {
+
+            this.reviewList = resReviews.reviews;
+            this.spinnerService.hide();
+
+            console.log('TEST > ', this.reviewList);
+
+
+          },
+          (err: Error) => {
+
+            console.error(err);
+            this.spinnerService.hide();
+
+          }
+        )
+        //#endregion
+
 
       },
       ( err: Error) => {

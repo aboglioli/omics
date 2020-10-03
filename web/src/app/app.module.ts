@@ -64,6 +64,7 @@ import { PublicationCardAuthorComponent } from './components/publication-card-ty
 import { PublicationCardReaderComponent } from './components/publication-card-type/publication-card-reader/publication-card-reader.component';
 import { TruncateStringPipe } from './pipes/truncate-string.pipe';
 import { PublicationReviewAddComponent } from './components/publication/publication-review-add/publication-review-add.component';
+import { PublicationReviewsBoxComponent } from './components/publication/publication-reviews-box/publication-reviews-box.component';
 
 
 @NgModule({
@@ -105,7 +106,8 @@ import { PublicationReviewAddComponent } from './components/publication/publicat
     PublicationCardAuthorComponent,
     PublicationCardReaderComponent,
     TruncateStringPipe,
-    PublicationReviewAddComponent
+    PublicationReviewAddComponent,
+    PublicationReviewsBoxComponent
   ],
   imports: [
     BrowserModule,

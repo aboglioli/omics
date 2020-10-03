@@ -139,7 +139,10 @@
       </div>
 
       <div class="comment-box">
-
+        <app-publication-reviews-box
+          *ngIf="reviewList !== undefined"
+          [reviewArray]="reviewList">
+        </app-publication-reviews-box>
       </div>
 
       <!-- Option bar -->
