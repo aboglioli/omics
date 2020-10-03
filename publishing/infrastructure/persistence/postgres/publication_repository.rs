@@ -22,79 +22,6 @@ use crate::domain::publication::{
     Status, Synopsis, Tag,
 };
 
-#[derive(Debug, Serialize, Deserialize)]
-struct StatusItemJson {
-    status: String,
-    admin_id: Option<String>,
-    comment: Option<String>,
-    datetime: String,
-}
-
-fn to_status_history(vec: Vec<StatusItemJson>) -> Result<StatusHistory<Status>> {
-    let mut items = Vec::new();
-    for item in vec.into_iter() {
-        match item.status.as_ref() {
-            "draft" => {
-                items.push(StatusItem::build(
-                    Status::Draft,
-                    DateTime::from_str(&item.datetime).unwrap(),
-                ));
-            }
-            "waiting-approval" => {
-                items.push(StatusItem::build(
-                    Status::WaitingApproval,
-                    DateTime::from_str(&item.datetime).unwrap(),
-                ));
-            }
-            "published" => {
-                items.push(StatusItem::build(
-                    Status::Published {
-                        admin_id: UserId::new(item.admin_id.unwrap())?,
-                        comment: Comment::new(item.comment.unwrap())?,
-                    },
-                    DateTime::from_str(&item.datetime).unwrap(),
-                ));
-            }
-            "rejected" => {
-                items.push(StatusItem::build(
-                    Status::Rejected {
-                        admin_id: UserId::new(item.admin_id.unwrap())?,
-                        comment: Comment::new(item.comment.unwrap())?,
-                    },
-                    DateTime::from_str(&item.datetime).unwrap(),
-                ));
-            }
-            _ => return Err(Error::new("publication_status", "invalid")),
-        }
-    }
-
-    Ok(StatusHistory::build(items))
-}
-
-fn from_status_history(status_history: &StatusHistory<Status>) -> Result<Vec<StatusItemJson>> {
-    let mut items = Vec::new();
-    for item in status_history.history().iter() {
-        let mut item_json = StatusItemJson {
-            status: item.status().to_string(),
-            admin_id: None,
-            comment: None,
-            datetime: item.datetime().to_rfc3339(),
-        };
-
-        match item.status() {
-            Status::Published { admin_id, comment } | Status::Rejected { admin_id, comment } => {
-                item_json.admin_id = Some(admin_id.to_string());
-                item_json.comment = Some(comment.to_string());
-            }
-            _ => {}
-        }
-
-        items.push(item_json);
-    }
-
-    Ok(items)
-}
-
 impl Publication {
     fn from_row(row: Row) -> Result<Self> {
         let id: Uuid = row.get("id");
@@ -110,11 +37,7 @@ impl Publication {
 
         let statistics: Statistics = serde_json::from_value(row.get("statistics"))?;
 
-        // let status_history: Vec<StatusItemJson> =
-        //     serde_json::from_value(row.get("status_history"))?;
-        // let status_history = to_status_history(status_history)?;
-        let status_items: Vec<StatusItem<Status>> =
-            serde_json::from_value(row.get("status_history"))?;
+        let status_items: Vec<StatusItem<Status>> = serde_json::from_value(row.get("status_history"))?;
 
         let pages: Vec<Page> = serde_json::from_value(row.get("pages"))?;
 
@@ -222,7 +145,7 @@ impl PublicationRepository for PostgresPublicationRepository {
                 &format!(
                     "SELECT * FROM publications
                     {}
-                    created_at ASC",
+                    ORDER BY created_at ASC",
                     sql,
                 ) as &str,
                 &params,
@@ -249,8 +172,7 @@ impl PublicationRepository for PostgresPublicationRepository {
             .is_err();
 
         let statistics = serde_json::to_value(publication.statistics())?;
-        let status_history =
-            serde_json::to_value(from_status_history(publication.status_history())?)?;
+        let status_history = serde_json::to_value(publication.status_history().history())?;
         let pages = serde_json::to_value(publication.pages())?;
 
         if create {

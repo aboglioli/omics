@@ -7,6 +7,7 @@ use identity::domain::user::UserId;
 use crate::domain::interaction::Comment;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "status")]
 pub enum Status {
     #[serde(rename = "draft")]
     Draft,
