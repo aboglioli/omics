@@ -1,0 +1,131 @@
+
+@import "src/scss/vars";
+
+div.box {
+
+  color: white;
+
+  min-width: 350px;
+
+  display: flex;
+  flex-direction: column;
+
+  .header {
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: $omics-background-flat;
+
+    padding-top: 1em;
+    position: relative;
+
+    div.button-top-menu {
+
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      padding: 5px;
+      position: absolute;
+      top: 0px;
+
+      button {
+        margin: 0px;
+        outline: none;
+      }
+
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 4em;
+      font-weight: bold;
+    }
+
+  }
+
+  .body {
+
+    overflow-y: auto;
+
+    div.box-row {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
+    div.block-field {
+
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      margin: 1em 2em;
+      min-width: 200px;
+
+      div.input-field-row {
+
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+
+        div.title-and-error {
+
+          display: flex;
+          justify-content: space-between;
+
+          p.text-danger {
+            font-weight: 500;
+            font-size: medium;
+            margin: 0;
+            max-width: 160px;
+          }
+
+          p.field-name {
+            display: flex;
+            align-items: center;
+            margin: 0px;
+            margin-right: 1em;
+
+            font-weight: bold;
+            font-size: initial;
+
+          }
+
+        }
+
+      }
+
+      .text-area {
+        margin-top: 0.5em;
+
+        ::ng-deep div.mat-form-field-flex {
+          background-color: white;
+          color: black;
+          border-radius: 6px;
+        }
+      }
+
+    }
+
+
+  }
+
+  .footer {
+    display: flex;
+    justify-content: center;
+    margin: 1em 0em;
+  }
+
+}
+
+
+
+button {
+
+  color: white;
+  border-color: white  !important;
+
+  &:focus {
+    outline: none;
+  }
+}

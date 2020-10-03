@@ -36,7 +36,6 @@ import { DashboardGestionAdminComponent } from './pages/dashboard-gestion-admin/
 import { DashboardGestionContratosPublicacionesComponent } from './pages/dashboard-gestion-contratos-publicaciones/dashboard-gestion-contratos-publicaciones.component';
 import { DashboardReglasNegociosComponent } from './pages/dashboard-reglas-negocios/dashboard-reglas-negocios.component';
 import { CatalogoComponent } from './pages/catalogo/catalogo.component';
-import { RealizarAnalisisComponent } from './components/publication/realizar-analisis/realizar-analisis.component';
 import { ColeccionInfoComponent } from './pages/coleccion-info/coleccion-info.component';
 import { PublicationInfoComponent } from './components/publication/publication-info/publication-info.component';
 import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
@@ -84,7 +83,6 @@ import { PublicationReviewAddComponent } from './components/publication/publicat
     DashboardGestionContratosPublicacionesComponent,
     DashboardReglasNegociosComponent,
     CatalogoComponent,
-    RealizarAnalisisComponent,
     ColeccionInfoComponent,
     PublicationInfoComponent,
     NavBarComponent,
