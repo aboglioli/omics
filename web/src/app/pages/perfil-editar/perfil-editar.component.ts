@@ -84,7 +84,7 @@ export class PerfilEditarComponent implements OnInit {
       birthdate:      ['', ],
       gender:         ['', ],
       profile_image:  ['', ],
-      biography:      ['', [Validators.maxLength(252) ] ],
+      biography:      ['', [Validators.maxLength(256) ] ],
     });
 
   }

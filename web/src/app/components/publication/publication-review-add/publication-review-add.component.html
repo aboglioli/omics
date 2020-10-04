@@ -1,1 +1,87 @@
-<p>publication-review-add works!</p>
+<div class="box">
+
+  <form  autocomplete="off" [formGroup]="formReview">
+
+    <div class="header">
+
+      <div  class="button-top-menu"
+            style="flex: 0.5">
+        <button mat-icon-button mat-dialog-close (click)="onClose(false)">
+          <fa-icon [icon]="faClose" size="2x"></fa-icon>
+        </button>
+      </div>
+
+
+      <h1>{{ ratingNumber }} / 5</h1>
+      <bar-rating [(rate)]="ratingNumber" [max]="5" [theme]="'stars'"
+                  formControlName="stars">
+      </bar-rating>
+    </div>
+
+    <div class="body">
+
+      <!-- Comentario Review -->
+      <div class="box-row">
+
+        <div class="block-field">
+
+          <div class="input-field-row">
+
+            <div class="title-and-error">
+              <p class="field-name">Comentario: </p>
+
+              <!-- mensaje de error -->
+              <p  *ngIf="commentNovalido"
+                  class="form-text text-danger">
+                  <span *ngIf="commentLenght > 256">Excedido cantidad de caracteres</span>
+                  <span *ngIf="commentLenght <= 256">Insuficiente cantidad de caracteres</span>
+              </p>
+            </div>
+
+          </div>
+
+          <mat-form-field appearance="fill" class="text-area">
+            <mat-label>{{ commentLenght }} / 256</mat-label>
+            <textarea matInput
+                      rows="8" cols="40"
+                      style="resize: none;"
+                      formControlName="comment"></textarea>
+          </mat-form-field>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </form>
+
+  <div class="footer">
+
+    <!-- Aceptar -->
+    <button mat-stroked-button
+            (click)="onSendReview()">
+      Enviar
+    </button>
+
+  </div>
+
+</div>
+
+<!-- Swal Message -->
+<swal #formDataInvalid
+  title="Ingrese un valor válido"
+  text="Ingrese comentario en el rango válido de caracteres"
+  icon="error"
+  [focusConfirm]="true">
+</swal>
+
+<swal #formDataValid
+  title="Análisis realizado"
+  text="Tu puntaje y comentario ha sido añadido correctamente"
+  icon="success"
+  [focusConfirm]="true"
+  (confirm)="onClose(true)">
+</swal>
+
+

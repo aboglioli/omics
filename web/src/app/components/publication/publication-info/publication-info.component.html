@@ -103,7 +103,7 @@
 
             <div class="fila center-align">
               <fa-icon [icon]="faStarFill" size="2x"></fa-icon>
-              <h4 style="margin: 0px 10px;">{{ publication.statistics.stars}} / 5</h4>
+              <h4 style="margin: 0px 10px;">{{ publication.statistics.stars | number: '1.0-1' }} / 5</h4>
             </div>
 
           </div>
@@ -139,7 +139,10 @@
       </div>
 
       <div class="comment-box">
-        <h1>Left</h1>
+        <app-publication-reviews-box
+          *ngIf="reviewList !== undefined"
+          [reviewArray]="reviewList">
+        </app-publication-reviews-box>
       </div>
 
       <!-- Option bar -->

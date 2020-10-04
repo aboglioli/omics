@@ -77,8 +77,7 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
       if ( reasonPublication ) {
 
         ( isApproved ) ?
-          this.approve(publication, reasonPublication)
-          :
+          this.approve(publication, reasonPublication) :
           this.reject( publication, reasonPublication );
 
       }
