@@ -12,7 +12,7 @@ pub trait ContractRepository: Sync + Send {
         ContractId::new(Uuid::new_v4().to_string())
     }
 
-    async fn find_by_id(&self, contract_id: &ContractId) -> Result<Contract>;
+    async fn find_by_id(&self, id: &ContractId) -> Result<Contract>;
     async fn search(
         &self,
         publication_id: Option<&PublicationId>,
