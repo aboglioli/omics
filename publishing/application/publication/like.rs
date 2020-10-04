@@ -65,7 +65,7 @@ mod tests {
             c.reader_repo(),
         );
 
-        let mut reader = mocks::reader("#user02");
+        let mut reader = mocks::reader("#user02", "user-2");
         c.reader_repo().save(&mut reader).await.unwrap();
         let mut publication = mocks::publication(
             "#publication01",
@@ -107,7 +107,7 @@ mod tests {
             c.reader_repo(),
         );
 
-        let mut reader = mocks::reader("#user02");
+        let mut reader = mocks::reader("#user02", "user-2");
         c.reader_repo().save(&mut reader).await.unwrap();
         let mut publication = mocks::publication(
             "#publication01",
@@ -142,7 +142,7 @@ mod tests {
             c.reader_repo(),
         );
 
-        let mut reader = mocks::reader("#user02");
+        let mut reader = mocks::reader("#user02", "user-2");
         c.reader_repo().save(&mut reader).await.unwrap();
         let mut publication = mocks::publication(
             "#publication01",

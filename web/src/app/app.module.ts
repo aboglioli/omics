@@ -15,6 +15,7 @@ import { ChartsModule } from 'ng2-charts';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { BarRatingModule } from 'ngx-bar-rating';
 
 // Modulos auxiliares
 import { MaterialModule } from './auxiliar-modules/material.module';
@@ -35,7 +36,6 @@ import { DashboardGestionAdminComponent } from './pages/dashboard-gestion-admin/
 import { DashboardGestionContratosPublicacionesComponent } from './pages/dashboard-gestion-contratos-publicaciones/dashboard-gestion-contratos-publicaciones.component';
 import { DashboardReglasNegociosComponent } from './pages/dashboard-reglas-negocios/dashboard-reglas-negocios.component';
 import { CatalogoComponent } from './pages/catalogo/catalogo.component';
-import { RealizarAnalisisComponent } from './components/publication/realizar-analisis/realizar-analisis.component';
 import { ColeccionInfoComponent } from './pages/coleccion-info/coleccion-info.component';
 import { PublicationInfoComponent } from './components/publication/publication-info/publication-info.component';
 import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
@@ -63,6 +63,8 @@ import { PublicationApproveRejectMotiveComponent } from './components/dashboard/
 import { PublicationCardAuthorComponent } from './components/publication-card-type/publication-card-author/publication-card-author.component';
 import { PublicationCardReaderComponent } from './components/publication-card-type/publication-card-reader/publication-card-reader.component';
 import { TruncateStringPipe } from './pipes/truncate-string.pipe';
+import { PublicationReviewAddComponent } from './components/publication/publication-review-add/publication-review-add.component';
+import { PublicationReviewsBoxComponent } from './components/publication/publication-reviews-box/publication-reviews-box.component';
 
 
 @NgModule({
@@ -82,7 +84,6 @@ import { TruncateStringPipe } from './pipes/truncate-string.pipe';
     DashboardGestionContratosPublicacionesComponent,
     DashboardReglasNegociosComponent,
     CatalogoComponent,
-    RealizarAnalisisComponent,
     ColeccionInfoComponent,
     PublicationInfoComponent,
     NavBarComponent,
@@ -104,7 +105,9 @@ import { TruncateStringPipe } from './pipes/truncate-string.pipe';
     PublicationApproveRejectMotiveComponent,
     PublicationCardAuthorComponent,
     PublicationCardReaderComponent,
-    TruncateStringPipe
+    TruncateStringPipe,
+    PublicationReviewAddComponent,
+    PublicationReviewsBoxComponent
   ],
   imports: [
     BrowserModule,
@@ -119,6 +122,7 @@ import { TruncateStringPipe } from './pipes/truncate-string.pipe';
     FontAwesomeModule,
     NgxSpinnerModule,
     SweetAlert2Module.forRoot(),
+    BarRatingModule,
 
     // Custom modules
     DomainModule,

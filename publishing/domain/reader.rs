@@ -20,24 +20,45 @@ pub type ReaderId = StringId;
 pub struct Reader {
     base: AggregateRoot<ReaderId>,
     events: Events<ReaderEvent>,
+
+    username: String,
+    name: Option<String>,
+    lastname: Option<String>,
+    profile_image: Option<String>,
+
     subscribed: bool,
     preferences: Preferences,
 }
 
 impl Reader {
-    pub fn new(id: ReaderId) -> Result<Self> {
+    pub fn new<S: Into<String>>(id: ReaderId, username: S) -> Result<Self> {
         Ok(Reader {
             base: AggregateRoot::new(id),
             events: Events::new(),
+            username: username.into(),
+            name: None,
+            lastname: None,
+            profile_image: None,
             subscribed: false,
             preferences: Preferences::default(),
         })
     }
 
-    pub fn build(base: AggregateRoot<ReaderId>, subscribed: bool) -> Self {
+    pub fn build(
+        base: AggregateRoot<ReaderId>,
+        username: String,
+        name: Option<String>,
+        lastname: Option<String>,
+        profile_image: Option<String>,
+        subscribed: bool,
+    ) -> Self {
         Reader {
             base,
             events: Events::new(),
+            username,
+            name,
+            lastname,
+            profile_image,
             subscribed,
             preferences: Preferences::default(),
         }
@@ -49,6 +70,22 @@ impl Reader {
 
     pub fn events(&self) -> &Events<ReaderEvent> {
         &self.events
+    }
+
+    pub fn username(&self) -> &str {
+        &self.username
+    }
+
+    pub fn name(&self) -> Option<&String> {
+        self.name.as_ref()
+    }
+
+    pub fn lastname(&self) -> Option<&String> {
+        self.lastname.as_ref()
+    }
+
+    pub fn profile_image(&self) -> Option<&String> {
+        self.profile_image.as_ref()
     }
 
     pub fn is_subscribed(&self) -> bool {

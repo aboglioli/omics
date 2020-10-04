@@ -612,7 +612,7 @@ mod tests {
             false,
             false,
         );
-        let reader = mocks::reader("#user01");
+        let reader = mocks::reader("#user01", "user-1");
         let mut publication = mocks::publication(
             "#publication01",
             "#user01",
@@ -651,7 +651,7 @@ mod tests {
             true,
             false,
         );
-        let reader = mocks::reader("#user01");
+        let reader = mocks::reader("#user01", "user-1");
         let comment = Comment::new("comment").unwrap();
         let stars = Stars::new(5).unwrap();
 

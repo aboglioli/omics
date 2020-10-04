@@ -186,7 +186,7 @@ mod tests {
                 "user",
             ),
             mocks::author(&format!("#user0{}", index), &format!("user-{}", index)),
-            mocks::reader(&format!("#user0{}", index)),
+            mocks::reader(&format!("#user0{}", index), &format!("user-{}", index)),
         )
     }
 
