@@ -96,6 +96,6 @@ pub fn author(id: &str, username: &str) -> Author {
     Author::new(AuthorId::new(id).unwrap(), username).unwrap()
 }
 
-pub fn reader(id: &str) -> Reader {
-    Reader::new(ReaderId::new(id).unwrap()).unwrap()
+pub fn reader(id: &str, username: &str) -> Reader {
+    Reader::new(ReaderId::new(id).unwrap(), username).unwrap()
 }

@@ -15,6 +15,13 @@ use crate::domain::reader::{Reader, ReaderId, ReaderRepository};
 impl Reader {
     fn from_row(row: Row) -> Result<Self> {
         let id: Uuid = row.get("id");
+
+        let username: String = row.get("username");
+
+        let name: Option<String> = row.get("name");
+        let lastname: Option<String> = row.get("lastname");
+        let profile_image: Option<String> = row.get("profile_image");
+
         let subscribed: bool = row.get("subscribed");
 
         let created_at: DateTime<Utc> = row.get("created_at");
@@ -28,6 +35,10 @@ impl Reader {
                 updated_at,
                 deleted_at,
             ),
+            username,
+            name,
+            lastname,
+            profile_image,
             subscribed,
         ))
     }

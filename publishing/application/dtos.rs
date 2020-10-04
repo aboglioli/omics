@@ -311,16 +311,28 @@ impl From<&Preferences> for PreferencesDto {
 #[derive(Serialize)]
 pub struct ReaderDto {
     pub id: String,
+    pub username: String,
+    pub name: Option<String>,
+    pub lastname: Option<String>,
+    pub profile_image: Option<String>,
     pub subscribed: bool,
     pub preferences: Option<PreferencesDto>,
+    pub created_at: String,
+    pub updated_at: Option<String>,
 }
 
 impl ReaderDto {
     pub fn from(reader: &Reader) -> Self {
         ReaderDto {
             id: reader.base().id().to_string(),
+            username: reader.username().to_string(),
+            name: reader.name().cloned(),
+            lastname: reader.lastname().cloned(),
+            profile_image: reader.profile_image().cloned(),
             subscribed: reader.is_subscribed(),
             preferences: None,
+            created_at: reader.base().created_at().to_rfc3339(),
+            updated_at: reader.base().updated_at().map(|d| d.to_rfc3339()),
         }
     }
 }
