@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { IReview } from '../../../domain/models/review';
+import { IReaderPublicationInteraction } from '../../../domain/models/reader';
 
 @Component({
   selector: 'app-publication-reviews-box',
@@ -9,6 +10,7 @@ import { IReview } from '../../../domain/models/review';
 export class PublicationReviewsBoxComponent implements OnInit {
 
   @Input() reviewArray: IReview[];
+  @Input() readerData: IReaderPublicationInteraction;
 
   constructor() { }
 

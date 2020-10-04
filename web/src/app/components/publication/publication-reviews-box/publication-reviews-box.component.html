@@ -3,7 +3,17 @@
   <!-- Sin reviews -->
   <div *ngIf="reviewArray.length == 0">
 
-    <h1 class="break-word">¡Sé el primero en realizar agregar tu opinión!</h1>
+    <!-- En caso que el que lo ve no es el creador -->
+    <h1 *ngIf="readerData"
+        class="break-word">
+        ¡Sé el primero en calificar!
+    </h1>
+
+    <!-- En caso que sea el mismo creador el que lo ve -->
+    <h1 *ngIf="!readerData"
+        class="break-word">
+        No hay calificaciones en tú publicación.
+    </h1>
 
   </div>
 
