@@ -21,6 +21,14 @@ impl SubscriptionPlan {
         })
     }
 
+    pub fn build(plan_id: PlanId, price: f64, assigned_at: DateTime<Utc>) -> Self {
+        SubscriptionPlan {
+            plan_id,
+            price,
+            assigned_at,
+        }
+    }
+
     pub fn plan_id(&self) -> &PlanId {
         &self.plan_id
     }

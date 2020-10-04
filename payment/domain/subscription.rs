@@ -11,7 +11,7 @@ use common::result::Result;
 use identity::domain::user::UserId;
 use shared::event::SubscriptionEvent;
 
-use crate::domain::payment::Payment;
+use crate::domain::payment::{Amount, Kind, Payment};
 use crate::domain::plan::Plan;
 
 pub type SubscriptionId = StringId;
@@ -143,28 +143,24 @@ impl Subscription {
         Ok(())
     }
 
-    pub fn add_payment(&mut self, payment: Payment) -> Result<()> {
+    pub fn pay(&mut self) -> Result<Payment> {
         if self.is_active() {
             return Err(Error::new("subscription", "already_paid"));
         }
 
-        if self.plan.price() != payment.amount().value() {
-            return Err(Error::new("subscription", "invalid_payment_amount"));
-        }
+        let payment = Payment::new(Kind::Income, Amount::new(self.plan.price())?)?;
 
         let status = self.status_history.current().pay()?;
         self.status_history.add_status(status);
 
-        let amount = payment.amount().value();
-
-        self.payments.push(payment);
+        self.payments.push(payment.clone());
 
         self.events.record_event(SubscriptionEvent::PaymentAdded {
             id: self.base().id().to_string(),
-            amount,
+            amount: payment.amount().value(),
         });
 
-        Ok(())
+        Ok(payment)
     }
 
     pub fn disable(&mut self) -> Result<()> {
@@ -185,9 +181,14 @@ impl Subscription {
 mod tests {
     use super::*;
 
-    use chrono::{Duration, Utc};
+    use std::str::FromStr;
+
+    use chrono::DateTime;
+
+    use common::model::StatusItem;
 
     use crate::domain::payment::{Amount, Kind};
+    use crate::domain::plan::{PlanId, Price};
     use crate::mocks;
 
     #[test]
@@ -217,16 +218,14 @@ mod tests {
     }
 
     #[test]
-    fn add_payment() {
+    fn pay() {
         let mut subscription = mocks::subscription("sub-1", "user-1", "plan-1", 75.0);
+        assert!(!subscription.is_active());
         assert_eq!(subscription.payments().len(), 0);
-
-        let payment = mocks::payment("income", 85.0, Utc::now());
-        assert!(subscription.add_payment(payment).is_err());
-
-        let payment = mocks::payment("income", 75.0, Utc::now());
-        assert!(subscription.add_payment(payment).is_ok());
-
+        assert!(subscription.pay().is_ok());
+        assert!(subscription.pay().is_err());
+        assert_eq!(subscription.payments().len(), 1);
+        assert!(subscription.is_active());
         assert_eq!(
             subscription.status_history().current().to_string(),
             "active"
@@ -236,80 +235,60 @@ mod tests {
     }
 
     #[test]
-    fn subscription_status_from_payments() {
-        let mut subscription = mocks::subscription("sub-1", "user-1", "plan-1", 75.0);
-        assert!(subscription
-            .add_payment(Payment::build(
-                Kind::Income,
-                Amount::new(75.0).unwrap(),
-                Utc::now() - Duration::days(70),
-            ))
-            .is_ok());
-        assert!(!subscription.is_active());
+    fn subscription_status_from_payments_and_change_plan() {
+        let mut subscription = Subscription::build(
+            AggregateRoot::new(SubscriptionId::new("#sub01").unwrap()),
+            UserId::new("#user01").unwrap(),
+            SubscriptionPlan::build(
+                PlanId::new("#plan01").unwrap(),
+                140.0,
+                DateTime::from_str("2020-05-01T14:30:00Z").unwrap(),
+            ),
+            vec![
+                Payment::build(
+                    Kind::Income,
+                    Amount::new(140.0).unwrap(),
+                    DateTime::from_str("2020-05-01T14:30:00Z").unwrap(),
+                ),
+                Payment::build(
+                    Kind::Income,
+                    Amount::new(140.0).unwrap(),
+                    DateTime::from_str("2020-06-01T14:30:00Z").unwrap(),
+                ),
+                Payment::build(
+                    Kind::Income,
+                    Amount::new(140.0).unwrap(),
+                    DateTime::from_str("2020-07-01T14:30:00Z").unwrap(),
+                ),
+                Payment::build(
+                    Kind::Income,
+                    Amount::new(140.0).unwrap(),
+                    DateTime::from_str("2020-08-01T14:30:00Z").unwrap(),
+                ),
+            ],
+            StatusHistory::build(vec![
+                StatusItem::new(Status::init()),
+                StatusItem::new(Status::Active),
+            ]),
+        );
 
+        assert!(!subscription.is_active());
         assert!(subscription.require_payment().is_ok());
         assert!(subscription.require_payment().is_err());
 
-        assert!(subscription
-            .add_payment(Payment::build(
-                Kind::Income,
-                Amount::new(50.0).unwrap(),
-                Utc::now() - Duration::days(70),
-            ))
-            .is_err());
-
-        assert!(subscription
-            .add_payment(Payment::build(
-                Kind::Income,
-                Amount::new(75.0).unwrap(),
-                Utc::now() - Duration::days(40),
-            ))
-            .is_ok());
-        assert!(!subscription.is_active());
-
-        assert!(subscription
-            .add_payment(Payment::build(
-                Kind::Income,
-                Amount::new(75.0).unwrap(),
-                Utc::now() - Duration::days(10),
-            ))
-            .is_ok());
+        let payment = subscription.pay().unwrap();
+        assert_eq!(payment.amount().value(), 140.0);
         assert!(subscription.is_active());
-
-        assert!(subscription
-            .add_payment(Payment::build(
-                Kind::Income,
-                Amount::new(50.0).unwrap(),
-                Utc::now(),
-            ))
-            .is_err());
-
+        assert!(subscription.pay().is_err());
         assert!(subscription.require_payment().is_err());
-
-        assert_eq!(subscription.payments().len(), 3);
+        assert_eq!(subscription.payments().len(), 5);
 
         assert!(!subscription.events().to_vec().unwrap().is_empty());
-    }
-
-    #[test]
-    fn change_plan() {
-        let mut subscription = mocks::subscription("sub-1", "user-1", "plan-1", 0.0);
-        assert!(subscription
-            .add_payment(Payment::new(Kind::Income, Amount::new(50.0).unwrap()).unwrap())
-            .is_err());
 
         assert!(subscription
-            .change_plan(mocks::plan("plan-2", 45.0))
+            .change_plan(
+                Plan::new(PlanId::new("#plan02").unwrap(), Price::new(175.75).unwrap(),).unwrap(),
+            )
             .is_ok());
-
-        assert!(subscription
-            .add_payment(Payment::new(Kind::Income, Amount::new(50.0).unwrap()).unwrap())
-            .is_err());
-        assert!(subscription
-            .add_payment(Payment::new(Kind::Income, Amount::new(45.0).unwrap()).unwrap())
-            .is_ok());
-        assert!(subscription
-            .add_payment(Payment::new(Kind::Income, Amount::new(45.0).unwrap()).unwrap())
-            .is_err());
     }
 }
