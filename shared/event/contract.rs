@@ -24,6 +24,19 @@ pub enum ContractEvent {
         id: String,
         publication_id: String,
     },
+    SummaryAdded {
+        id: String,
+        publication_id: String,
+        total: f64,
+        amount: f64,
+        from: String,
+        to: String,
+    },
+    PaymentAdded {
+        id: String,
+        publication_id: String,
+        amount: f64,
+    },
 }
 
 impl ToString for ContractEvent {
@@ -33,6 +46,8 @@ impl ToString for ContractEvent {
             ContractEvent::Approved { .. } => "approved".to_owned(),
             ContractEvent::Rejected { .. } => "rejected".to_owned(),
             ContractEvent::Cancelled { .. } => "cancelled".to_owned(),
+            ContractEvent::SummaryAdded { .. } => "summary-added".to_owned(),
+            ContractEvent::PaymentAdded { .. } => "payment-added".to_owned(),
         }
     }
 }
