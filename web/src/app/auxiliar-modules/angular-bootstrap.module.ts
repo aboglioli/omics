@@ -1,17 +1,19 @@
 import { NgModule } from '@angular/core';
 
-import {NgbAlertModule, NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbAlertModule, NgbCarouselModule, NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [],
   imports: [
     NgbAlertModule,
-    NgbDropdownModule
+    NgbDropdownModule,
+    NgbCarouselModule
   ],
   exports: [
 
     NgbAlertModule,
-    NgbDropdownModule
+    NgbDropdownModule,
+    NgbCarouselModule
 
   ]
 })

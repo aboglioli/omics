@@ -38,3 +38,4 @@ Ver el archivo: docs/API.md
 * [ngx-toastr](https://www.npmjs.com/package/ngx-toastr).
 * [ng2-charts](https://valor-software.com/ng2-charts/#/GeneralInfo).
 * [FontAwesome](https://www.npmjs.com/package/@fortawesome/angular-fontawesome).
+* [NGX Bar Rating ](https://www.npmjs.com/package/ngx-bar-rating).
