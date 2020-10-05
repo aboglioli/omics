@@ -72,12 +72,13 @@ impl SubscriptionRepository for PostgresSubscriptionRepository {
         Subscription::from_row(row)
     }
 
-    async fn find_last_active_by_user_id(&self, id: &UserId) -> Result<Subscription> {
+    async fn find_last_by_user_id(&self, id: &UserId) -> Result<Subscription> {
         let row = self
             .client
             .query_one(
                 "SELECT * FROM subscriptions
                 WHERE user_id = $1
+                ORDER BY created_at DESC
                 LIMIT 1",
                 &[&id.to_uuid()?],
             )

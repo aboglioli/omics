@@ -14,7 +14,7 @@ pub trait SubscriptionRepository: Sync + Send {
     }
 
     async fn find_by_id(&self, id: &SubscriptionId) -> Result<Subscription>;
-    async fn find_last_active_by_user_id(&self, id: &UserId) -> Result<Subscription>;
+    async fn find_last_by_user_id(&self, id: &UserId) -> Result<Subscription>;
     async fn search(
         &self,
         user_id: Option<&UserId>,
