@@ -132,17 +132,21 @@
 
     <div class="side opacity-background">
 
-      <div class="fila" style="justify-content: center;">
+      <div  *ngIf="readerInfo"
+            class="fila" style="justify-content: center;">
         <bar-rating [(rate)]="ratingPublication" [max]="5" [theme]="'stars'"
                     (rateChange)="addReview($event)">
         </bar-rating>
       </div>
 
       <div class="comment-box">
+
         <app-publication-reviews-box
           *ngIf="reviewList !== undefined"
-          [reviewArray]="reviewList">
+          [reviewArray]="reviewList"
+          [readerData]="readerInfo">
         </app-publication-reviews-box>
+
       </div>
 
       <!-- Option bar -->

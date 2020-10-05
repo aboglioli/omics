@@ -14,6 +14,7 @@ export interface IReader {
   preferences?: IPreferences;
   created_at: string;
   updated_at?: string;
+  profile_image?: string;
 }
 
 export interface IReaderPublicationInteraction {

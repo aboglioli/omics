@@ -95,8 +95,7 @@ export class PublicationInfoComponent implements OnInit {
             this.reviewList = resReviews.reviews;
             this.spinnerService.hide();
 
-            console.log('TEST > ', this.reviewList);
-
+            // console.log('TEST > ', this.reviewList);
 
           },
           (err: Error) => {

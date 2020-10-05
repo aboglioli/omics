@@ -1,14 +1,95 @@
 <div class="container-box">
 
   <!-- Sin reviews -->
-  <div *ngIf="reviewArray.length == 0">
+  <div  *ngIf="reviewArray.length == 0"
+        class="no-reviews">
 
-    <h1 class="break-word">¡Sé el primero en realizar agregar tu opinión!</h1>
+    <!-- En caso que el que lo ve no es el creador -->
+    <h1 *ngIf="readerData"
+        class="break-word">
+        ¡Sé el primero en calificar!
+    </h1>
+
+    <!-- En caso que sea el mismo creador el que lo ve -->
+    <h1 *ngIf="!readerData"
+        class="break-word">
+        No hay calificaciones en tu publicación.
+    </h1>
 
   </div>
 
   <!-- Con reviews -->
-  <div *ngIf="reviewArray.length > 0">
+  <div  *ngIf="reviewArray.length > 0"
+        class="with-reviews">
+
+    <ngb-carousel #commentCarousel
+      style="height: 100%;"
+      [interval]="10000"
+      [pauseOnHover]="true"
+      [showNavigationArrows]="false"
+      [showNavigationIndicators]="false">
+
+      <ng-template ngbSlide *ngFor="let review of reviewArray; index as i">
+
+        <div class="comment-info">
+
+          <div class="header fila">
+
+            <div style="display: flex;">
+              <img  [src]="review.reader.profile_image"
+                    alt="omics-avatar-profile"
+                    class="avatar">
+
+              <h2 style="margin-left: 1em;">{{review.reader.username}}</h2>
+            </div>
+
+            <div class="stars-review fila">
+
+              <!-- Una forma de repetir una cantidad de veces en html sin tener que crear una variable -->
+              <div *ngFor="let dummyRepeat of [].constructor(5); let i = index">
+
+                <!-- Estrellas marcadas -->
+                <h1 *ngIf="i < review.stars">
+                  <fa-icon  [icon]="faStarFill" size="1x"></fa-icon>
+                </h1>
+
+                <!-- Estrellas sin marcar -->
+                <h1 *ngIf="i >= review.stars">
+                  <fa-icon  [icon]="faStarEmpty" size="1x"></fa-icon>
+                </h1>
+
+              </div>
+
+            </div>
+
+
+            <div style="margin-right: 0.25em">
+              <h3>{{ review.created_at | date: 'shortDate' | date: 'dd/MM/yyyy' }}</h3>
+            </div>
+
+          </div>
+
+          <div class="body fila">
+            {{review.comment}}
+          </div>
+
+        </div>
+
+      </ng-template>
+
+    </ngb-carousel>
+
+    <div class="arrow-custom">
+
+      <button mat-button (click)="onPrevious()" class="option-item" style="flex: 1">
+        <fa-icon  [icon]="faLeft" size="2x"></fa-icon>
+      </button>
+
+      <button mat-button (click)="onNext()" class="option-item" style="flex: 1">
+        <fa-icon  [icon]="faRight" size="2x"></fa-icon>
+      </button>
+
+    </div>
 
   </div>
 
