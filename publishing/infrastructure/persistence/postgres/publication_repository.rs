@@ -84,21 +84,6 @@ impl PostgresPublicationRepository {
 
 #[async_trait]
 impl PublicationRepository for PostgresPublicationRepository {
-    async fn find_all(&self) -> Result<Vec<Publication>> {
-        let rows = self
-            .client
-            .query("SELECT * FROM publications", &[])
-            .await
-            .map_err(|err| Error::not_found("publication").wrap_raw(err))?;
-
-        let mut publications = Vec::new();
-        for row in rows.into_iter() {
-            publications.push(Publication::from_row(row)?);
-        }
-
-        Ok(publications)
-    }
-
     async fn find_by_id(&self, id: &PublicationId) -> Result<Publication> {
         let row = self
             .client
