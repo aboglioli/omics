@@ -71,6 +71,21 @@ impl ContractRepository for PostgresContractRepository {
         Contract::from_row(row)
     }
 
+    async fn find_last_active_by_publication_id(&self, id: &PublicationId) -> Result<Contract> {
+        let row = self
+            .client
+            .query_one(
+                "SELECT * FROM contracts
+                WHERE publication_id = $1
+                LIMIT 1",
+                &[&id.to_uuid()?],
+            )
+            .await
+            .map_err(|err| Error::not_found("contract").wrap_raw(err))?;
+
+        Contract::from_row(row)
+    }
+
     async fn search(
         &self,
         publication_id: Option<&PublicationId>,

@@ -3,9 +3,7 @@ use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 use identity::domain::user::UserId;
-use publishing::domain::reader::ReaderRepository;
 
-use crate::domain::plan::PlanRepository;
 use crate::domain::subscription::{Status, SubscriptionRepository};
 
 pub struct Unsubscribe<'a> {

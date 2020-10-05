@@ -13,6 +13,7 @@ pub trait ContractRepository: Sync + Send {
     }
 
     async fn find_by_id(&self, id: &ContractId) -> Result<Contract>;
+    async fn find_last_active_by_publication_id(&self, id: &PublicationId) -> Result<Contract>;
     async fn search(
         &self,
         publication_id: Option<&PublicationId>,
