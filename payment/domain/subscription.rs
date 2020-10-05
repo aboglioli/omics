@@ -9,6 +9,7 @@ use common::error::Error;
 use common::model::{AggregateRoot, Events, StatusHistory, StringId};
 use common::result::Result;
 use identity::domain::user::UserId;
+use publishing::domain::reader::Reader;
 use shared::event::SubscriptionEvent;
 
 use crate::domain::payment::{Amount, Kind, Payment};
@@ -27,7 +28,11 @@ pub struct Subscription {
 }
 
 impl Subscription {
-    pub fn new(id: SubscriptionId, user_id: UserId, plan: Plan) -> Result<Self> {
+    pub fn new(id: SubscriptionId, reader: &Reader, plan: Plan) -> Result<Self> {
+        if reader.is_subscribed() {
+            return Err(Error::new("user", "already_subscribed"));
+        }
+
         let plan = SubscriptionPlan::new(plan)?;
         let mut status_history = StatusHistory::new(Status::init());
 
@@ -39,7 +44,7 @@ impl Subscription {
         let mut subscription = Subscription {
             base: AggregateRoot::new(id),
             events: Events::new(),
-            user_id,
+            user_id: reader.base().id().clone(),
             plan,
             payments: Vec::new(),
             status_history,

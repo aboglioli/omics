@@ -11,7 +11,10 @@ pub trait PlanRepository: Sync + Send {
         PlanId::new(Uuid::new_v4().to_string())
     }
 
+    async fn find_all(&self) -> Result<Vec<Plan>>;
     async fn find_by_id(&self, id: &PlanId) -> Result<Plan>;
 
     async fn save(&self, plan: &mut Plan) -> Result<()>;
+
+    async fn delete(&self, id: &PlanId) -> Result<()>;
 }

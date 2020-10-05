@@ -49,6 +49,12 @@ pub struct PostgresContractRepository {
     client: Arc<Client>,
 }
 
+impl PostgresContractRepository {
+    pub fn new(client: Arc<Client>) -> Self {
+        PostgresContractRepository { client }
+    }
+}
+
 #[async_trait]
 impl ContractRepository for PostgresContractRepository {
     async fn find_by_id(&self, id: &ContractId) -> Result<Contract> {
