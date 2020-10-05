@@ -24,7 +24,7 @@ impl Collection {
         let name: String = row.get("name");
         let synopsis: String = row.get("synopsis");
         let category_id: String = row.get("category_id");
-        let tag_strs: Vec<String> = row.get("tags");
+        let tags: Vec<Tag> = serde_json::from_value(row.get("tags"))?;
         let cover: String = row.get("cover");
 
         let items: Vec<Item> = serde_json::from_value(row.get("items"))?;
@@ -32,11 +32,6 @@ impl Collection {
         let created_at: DateTime<Utc> = row.get("created_at");
         let updated_at: Option<DateTime<Utc>> = row.get("updated_at");
         let deleted_at: Option<DateTime<Utc>> = row.get("deleted_at");
-
-        let mut tags = Vec::new();
-        for tag in tag_strs.into_iter() {
-            tags.push(Tag::new(tag)?);
-        }
 
         Ok(Collection::build(
             AggregateRoot::build(
@@ -70,21 +65,6 @@ impl PostgresCollectionRepository {
 
 #[async_trait]
 impl CollectionRepository for PostgresCollectionRepository {
-    async fn find_all(&self) -> Result<Vec<Collection>> {
-        let rows = self
-            .client
-            .query("SELECT * FROM collections", &[])
-            .await
-            .map_err(|err| Error::not_found("collection").wrap_raw(err))?;
-
-        let mut collections = Vec::new();
-        for row in rows.into_iter() {
-            collections.push(Collection::from_row(row)?);
-        }
-
-        Ok(collections)
-    }
-
     async fn find_by_id(&self, id: &CollectionId) -> Result<Collection> {
         let row = self
             .client
@@ -111,11 +91,13 @@ impl CollectionRepository for PostgresCollectionRepository {
         author_id: Option<&AuthorId>,
         category_id: Option<&CategoryId>,
         publication_id: Option<&PublicationId>,
+        tag: Option<&Tag>,
         name: Option<&String>,
     ) -> Result<Vec<Collection>> {
         let author_id = author_id.map(|id| id.to_uuid()).transpose()?;
         let category_id = category_id.map(|id| id.value());
         let publication_id = publication_id.map(|id| id.value());
+        let tag = tag.map(|t| t.slug());
 
         let (sql, params) = WhereBuilder::new()
             .add_param_opt("author_id = $$", &author_id, author_id.is_some())
@@ -125,6 +107,15 @@ impl CollectionRepository for PostgresCollectionRepository {
                     ?| array[$$]",
                 &publication_id,
                 publication_id.is_some(),
+            )
+            .add_param_opt(
+                "EXISTS (
+                    SELECT TRUE
+                    FROM jsonb_array_elements(tags) tag
+                    WHERE tag->>'slug' = $$
+                )",
+                &tag,
+                tag.is_some(),
             )
             .add_param_opt(
                 "LOWER(name) LIKE '%' || LOWER($$) || '%'",
@@ -160,6 +151,7 @@ impl CollectionRepository for PostgresCollectionRepository {
             .await
             .is_err();
 
+        let tags = serde_json::to_value(collection.header().tags())?;
         let items = serde_json::to_value(collection.items())?;
 
         if create {
@@ -182,12 +174,7 @@ impl CollectionRepository for PostgresCollectionRepository {
                         &collection.header().name().value(),
                         &collection.header().synopsis().value(),
                         &collection.header().category_id().value(),
-                        &collection
-                            .header()
-                            .tags()
-                            .iter()
-                            .map(|tag| tag.name())
-                            .collect::<Vec<&str>>(),
+                        &tags,
                         &collection.header().cover().url(),
                         &items,
                         &collection.base().created_at(),
@@ -215,12 +202,7 @@ impl CollectionRepository for PostgresCollectionRepository {
                         &collection.header().name().value(),
                         &collection.header().synopsis().value(),
                         &collection.header().category_id().value(),
-                        &collection
-                            .header()
-                            .tags()
-                            .iter()
-                            .map(|tag| tag.name())
-                            .collect::<Vec<&str>>(),
+                        &tags,
                         &collection.header().cover().url(),
                         &items,
                         &collection.base().updated_at(),

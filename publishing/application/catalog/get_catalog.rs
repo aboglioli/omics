@@ -42,7 +42,7 @@ impl<'a> GetCatalog<'a> {
     pub async fn exec(&self) -> Result<Catalog> {
         let mut publications = self
             .publication_repo
-            .search(None, None, Some(&"published".to_owned()), None)
+            .search(None, None, None, Some(&"published".to_owned()), None)
             .await?;
 
         let mut catalog = Catalog::default();

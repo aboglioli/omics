@@ -7,12 +7,13 @@ use identity::domain::user::{UserId, UserRepository};
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};
 use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::category::CategoryRepository;
-use crate::domain::publication::{PublicationRepository, Status};
+use crate::domain::publication::{PublicationRepository, Status, Tag};
 
 #[derive(Deserialize)]
 pub struct SearchCommand {
     pub author_id: Option<String>,
     pub category_id: Option<String>,
+    pub tag: Option<String>,
     pub status: Option<String>,
     pub name: Option<String>,
 }
@@ -62,6 +63,7 @@ impl<'a> Search<'a> {
             .search(
                 cmd.author_id.map(AuthorId::new).transpose()?.as_ref(),
                 cmd.category_id.map(AuthorId::new).transpose()?.as_ref(),
+                cmd.tag.map(Tag::new).transpose()?.as_ref(),
                 cmd.status.as_ref(),
                 cmd.name.as_ref(),
             )

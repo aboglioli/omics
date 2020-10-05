@@ -8,7 +8,7 @@ use common::result::Result;
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
 use crate::domain::collection::{Collection, CollectionId, CollectionRepository};
-use crate::domain::publication::PublicationId;
+use crate::domain::publication::{PublicationId, Tag};
 
 pub struct InMemCollectionRepository {
     cache: InMemCache<CollectionId, Collection>,
@@ -30,10 +30,6 @@ impl Default for InMemCollectionRepository {
 
 #[async_trait]
 impl CollectionRepository for InMemCollectionRepository {
-    async fn find_all(&self) -> Result<Vec<Collection>> {
-        Ok(self.cache.all().await)
-    }
-
     async fn find_by_id(&self, id: &CollectionId) -> Result<Collection> {
         self.cache
             .get(id)
@@ -46,6 +42,7 @@ impl CollectionRepository for InMemCollectionRepository {
         author_id: Option<&AuthorId>,
         category_id: Option<&CategoryId>,
         publication_id: Option<&PublicationId>,
+        _tag: Option<&Tag>,
         name: Option<&String>,
     ) -> Result<Vec<Collection>> {
         let mut collections = self.cache.all().await;

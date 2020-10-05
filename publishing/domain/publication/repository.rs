@@ -5,7 +5,7 @@ use common::result::Result;
 
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
-use crate::domain::publication::{Publication, PublicationId};
+use crate::domain::publication::{Publication, PublicationId, Tag};
 
 #[async_trait]
 pub trait PublicationRepository: Sync + Send {
@@ -18,6 +18,7 @@ pub trait PublicationRepository: Sync + Send {
         &self,
         author_id: Option<&AuthorId>,
         category_id: Option<&CategoryId>,
+        tag: Option<&Tag>,
         status: Option<&String>,
         name: Option<&String>,
     ) -> Result<Vec<Publication>>;

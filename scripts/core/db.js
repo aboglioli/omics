@@ -1,3 +1,4 @@
+const slugify = require('slugify');
 const { Client } = require('pg');
 
 const config = require('./config');
@@ -38,7 +39,10 @@ const tags = [
   'Etiqueta genérica',
   'Hola',
   'Chau',
-];
+].map(tag => ({
+  slug: slugify(tag, { lower: true }),
+  name: tag,
+}));
 
 // Clean db
 function clean() {
@@ -156,7 +160,7 @@ async function createPublication({
       name,
       synopsis,
       categoryId,
-      tags,
+      JSON.stringify(tags),
       cover,
       statistics,
       JSON.stringify(statusHistory),
@@ -203,7 +207,7 @@ async function createCollection({
       name,
       synopsis,
       categoryId,
-      tags,
+      JSON.stringify(tags),
       cover,
       JSON.stringify(items),
       createdAt,

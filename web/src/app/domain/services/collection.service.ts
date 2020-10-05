@@ -9,6 +9,7 @@ export interface ISearchCommand {
   author_id?: string;
   category_id?: string;
   publication_id?: string;
+  tag?: string;
   name?: string;
 }
 

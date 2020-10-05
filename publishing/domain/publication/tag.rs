@@ -1,9 +1,10 @@
+use serde::{Deserialize, Serialize};
 use slug::slugify;
 
 use common::error::Error;
 use common::result::Result;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Tag {
     slug: String,
     name: String,

@@ -78,6 +78,7 @@ async fn get_publications(
         SearchPublicationCommand {
             author_id: Some(user_id),
             category_id: None,
+            tag: None,
             status: None,
             name: None,
         },
@@ -115,6 +116,7 @@ async fn get_collections(
             author_id: Some(user_id),
             category_id: None,
             publication_id: None,
+            tag: None,
             name: None,
         },
         include.into_inner().into(),

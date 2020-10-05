@@ -28,7 +28,7 @@ impl Publication {
         let name: String = row.get("name");
         let synopsis: String = row.get("synopsis");
         let category_id: String = row.get("category_id");
-        let tag_strs: Vec<String> = row.get("tags");
+        let tags: Vec<Tag> = serde_json::from_value(row.get("tags"))?;
         let cover: String = row.get("cover");
 
         let contract: bool = row.get("contract");
@@ -43,11 +43,6 @@ impl Publication {
         let created_at: DateTime<Utc> = row.get("created_at");
         let updated_at: Option<DateTime<Utc>> = row.get("updated_at");
         let deleted_at: Option<DateTime<Utc>> = row.get("deleted_at");
-
-        let mut tags = Vec::new();
-        for tag in tag_strs.into_iter() {
-            tags.push(Tag::new(tag)?);
-        }
 
         Ok(Publication::build(
             AggregateRoot::build(
@@ -102,15 +97,26 @@ impl PublicationRepository for PostgresPublicationRepository {
         &self,
         author_id: Option<&AuthorId>,
         category_id: Option<&CategoryId>,
+        tag: Option<&Tag>,
         status: Option<&String>,
         name: Option<&String>,
     ) -> Result<Vec<Publication>> {
         let author_id = author_id.map(|id| id.to_uuid()).transpose()?;
         let category_id = category_id.map(|id| id.value());
+        let tag = tag.map(|t| t.slug());
 
         let (sql, params) = WhereBuilder::new()
             .add_param_opt("author_id = $$", &author_id, author_id.is_some())
             .add_param_opt("category_id = $$", &category_id, category_id.is_some())
+            .add_param_opt(
+                "EXISTS (
+                    SELECT TRUE
+                    FROM jsonb_array_elements(tags) tag
+                    WHERE tag->>'slug' = $$
+                )",
+                &tag,
+                tag.is_some(),
+            )
             .add_param_opt(
                 "status_history->-1->>'status' = $$",
                 &status,
@@ -158,6 +164,7 @@ impl PublicationRepository for PostgresPublicationRepository {
         let statistics = serde_json::to_value(publication.statistics())?;
         let status_history = serde_json::to_value(publication.status_history().history())?;
         let pages = serde_json::to_value(publication.pages())?;
+        let tags = serde_json::to_value(publication.header().tags())?;
 
         if create {
             self.client
@@ -181,12 +188,7 @@ impl PublicationRepository for PostgresPublicationRepository {
                         &publication.header().name().value(),
                         &publication.header().synopsis().value(),
                         &publication.header().category_id().value(),
-                        &publication
-                            .header()
-                            .tags()
-                            .iter()
-                            .map(|tag| tag.name())
-                            .collect::<Vec<&str>>(),
+                        &tags,
                         &publication.header().cover().url(),
                         &statistics,
                         &status_history,
@@ -218,12 +220,7 @@ impl PublicationRepository for PostgresPublicationRepository {
                         &publication.header().name().value(),
                         &publication.header().synopsis().value(),
                         &publication.header().category_id().value(),
-                        &publication
-                            .header()
-                            .tags()
-                            .iter()
-                            .map(|tag| tag.name())
-                            .collect::<Vec<&str>>(),
+                        &tags,
                         &publication.header().cover().url(),
                         &statistics,
                         &status_history,

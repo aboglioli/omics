@@ -14,6 +14,7 @@ export interface ISearchCommand {
   author_id?: string;
   category_id?: string;
   status?: string;
+  tag?: string;
   name?: string;
 }
 

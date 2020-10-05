@@ -328,6 +328,7 @@ async fn get_collections(
             author_id: None,
             category_id: None,
             publication_id: Some(path.into_inner()),
+            tag: None,
             name: None,
         },
         include.into_inner().into(),

@@ -7,7 +7,7 @@ use common::result::Result;
 
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
-use crate::domain::publication::{Publication, PublicationId, PublicationRepository};
+use crate::domain::publication::{Publication, PublicationId, PublicationRepository, Tag};
 
 pub struct InMemPublicationRepository {
     cache: InMemCache<PublicationId, Publication>,
@@ -40,6 +40,7 @@ impl PublicationRepository for InMemPublicationRepository {
         &self,
         author_id: Option<&AuthorId>,
         category_id: Option<&CategoryId>,
+        _tag: Option<&Tag>,
         status: Option<&String>,
         name: Option<&String>,
     ) -> Result<Vec<Publication>> {
