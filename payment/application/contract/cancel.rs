@@ -2,7 +2,7 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
-use publishing::domain::publication::{PublicationRepository};
+use publishing::domain::publication::PublicationRepository;
 
 use crate::domain::contract::{ContractId, ContractRepository};
 
