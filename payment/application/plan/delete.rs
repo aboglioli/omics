@@ -1,5 +1,3 @@
-use serde::Deserialize;
-
 use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
@@ -8,47 +6,38 @@ use identity::domain::user::{UserId, UserRepository};
 
 use crate::domain::plan::{Plan, PlanId, PlanRepository, Price};
 
-#[derive(Deserialize)]
-pub struct CreateCommand {
-    id: String,
-    price: f64,
-}
-
-pub struct Create<'a> {
+pub struct Delete<'a> {
     event_pub: &'a dyn EventPublisher,
 
     plan_repo: &'a dyn PlanRepository,
     user_repo: &'a dyn UserRepository,
 }
 
-impl<'a> Create<'a> {
+// TODO: update subscriptions before deleting
+impl<'a> Delete<'a> {
     pub fn new(
         event_pub: &'a dyn EventPublisher,
         plan_repo: &'a dyn PlanRepository,
         user_repo: &'a dyn UserRepository,
     ) -> Self {
-        Create {
+        Delete {
             event_pub,
             plan_repo,
             user_repo,
         }
     }
 
-    pub async fn exec(&self, auth_id: String, cmd: CreateCommand) -> Result<CommandResponse> {
+    pub async fn exec(&self, auth_id: String, plan_id: String) -> Result<CommandResponse> {
         let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
         if !user.is_admin() {
             return Err(Error::unauthorized());
         }
 
-        let plan_id = PlanId::new(cmd.id)?;
+        let mut plan = self.plan_repo.find_by_id(&PlanId::new(plan_id)?).await?;
 
-        if self.plan_repo.find_by_id(&plan_id).await.is_ok() {
-            return Err(Error::new("plan", "already_exists"));
-        }
+        plan.delete()?;
 
-        let mut plan = Plan::new(plan_id, Price::new(cmd.price)?)?;
-
-        self.plan_repo.save(&mut plan).await?;
+        self.plan_repo.delete(plan.base().id()).await?;
 
         self.event_pub.publish_all(plan.events().to_vec()?).await?;
 

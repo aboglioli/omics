@@ -28,7 +28,11 @@ impl<'a> Unsubscribe<'a> {
     pub async fn exec(&self, auth_id: String) -> Result<CommandResponse> {
         let mut subscriptions = self
             .subscription_repo
-            .search(Some(&UserId::new(auth_id)?), Some(&"active".to_owned()))
+            .search(
+                Some(&UserId::new(auth_id)?),
+                None,
+                Some(&"active".to_owned()),
+            )
             .await?;
 
         if subscriptions.is_empty() {
@@ -45,7 +49,7 @@ impl<'a> Unsubscribe<'a> {
 
         let subscription = &mut subscriptions[0];
 
-        subscription.disable();
+        subscription.disable()?;
 
         self.subscription_repo.save(subscription).await?;
 

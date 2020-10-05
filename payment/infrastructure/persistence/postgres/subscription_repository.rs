@@ -13,6 +13,7 @@ use common::sql::where_builder::WhereBuilder;
 use identity::domain::user::UserId;
 
 use crate::domain::payment::Payment;
+use crate::domain::plan::PlanId;
 use crate::domain::subscription::{
     Status, Subscription, SubscriptionId, SubscriptionPlan, SubscriptionRepository,
 };
@@ -74,9 +75,11 @@ impl SubscriptionRepository for PostgresSubscriptionRepository {
     async fn search(
         &self,
         user_id: Option<&UserId>,
+        plan_id: Option<&PlanId>,
         status: Option<&String>,
     ) -> Result<Vec<Subscription>> {
         let user_id = user_id.map(|id| id.to_uuid()).transpose()?;
+        let _plan_id = plan_id.map(|id| id.value()); // TODO
 
         let (sql, params) = WhereBuilder::new()
             .add_param_opt("user_id = $$", &user_id, user_id.is_some())

@@ -44,7 +44,13 @@ impl<'a> Create<'a> {
             return Err(Error::unauthorized());
         }
 
-        let mut category = Category::new(CategoryId::new(cmd.id)?, Name::new(cmd.name)?)?;
+        let category_id = CategoryId::new(cmd.id)?;
+
+        if self.category_repo.find_by_id(&category_id).await.is_ok() {
+            return Err(Error::new("category", "already_exists"));
+        }
+
+        let mut category = Category::new(category_id, Name::new(cmd.name)?)?;
 
         self.category_repo.save(&mut category).await?;
 
