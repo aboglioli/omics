@@ -98,6 +98,10 @@ where
     pub fn statistics_serv(&self) -> &StatisticsService {
         &self.statistics_serv
     }
+
+    pub fn statistics_serv_clone(&self) -> Arc<StatisticsService> {
+        self.statistics_serv.clone()
+    }
 }
 
 #[async_trait]

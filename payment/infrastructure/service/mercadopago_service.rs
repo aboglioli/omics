@@ -4,10 +4,16 @@ use common::result::Result;
 
 use crate::domain::payment::{Payment, PaymentService};
 
-pub struct FakePaymentService {}
+pub struct MercadoPagoService;
+
+impl MercadoPagoService {
+    pub fn new() -> Self {
+        MercadoPagoService
+    }
+}
 
 #[async_trait]
-impl PaymentService for FakePaymentService {
+impl PaymentService for MercadoPagoService {
     async fn pay(&self, email: &str, payment: &Payment) -> Result<()> {
         println!("Pay to: {}, amount: {}", email, payment.amount().value());
         Ok(())
