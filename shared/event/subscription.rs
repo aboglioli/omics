@@ -12,17 +12,21 @@ pub enum SubscriptionEvent {
     },
     PlanChanged {
         id: String,
+        user_id: String,
         plan_id: String,
     },
     PaymentRequired {
         id: String,
+        user_id: String,
     },
     PaymentAdded {
         id: String,
+        user_id: String,
         amount: f64,
     },
     Disabled {
         id: String,
+        user_id: String,
     },
 }
 

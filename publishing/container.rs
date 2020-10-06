@@ -7,6 +7,8 @@ use common::event::{EventPublisher, EventSubscriber};
 use common::result::Result;
 use identity::domain::user::UserRepository;
 
+use crate::application::publication::ContractHandler;
+use crate::application::reader::SubscriptionHandler;
 use crate::domain::author::AuthorRepository;
 use crate::domain::category::CategoryRepository;
 use crate::domain::collection::CollectionRepository;
@@ -103,7 +105,7 @@ impl<EPub> Container for PublishingContainer<EPub>
 where
     EPub: Sync + Send,
 {
-    async fn subscribe<ES>(&self, _event_sub: &ES) -> Result<()>
+    async fn subscribe<ES>(&self, event_sub: &ES) -> Result<()>
     where
         ES: EventSubscriber + Sync + Send,
     {
@@ -120,6 +122,12 @@ where
         // let reader_handler =
         //     InteractionHandler::new(self.reader_repo.clone(), self.publication_repo.clone());
         // event_sub.subscribe(Box::new(reader_handler)).await?;
+
+        let subscription_handler = SubscriptionHandler::new(self.reader_repo.clone());
+        event_sub.subscribe(Box::new(subscription_handler)).await?;
+
+        let contract_handler = ContractHandler::new(self.publication_repo.clone());
+        event_sub.subscribe(Box::new(contract_handler)).await?;
 
         Ok(())
     }

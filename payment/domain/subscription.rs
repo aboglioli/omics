@@ -126,6 +126,7 @@ impl Subscription {
 
         self.events.record_event(SubscriptionEvent::PlanChanged {
             id: self.base().id().to_string(),
+            user_id: self.user_id().to_string(),
             plan_id: self.plan().plan_id().to_string(),
         });
 
@@ -143,6 +144,7 @@ impl Subscription {
         self.events
             .record_event(SubscriptionEvent::PaymentRequired {
                 id: self.base().id().to_string(),
+                user_id: self.user_id().to_string(),
             });
 
         Ok(())
@@ -162,6 +164,7 @@ impl Subscription {
 
         self.events.record_event(SubscriptionEvent::PaymentAdded {
             id: self.base().id().to_string(),
+            user_id: self.user_id().to_string(),
             amount: payment.amount().value(),
         });
 
@@ -176,6 +179,7 @@ impl Subscription {
 
         self.events.record_event(SubscriptionEvent::Disabled {
             id: self.base().id().to_string(),
+            user_id: self.user_id().to_string(),
         });
 
         Ok(())

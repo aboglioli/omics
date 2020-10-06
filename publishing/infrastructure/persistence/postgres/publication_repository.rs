@@ -177,11 +177,12 @@ impl PublicationRepository for PostgresPublicationRepository {
                         category_id,
                         tags,
                         cover,
+                        contract,
                         statistics,
-                        status_history,
                         pages,
+                        status_history,
                         created_at
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
                     &[
                         &publication.base().id().to_uuid()?,
                         &publication.author_id().to_uuid()?,
@@ -190,9 +191,10 @@ impl PublicationRepository for PostgresPublicationRepository {
                         &publication.header().category_id().value(),
                         &tags,
                         &publication.header().cover().url(),
+                        &publication.has_contract(),
                         &statistics,
-                        &status_history,
                         &pages,
+                        &status_history,
                         &publication.base().created_at(),
                     ],
                 )
@@ -208,11 +210,12 @@ impl PublicationRepository for PostgresPublicationRepository {
                         category_id = $4,
                         tags = $5,
                         cover = $6,
-                        statistics = $7,
-                        status_history = $8,
+                        contract = $7,
+                        statistics = $8,
                         pages = $9,
-                        updated_at = $10,
-                        deleted_at = $11
+                        status_history = $10,
+                        updated_at = $11,
+                        deleted_at = $12
                     WHERE
                         id = $1",
                     &[
@@ -222,9 +225,10 @@ impl PublicationRepository for PostgresPublicationRepository {
                         &publication.header().category_id().value(),
                         &tags,
                         &publication.header().cover().url(),
+                        &publication.has_contract(),
                         &statistics,
-                        &status_history,
                         &pages,
+                        &status_history,
                         &publication.base().updated_at(),
                         &publication.base().deleted_at(),
                     ],

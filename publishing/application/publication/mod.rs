@@ -1,6 +1,7 @@
 mod add_review;
 mod add_to_favorites;
 mod approve;
+mod contract_handler;
 mod create;
 mod delete;
 mod delete_review;
@@ -19,6 +20,7 @@ mod update_pages;
 pub use add_review::*;
 pub use add_to_favorites::*;
 pub use approve::*;
+pub use contract_handler::*;
 pub use create::*;
 pub use delete::*;
 pub use delete_review::*;
