@@ -1,9 +1,11 @@
+mod service;
 mod repository;
 mod status;
 mod summary;
 pub use repository::*;
 pub use status::*;
 pub use summary::*;
+pub use service::*;
 
 use common::error::Error;
 use common::model::{AggregateRoot, Events, StatusHistory, StringId};
