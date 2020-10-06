@@ -1,0 +1,17 @@
+[package]
+name = "reports"
+version = "0.1.0"
+authors = ["Alan Boglioli <alan.boglioli@gmail.com>"]
+edition = "2018"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+common = { path = "../common" }
+shared = { path = "../shared" }
+identity = { path = "../identity" }
+
+chrono = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
