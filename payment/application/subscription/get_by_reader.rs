@@ -21,7 +21,7 @@ impl<'a> GetByReader<'a> {
 
         let subscription = self
             .subscription_repo
-            .find_last_by_user_id(&UserId::new(reader_id)?)
+            .find_by_user_id(&UserId::new(reader_id)?)
             .await?;
 
         Ok(SubscriptionDto::from(&subscription))

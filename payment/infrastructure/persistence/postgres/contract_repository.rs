@@ -71,7 +71,7 @@ impl ContractRepository for PostgresContractRepository {
         Contract::from_row(row)
     }
 
-    async fn find_last_by_publication_id(&self, id: &PublicationId) -> Result<Contract> {
+    async fn find_by_publication_id(&self, id: &PublicationId) -> Result<Contract> {
         let row = self
             .client
             .query_one(

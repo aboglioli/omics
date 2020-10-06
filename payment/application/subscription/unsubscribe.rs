@@ -42,7 +42,10 @@ impl<'a> Unsubscribe<'a> {
 
         subscription.disable()?;
 
-        self.subscription_repo.save(subscription).await?;
+        // self.subscription_repo.save(subscription).await?;
+        self.subscription_repo
+            .delete(subscription.base().id())
+            .await?;
 
         self.event_pub
             .publish_all(subscription.events().to_vec()?)

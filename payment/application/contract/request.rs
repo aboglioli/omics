@@ -39,7 +39,7 @@ impl<'a> Request<'a> {
         // TODO: should be done by a domain service
         if let Ok(last) = self
             .contract_repo
-            .find_last_by_publication_id(publication.base().id())
+            .find_by_publication_id(publication.base().id())
             .await
         {
             if !matches!(last.status_history().current(), Status::Cancelled) {

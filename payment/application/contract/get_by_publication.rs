@@ -32,7 +32,7 @@ impl<'a> GetByPublication<'a> {
 
         let contract = self
             .contract_repo
-            .find_last_by_publication_id(publication.base().id())
+            .find_by_publication_id(publication.base().id())
             .await?;
 
         Ok(ContractDto::from(&contract))

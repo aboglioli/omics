@@ -37,7 +37,7 @@ impl<'a> Subscribe<'a> {
         let plan = self.plan_repo.find_by_id(&PlanId::new(plan_id)?).await?;
 
         // TODO: should be done by a domain service
-        if let Ok(last) = self.subscription_repo.find_last_by_user_id(&user_id).await {
+        if let Ok(last) = self.subscription_repo.find_by_user_id(&user_id).await {
             if !matches!(last.status_history().current(), Status::Inactive) {
                 return Err(Error::new("subscription", "already_exists"));
             }

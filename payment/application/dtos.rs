@@ -1,7 +1,8 @@
 use serde::Serialize;
 
 use common::model::StatusItem;
-use publishing::application::dtos::StatisticsDto;
+use identity::application::dtos::UserDto;
+use publishing::application::dtos::{PublicationDto, StatisticsDto};
 
 use crate::domain::contract::{Contract, Status as ContractStatus, Summary};
 use crate::domain::payment::Payment;
@@ -77,7 +78,8 @@ impl SubscriptionStatusDto {
 #[derive(Serialize)]
 pub struct SubscriptionDto {
     pub id: String,
-    pub user_id: String,
+    pub user_id: Option<String>,
+    pub user: Option<UserDto>,
     pub plan: SubscriptionPlanDto,
     pub payments: Vec<PaymentDto>,
     pub status: SubscriptionStatusDto,
@@ -87,7 +89,8 @@ impl SubscriptionDto {
     pub fn from(subscription: &Subscription) -> Self {
         SubscriptionDto {
             id: subscription.base().id().to_string(),
-            user_id: subscription.user_id().to_string(),
+            user_id: Some(subscription.user_id().to_string()),
+            user: None,
             plan: SubscriptionPlanDto::from(subscription.plan()),
             payments: subscription
                 .payments()
@@ -96,6 +99,12 @@ impl SubscriptionDto {
                 .collect(),
             status: SubscriptionStatusDto::from(subscription.status_history().current_item()),
         }
+    }
+
+    pub fn user(mut self, user: UserDto) -> Self {
+        self.user_id = None;
+        self.user = Some(user);
+        self
     }
 }
 
@@ -153,7 +162,8 @@ impl ContractStatusDto {
 #[derive(Serialize)]
 pub struct ContractDto {
     pub id: String,
-    pub publication_id: String,
+    pub publication_id: Option<String>,
+    pub publication: Option<PublicationDto>,
     pub summaries: Vec<SummaryDto>,
     pub payments: Vec<PaymentDto>,
     pub status: ContractStatusDto,
@@ -163,10 +173,17 @@ impl ContractDto {
     pub fn from(contract: &Contract) -> Self {
         ContractDto {
             id: contract.base().id().to_string(),
-            publication_id: contract.publication_id().to_string(),
+            publication_id: Some(contract.publication_id().to_string()),
+            publication: None,
             summaries: contract.summaries().iter().map(SummaryDto::from).collect(),
             payments: contract.payments().iter().map(PaymentDto::from).collect(),
             status: ContractStatusDto::from(contract.status_history().current_item()),
         }
+    }
+
+    pub fn publication(mut self, publication: PublicationDto) -> Self {
+        self.publication_id = None;
+        self.publication = Some(publication);
+        self
     }
 }
