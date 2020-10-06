@@ -4,7 +4,7 @@ use common::request::CommandResponse;
 use common::result::Result;
 use publishing::domain::publication::{PublicationId, PublicationRepository};
 
-use crate::domain::contract::{Contract, ContractRepository};
+use crate::domain::contract::{Contract, ContractRepository, Status};
 
 pub struct Request<'a> {
     event_pub: &'a dyn EventPublisher,
@@ -34,6 +34,17 @@ impl<'a> Request<'a> {
 
         if publication.author_id().value() != auth_id {
             return Err(Error::not_owner("publication"));
+        }
+
+        // TODO: should be done by a domain service
+        if let Ok(last) = self
+            .contract_repo
+            .find_last_by_publication_id(publication.base().id())
+            .await
+        {
+            if !matches!(last.status_history().current(), Status::Cancelled) {
+                return Err(Error::new("contract", "already_exists"));
+            }
         }
 
         let mut contract = Contract::new(self.contract_repo.next_id().await?, &publication)?;

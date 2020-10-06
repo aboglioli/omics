@@ -1,3 +1,4 @@
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
@@ -5,7 +6,7 @@ use identity::domain::user::UserId;
 use publishing::domain::reader::ReaderRepository;
 
 use crate::domain::plan::{PlanId, PlanRepository};
-use crate::domain::subscription::{Subscription, SubscriptionRepository};
+use crate::domain::subscription::{Status, Subscription, SubscriptionRepository};
 
 pub struct Subscribe<'a> {
     event_pub: &'a dyn EventPublisher,
@@ -34,6 +35,13 @@ impl<'a> Subscribe<'a> {
         let user_id = UserId::new(auth_id)?;
         let reader = self.reader_repo.find_by_id(&user_id).await?;
         let plan = self.plan_repo.find_by_id(&PlanId::new(plan_id)?).await?;
+
+        // TODO: should be done by a domain service
+        if let Ok(last) = self.subscription_repo.find_last_by_user_id(&user_id).await {
+            if !matches!(last.status_history().current(), Status::Inactive) {
+                return Err(Error::new("subscription", "already_exists"));
+            }
+        }
 
         let mut subscription =
             Subscription::new(self.subscription_repo.next_id().await?, &reader, plan)?;
