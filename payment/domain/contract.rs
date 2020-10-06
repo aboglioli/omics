@@ -1,11 +1,11 @@
-mod service;
 mod repository;
+mod service;
 mod status;
 mod summary;
 pub use repository::*;
+pub use service::*;
 pub use status::*;
 pub use summary::*;
-pub use service::*;
 
 use common::error::Error;
 use common::model::{AggregateRoot, Events, StatusHistory, StringId};
@@ -192,6 +192,12 @@ impl Contract {
 
         let payment = Payment::new(Kind::Outcome, Amount::new(amount)?)?;
         self.payments.push(payment.clone());
+
+        self.events.record_event(ContractEvent::PaymentAdded {
+            id: self.base().id().to_string(),
+            publication_id: self.publication_id().to_string(),
+            amount,
+        });
 
         Ok(payment)
     }

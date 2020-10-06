@@ -5,7 +5,7 @@ use common::request::Include;
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
 use publishing::application::dtos::PublicationDto;
-use publishing::domain::publication::{PublicationRepository};
+use publishing::domain::publication::PublicationRepository;
 
 use crate::application::dtos::ContractDto;
 use crate::domain::contract::ContractRepository;
