@@ -7,6 +7,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 import { PublicationApproveRejectMotiveComponent } from 'src/app/components/dashboard/publication-approve-reject-motive/publication-approve-reject-motive.component';
+import { BreakpointObserver } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-dashboard-gestion-contratos-publicaciones',
@@ -21,19 +22,23 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
   public faApprove = faCheckCircle;
 
   public publicationList: IPublication[];
+  public isBigScreen = true;
 
   constructor(
     private publicationService: PublicationService,
     private spinnerService: NgxSpinnerService,
     public dialog: MatDialog,
     private sweetAlertGenericService: SweetAlertGenericMessageService,
+    private breakpointObserver: BreakpointObserver,
   ) { }
 
   ngOnInit(): void {
 
+    this.checkWidthScreen();
     this.getAllPublication();
 
   }
+
 
   public getAllPublication(): void {
 
@@ -57,6 +62,17 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
     );
 
   }
+
+  private checkWidthScreen(): void {
+
+    this.breakpointObserver.observe(['(max-width: 950px)']).subscribe(
+      (result: any) => {
+
+        this.isBigScreen = (result.matches) ? false : true;
+
+      });
+  }
+
 
 
   public openMessageReasonDialog( publication: IPublication, isApproved: boolean ): void {

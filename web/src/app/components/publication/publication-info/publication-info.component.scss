@@ -7,8 +7,6 @@ div.panel-box {
   flex-direction: column;
   height: 100%;
 
-
-
   // Pantalla grande
   @media screen and (min-width: $break-small) {
     height: 90vh;
