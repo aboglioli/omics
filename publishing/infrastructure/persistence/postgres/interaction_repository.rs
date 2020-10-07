@@ -49,8 +49,8 @@ impl InteractionRepository for PostgresInteractionRepository {
                 &publication_id,
                 publication_id.is_some(),
             )
-            .add_param_opt("from >= $$", &from, from.is_some())
-            .add_param_opt("to <= $$", &to, to.is_some())
+            .add_param_opt("datetime >= $$", &from, from.is_some())
+            .add_param_opt("datetime <= $$", &to, to.is_some())
             .build();
 
         let rows = self
@@ -100,8 +100,8 @@ impl InteractionRepository for PostgresInteractionRepository {
                 &publication_id,
                 publication_id.is_some(),
             )
-            .add_param_opt("from >= $$", &from, from.is_some())
-            .add_param_opt("to <= $$", &to, to.is_some())
+            .add_param_opt("datetime >= $$", &from, from.is_some())
+            .add_param_opt("datetime <= $$", &to, to.is_some())
             .build();
 
         let rows = self
@@ -147,8 +147,8 @@ impl InteractionRepository for PostgresInteractionRepository {
                 &publication_id,
                 publication_id.is_some(),
             )
-            .add_param_opt("from >= $$", &from, from.is_some())
-            .add_param_opt("to <= $$", &to, to.is_some())
+            .add_param_opt("datetime >= $$", &from, from.is_some())
+            .add_param_opt("datetime <= $$", &to, to.is_some())
             .build();
 
         let rows = self
@@ -194,8 +194,8 @@ impl InteractionRepository for PostgresInteractionRepository {
                 &publication_id,
                 publication_id.is_some(),
             )
-            .add_param_opt("from >= $$", &from, from.is_some())
-            .add_param_opt("to <= $$", &to, to.is_some())
+            .add_param_opt("datetime >= $$", &from, from.is_some())
+            .add_param_opt("datetime <= $$", &to, to.is_some())
             .build();
 
         let rows = self
@@ -248,8 +248,8 @@ impl InteractionRepository for PostgresInteractionRepository {
                 &publication_id,
                 publication_id.is_some(),
             )
-            .add_param_opt("from >= $$", &from, from.is_some())
-            .add_param_opt("to <= $$", &to, to.is_some())
+            .add_param_opt("datetime >= $$", &from, from.is_some())
+            .add_param_opt("datetime <= $$", &to, to.is_some())
             .build();
 
         let rows = self
@@ -298,8 +298,8 @@ impl InteractionRepository for PostgresInteractionRepository {
                 &collection_id,
                 collection_id.is_some(),
             )
-            .add_param_opt("from >= $$", &from, from.is_some())
-            .add_param_opt("to <= $$", &to, to.is_some())
+            .add_param_opt("datetime >= $$", &from, from.is_some())
+            .add_param_opt("datetime <= $$", &to, to.is_some())
             .build();
 
         let rows = self
@@ -344,8 +344,8 @@ impl InteractionRepository for PostgresInteractionRepository {
         let (sql, params) = WhereBuilder::new()
             .add_param_opt("reader_id = $$", &reader_id, reader_id.is_some())
             .add_param_opt("author_id = $$", &author_id, author_id.is_some())
-            .add_param_opt("from >= $$", &from, from.is_some())
-            .add_param_opt("to <= $$", &to, to.is_some())
+            .add_param_opt("datetime >= $$", &from, from.is_some())
+            .add_param_opt("datetime <= $$", &to, to.is_some())
             .build();
 
         let rows = self

@@ -30,7 +30,7 @@ pub struct Contract {
 
 impl Contract {
     pub fn new(id: ContractId, publication: &Publication) -> Result<Self> {
-        if publication.statistics().unique_views() < 1000 {
+        if publication.statistics().unique_views() < 30 {
             return Err(Error::new("contract", "publication_has_low_views"));
         }
 

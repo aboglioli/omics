@@ -96,12 +96,13 @@ impl PlanRepository for PostgresPlanRepository {
                     "UPDATE plans
                     SET
                         price = $2,
-                        updated_at = $5,
-                        deleted_at= $6
+                        updated_at = $3,
+                        deleted_at= $4
                     WHERE
                         id = $1",
                     &[
                         &plan.base().id().value(),
+                        &plan.price().value(),
                         &plan.base().updated_at(),
                         &plan.base().deleted_at(),
                     ],

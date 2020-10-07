@@ -148,8 +148,8 @@ impl SubscriptionRepository for PostgresSubscriptionRepository {
                         user_id,
                         plan,
                         payments,
-                        status_hustory,
-                        created_at,
+                        status_history,
+                        created_at
                     ) VALUES ($1, $2, $3, $4, $5, $6)",
                     &[
                         &subscription.base().id().to_uuid()?,
@@ -171,8 +171,8 @@ impl SubscriptionRepository for PostgresSubscriptionRepository {
                         plan = $3,
                         payments = $4,
                         status_history = $5,
-                        updated_at = $10,
-                        deleted_at = $11
+                        updated_at = $6,
+                        deleted_at = $7
                     WHERE
                         id = $1",
                     &[
