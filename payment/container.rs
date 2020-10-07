@@ -7,6 +7,7 @@ use common::event::EventPublisher;
 
 use identity::domain::user::UserRepository;
 use publishing::domain::publication::{PublicationRepository, StatisticsService};
+use publishing::domain::reader::ReaderRepository;
 
 use crate::domain::contract::{ContractRepository, ContractService};
 use crate::domain::payment::PaymentService;
@@ -19,6 +20,7 @@ pub struct PaymentContainer<EPub> {
     contract_repo: Arc<dyn ContractRepository>,
     plan_repo: Arc<dyn PlanRepository>,
     publication_repo: Arc<dyn PublicationRepository>,
+    reader_repo: Arc<dyn ReaderRepository>,
     subscription_repo: Arc<dyn SubscriptionRepository>,
     user_repo: Arc<dyn UserRepository>,
 
@@ -35,6 +37,7 @@ where
         contract_repo: Arc<dyn ContractRepository>,
         plan_repo: Arc<dyn PlanRepository>,
         publication_repo: Arc<dyn PublicationRepository>,
+        reader_repo: Arc<dyn ReaderRepository>,
         subscription_repo: Arc<dyn SubscriptionRepository>,
         user_repo: Arc<dyn UserRepository>,
         payment_serv: Arc<dyn PaymentService>,
@@ -51,6 +54,7 @@ where
             contract_repo,
             plan_repo,
             publication_repo,
+            reader_repo,
             subscription_repo,
             user_repo,
             contract_serv,
@@ -72,6 +76,10 @@ where
 
     pub fn publication_repo(&self) -> &dyn PublicationRepository {
         self.publication_repo.as_ref()
+    }
+
+    pub fn reader_repo(&self) -> &dyn ReaderRepository {
+        self.reader_repo.as_ref()
     }
 
     pub fn subscription_repo(&self) -> &dyn SubscriptionRepository {

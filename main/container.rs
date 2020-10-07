@@ -108,7 +108,7 @@ impl MainContainer {
             pub_collectionot_repo.clone(),
             pub_interactionot_repo.clone(),
             pub_publicationot_repo.clone(),
-            pub_reader_repo,
+            pub_reader_repo.clone(),
             id_user_repo.clone(),
         );
 
@@ -117,6 +117,7 @@ impl MainContainer {
             pay_contract_repo,
             pay_plan_repo,
             pub_publicationot_repo.clone(),
+            pub_reader_repo.clone(),
             pay_subscription_repo,
             id_user_repo.clone(),
             pay_payment_serv,
