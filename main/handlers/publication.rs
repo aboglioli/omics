@@ -1,6 +1,9 @@
 use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse, Responder};
 
 use common::request::IncludeParams;
+use payment::application::contract::{
+    GetByPublication as GetContractByPublication, Request as RequestContract,
+};
 use publishing::application::collection::{
     Search as SearchCollection, SearchCommand as SearchCollectionCommand,
 };
@@ -378,6 +381,40 @@ async fn remove_from_favorites(
     .map_err(PublicError::from)
 }
 
+#[get("/{publication_id}/contract")]
+async fn get_contract(
+    req: HttpRequest,
+    path: web::Path<String>,
+    c: web::Data<MainContainer>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    GetContractByPublication::new(c.payment.contract_repo(), c.payment.publication_repo())
+        .exec(auth_id, path.into_inner())
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
+}
+
+#[post("/{publication_id}/contract")]
+async fn request_contract(
+    req: HttpRequest,
+    path: web::Path<String>,
+    c: web::Data<MainContainer>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    RequestContract::new(
+        c.payment.event_pub(),
+        c.payment.contract_repo(),
+        c.payment.publication_repo(),
+    )
+    .exec(auth_id, path.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
+}
+
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/publications")
@@ -398,6 +435,8 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .service(get_reviews)
             .service(get_collections)
             .service(add_to_favorites)
-            .service(remove_from_favorites),
+            .service(remove_from_favorites)
+            .service(get_contract)
+            .service(request_contract),
     );
 }

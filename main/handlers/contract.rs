@@ -3,7 +3,7 @@ use actix_web::{delete, get, post, web, HttpRequest, HttpResponse, Responder};
 use common::request::IncludeParams;
 use payment::application::contract::{
     Approve, Cancel, ChargeForContract, GenerateStatistics, GenerateStatisticsCommand, GetAll,
-    GetByPublication, Reject, Request,
+    Reject,
 };
 
 use crate::authorization::auth;
@@ -24,40 +24,6 @@ async fn get_all(
         c.payment.user_repo(),
     )
     .exec(auth_id, include.into_inner().into())
-    .await
-    .map(|res| HttpResponse::Ok().json(res))
-    .map_err(PublicError::from)
-}
-
-#[get("/{publication_id}/contract")]
-async fn get_by_publication_id(
-    req: HttpRequest,
-    path: web::Path<String>,
-    c: web::Data<MainContainer>,
-) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
-
-    GetByPublication::new(c.payment.contract_repo(), c.payment.publication_repo())
-        .exec(auth_id, path.into_inner())
-        .await
-        .map(|res| HttpResponse::Ok().json(res))
-        .map_err(PublicError::from)
-}
-
-#[post("/{publication_id}/contract")]
-async fn request(
-    req: HttpRequest,
-    path: web::Path<String>,
-    c: web::Data<MainContainer>,
-) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
-
-    Request::new(
-        c.payment.event_pub(),
-        c.payment.contract_repo(),
-        c.payment.publication_repo(),
-    )
-    .exec(auth_id, path.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -169,10 +135,5 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .service(cancel)
             .service(generate_statistics)
             .service(charge),
-    )
-    .service(
-        web::scope("/publications")
-            .service(get_by_publication_id)
-            .service(request),
     );
 }

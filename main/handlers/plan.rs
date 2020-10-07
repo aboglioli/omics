@@ -1,6 +1,7 @@
 use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse, Responder};
 
 use payment::application::plan::{Create, CreateCommand, Delete, GetAll, Update, UpdateCommand};
+use payment::application::subscription::Subscribe;
 
 use crate::authorization::auth;
 use crate::container::MainContainer;
@@ -73,12 +74,33 @@ async fn delete(
     .map_err(PublicError::from)
 }
 
+#[post("/{plan_id}/subscribe")]
+async fn subscribe(
+    req: HttpRequest,
+    path: web::Path<String>,
+    c: web::Data<MainContainer>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    Subscribe::new(
+        c.payment.event_pub(),
+        c.payment.plan_repo(),
+        c.payment.reader_repo(),
+        c.payment.subscription_repo(),
+    )
+    .exec(auth_id, path.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
+}
+
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/plans")
             .service(get_all)
             .service(create)
             .service(update)
-            .service(delete),
+            .service(delete)
+            .service(subscribe),
     );
 }
