@@ -1,8 +1,8 @@
 <div class="authors-container">
   <a class="author" [href]="'/profile/' + author.id" *ngFor="let author of authors">
 
-    <div class="text">
-      <span class="username">{{author.username}}</span>
+    <div class="row-over top">
+      <span class="text username">{{author.username | truncateString: 20:false}}</span>
     </div>
 
     <span *ngIf="author.profile_image">
@@ -12,8 +12,9 @@
       <img src="assets/images/generic/avatar196x196.jpg">
     </span>
 
-    <div class="text">
-      <span class="followers">{{author.followers}} seguidores</span>
+    <div class="row-over bottom" style="justify-content: center;">
+      <fa-icon [icon]="faFollowers" size="1x"></fa-icon>
+      <span class="text followers" style="margin-left: 0.5em">{{author.followers}}</span>
     </div>
   </a>
 </div>
