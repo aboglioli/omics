@@ -5,6 +5,7 @@ use async_trait::async_trait;
 use common::container::Container;
 use common::event::{EventPublisher, EventSubscriber};
 use common::result::Result;
+use common::config::Config;
 use identity::domain::user::UserRepository;
 use publishing::domain::author::AuthorRepository;
 use publishing::domain::collection::CollectionRepository;
@@ -100,17 +101,24 @@ where
     where
         ES: EventSubscriber + Sync + Send,
     {
-        let registered_handler = RegisteredHandler::new(self.email_serv.clone());
-        event_sub.subscribe(Box::new(registered_handler)).await?;
+        let config = Config::get();
 
-        let approved_rejected_publication_handler = ApprovedRejectedPublicationHandler::new(
-            self.publication_repo.clone(),
-            self.user_repo.clone(),
-            self.email_serv.clone(),
-        );
-        event_sub
-            .subscribe(Box::new(approved_rejected_publication_handler))
-            .await?;
+        if config.env() == "production" {
+            let registered_handler = RegisteredHandler::new(self.email_serv.clone());
+            event_sub.subscribe(Box::new(registered_handler)).await?;
+        }
+
+
+        if config.env() == "production" {
+            let approved_rejected_publication_handler = ApprovedRejectedPublicationHandler::new(
+                self.publication_repo.clone(),
+                self.user_repo.clone(),
+                self.email_serv.clone(),
+            );
+            event_sub
+                .subscribe(Box::new(approved_rejected_publication_handler))
+                .await?;
+        }
 
         let notification_handler = NotificationHandler::new(
             self.author_repo.clone(),

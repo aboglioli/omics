@@ -8,6 +8,16 @@ module.exports = {
   'parserOptions': {
     'ecmaVersion': 12
   },
+  'globals': {
+    'process': true,
+    'describe': true,
+    'test': true,
+    'expect': true,
+    'beforeAll': true,
+    'before': true,
+    'afterAll': true,
+    'after': true,
+  },
   'rules': {
     'indent': [
       'error',

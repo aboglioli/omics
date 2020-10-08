@@ -8,7 +8,8 @@
     "populate": "node scripts/populate",
     "migrate": "node scripts/migrate",
     "clean-db": "node scripts/clean-db",
-    "test": "jest core tests --detectOpenHandles"
+    "test": "jest core tests",
+    "lint": "eslint '*/**/*.js' --fix"
   },
   "author": "Alan Boglioli <alan.boglioli@gmail.com>",
   "license": "MIT",
