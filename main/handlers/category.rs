@@ -89,7 +89,12 @@ async fn get_collections(
         c.publishing.category_repo(),
         c.publishing.collection_repo(),
     )
-    .exec(auth_id, cmd, include.into_inner().into())
+    .exec(
+        auth_id,
+        cmd,
+        include.into_inner().into(),
+        PaginationParams::default(),
+    )
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)

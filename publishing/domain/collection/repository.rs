@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 use common::result::Result;
@@ -22,6 +23,10 @@ pub trait CollectionRepository: Sync + Send {
         publication_id: Option<&PublicationId>,
         tag: Option<&Tag>,
         name: Option<&String>,
+        from: Option<&DateTime<Utc>>,
+        to: Option<&DateTime<Utc>>,
+        offset: Option<usize>,
+        limit: Option<usize>,
     ) -> Result<Vec<Collection>>;
 
     async fn save(&self, collection: &mut Collection) -> Result<()>;

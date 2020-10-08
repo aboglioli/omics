@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 
 use common::cache::Cache;
 use common::error::Error;
@@ -44,6 +45,10 @@ impl CollectionRepository for InMemCollectionRepository {
         publication_id: Option<&PublicationId>,
         _tag: Option<&Tag>,
         name: Option<&String>,
+        _from: Option<&DateTime<Utc>>,
+        _to: Option<&DateTime<Utc>>,
+        _offset: Option<usize>,
+        _limit: Option<usize>,
     ) -> Result<Vec<Collection>> {
         let mut collections = self.cache.all().await;
 

@@ -17,12 +17,13 @@ use crate::error::PublicError;
 async fn search(
     req: HttpRequest,
     cmd: web::Query<SearchCommand>,
+    pagination: web::Query<PaginationParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
 
     Search::new(c.publishing.author_repo())
-        .exec(auth_id, cmd.into_inner())
+        .exec(auth_id, cmd.into_inner(), pagination.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -112,7 +113,12 @@ async fn get_collections(
         c.publishing.category_repo(),
         c.publishing.collection_repo(),
     )
-    .exec(auth_id, cmd, include.into_inner().into())
+    .exec(
+        auth_id,
+        cmd,
+        include.into_inner().into(),
+        PaginationParams::default(),
+    )
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)

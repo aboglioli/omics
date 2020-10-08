@@ -9,6 +9,7 @@ use uuid::Uuid;
 use common::error::Error;
 use common::model::AggregateRoot;
 use common::result::Result;
+use common::sql::where_builder::WhereBuilder;
 
 use crate::domain::author::{Author, AuthorId, AuthorRepository};
 
@@ -58,10 +59,54 @@ impl PostgresAuthorRepository {
 
 #[async_trait]
 impl AuthorRepository for PostgresAuthorRepository {
-    async fn find_all(&self) -> Result<Vec<Author>> {
+    async fn find_by_id(&self, id: &AuthorId) -> Result<Author> {
+        let row = self
+            .client
+            .query_one("SELECT * FROM users WHERE id = $1", &[&id.to_uuid()?])
+            .await
+            .map_err(|err| Error::not_found("author").wrap_raw(err))?;
+
+        Author::from_row(row)
+    }
+
+    async fn search(
+        &self,
+        name: Option<&String>,
+        from: Option<&DateTime<Utc>>,
+        to: Option<&DateTime<Utc>>,
+        offset: Option<usize>,
+        limit: Option<usize>,
+    ) -> Result<Vec<Author>> {
+        let offset = offset.unwrap_or_else(|| 0);
+        let limit = limit
+            .map(|l| if l <= 1000 { l } else { 1000 })
+            .unwrap_or_else(|| 100);
+
+        let (mut sql, params) = WhereBuilder::new()
+            .add_param_opt(
+                "(
+                    LOWER(username) LIKE '%' || LOWER($$) || '%'
+                    OR LOWER(name) LIKE '%' || LOWER($$) || '%'
+                )",
+                &name,
+                name.is_some(),
+            )
+            .add_param_opt("created_at >= $$", &from, from.is_some())
+            .add_param_opt("created_at <= $$", &to, to.is_some())
+            .build();
+
+        sql = format!(
+            "SELECT * FROM users
+            {}
+            ORDER BY created_at ASC
+            OFFSET {}
+            LIMIT {}",
+            sql, offset, limit,
+        );
+
         let rows = self
             .client
-            .query("SELECT * FROM users ORDER BY followers DESC", &[])
+            .query(&sql as &str, &params)
             .await
             .map_err(|err| Error::not_found("author").wrap_raw(err))?;
 
@@ -72,16 +117,6 @@ impl AuthorRepository for PostgresAuthorRepository {
         }
 
         Ok(authors)
-    }
-
-    async fn find_by_id(&self, id: &AuthorId) -> Result<Author> {
-        let row = self
-            .client
-            .query_one("SELECT * FROM users WHERE id = $1", &[&id.to_uuid()?])
-            .await
-            .map_err(|err| Error::not_found("author").wrap_raw(err))?;
-
-        Author::from_row(row)
     }
 
     async fn save(&self, author: &mut Author) -> Result<()> {

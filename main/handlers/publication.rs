@@ -321,10 +321,14 @@ async fn get_reviews(
 async fn get_collections(
     req: HttpRequest,
     path: web::Path<String>,
+    cmd: web::Query<SearchCollectionCommand>,
     include: web::Query<IncludeParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
+
+    let mut cmd = cmd.into_inner();
+    cmd.publication_id = Some(path.into_inner());
 
     SearchCollection::new(
         c.publishing.author_repo(),
@@ -333,14 +337,9 @@ async fn get_collections(
     )
     .exec(
         auth_id,
-        SearchCollectionCommand {
-            author_id: None,
-            category_id: None,
-            publication_id: Some(path.into_inner()),
-            tag: None,
-            name: None,
-        },
+        cmd,
         include.into_inner().into(),
+        PaginationParams::default(),
     )
     .await
     .map(|res| HttpResponse::Ok().json(res))

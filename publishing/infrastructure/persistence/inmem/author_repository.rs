@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 
 use common::cache::Cache;
 use common::error::Error;
@@ -27,15 +28,22 @@ impl Default for InMemAuthorRepository {
 
 #[async_trait]
 impl AuthorRepository for InMemAuthorRepository {
-    async fn find_all(&self) -> Result<Vec<Author>> {
-        Ok(self.cache.all().await)
-    }
-
     async fn find_by_id(&self, id: &AuthorId) -> Result<Author> {
         self.cache
             .get(id)
             .await
             .ok_or_else(|| Error::not_found("author"))
+    }
+
+    async fn search(
+        &self,
+        _name: Option<&String>,
+        _from: Option<&DateTime<Utc>>,
+        _to: Option<&DateTime<Utc>>,
+        _offset: Option<usize>,
+        _limit: Option<usize>,
+    ) -> Result<Vec<Author>> {
+        Ok(self.cache.all().await)
     }
 
     async fn save(&self, author: &mut Author) -> Result<()> {
