@@ -226,7 +226,7 @@ async function createCollection({
 
 module.exports = {
   client,
-  knext,
+  knex,
 
   image,
   password,
