@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use common::request::Include;
+use common::request::{Include, PaginationParams};
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
 
@@ -16,6 +16,8 @@ pub struct SearchCommand {
     pub tag: Option<String>,
     pub status: Option<String>,
     pub name: Option<String>,
+    pub date_from: Option<String>,
+    pub date_to: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -50,6 +52,7 @@ impl<'a> Search<'a> {
         auth_id: Option<String>,
         cmd: SearchCommand,
         include: Include,
+        pagination: PaginationParams,
     ) -> Result<SearchResponse> {
         let is_content_manager = if let Some(auth_id) = &auth_id {
             let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;

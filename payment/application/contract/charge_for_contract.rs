@@ -46,6 +46,7 @@ impl<'a> ChargeForContract<'a> {
 
         let payment = contract.pay_summaries()?;
 
+        // TODO: use real user information
         self.payment_serv.pay("some@one.com", &payment).await?;
 
         self.contract_repo.save(&mut contract).await?;
