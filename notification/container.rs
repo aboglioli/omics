@@ -2,10 +2,10 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 
+use common::config::Config;
 use common::container::Container;
 use common::event::{EventPublisher, EventSubscriber};
 use common::result::Result;
-use common::config::Config;
 use identity::domain::user::UserRepository;
 use publishing::domain::author::AuthorRepository;
 use publishing::domain::collection::CollectionRepository;
@@ -107,7 +107,6 @@ where
             let registered_handler = RegisteredHandler::new(self.email_serv.clone());
             event_sub.subscribe(Box::new(registered_handler)).await?;
         }
-
 
         if config.env() == "production" {
             let approved_rejected_publication_handler = ApprovedRejectedPublicationHandler::new(

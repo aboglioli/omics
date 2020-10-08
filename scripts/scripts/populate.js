@@ -1,41 +1,37 @@
 const { v4: uuidv4 } = require('uuid');
+const { connectDb } = require('../core/db');
 const {
-  client,
-
   image,
-  password,
-
   genders,
   categories,
   tags,
-
-  createUser,
-  createPublication,
-  createCollection,
-} = require('../core/db');
+} = require('../core/constants');
 const { rand, randArr } = require('../core/utils');
 
 async function main() {
   console.log('[ POPULATE ]');
-  client.connect();
+  const knex = connectDb();
   console.log('Populating DB...');
 
   try {
     // Create user, publications and collections
     for (let i = 0; i < 10; i++) {
       const userId = uuidv4();
-      await createUser({
-        userId,
-        username: `user-${i}`,
-        email: `user-${i}@omics.com`,
-        name: 'Name',
-        lastname: 'Lastname',
-        birthdate: '1994-08-01 15:30:00Z',
-        gender: randArr(genders),
-        biography: 'My biography...',
-        profileImage: image(200),
-        createdAt: new Date(),
-      });
+
+      await knex('users')
+        .insert({
+          id: userId,
+          provider: 'local',
+          username: `user-${i}`,
+          email: `user-${i}@omics.com`,
+          name: 'Name',
+          lastname: 'Lastname',
+          birthdate: '1994-08-01 15:30:00Z',
+          gender: randArr(genders),
+          biography: 'My biography...',
+          profile_image: image(200),
+          created_at: new Date(),
+        });
 
       let publicationIds = [];
       for (let j = 0; j < rand(1, 15); j++) {
@@ -87,26 +83,27 @@ async function main() {
           }
         }
 
-        await createPublication({
-          publicationId,
-          authorId: userId,
-          name: `Publication ${i}-${j}`,
-          synopsis: 'Synopsis...',
-          categoryId: randArr(categories),
-          tags: randArr(tags, true),
-          cover: image(250),
-          statistics: {
-            views: rand(0, 1000),
-            unique_views: rand(0, 850),
-            readings: rand(0, 560),
-            likes: rand(0, 175),
-            reviews: rand(0, 85),
-            stars: rand(0, 51) / 10.0,
-          },
-          statusHistory,
-          pages,
-          createdAt: new Date(),
-        });
+        await knex('publications')
+          .insert({
+            id: publicationId,
+            author_id: userId,
+            name: `Publication ${i}-${j}`,
+            synopsis: 'Synopsis...',
+            category_id: randArr(categories),
+            tags: JSON.stringify(randArr(tags, true)),
+            cover: image(250),
+            statistics: {
+              views: rand(0, 1000),
+              unique_views: rand(0, 850),
+              readings: rand(0, 560),
+              likes: rand(0, 175),
+              reviews: rand(0, 85),
+              stars: rand(0, 51) / 10.0,
+            },
+            status_history: JSON.stringify(statusHistory),
+            pages: JSON.stringify(pages),
+            created_at: new Date(),
+          });
 
         publicationIds.push(publicationId);
       }
@@ -115,39 +112,41 @@ async function main() {
         const collectionId = uuidv4();
 
         const items = publicationIds
-          .filter(_ => rand(1, 100) < 20)
+          .filter(() => rand(1, 100) < 20)
           .map(pId => ({
             publication_id: { id: pId },
             date: new Date(),
           }));
 
-        await createCollection({
-          collectionId,
-          authorId: userId,
-          name: `Collection ${i}-${j}`,
-          synopsis: 'I am a collection...',
-          categoryId: randArr(categories),
-          tags: randArr(tags, true),
-          cover: image(250),
-          items,
-          createdAt: new Date(),
-        });
+        await knex('collections')
+          .insert({
+            id: collectionId,
+            author_id: userId,
+            name: `Collection ${i}-${j}`,
+            synopsis: 'I am a collection...',
+            category_id: randArr(categories),
+            tags: JSON.stringify(randArr(tags, true)),
+            cover: image(250),
+            items: JSON.stringify(items),
+            created_at: new Date(),
+          });
       }
     }
 
     // Add interactions
-    const { rows: users } = await client.query('SELECT * FROM users');
-    const { rows: publications } = await client.query('SELECT * FROM publications');
+    const users = await knex('users');
+    const publications = await knex('publications');
 
     for (const user of users) {
       for (const publication of publications) {
         if (user.id != publication.author_id) {
           if (rand(0, 100) < 30) {
-            await client.query(
-              `INSERT INTO publication_favorites(reader_id, publication_id, datetime)
-              VALUES ($1, $2, $3)`,
-              [user.id, publication.id, new Date()],
-            );
+            await knex('publication_favorites')
+              .insert({
+                reader_id: user.id,
+                publication_id: publication.id,
+                datetime: new Date(),
+              });
           }
         }
       }
@@ -156,7 +155,7 @@ async function main() {
     console.log(err);
   } finally {
     console.log('READY');
-    client.end();
+    await knex.destroy();
   }
 }
 

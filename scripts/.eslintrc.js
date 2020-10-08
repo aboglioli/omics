@@ -10,6 +10,7 @@ module.exports = {
   },
   'globals': {
     'process': true,
+    'jest': true,
     'describe': true,
     'test': true,
     'expect': true,

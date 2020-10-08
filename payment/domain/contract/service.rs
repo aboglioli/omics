@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use chrono::{DateTime, Utc};
 
-use common::result::Result;
 use common::error::Error;
+use common::result::Result;
 use publishing::domain::publication::StatisticsService;
 
 use crate::domain::contract::{Contract, ContractRepository, Summary};

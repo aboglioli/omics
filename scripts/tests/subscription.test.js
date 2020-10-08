@@ -76,11 +76,7 @@ describe('Subscription', () => {
     await knex.destroy();
   });
 
-  test('example', async () => {
-    let { data: user } = await req.get(`/users/${user_id}`);
-    expect(user.username).toBe('sub-user-1');
+  test('request', async () => {
 
-    let { data: { publication } } = await req.get(`/publications/${publication_id}`);
-    expect(publication.id).toBe(publication_id);
   });
 });
