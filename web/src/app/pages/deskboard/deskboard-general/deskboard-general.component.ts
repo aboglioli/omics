@@ -19,7 +19,6 @@ export class DeskboardGeneralComponent implements OnInit {
   // FontAwesome Icon
   public faComic = faBookOpen;
   public faReporte = faChartPie;
-  public faComentarios = faCommentDots;
   public faBilletera = faWallet;
   public faDesk = faDesktop;
 

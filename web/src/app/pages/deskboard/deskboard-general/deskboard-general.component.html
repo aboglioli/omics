@@ -26,11 +26,6 @@
 
         </div>
 
-        <!-- Comentarios -->
-        <div  *ngSwitchCase="optionMenu.comments">
-
-        </div>
-
         <!-- Billetera -->
         <div  *ngSwitchCase="optionMenu.wallet">
 
@@ -49,14 +44,13 @@
 
     <div class="menu">
 
-
       <!-- Mis Comics -->
       <button mat-stroked-button class="button-white-borders pink-hover top-menu"
               [ngClass]="{'current-menu': ( currentOption === optionMenu.comics )}"
               (click)="onChangeTopMenu( optionMenu.comics )">
 
         <span *ngIf="isBigScreen">
-          <fa-icon [icon]="faComic" size="1x" style="margin-right: 1em;"></fa-icon>
+          <fa-icon [icon]="faComic" size="2x" style="margin-right: 1em;"></fa-icon>
           Mis Comics
         </span>
 
@@ -72,28 +66,12 @@
               (click)="onChangeTopMenu( optionMenu.reports )">
 
         <span *ngIf="isBigScreen">
-          <fa-icon [icon]="faReporte" size="1x" style="margin-right: 1em;"></fa-icon>
+          <fa-icon [icon]="faReporte" size="2x" style="margin-right: 1em;"></fa-icon>
           Reportes
         </span>
 
         <span *ngIf="!isBigScreen">
           <fa-icon [icon]="faReporte" size="2x" style="margin-right: 0em;"></fa-icon>
-        </span>
-
-      </button>
-
-      <!-- Comentarios -->
-      <button mat-stroked-button class="button-white-borders pink-hover top-menu"
-              [ngClass]="{'current-menu': ( currentOption === optionMenu.comments )}"
-              (click)="onChangeTopMenu( optionMenu.comments )">
-
-        <span *ngIf="isBigScreen">
-          <fa-icon [icon]="faComentarios" size="1x" style="margin-right: 1em;"></fa-icon>
-          Comentarios
-        </span>
-
-        <span *ngIf="!isBigScreen">
-          <fa-icon [icon]="faComentarios" size="2x" style="margin-right: 0em;"></fa-icon>
         </span>
 
       </button>
@@ -104,7 +82,7 @@
               (click)="onChangeTopMenu( optionMenu.wallet )">
 
         <span *ngIf="isBigScreen">
-          <fa-icon [icon]="faBilletera" size="1x" style="margin-right: 1em;"></fa-icon>
+          <fa-icon [icon]="faBilletera" size="2x" style="margin-right: 1em;"></fa-icon>
           Billetera
         </span>
 
@@ -128,10 +106,6 @@
         <!-- Reportes -->
         <app-deskboard-report  *ngSwitchCase="optionMenu.reports">
         </app-deskboard-report>
-
-        <!-- Comentarios -->
-        <app-deskboard-comments  *ngSwitchCase="optionMenu.comments">
-        </app-deskboard-comments>
 
         <!-- Billetera -->
         <app-deskboard-wallet  *ngSwitchCase="optionMenu.wallet">

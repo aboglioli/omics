@@ -66,7 +66,6 @@ import { TruncateStringPipe } from './pipes/truncate-string.pipe';
 import { PublicationReviewAddComponent } from './components/publication/publication-review-add/publication-review-add.component';
 import { PublicationReviewsBoxComponent } from './components/publication/publication-reviews-box/publication-reviews-box.component';
 import { DeskboardReportComponent } from './pages/deskboard/deskboard-reports/deskboard-report.component';
-import { DeskboardCommentsComponent } from './pages/deskboard/deskboard-comments/deskboard-comments.component';
 import { DeskboardWalletComponent } from './pages/deskboard/deskboard-wallet/deskboard-wallet.component';
 
 
@@ -112,7 +111,6 @@ import { DeskboardWalletComponent } from './pages/deskboard/deskboard-wallet/des
     PublicationReviewAddComponent,
     PublicationReviewsBoxComponent,
     DeskboardReportComponent,
-    DeskboardCommentsComponent,
     DeskboardWalletComponent
   ],
   imports: [
