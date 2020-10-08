@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 
 use common::cache::Cache;
 use common::error::Error;
@@ -43,6 +44,10 @@ impl PublicationRepository for InMemPublicationRepository {
         _tag: Option<&Tag>,
         status: Option<&String>,
         name: Option<&String>,
+        _from: Option<&DateTime<Utc>>,
+        _to: Option<&DateTime<Utc>>,
+        _offset: Option<usize>,
+        _limit: Option<usize>,
     ) -> Result<Vec<Publication>> {
         let mut publications = self.cache.all().await;
 

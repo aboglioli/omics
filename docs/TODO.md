@@ -13,8 +13,9 @@ Filtros:
 - Hast
 
 ## Latest
-- [ ] Add filters to publication Search.
-- [ ] Returns ID after requesting contract.
+- [x] Add filters to publication Search.
+- [x] Returns ID after requesting contract.
+- [ ] Pagination
 
 ## Urgent
 - [x] Publication status should be an object in DTO to show comments.

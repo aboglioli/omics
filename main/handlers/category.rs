@@ -1,6 +1,6 @@
 use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse, Responder};
 
-use common::request::IncludeParams;
+use common::request::{IncludeParams, PaginationParams};
 use publishing::application::category::{
     Create, CreateCommand, Delete, GetAll, GetById, Update, UpdateCommand,
 };
@@ -45,10 +45,14 @@ async fn get_by_id(
 async fn get_publications(
     req: HttpRequest,
     path: web::Path<String>,
+    cmd: web::Query<SearchPublicationCommand>,
     include: web::Query<IncludeParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
+
+    let mut cmd = cmd.into_inner();
+    cmd.category_id = Some(path.into_inner());
 
     SearchPublication::new(
         c.publishing.author_repo(),
@@ -58,14 +62,9 @@ async fn get_publications(
     )
     .exec(
         auth_id,
-        SearchPublicationCommand {
-            author_id: None,
-            category_id: Some(path.into_inner()),
-            tag: None,
-            status: None,
-            name: None,
-        },
+        cmd,
         include.into_inner().into(),
+        PaginationParams::default(),
     )
     .await
     .map(|res| HttpResponse::Ok().json(res))
@@ -76,27 +75,21 @@ async fn get_publications(
 async fn get_collections(
     req: HttpRequest,
     path: web::Path<String>,
+    cmd: web::Query<SearchCollectionCommand>,
     include: web::Query<IncludeParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await.ok();
+
+    let mut cmd = cmd.into_inner();
+    cmd.category_id = Some(path.into_inner());
 
     SearchCollection::new(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
         c.publishing.collection_repo(),
     )
-    .exec(
-        auth_id,
-        SearchCollectionCommand {
-            author_id: None,
-            category_id: Some(path.into_inner()),
-            publication_id: None,
-            tag: None,
-            name: None,
-        },
-        include.into_inner().into(),
-    )
+    .exec(auth_id, cmd, include.into_inner().into())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)

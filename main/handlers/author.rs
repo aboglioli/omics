@@ -1,6 +1,6 @@
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 
-use common::request::IncludeParams;
+use common::request::{IncludeParams, PaginationParams};
 use publishing::application::author::{Follow, GetById, Search, SearchCommand, Unfollow};
 use publishing::application::collection::{
     Search as SearchCollection, SearchCommand as SearchCollectionCommand,
@@ -50,11 +50,11 @@ async fn get_by_id(
         .map_err(PublicError::from)
 }
 
-// TODO: consider other options of searching
 #[get("/{author_id}/publications")]
 async fn get_publications(
     req: HttpRequest,
     path: web::Path<String>,
+    cmd: web::Query<SearchPublicationCommand>,
     include: web::Query<IncludeParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
@@ -67,6 +67,9 @@ async fn get_publications(
         user_id
     };
 
+    let mut cmd = cmd.into_inner();
+    cmd.author_id = Some(user_id);
+
     SearchPublication::new(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
@@ -75,14 +78,9 @@ async fn get_publications(
     )
     .exec(
         auth_id,
-        SearchPublicationCommand {
-            author_id: Some(user_id),
-            category_id: None,
-            tag: None,
-            status: None,
-            name: None,
-        },
+        cmd,
         include.into_inner().into(),
+        PaginationParams::default(),
     )
     .await
     .map(|res| HttpResponse::Ok().json(res))
@@ -93,6 +91,7 @@ async fn get_publications(
 async fn get_collections(
     req: HttpRequest,
     path: web::Path<String>,
+    cmd: web::Query<SearchCollectionCommand>,
     include: web::Query<IncludeParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
@@ -105,22 +104,15 @@ async fn get_collections(
         user_id
     };
 
+    let mut cmd = cmd.into_inner();
+    cmd.author_id = Some(user_id);
+
     SearchCollection::new(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
         c.publishing.collection_repo(),
     )
-    .exec(
-        auth_id,
-        SearchCollectionCommand {
-            author_id: Some(user_id),
-            category_id: None,
-            publication_id: None,
-            tag: None,
-            name: None,
-        },
-        include.into_inner().into(),
-    )
+    .exec(auth_id, cmd, include.into_inner().into())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)

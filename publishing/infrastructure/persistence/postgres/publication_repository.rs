@@ -100,12 +100,20 @@ impl PublicationRepository for PostgresPublicationRepository {
         tag: Option<&Tag>,
         status: Option<&String>,
         name: Option<&String>,
+        from: Option<&DateTime<Utc>>,
+        to: Option<&DateTime<Utc>>,
+        offset: Option<usize>,
+        limit: Option<usize>,
     ) -> Result<Vec<Publication>> {
         let author_id = author_id.map(|id| id.to_uuid()).transpose()?;
         let category_id = category_id.map(|id| id.value());
         let tag = tag.map(|t| t.slug());
+        let offset = offset.unwrap_or_else(|| 0);
+        let limit = limit
+            .map(|l| if l <= 1000 { l } else { 1000 })
+            .unwrap_or_else(|| 100);
 
-        let (sql, params) = WhereBuilder::new()
+        let (mut sql, params) = WhereBuilder::new()
             .add_param_opt("author_id = $$", &author_id, author_id.is_some())
             .add_param_opt("category_id = $$", &category_id, category_id.is_some())
             .add_param_opt(
@@ -127,19 +135,22 @@ impl PublicationRepository for PostgresPublicationRepository {
                 &name,
                 name.is_some(),
             )
+            .add_param_opt("created_at >= $$", &from, from.is_some())
+            .add_param_opt("created_at <= $$", &to, to.is_some())
             .build();
+
+        sql = format!(
+            "SELECT * FROM publications
+            {}
+            ORDER BY created_at ASC
+            OFFSET {}
+            LIMIT {}",
+            sql, offset, limit,
+        );
 
         let rows = self
             .client
-            .query(
-                &format!(
-                    "SELECT * FROM publications
-                    {}
-                    ORDER BY created_at ASC",
-                    sql,
-                ) as &str,
-                &params,
-            )
+            .query(&sql as &str, &params)
             .await
             .map_err(|err| Error::not_found("publication").wrap_raw(err))?;
 
