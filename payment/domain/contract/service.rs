@@ -86,3 +86,503 @@ impl ContractService {
         Ok(contracts)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use std::str::FromStr;
+
+    use async_trait::async_trait;
+
+    use common::model::{AggregateRoot, StatusHistory, StatusItem};
+    use identity::domain::user::UserId;
+    use publishing::domain::author::AuthorId;
+    use publishing::domain::collection::CollectionId;
+    use publishing::domain::interaction::{
+        CollectionFavorite, Comment, Follow, InteractionRepository, Like, PublicationFavorite,
+        ReaderPublicationId, Reading, Review, Stars, View,
+    };
+    use publishing::domain::publication::{PublicationId, Statistics};
+    use publishing::domain::reader::ReaderId;
+    use publishing::mocks as publishing_mocks;
+
+    use crate::domain::contract::{ContractId, Status as ContractStatus};
+    use crate::domain::payment::{Amount, Kind, Payment};
+    use crate::domain::plan::{Plan, PlanId, Price};
+    use crate::domain::subscription::{
+        Status as SubscriptionStatus, Subscription, SubscriptionId, SubscriptionPlan,
+    };
+
+    struct FakeContractRepository;
+
+    #[async_trait]
+    impl ContractRepository for FakeContractRepository {
+        async fn find_by_id(&self, _id: &ContractId) -> Result<Contract> {
+            unimplemented!()
+        }
+
+        async fn find_by_publication_id(&self, _id: &PublicationId) -> Result<Contract> {
+            unimplemented!()
+        }
+
+        async fn search(
+            &self,
+            _publication_id: Option<&PublicationId>,
+            status: Option<&String>,
+        ) -> Result<Vec<Contract>> {
+            assert_eq!(status.unwrap(), "approved");
+
+            let statistics = Statistics::new(5000, 5000, 5000, 5000, 5000, 4.5)?;
+
+            let mut publication_1 = publishing_mocks::publication(
+                "#publication01",
+                "#user01",
+                "Publication 1",
+                "adventure",
+                vec!["Tag 1"],
+                "cover.jpg",
+                2,
+                true,
+                true,
+                false,
+            );
+            publication_1.set_statistics(statistics.clone())?;
+
+            let mut publication_2 = publishing_mocks::publication(
+                "#publication02",
+                "#user02",
+                "Publication 2",
+                "adventure",
+                vec!["Tag 1"],
+                "cover.jpg",
+                2,
+                true,
+                true,
+                false,
+            );
+            publication_2.set_statistics(statistics.clone())?;
+
+            let mut publication_3 = publishing_mocks::publication(
+                "#publication03",
+                "#user03",
+                "Publication 3",
+                "adventure",
+                vec!["Tag 1"],
+                "cover.jpg",
+                2,
+                true,
+                true,
+                false,
+            );
+            publication_3.set_statistics(statistics)?;
+
+            Ok(vec![
+                Contract::build(
+                    AggregateRoot::new(ContractId::new("#contract01")?),
+                    PublicationId::new("#publication01")?,
+                    Vec::new(),
+                    Vec::new(),
+                    StatusHistory::build(vec![
+                        StatusItem::new(ContractStatus::init()),
+                        StatusItem::new(ContractStatus::Approved {
+                            admin_id: UserId::new("#admin")?,
+                        }),
+                    ]),
+                ),
+                Contract::build(
+                    AggregateRoot::new(ContractId::new("#contract02")?),
+                    PublicationId::new("#publication02")?,
+                    Vec::new(),
+                    Vec::new(),
+                    StatusHistory::build(vec![
+                        StatusItem::new(ContractStatus::init()),
+                        StatusItem::new(ContractStatus::Approved {
+                            admin_id: UserId::new("#admin")?,
+                        }),
+                    ]),
+                ),
+                Contract::build(
+                    AggregateRoot::new(ContractId::new("#contract03")?),
+                    PublicationId::new("#publication03")?,
+                    Vec::new(),
+                    Vec::new(),
+                    StatusHistory::build(vec![
+                        StatusItem::new(ContractStatus::init()),
+                        StatusItem::new(ContractStatus::Approved {
+                            admin_id: UserId::new("#admin")?,
+                        }),
+                    ]),
+                ),
+            ])
+        }
+
+        async fn save(&self, _contract: &mut Contract) -> Result<()> {
+            unimplemented!()
+        }
+
+        async fn delete(&self, _id: &ContractId) -> Result<()> {
+            unimplemented!()
+        }
+    }
+
+    struct FakeSubscriptionRepository;
+
+    #[async_trait]
+    impl SubscriptionRepository for FakeSubscriptionRepository {
+        async fn find_by_id(&self, _id: &SubscriptionId) -> Result<Subscription> {
+            unimplemented!()
+        }
+
+        async fn find_by_user_id(&self, _id: &UserId) -> Result<Subscription> {
+            unimplemented!()
+        }
+
+        // Subscription 1: $225 (in date range)
+        // Subscription 2: $225 (in date range)
+        async fn search(
+            &self,
+            _user_id: Option<&UserId>,
+            _plan_id: Option<&PlanId>,
+            _status: Option<&String>,
+        ) -> Result<Vec<Subscription>> {
+            let plan = Plan::new(PlanId::new("basic")?, Price::new(75.0)?)?;
+
+            let subscription_1 = Subscription::build(
+                AggregateRoot::new(SubscriptionId::new("#subscription01")?),
+                UserId::new("#user01")?,
+                SubscriptionPlan::new(plan.clone())?,
+                vec![
+                    Payment::build(
+                        Kind::Income,
+                        Amount::new(75.0)?,
+                        DateTime::from_str("2020-04-15T15:30:00Z").unwrap(),
+                    ),
+                    Payment::build(
+                        Kind::Income,
+                        Amount::new(75.0)?,
+                        DateTime::from_str("2020-05-01T14:30:00Z").unwrap(),
+                    ),
+                    Payment::build(
+                        Kind::Income,
+                        Amount::new(75.0)?,
+                        DateTime::from_str("2020-05-15T14:30:00Z").unwrap(),
+                    ),
+                    Payment::build(
+                        Kind::Income,
+                        Amount::new(75.0)?,
+                        DateTime::from_str("2020-05-30T14:30:00Z").unwrap(),
+                    ),
+                    Payment::build(
+                        Kind::Income,
+                        Amount::new(75.0)?,
+                        DateTime::from_str("2020-06-01T15:30:00Z").unwrap(),
+                    ),
+                ],
+                StatusHistory::build(vec![
+                    StatusItem::new(SubscriptionStatus::init()),
+                    StatusItem::new(SubscriptionStatus::Active),
+                ]),
+            );
+
+            let subscription_2 = Subscription::build(
+                AggregateRoot::new(SubscriptionId::new("#subscription02")?),
+                UserId::new("#user02")?,
+                SubscriptionPlan::new(plan.clone())?,
+                vec![
+                    Payment::build(
+                        Kind::Income,
+                        Amount::new(75.0)?,
+                        DateTime::from_str("2020-05-01T14:30:00Z").unwrap(),
+                    ),
+                    Payment::build(
+                        Kind::Income,
+                        Amount::new(75.0)?,
+                        DateTime::from_str("2020-05-15T14:30:00Z").unwrap(),
+                    ),
+                    Payment::build(
+                        Kind::Income,
+                        Amount::new(75.0)?,
+                        DateTime::from_str("2020-05-30T14:30:00Z").unwrap(),
+                    ),
+                    Payment::build(
+                        Kind::Income,
+                        Amount::new(75.0)?,
+                        DateTime::from_str("2020-06-01T14:30:00Z").unwrap(),
+                    ),
+                ],
+                StatusHistory::build(vec![
+                    StatusItem::new(SubscriptionStatus::init()),
+                    StatusItem::new(SubscriptionStatus::Active),
+                ]),
+            );
+
+            Ok(vec![subscription_1, subscription_2])
+        }
+
+        async fn save(&self, _subscription: &mut Subscription) -> Result<()> {
+            unimplemented!()
+        }
+
+        async fn delete(&self, _id: &SubscriptionId) -> Result<()> {
+            unimplemented!()
+        }
+    }
+
+    struct FakeInteractionRepository;
+
+    #[async_trait]
+    impl InteractionRepository for FakeInteractionRepository {
+        // Publication 1: 2 views
+        // Publication 2: 1 view
+        // Publication 3: 0 views
+        async fn find_views(
+            &self,
+            _reader_id: Option<&ReaderId>,
+            publication_id: Option<&PublicationId>,
+            _from: Option<&DateTime<Utc>>,
+            _to: Option<&DateTime<Utc>>,
+        ) -> Result<Vec<View>> {
+            match publication_id.unwrap().value() {
+                "#publication01" => Ok(vec![
+                    View::new(
+                        ReaderPublicationId::new(
+                            ReaderId::new("#user02")?,
+                            PublicationId::new("#publication01")?,
+                        )?,
+                        true,
+                    )?,
+                    View::new(
+                        ReaderPublicationId::new(
+                            ReaderId::new("#user03")?,
+                            PublicationId::new("#publication01")?,
+                        )?,
+                        true,
+                    )?,
+                ]),
+                "#publication02" => Ok(vec![View::new(
+                    ReaderPublicationId::new(
+                        ReaderId::new("#user01")?,
+                        PublicationId::new("#publication02")?,
+                    )?,
+                    true,
+                )?]),
+                "#publication03" => Ok(Vec::new()),
+                id => Err(Error::not_found("publication").set_message(id)),
+            }
+        }
+        async fn find_readings(
+            &self,
+            _reader_id: Option<&ReaderId>,
+            publication_id: Option<&PublicationId>,
+            _from: Option<&DateTime<Utc>>,
+            _to: Option<&DateTime<Utc>>,
+        ) -> Result<Vec<Reading>> {
+            match publication_id.unwrap().value() {
+                "#publication01" => Ok(vec![
+                    Reading::new(ReaderPublicationId::new(
+                        ReaderId::new("#user02")?,
+                        PublicationId::new("#publication01")?,
+                    )?)?,
+                    Reading::new(ReaderPublicationId::new(
+                        ReaderId::new("#user03")?,
+                        PublicationId::new("#publication01")?,
+                    )?)?,
+                ]),
+                "#publication02" => Ok(vec![Reading::new(ReaderPublicationId::new(
+                    ReaderId::new("#user01")?,
+                    PublicationId::new("#publication02")?,
+                )?)?]),
+                "#publication03" => Ok(Vec::new()),
+                id => Err(Error::not_found("publication").set_message(id)),
+            }
+        }
+        async fn find_likes(
+            &self,
+            _reader_id: Option<&ReaderId>,
+            publication_id: Option<&PublicationId>,
+            _from: Option<&DateTime<Utc>>,
+            _to: Option<&DateTime<Utc>>,
+        ) -> Result<Vec<Like>> {
+            match publication_id.unwrap().value() {
+                "#publication01" => Ok(vec![
+                    Like::new(ReaderPublicationId::new(
+                        ReaderId::new("#user02")?,
+                        PublicationId::new("#publication01")?,
+                    )?)?,
+                    Like::new(ReaderPublicationId::new(
+                        ReaderId::new("#user03")?,
+                        PublicationId::new("#publication01")?,
+                    )?)?,
+                ]),
+                "#publication02" => Ok(vec![Like::new(ReaderPublicationId::new(
+                    ReaderId::new("#user01")?,
+                    PublicationId::new("#publication02")?,
+                )?)?]),
+                "#publication03" => Ok(Vec::new()),
+                id => Err(Error::not_found("publication").set_message(id)),
+            }
+        }
+        async fn find_reviews(
+            &self,
+            _reader_id: Option<&ReaderId>,
+            publication_id: Option<&PublicationId>,
+            _from: Option<&DateTime<Utc>>,
+            _to: Option<&DateTime<Utc>>,
+        ) -> Result<Vec<Review>> {
+            match publication_id.unwrap().value() {
+                "#publication01" => Ok(vec![
+                    Review::new(
+                        ReaderPublicationId::new(
+                            ReaderId::new("#user02")?,
+                            PublicationId::new("#publication01")?,
+                        )?,
+                        Stars::new(4)?,
+                        Comment::new("Comment...")?,
+                    )?,
+                    Review::new(
+                        ReaderPublicationId::new(
+                            ReaderId::new("#user03")?,
+                            PublicationId::new("#publication01")?,
+                        )?,
+                        Stars::new(4)?,
+                        Comment::new("Comment...")?,
+                    )?,
+                ]),
+                "#publication02" => Ok(vec![Review::new(
+                    ReaderPublicationId::new(
+                        ReaderId::new("#user01")?,
+                        PublicationId::new("#publication02")?,
+                    )?,
+                    Stars::new(4)?,
+                    Comment::new("Comment...")?,
+                )?]),
+                "#publication03" => Ok(Vec::new()),
+                id => Err(Error::not_found("publication").set_message(id)),
+            }
+        }
+        async fn find_publication_favorites(
+            &self,
+            _reader_id: Option<&ReaderId>,
+            _publication_id: Option<&PublicationId>,
+            _from: Option<&DateTime<Utc>>,
+            _to: Option<&DateTime<Utc>>,
+        ) -> Result<Vec<PublicationFavorite>> {
+            unimplemented!()
+        }
+        async fn find_collection_favorites(
+            &self,
+            _reader_id: Option<&ReaderId>,
+            _collection_id: Option<&CollectionId>,
+            _from: Option<&DateTime<Utc>>,
+            _to: Option<&DateTime<Utc>>,
+        ) -> Result<Vec<CollectionFavorite>> {
+            unimplemented!()
+        }
+        async fn find_follows(
+            &self,
+            _reader_id: Option<&ReaderId>,
+            _author_id: Option<&AuthorId>,
+            _from: Option<&DateTime<Utc>>,
+            _to: Option<&DateTime<Utc>>,
+        ) -> Result<Vec<Follow>> {
+            unimplemented!()
+        }
+
+        async fn save_view(&self, _view: &mut View) -> Result<()> {
+            unimplemented!()
+        }
+        async fn save_reading(&self, _reading: &mut Reading) -> Result<()> {
+            unimplemented!()
+        }
+        async fn save_like(&self, _like: &mut Like) -> Result<()> {
+            unimplemented!()
+        }
+        async fn save_review(&self, _review: &mut Review) -> Result<()> {
+            unimplemented!()
+        }
+        async fn save_publication_favorite(
+            &self,
+            _favorite: &mut PublicationFavorite,
+        ) -> Result<()> {
+            unimplemented!()
+        }
+        async fn save_collection_favorite(&self, _favorite: &mut CollectionFavorite) -> Result<()> {
+            unimplemented!()
+        }
+        async fn save_follow(&self, _follow: &mut Follow) -> Result<()> {
+            unimplemented!()
+        }
+
+        async fn delete_like(
+            &self,
+            _reader_id: &ReaderId,
+            _publication_id: &PublicationId,
+        ) -> Result<()> {
+            unimplemented!()
+        }
+        async fn delete_review(
+            &self,
+            _reader_id: &ReaderId,
+            _publication_id: &PublicationId,
+        ) -> Result<()> {
+            unimplemented!()
+        }
+        async fn delete_publication_favorite(
+            &self,
+            _reader_id: &ReaderId,
+            _publication_id: &PublicationId,
+        ) -> Result<()> {
+            unimplemented!()
+        }
+        async fn delete_collection_favorite(
+            &self,
+            _reader_id: &ReaderId,
+            _collection_id: &CollectionId,
+        ) -> Result<()> {
+            unimplemented!()
+        }
+        async fn delete_follow(&self, _reader_id: &ReaderId, _author_id: &AuthorId) -> Result<()> {
+            unimplemented!()
+        }
+    }
+
+    #[tokio::test]
+    async fn calculate_summaries() {
+        let contract_serv = ContractService::new(
+            Arc::new(FakeContractRepository),
+            Arc::new(FakeSubscriptionRepository),
+            Arc::new(StatisticsService::new(Arc::new(FakeInteractionRepository))),
+        );
+
+        // Subscription amount: $450
+        // Total views: 3 views
+        let contracts = contract_serv
+            .calculate_summaries(
+                DateTime::from_str("2020-05-01T14:30:00Z").unwrap(),
+                DateTime::from_str("2020-05-31T14:30:00Z").unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(contracts.len(), 3);
+
+        let summaries = contracts[0].summaries();
+        assert_eq!(summaries.len(), 1);
+        assert!(!summaries[0].is_paid());
+        assert_eq!(summaries[0].total(), 450.0);
+        assert_eq!(summaries[0].amount(), 2.0 / 3.0 * 450.0);
+
+        let summaries = contracts[1].summaries();
+        assert_eq!(summaries.len(), 1);
+        assert!(!summaries[0].is_paid());
+        assert_eq!(summaries[0].total(), 450.0);
+        assert_eq!(summaries[0].amount(), 1.0 / 3.0 * 450.0);
+
+        let summaries = contracts[2].summaries();
+        assert_eq!(summaries.len(), 1);
+        assert!(!summaries[0].is_paid());
+        assert_eq!(summaries[0].total(), 450.0);
+        assert_eq!(summaries[0].amount(), 0.0 / 3.0 * 450.0);
+    }
+}
