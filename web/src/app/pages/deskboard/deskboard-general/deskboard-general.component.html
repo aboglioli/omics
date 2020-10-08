@@ -1,0 +1,149 @@
+
+<div class="deskboard-body">
+
+  <div class="side"></div>
+
+  <div class="center">
+
+    <div class="header">
+
+
+      <div>
+        <fa-icon *ngIf="!isBigScreen" [icon]="faDesk" size="2x"></fa-icon>
+        <h1 *ngIf="isBigScreen">DESKBOARD</h1>
+      </div>
+
+      <!-- #region Item medio según menú -->
+      <div [ngSwitch]="currentOption">
+
+        <!-- Comics -->
+        <div  *ngSwitchCase="optionMenu.comics" class="box-type">
+          Publicaciones
+        </div>
+
+        <!-- Reportes -->
+        <div  *ngSwitchCase="optionMenu.reports">
+
+        </div>
+
+        <!-- Comentarios -->
+        <div  *ngSwitchCase="optionMenu.comments">
+
+        </div>
+
+        <!-- Billetera -->
+        <div  *ngSwitchCase="optionMenu.wallet">
+
+        </div>
+
+      </div>
+      <!-- #endregion -->
+
+      <div *ngIf="isBigScreen">
+        <h2 *ngIf="userData"
+            (click)="onGoToProfile()">{{ userData.username }}
+        </h2>
+      </div>
+
+    </div>
+
+    <div class="menu">
+
+
+      <!-- Mis Comics -->
+      <button mat-stroked-button class="button-white-borders pink-hover top-menu"
+              [ngClass]="{'current-menu': ( currentOption === optionMenu.comics )}"
+              (click)="onChangeTopMenu( optionMenu.comics )">
+
+        <span *ngIf="isBigScreen">
+          <fa-icon [icon]="faComic" size="1x" style="margin-right: 1em;"></fa-icon>
+          Mis Comics
+        </span>
+
+        <span *ngIf="!isBigScreen">
+          <fa-icon [icon]="faComic" size="2x" style="margin-right: 0em;"></fa-icon>
+        </span>
+
+      </button>
+
+      <!-- Reportes -->
+      <button mat-stroked-button class="button-white-borders pink-hover top-menu"
+              [ngClass]="{'current-menu': ( currentOption === optionMenu.reports )}"
+              (click)="onChangeTopMenu( optionMenu.reports )">
+
+        <span *ngIf="isBigScreen">
+          <fa-icon [icon]="faReporte" size="1x" style="margin-right: 1em;"></fa-icon>
+          Reportes
+        </span>
+
+        <span *ngIf="!isBigScreen">
+          <fa-icon [icon]="faReporte" size="2x" style="margin-right: 0em;"></fa-icon>
+        </span>
+
+      </button>
+
+      <!-- Comentarios -->
+      <button mat-stroked-button class="button-white-borders pink-hover top-menu"
+              [ngClass]="{'current-menu': ( currentOption === optionMenu.comments )}"
+              (click)="onChangeTopMenu( optionMenu.comments )">
+
+        <span *ngIf="isBigScreen">
+          <fa-icon [icon]="faComentarios" size="1x" style="margin-right: 1em;"></fa-icon>
+          Comentarios
+        </span>
+
+        <span *ngIf="!isBigScreen">
+          <fa-icon [icon]="faComentarios" size="2x" style="margin-right: 0em;"></fa-icon>
+        </span>
+
+      </button>
+
+      <!-- Billetera -->
+      <button mat-stroked-button class="button-white-borders pink-hover top-menu"
+              [ngClass]="{'current-menu': ( currentOption === optionMenu.wallet )}"
+              (click)="onChangeTopMenu( optionMenu.wallet )">
+
+        <span *ngIf="isBigScreen">
+          <fa-icon [icon]="faBilletera" size="1x" style="margin-right: 1em;"></fa-icon>
+          Billetera
+        </span>
+
+        <span *ngIf="!isBigScreen">
+          <fa-icon [icon]="faBilletera" size="2x" style="margin-right: 0em;"></fa-icon>
+        </span>
+
+      </button>
+
+    </div>
+
+    <div class="body" *ngIf="userData">
+
+      <!-- #region Body según menú elegido TODO: Esto debería manejarse con pathChild quizas-->
+      <span [ngSwitch]="currentOption">
+
+        <!-- Comics -->
+        <app-deskboard-mis-comics *ngSwitchCase="optionMenu.comics">
+        </app-deskboard-mis-comics>
+
+        <!-- Reportes -->
+        <app-deskboard-report  *ngSwitchCase="optionMenu.reports">
+        </app-deskboard-report>
+
+        <!-- Comentarios -->
+        <app-deskboard-comments  *ngSwitchCase="optionMenu.comments">
+        </app-deskboard-comments>
+
+        <!-- Billetera -->
+        <app-deskboard-wallet  *ngSwitchCase="optionMenu.wallet">
+        </app-deskboard-wallet>
+
+      </span>
+      <!-- #endregion -->
+
+    </div>
+
+  </div>
+
+  <div class="side"></div>
+
+</div>
