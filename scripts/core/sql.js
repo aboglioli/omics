@@ -1,4 +1,4 @@
-const { client } = require('./db')
+const { client } = require('./db');
 
 function keyValue(obj) {
   return Object

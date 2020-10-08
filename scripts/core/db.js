@@ -12,6 +12,16 @@ const client = new Client({
   port: config.postgres_port,
 });
 
+const knex = require('knex')({
+  client: 'pg',
+  connection: {
+    host: config.postgres_host,
+    user: config.postgres_username,
+    password: config.postgres_password,
+    database: config.postgres_database,
+  },
+});
+
 // Utils
 const image = size => `https://via.placeholder.com/${size ? size : '256'}.jpg`;
 const password = '$2y$12$nPMNHiYhXb90lZTu0CX.2eY5RIQ/Uek28lCua23OIfkLhcjZtnIIO';
@@ -216,6 +226,7 @@ async function createCollection({
 
 module.exports = {
   client,
+  knext,
 
   image,
   password,

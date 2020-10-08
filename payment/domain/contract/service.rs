@@ -3,6 +3,7 @@ use std::sync::Arc;
 use chrono::{DateTime, Utc};
 
 use common::result::Result;
+use common::error::Error;
 use publishing::domain::publication::StatisticsService;
 
 use crate::domain::contract::{Contract, ContractRepository, Summary};
@@ -46,6 +47,10 @@ impl ContractService {
                     subscription_total += payment.amount().value();
                 }
             }
+        }
+
+        if subscription_total == 0.0 {
+            return Err(Error::new("subscription_total", "zero"));
         }
 
         let mut total_views = 0;

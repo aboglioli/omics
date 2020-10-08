@@ -17,10 +17,10 @@ const randArr = (arr, multiple = false) => {
 
     return acc;
   }, []);
-}
+};
 
 module.exports = {
-    sleep,
-    rand,
-    randArr,
+  sleep,
+  rand,
+  randArr,
 };

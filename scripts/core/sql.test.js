@@ -39,5 +39,5 @@ describe('SQL', () => {
     expect(res).toBe(
       'UPDATE publications SET name = $2, synopsis = $3, status = $4 WHERE pub_id = $1',
     );
-  })
+  });
 });

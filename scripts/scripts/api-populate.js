@@ -139,7 +139,7 @@ async function main() {
 
         await collection({
           name: `Collection ${i}`,
-          synopsis: `This is a collection.`,
+          synopsis: 'This is a collection.',
           categoryId: categories[rand(0, categories.length)].id,
           tags: ['Tag 2', 'Tag 3'],
           publicationIds,
@@ -165,7 +165,7 @@ async function main() {
       console.log('Status:', err.response.status);
       console.log('Response:', err.response.data);
     } else {
-      console.log(err)
+      console.log(err);
     }
   }
 }
