@@ -8,7 +8,7 @@
     "populate": "node scripts/populate",
     "migrate": "node scripts/migrate",
     "clean-db": "node scripts/clean-db",
-    "test": "jest core tests"
+    "test": "jest core tests --detectOpenHandles"
   },
   "author": "Alan Boglioli <alan.boglioli@gmail.com>",
   "license": "MIT",
