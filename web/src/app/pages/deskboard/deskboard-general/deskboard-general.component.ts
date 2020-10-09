@@ -6,7 +6,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import {BreakpointObserver } from '@angular/cdk/layout';
 import { Router } from '@angular/router';
 import { faBookOpen, faChartPie, faCommentDots, faWallet, faDesktop } from '@fortawesome/free-solid-svg-icons';
-import { DeskboardOptionMenu } from '../../../models/enums.model';
+import { DeskboardOptionMenu, typeSearchCatalogue } from '../../../models/enums.model';
 
 
 @Component({
@@ -28,6 +28,8 @@ export class DeskboardGeneralComponent implements OnInit {
   public optionMenu = DeskboardOptionMenu;
   public currentOption = this.optionMenu.comics; // TODO: En vez de esto, debería usarse "patch child" (esto lo hice por tiempo)
 
+  public optionTypeSearch = typeSearchCatalogue;
+  public currentTypeSearch = this.optionTypeSearch.collection;
 
   constructor(
     private authService: AuthService,
@@ -81,6 +83,10 @@ export class DeskboardGeneralComponent implements OnInit {
 
     this.currentOption = option;
 
+  }
+
+  public onMyPublicationTypeSearch( option: number ): void {
+    this.currentTypeSearch = option;
   }
 
 

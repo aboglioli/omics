@@ -18,7 +18,16 @@
 
         <!-- Comics -->
         <div  *ngSwitchCase="optionMenu.comics" class="box-type">
-          Publicaciones
+          <div  [ngClass]="{'selected': ( currentTypeSearch === optionTypeSearch.publication )}"
+                (click)="onMyPublicationTypeSearch( optionTypeSearch.publication )">
+            Publicaciones
+          </div>
+
+          <div  [ngClass]="{'selected': ( currentTypeSearch === optionTypeSearch.collection )}"
+                (click)="onMyPublicationTypeSearch( optionTypeSearch.collection )">
+            Colecciones
+          </div>
+
         </div>
 
         <!-- Reportes -->
@@ -100,7 +109,9 @@
       <span [ngSwitch]="currentOption">
 
         <!-- Comics -->
-        <app-deskboard-mis-comics *ngSwitchCase="optionMenu.comics">
+        <app-deskboard-mis-comics
+          *ngSwitchCase="optionMenu.comics"
+          [typeSearch]="currentTypeSearch" >
         </app-deskboard-mis-comics>
 
         <!-- Reportes -->
