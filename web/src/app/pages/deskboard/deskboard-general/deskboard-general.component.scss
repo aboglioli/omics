@@ -77,13 +77,33 @@ div.deskboard-body {
       display: flex;
       flex-direction: row;
       align-items: center;
-      padding: 0.5em 1em;
+      padding: 0.1em 0.1em;
 
-      font-weight: bold;
       font-size: 12pt;
-      color: $omics-background-flat;
 
-      background-color: white;
+      color: white;
+      background-color: $omics-background-flat;
+
+
+      div {
+        cursor: pointer;
+        padding: 0.5em 0.5em;
+
+        &.selected {
+          font-weight: bold;
+          color: $omics-background-flat;
+          background-color: white;
+        }
+
+        &:not(.selected) {
+          box-shadow: inset 0px 0px 0px 2px white;
+        }
+
+        &:hover {
+          color: $omics-neon-pink;
+        }
+
+      }
 
     }
 

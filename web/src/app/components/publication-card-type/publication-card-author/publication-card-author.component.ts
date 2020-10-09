@@ -41,7 +41,6 @@ export class PublicationCardAuthorComponent implements OnInit {
 
   public goToEdit(): void {
 
-    // TODO: Agregar para ver la publicación
     this.router.navigate([`publication/edit/${this.publication.id}`], { relativeTo: this.activatedRoute });
 
   }

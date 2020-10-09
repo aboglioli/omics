@@ -1,22 +1,30 @@
-import { Component, OnInit } from '@angular/core';
-import { faFileUpload } from '@fortawesome/free-solid-svg-icons';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { faFileUpload, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { Router, ActivatedRoute } from '@angular/router';
-import { AuthorService } from '../../../domain/services/author.service';
+import { AuthorService, IGetCollectionsResponse } from '../../../domain/services/author.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { IGetPublicationsResponse } from 'src/app/domain/services/collection.service';
 import { IPublication } from '../../../domain/models/publication';
+import { typeSearchCatalogue } from 'src/app/models/enums.model';
+import { ICollection } from 'src/app/domain/models';
 
 @Component({
   selector: 'app-deskboard-mis-comics',
   templateUrl: './deskboard-mis-comics.component.html',
   styleUrls: ['./deskboard-mis-comics.component.scss']
 })
-export class DeskboardMisComicsComponent implements OnInit {
+export class DeskboardMisComicsComponent implements OnInit, OnChanges {
+
+  @Input() typeSearch: typeSearchCatalogue = typeSearchCatalogue.publication;
 
   // Font Awseome icons
   public faUpload = faFileUpload;
+  public faAdd = faPlusCircle;
 
   public publicationList: IPublication[];
+  public collectionList: ICollection[];
+
+  public typeSearchList = typeSearchCatalogue;
 
   constructor(
     private router: Router,
@@ -27,7 +35,34 @@ export class DeskboardMisComicsComponent implements OnInit {
 
   ngOnInit(): void {
 
+    ( this.typeSearch === this.typeSearchList.publication  ) ?
+      this.getPublicationData() :
+      this.getCollectionData();
+
+  }
+
+  ngOnChanges( changes: SimpleChanges ): void {
+
+    if ( changes.typeSearch ) {
+
+      ( this.typeSearch === typeSearchCatalogue.publication  ) ?
+        this.getPublicationData() :
+        this.getCollectionData();
+
+    }
+
+  }
+
+  public goToNewPublication(): void {
+
+    this.router.navigate(['publication/new'], { relativeTo: this.activatedRoute });
+
+  }
+
+  private getPublicationData(): void {
+
     this.spinnerService.show();
+
     this.authorService.getPublications('me').subscribe(
       (resData: IGetPublicationsResponse) => {
 
@@ -42,13 +77,29 @@ export class DeskboardMisComicsComponent implements OnInit {
         this.spinnerService.hide();
 
       }
-    )
+    );
 
   }
 
-  public goToNewPublication(): void {
+  private getCollectionData(): void {
 
-    this.router.navigate(['publication/new'], { relativeTo: this.activatedRoute });
+    this.spinnerService.show();
+
+    this.authorService.getCollections('me').subscribe(
+      (resData: IGetCollectionsResponse) => {
+
+        this.collectionList = resData.collections;
+
+        this.spinnerService.hide();
+
+      },
+      (err: Error) => {
+
+        console.error(err);
+        this.spinnerService.hide();
+
+      }
+    );
 
   }
 

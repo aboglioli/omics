@@ -2,21 +2,48 @@
 
   <div class="top-menu">
 
-    <button mat-stroked-button class="button-white-borders pink-hover"
-            style="padding-top: 0.25em;"
-            (click)="goToNewPublication()">
-      <fa-icon [icon]="faUpload" size="2x" style="margin-right: 0.5em"></fa-icon>
-      Añadir Publicación
-    </button>
+    <!-- Publicaciones -->
+    <span *ngIf="typeSearch === typeSearchList.publication">
+
+      <button mat-stroked-button class="button-white-borders pink-hover"
+              style="padding-top: 0.25em;"
+              (click)="goToNewPublication()">
+        <fa-icon [icon]="faUpload" size="2x" style="margin-right: 0.5em"></fa-icon>
+        Añadir Publicación
+      </button>
+
+    </span>
+
+    <!-- Colecciones -->
+    <span *ngIf="typeSearch === typeSearchList.collection">
+
+      <button mat-stroked-button class="button-white-borders pink-hover"
+              style="padding-top: 0.25em;"
+              (click)="goToNewPublication()">
+        <fa-icon [icon]="faAdd" size="2x" style="margin-right: 0.5em"></fa-icon>
+        Agregar Colección
+      </button>
+
+    </span>
 
   </div>
 
   <hr>
 
-  <div *ngIf="publicationList" class="publication-container" >
+  <!-- Publicaciones -->
+  <div *ngIf=" (typeSearch === typeSearchList.publication ) && publicationList" class="card-container" >
 
-    <div *ngFor="let publication of publicationList" class="publication-card">
+    <div *ngFor="let publication of publicationList" class="card-box">
       <app-publication-card-author [publication]="publication"></app-publication-card-author>
+    </div>
+
+  </div>
+
+  <!-- Colecciones -->
+  <div *ngIf=" (typeSearch === typeSearchList.collection ) && collectionList" class="card-container" >
+
+    <div *ngFor="let collection of collectionList" class="card-box">
+      <app-collection-card-author [collection]="collection"></app-collection-card-author>
     </div>
 
   </div>

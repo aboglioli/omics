@@ -43,7 +43,6 @@ import { SideNavMenuMainComponent } from './shared/side-nav-menu-main/side-nav-m
 import { AutoresComponent } from './pages/autores/autores.component';
 import { UnderConstructionComponent } from './shared/under-construction/under-construction.component';
 import { DeskboardMisComicsComponent } from './components/deskboard/deskboard-mis-comics/deskboard-mis-comics.component';
-import { PublicationNewEditComponent } from './components/deskboard/publication-new-edit/publication-new-edit.component';
 import { PublicationCardManagerComponent } from './components/publication-card-type/publication-card/publication-card-manager.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 // --->
@@ -65,8 +64,13 @@ import { PublicationCardReaderComponent } from './components/publication-card-ty
 import { TruncateStringPipe } from './pipes/truncate-string.pipe';
 import { PublicationReviewAddComponent } from './components/publication/publication-review-add/publication-review-add.component';
 import { PublicationReviewsBoxComponent } from './components/publication/publication-reviews-box/publication-reviews-box.component';
-import { DeskboardReportComponent } from './pages/deskboard/deskboard-reports/deskboard-report.component';
-import { DeskboardWalletComponent } from './pages/deskboard/deskboard-wallet/deskboard-wallet.component';
+import { DeskboardReportComponent } from './components/deskboard/deskboard-reports/deskboard-report.component';
+import { DeskboardWalletComponent } from './components/deskboard/deskboard-wallet/deskboard-wallet.component';
+import { CollectionCardReaderComponent } from './components/collection-card-type/collection-card-reader/collection-card-reader.component';
+import { CollectionCardAuthorComponent } from './components/collection-card-type/collection-card-author/collection-card-author.component';
+import { PublicationNewEditComponent } from './pages/deskboard/publication-new-edit/publication-new-edit.component';
+import { CollectionNewEditComponent } from './pages/deskboard/collection-new-edit/collection-new-edit.component';
+import { CollectionInfoComponent } from './components/collection-info/collection-info.component';
 
 
 @NgModule({
@@ -111,7 +115,11 @@ import { DeskboardWalletComponent } from './pages/deskboard/deskboard-wallet/des
     PublicationReviewAddComponent,
     PublicationReviewsBoxComponent,
     DeskboardReportComponent,
-    DeskboardWalletComponent
+    DeskboardWalletComponent,
+    CollectionCardReaderComponent,
+    CollectionCardAuthorComponent,
+    CollectionNewEditComponent,
+    CollectionInfoComponent
   ],
   imports: [
     BrowserModule,

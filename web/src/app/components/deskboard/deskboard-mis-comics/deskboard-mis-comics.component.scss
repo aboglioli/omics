@@ -11,18 +11,19 @@ div.mis-comics-container {
     display: flex;
     justify-content: space-around;
 
+    margin-top: 1em;
     padding: 0.5em 0.5em;
 
   }
 
-  div.publication-container {
+  div.card-container {
 
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
 
-    .publication-card {
+    .card-box {
 
       margin: 1em 1em;
 
@@ -42,8 +43,10 @@ button.button-white-borders {
   border-color: white;
 
   &.pink-hover:hover {
+    font-weight: bold;
     color: $omics-neon-pink;
     border-color: $omics-neon-pink;
+    background-color: rgba($color: $omics-background-flat, $alpha: 0.5);
   }
 
 }
