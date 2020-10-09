@@ -53,7 +53,7 @@
                 (click)="openMessageReasonDialog(publication, false)">
 
           <fa-icon [icon]="faReject" size="1x"></fa-icon>
-          Rechazar
+          <span *ngIf="isBigScreen">Rechazar</span>
 
         </button>
 
@@ -61,7 +61,7 @@
                 (click)="openMessageReasonDialog(publication, true)">
 
           <fa-icon [icon]="faApprove" size="1x"></fa-icon>
-          Aprobar
+          <span *ngIf="isBigScreen">Aprobar</span>
 
         </button>
 

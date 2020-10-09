@@ -26,7 +26,7 @@ export class CatalogoComponent implements OnInit {
   ngOnInit(): void {
 
     this.spinnerService.show();
-    this.publicationService.search( { status: 'published' } ).subscribe(
+    this.publicationService.search( { status: 'published' }, 'category' ).subscribe(
       (searchRes: ISearchResponse ) => {
 
         this.publicationList = searchRes.publications;

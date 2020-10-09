@@ -27,7 +27,7 @@ div.deskboard-body {
 
   div.center {
 
-    flex: 4;
+    flex: 6;
 
     display: flex;
     flex-direction: column;
@@ -92,11 +92,10 @@ div.deskboard-body {
 
       min-height: 70px;
       background-color: $omics-background-menu;
-      padding: 0.25em 0.25em;
+      padding: 0.25em 0.5em;
 
       display: flex;
-      justify-content: space-around;
-      align-items: center;
+      justify-content: center;
 
     }
 
@@ -118,12 +117,41 @@ button.button-white-borders {
 
   &.pink-hover:hover {
 
+    background-color: rgba($color: $omics-background-flat, $alpha: 0.2);
     color: $omics-neon-pink;
 
     // Pantalla grande
     @media screen and (min-width: $break-small) {
       border-color: $omics-neon-pink;
     }
+
+  }
+
+  &.current-menu {
+
+    color: $omics-neon-pink;
+
+    // Pantalla grande
+    @media screen and (min-width: $break-small) {
+      border-color: $omics-neon-pink;
+    }
+
+  }
+
+  &.top-menu {
+
+    flex: 1;
+
+    // Pantalla grande
+    @media screen and (min-width: $break-small) {
+      margin: 0.5em 1em;
+    }
+
+    // Pantalla chica
+    @media screen and (max-width: $break-small) {
+      border: none;
+    }
+
 
   }
 

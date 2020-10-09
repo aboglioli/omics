@@ -6,7 +6,8 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import {BreakpointObserver } from '@angular/cdk/layout';
 import { Router } from '@angular/router';
 import { faBookOpen, faChartPie, faCommentDots, faWallet, faDesktop } from '@fortawesome/free-solid-svg-icons';
-import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
+import { DeskboardOptionMenu } from '../../../models/enums.model';
+
 
 @Component({
   selector: 'app-deskboard-general',
@@ -18,13 +19,15 @@ export class DeskboardGeneralComponent implements OnInit {
   // FontAwesome Icon
   public faComic = faBookOpen;
   public faReporte = faChartPie;
-  public faComentarios = faCommentDots;
   public faBilletera = faWallet;
   public faDesk = faDesktop;
 
   public userData: IUser;
   public isBigScreen = true;
-  public idSubComponent = 0; // TODO: En vez de esto, debería usarse "patch child" (esto lo hice por tiempo)
+
+  public optionMenu = DeskboardOptionMenu;
+  public currentOption = this.optionMenu.comics; // TODO: En vez de esto, debería usarse "patch child" (esto lo hice por tiempo)
+
 
   constructor(
     private authService: AuthService,
@@ -32,7 +35,6 @@ export class DeskboardGeneralComponent implements OnInit {
     private spinnerService: NgxSpinnerService,
     private breakpointObserver: BreakpointObserver,
     private router: Router,
-    private sweetAlertGenericService: SweetAlertGenericMessageService,
   ) { }
 
   ngOnInit(): void {
@@ -75,24 +77,11 @@ export class DeskboardGeneralComponent implements OnInit {
 
   }
 
-  public onMyComics(): void {
-    this.idSubComponent = 0;
-    this.sweetAlertGenericService.showUnderConstrucction();
+  public onChangeTopMenu( option: number ): void {
+
+    this.currentOption = option;
+
   }
 
-  public onReports(): void {
-    // this.idSubComponent = 1;
-    this.sweetAlertGenericService.showUnderConstrucction();
-  }
-
-  public onComments(): void {
-    // this.idSubComponent = 2;
-    this.sweetAlertGenericService.showUnderConstrucction();
-  }
-
-  public onWallet(): void {
-    // this.idSubComponent = 3;
-    this.sweetAlertGenericService.showUnderConstrucction();
-  }
 
 }

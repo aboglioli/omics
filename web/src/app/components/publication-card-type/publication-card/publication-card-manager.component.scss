@@ -3,7 +3,18 @@
 div.card-box {
 
   display: flex;
-  flex-direction: row;
+
+  // Pantalla grande
+  @media screen and (min-width: $break-small) {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  // Pantalla chica
+  @media screen and (max-width: $break-small) {
+    flex-direction: column;
+    align-items: center;
+  }
 
   border-style: solid;
   border-width: 2px;
@@ -13,8 +24,17 @@ div.card-box {
 
   div.left {
 
-    width: 180px;
-    height: 180px;
+    // Pantalla grande
+    @media screen and (min-width: $break-small) {
+      width: 180px;
+      height: 180px;
+    }
+
+    // Pantalla chica
+    @media screen and (max-width: $break-small) {
+      width: 250px;
+      height: 250px;
+    }
 
     img {
       height: 100%;
@@ -25,7 +45,17 @@ div.card-box {
   }
 
   div.right {
-    width: 300px;
+
+    // Pantalla grande
+    @media screen and (min-width: $break-small) {
+      width: 300px;
+    }
+
+    // Pantalla chica
+    @media screen and (max-width: $break-small) {
+      width: 180px;
+    }
+
     max-height: 180px;
 
     display: flex;

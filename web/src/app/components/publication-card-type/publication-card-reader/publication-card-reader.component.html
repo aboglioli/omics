@@ -1,20 +1,46 @@
-  <div *ngIf="publication">
 
-    <div class="publication">
-      <div class="text">
-        <span class="name">{{publication.name}}</span>
+<div class="publication">
+
+  <!-- Title -->
+  <div class="title">
+    <h3>{{publication.name | truncateString: 25:true}}</h3>
+  </div>
+
+  <!-- Image cover with info -->
+  <div class="cover">
+
+    <div class="row-over top">
+
+      <!-- Vistas únicas -->
+      <div class="fila center-align">
+        <fa-icon [icon]="faVistas" size="1x"></fa-icon>
+        <h4 style="margin: 0px 10px;">{{ publication.statistics.views }}</h4>
       </div>
 
-      <div class="cover">
-        <img [src]="publication.cover" alt="Thumbail image" >
+      <!-- Category -->
+      <div class="fila center-align">
+        <h5 style="margin: 0px 10px;">{{ publication.category.name | truncateString: 20:false}}</h5>
       </div>
 
-      <div class="text">
-        <span class="views">
-          {{publication.statistics.views}} visualizaciones
-        </span>
-      </div>
     </div>
 
+    <div class="row-over bottom">
 
+      <!-- Likes -->
+      <div class="fila center-align">
+        <fa-icon [icon]="faLike" size="1x"></fa-icon>
+        <h4 style="margin: 0px 10px;">{{ publication.statistics.likes }}</h4>
+      </div>
+
+      <!-- Favorito -->
+      <div class="fila center-align">
+        <fa-icon [icon]="faStarFill" size="1x"></fa-icon>
+        <h4 style="margin: 0px 10px;">{{ publication.statistics.stars | number: '1.0-1' }} / 5</h4>
+      </div>
+
+    </div>
+
+    <img [src]="publication.cover" alt="Thumbail image">
   </div>
+
+</div>

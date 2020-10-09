@@ -6,7 +6,7 @@ import { AboutComponent } from './pages/about/about.component';
 import { AutoresComponent } from './pages/autores/autores.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 
-import { DeskboardGeneralComponent } from './pages/deskboard-general/deskboard-general.component';
+import { DeskboardGeneralComponent } from './pages/deskboard/deskboard-general/deskboard-general.component';
 import { FavoritosComponent } from './pages/favoritos/favoritos.component';
 import { DashboardReportesComponent } from './pages/dashboard-reportes/dashboard-reportes.component';
 import { DashboardGestionContratosPublicacionesComponent } from './pages/dashboard-gestion-contratos-publicaciones/dashboard-gestion-contratos-publicaciones.component';

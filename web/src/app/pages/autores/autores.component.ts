@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { faUsers } from '@fortawesome/free-solid-svg-icons';
 
 import { IAuthor } from '../../domain/models';
 import { AuthorService } from '../../domain/services/author.service';
@@ -9,6 +10,10 @@ import { AuthorService } from '../../domain/services/author.service';
   styleUrls: ['./autores.component.scss']
 })
 export class AutoresComponent implements OnInit {
+
+  // Font Awseome icons
+  public faFollowers = faUsers;
+
   public authors: IAuthor[];
 
   constructor(

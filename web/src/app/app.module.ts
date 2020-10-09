@@ -30,7 +30,7 @@ import { FavoritosComponent } from './pages/favoritos/favoritos.component';
 import { PerfilComponent } from './pages/perfil/perfil.component';
 import { SuscripcionComponent } from './components/suscripcion/suscripcion.component';
 import { DonacionComponent } from './components/donacion/donacion.component';
-import { DeskboardGeneralComponent } from './pages/deskboard-general/deskboard-general.component';
+import { DeskboardGeneralComponent } from './pages/deskboard/deskboard-general/deskboard-general.component';
 import { DashboardReportesComponent } from './pages/dashboard-reportes/dashboard-reportes.component';
 import { DashboardGestionAdminComponent } from './pages/dashboard-gestion-admin/dashboard-gestion-admin.component';
 import { DashboardGestionContratosPublicacionesComponent } from './pages/dashboard-gestion-contratos-publicaciones/dashboard-gestion-contratos-publicaciones.component';
@@ -65,6 +65,8 @@ import { PublicationCardReaderComponent } from './components/publication-card-ty
 import { TruncateStringPipe } from './pipes/truncate-string.pipe';
 import { PublicationReviewAddComponent } from './components/publication/publication-review-add/publication-review-add.component';
 import { PublicationReviewsBoxComponent } from './components/publication/publication-reviews-box/publication-reviews-box.component';
+import { DeskboardReportComponent } from './pages/deskboard/deskboard-reports/deskboard-report.component';
+import { DeskboardWalletComponent } from './pages/deskboard/deskboard-wallet/deskboard-wallet.component';
 
 
 @NgModule({
@@ -107,7 +109,9 @@ import { PublicationReviewsBoxComponent } from './components/publication/publica
     PublicationCardReaderComponent,
     TruncateStringPipe,
     PublicationReviewAddComponent,
-    PublicationReviewsBoxComponent
+    PublicationReviewsBoxComponent,
+    DeskboardReportComponent,
+    DeskboardWalletComponent
   ],
   imports: [
     BrowserModule,
