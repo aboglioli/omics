@@ -20,6 +20,7 @@ export interface ISearchCommand {
   date_to?: string;
   offset?: number;
   limit?: number;
+  // most_viewed, most_liked, newest, best_reviews
   order_by?: string;
 }
 

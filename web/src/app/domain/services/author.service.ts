@@ -16,6 +16,7 @@ export interface ISearchCommand {
   date_to?: string;
   offset?: number;
   limit?: number;
+  // followers, publications, newest
   order_by?: string;
 }
 
