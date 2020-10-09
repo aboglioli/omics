@@ -21,6 +21,7 @@ pub struct Author {
     biography: Option<String>,
     profile_image: Option<String>,
     followers: u32,
+    publications: u32,
 }
 
 impl Author {
@@ -34,6 +35,7 @@ impl Author {
             biography: None,
             profile_image: None,
             followers: 0,
+            publications: 0,
         })
     }
 
@@ -45,6 +47,7 @@ impl Author {
         biography: Option<String>,
         profile_image: Option<String>,
         followers: u32,
+        publications: u32,
     ) -> Self {
         Author {
             base,
@@ -55,6 +58,7 @@ impl Author {
             biography,
             profile_image,
             followers,
+            publications,
         }
     }
 
@@ -88,6 +92,10 @@ impl Author {
 
     pub fn followers(&self) -> u32 {
         self.followers
+    }
+
+    pub fn publications(&self) -> u32 {
+        self.publications
     }
 
     pub fn set_name<S: Into<String>>(&mut self, name: S, lastname: S) -> Result<()> {
@@ -144,6 +152,16 @@ impl Author {
             reader_id: reader.base().id().to_string(),
         });
 
+        Ok(())
+    }
+
+    pub fn add_publication(&mut self) -> Result<()> {
+        self.publications += 1;
+        Ok(())
+    }
+
+    pub fn remove_publication(&mut self) -> Result<()> {
+        self.publications -= 1;
         Ok(())
     }
 

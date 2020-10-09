@@ -7,6 +7,7 @@ use common::event::{EventPublisher, EventSubscriber};
 use common::result::Result;
 use identity::domain::user::UserRepository;
 
+use crate::application::author::PublicationCounterHandler;
 use crate::application::publication::ContractHandler;
 use crate::application::reader::SubscriptionHandler;
 use crate::domain::author::AuthorRepository;
@@ -126,6 +127,12 @@ where
         // let reader_handler =
         //     InteractionHandler::new(self.reader_repo.clone(), self.publication_repo.clone());
         // event_sub.subscribe(Box::new(reader_handler)).await?;
+
+        let publication_counter_handler =
+            PublicationCounterHandler::new(self.author_repo.clone(), self.publication_repo.clone());
+        event_sub
+            .subscribe(Box::new(publication_counter_handler))
+            .await?;
 
         let subscription_handler = SubscriptionHandler::new(self.reader_repo.clone());
         event_sub.subscribe(Box::new(subscription_handler)).await?;

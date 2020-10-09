@@ -60,6 +60,9 @@ impl<'a> Search<'a> {
                 "followers" => {
                     authors.sort_by(|a, b| b.followers().cmp(&a.followers()));
                 }
+                "publications" => {
+                    authors.sort_by(|a, b| b.publications().cmp(&a.publications()));
+                }
                 "newest" => {
                     authors.reverse();
                 }

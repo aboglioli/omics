@@ -25,6 +25,7 @@ impl Author {
         let profile_image: Option<String> = row.get("profile_image");
 
         let followers: i32 = row.get("followers");
+        let publications: i32 = row.get("publications");
 
         let created_at: DateTime<Utc> = row.get("created_at");
         let updated_at: Option<DateTime<Utc>> = row.get("updated_at");
@@ -43,6 +44,7 @@ impl Author {
             biography,
             profile_image,
             followers as u32,
+            publications as u32,
         ))
     }
 }

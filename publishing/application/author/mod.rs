@@ -1,3 +1,4 @@
+mod publication_counter_handler;
 // mod author_from_user_handler;
 mod follow;
 mod get_by_id;
@@ -6,5 +7,6 @@ mod unfollow;
 // pub use author_from_user_handler::*;
 pub use follow::*;
 pub use get_by_id::*;
+pub use publication_counter_handler::*;
 pub use search::*;
 pub use unfollow::*;
