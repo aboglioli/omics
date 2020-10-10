@@ -13,5 +13,6 @@ pub trait PaymentService: Sync + Send {
         external_reference: String,
         payer: &User,
     ) -> Result<String>;
-    async fn is_payment_approved(&self, id: String) -> Result<bool>;
+
+    async fn get_external_reference_from_payment(&self, payment_id: String) -> Result<String>;
 }

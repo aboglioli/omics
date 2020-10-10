@@ -1,19 +1,48 @@
 use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse, Responder};
+use serde::Deserialize;
 use serde_json::Value;
 
+use common::error::Error;
+use payment::application::subscription::Pay;
+
 use crate::container::MainContainer;
+use crate::error::PublicError;
+
+#[derive(Deserialize)]
+pub struct MPEventData {
+    id: String,
+}
+
+#[derive(Deserialize)]
+pub struct MPEvent {
+    action: String,
+    data: MPEventData,
+}
 
 #[post("/mercado-pago")]
-async fn mercado_pago(
-    _req: HttpRequest,
-    cmd: web::Json<Value>,
-    _c: web::Data<MainContainer>,
-) -> impl Responder {
-    let cmd = serde_json::to_string_pretty(&cmd.into_inner()).unwrap();
+async fn mercado_pago(cmd: web::Json<Value>, c: web::Data<MainContainer>) -> impl Responder {
+    let cmd = cmd.into_inner();
 
-    println!("{}", cmd);
+    let event_str = serde_json::to_string_pretty(&cmd).unwrap();
+    println!("MercadoPago Event:\n{}", event_str);
 
-    HttpResponse::Ok()
+    let cmd: MPEvent = serde_json::from_value(cmd)
+        .map_err(Error::from)
+        .map_err(PublicError::from)?;
+
+    if cmd.action.starts_with("payment") {
+        Pay::new(
+            c.payment.event_pub(),
+            c.payment.subscription_repo(),
+            c.payment.payment_serv(),
+        )
+        .exec(cmd.data.id)
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
+    } else {
+        Ok(HttpResponse::Ok().body("not_handled"))
+    }
 }
 
 pub fn routes(cfg: &mut web::ServiceConfig) {

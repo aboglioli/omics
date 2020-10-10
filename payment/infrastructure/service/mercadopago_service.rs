@@ -15,6 +15,11 @@ pub struct MPPreferenceResponse {
     init_point: String,
 }
 
+#[derive(Deserialize)]
+pub struct MPPayment {
+    external_reference: String,
+}
+
 pub struct MercadoPagoService {
     public_key: String,
     access_token: String,
@@ -77,7 +82,29 @@ impl PaymentService for MercadoPagoService {
         Ok(res.init_point)
     }
 
-    async fn is_payment_approved(&self, _id: String) -> Result<bool> {
-        Ok(true)
+    async fn get_external_reference_from_payment(&self, payment_id: String) -> Result<String> {
+        let client = reqwest::Client::new();
+        let res = client
+            .get(&format!(
+                "https://api.mercadopago.com/v1/payments/{}",
+                payment_id
+            ))
+            .header(AUTHORIZATION, format!("Bearer {}", self.access_token))
+            .send()
+            .await
+            .map_err(|err| {
+                Error::new(
+                    "mercado_pago_service",
+                    "get_external_reference_from_payment",
+                )
+                .wrap_raw(err)
+            })?;
+
+        let res: MPPayment = res
+            .json()
+            .await
+            .map_err(|err| Error::new("response", "deserialize").wrap_raw(err))?;
+
+        Ok(res.external_reference)
     }
 }

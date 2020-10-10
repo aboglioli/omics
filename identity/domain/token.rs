@@ -8,6 +8,7 @@ pub use service::*;
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 // TokenId
@@ -86,7 +87,7 @@ impl ToString for Token {
 }
 
 // Data
-#[derive(Default, Debug, Clone)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct Data {
     data: HashMap<String, String>,
 }
