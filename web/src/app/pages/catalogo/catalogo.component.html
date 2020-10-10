@@ -1,12 +1,21 @@
 <div class="listado-biblioteca">
 
-  <div class="comic-thumbail" *ngFor="let publication of publicationList">
 
-    <app-publication-card-reader
-          [publication]="publication"
-          (click)="showPublicationInfo( publication.id )">
-    </app-publication-card-reader>
+  <!-- Catalogo de publicaciones y colecciones -->
+  <div class="catalogo">
 
+    <div class="comic-thumbail" *ngFor="let publication of publicationList">
+      <app-publication-card-reader
+            [publication]="publication"
+            (click)="showPublicationInfo( publication.id )">
+      </app-publication-card-reader>
+    </div>
+
+  </div>
+
+  <!-- Filstros y búsqueda -->
+  <div class="filtros">
+    <h1>Seleccionar </h1>
   </div>
 
 </div>
