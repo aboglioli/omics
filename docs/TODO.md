@@ -94,9 +94,9 @@ Filtros:
 
 ## Módulo de Suscripción y Donación 
 - [ ] CU 16 - Donar a Autor 
-- [ ] CU 17 - Realizar Suscripción 
-- [ ] CU 18 - Cancelar Suscripción 
-- [ ] CU 19 - Pagar Suscripción  
+- [x] CU 17 - Realizar Suscripción 
+- [x] CU 18 - Cancelar Suscripción 
+- [x] CU 19 - Pagar Suscripción  
 
 ## Módulo de Publicación de Obras 
 - [x] CU 20 - Publicar Obra 
@@ -106,18 +106,18 @@ Filtros:
 - [x] CU 24 - Ver Estadísticas de Publicaciones  
 
 ## Módulo de Notificaciones 
-- [ ] CU 25 - Notificar Actividad de Autores y Contenido 
-- [ ] CU 26 - Notificar Resumen de Pago 
+- [x] CU 25 - Notificar Actividad de Autores y Contenido 
+- [x] CU 26 - Notificar Resumen de Pago 
 
 ## Módulo de Contrato 
-- [ ] CU 27 - Requerir Contrato 
-- [ ] CU 28 - Rescindir Contrato 
-- [ ] CU 29 - Cobrar por Resumen de Publicación 
-- [ ] CU 30 - Generar Resumen de Publicación 
-- [ ] CU 31 - Aceptar/Rechazar Contrato  
+- [x] CU 27 - Requerir Contrato 
+- [x] CU 28 - Rescindir Contrato 
+- [x] CU 29 - Cobrar por Resumen de Publicación 
+- [x] CU 30 - Generar Resumen de Publicación 
+- [x] CU 31 - Aceptar/Rechazar Contrato  
 
 ## Módulo de Reportes 
-- [ ] CU 32 - Generar y Visualizar Reportes 
+- [x] CU 32 - Generar y Visualizar Reportes 
 
 ## Módulo de Configuración
 - [ ] CU 33 - Configurar Reglas de Negocio  
