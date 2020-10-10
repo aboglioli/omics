@@ -117,12 +117,15 @@ div.collection-info-box {
 
 div.listado-biblioteca {
 
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-evenly;
+  span {
 
-  div.comic-thumbail {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+  }
+
+  .comic-thumbail {
 
     margin: 0.5em;
 

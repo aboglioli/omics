@@ -1,0 +1,91 @@
+@import "src/scss/vars";
+
+div.card-box {
+
+  display: flex;
+  flex-direction: column;
+
+  border-style: solid;
+  border-width: 2px;
+  border-color: $omics-background-menu;
+
+  color: white;
+
+  div.header {
+    width: 100%;
+    text-align: center;
+    background-color: $omics-background-menu;
+
+    h3 {
+      margin: 1em;
+      font-weight: 500;
+    }
+
+  }
+
+  div.body {
+
+    display: flex;
+    flex-direction: row;
+
+    div.info-box {
+
+      width: 172px;
+      height: 250px;
+      position: relative;
+
+      img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+      }
+
+      div.menu-box {
+        height: 64px;
+        background-color: red;
+      }
+
+    }
+
+    .action-box {
+      background-color: $omics-background-flat;
+      width: 100%;
+
+      display: flex;
+      justify-content: space-around;
+
+    }
+
+  }
+
+
+  .row-over{
+    display: flex;
+    justify-content: space-between;
+    padding: 0.25em 0.5em;
+    position: absolute;
+    width: 100%;
+    background-color: rgba($color: $omics-background-flat-active, $alpha: 0.6);
+
+    &.top {
+      top: 0;
+    }
+
+    &.bottom {
+      bottom: 0;
+    }
+
+  }
+
+  div.fila {
+
+    display: flex;
+    flex-direction: row;
+
+    &.center-align {
+      align-items: center;
+    }
+
+  }
+
+}

@@ -95,5 +95,4 @@ export class CollectionInfoComponent implements OnInit {
     this.router.navigate( [`/profile/${this.collectionData.author.id}`] );
   }
 
-
 }

@@ -1,1 +1,34 @@
-<p>collection-card-read works!</p>
+<div *ngIf="collection"
+      class="card-box"
+      (click)="onGoToCollection()">
+
+  <div class="header">
+    <h3>{{collection.name | truncateString: 25:true}}</h3>
+  </div>
+
+  <div class="body">
+
+    <!-- Cover thumbail -->
+    <div class="info-box">
+
+      <!-- Categorias -->
+      <div class="row-over top" style="justify-content: center;">
+        <div class="fila center-align">
+          <h4 style="margin: 0px 10px;">{{ collection.category_id | truncateString: 20:false}}</h4>
+        </div>
+      </div>
+
+      <img [src]="collection.cover" alt="Thumbail image">
+
+      <!-- Ultima modificación y menu de acciones -->
+      <div class="row-over bottom" style="padding: 0">
+        <div style="display: flex; flex-direction: column; width: 100%; align-items: center;">
+          <small>Actualizado: {{ (collection.updated_at ? collection.updated_at: collection.created_at) | date: 'shortDate' | date: 'dd/MM/yyyy' }}</small>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
