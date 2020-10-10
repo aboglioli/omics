@@ -1,0 +1,107 @@
+<div class="collection-info-box">
+
+  <div class="side"></div>
+
+  <div class="center">
+
+    <span *ngIf="collectionData" style="display: flex; flex-direction: column; height: 100%;">
+
+      <div class="header">
+
+        <div class="row-over top" style="justify-content: center;">
+          <h2 style="margin: 0.25em 0.25em;">{{ collectionData.name | truncateString: 30:false}}</h2>
+        </div>
+
+        <!-- #region Imagen avatar perfil-->
+        <img  *ngIf="!collectionData.cover"
+              src="assets/images/generic/avatar196x196.jpg"
+              alt="omics-avatar-profile"
+              class="avatar">
+
+        <img  *ngIf="collectionData.cover"
+              [src]="collectionData.cover"
+              alt="omics-avatar-profile"
+              class="avatar">
+
+        <!-- #endregion -->
+
+        <div class="row-over bottom" style="padding: 0.25em 1em;">
+
+          <!-- Perfil autor -->
+          <div (click)="onGoToAuthorProfile()"
+              class="author"
+              style="display: flex; align-items: center;">
+
+            <pre style="color: white; margin: 0px">by </pre>
+            <h4 style="margin: 0em;">{{ collectionData.author.username }}</h4>
+
+            <!-- #region Avatar -->
+            <img  *ngIf="!collectionData.author.profile_image"
+                  src="assets/images/generic/avatar196x196.jpg"
+                  alt="omics-avatar-profile"
+                  class="avatar">
+
+            <img  *ngIf="collectionData.author.profile_image"
+                  [src]="collectionData.author.profile_image"
+                  alt="omics-avatar-profile"
+                  class="avatar">
+            <!-- #endregion -->
+
+          </div>
+
+          <!-- Categoria -->
+          <div class="category">
+            <pre style="color: white; margin: 0px">Categoría: </pre>
+            <h3 style="margin: 0px;">{{ collectionData.category.name }}</h3>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="body">
+
+        <!-- Description -->
+        <div class="description-box">
+
+          <!-- Fechas -->
+          <div style="display: flex; justify-content: space-between;">
+
+            <h5>Creado: {{ collectionData.created_at | date: 'shortDate' | date: 'dd/MM/yyyy' }}</h5>
+
+            <h5 *ngIf="collectionData.updated_at">
+              Actualizado:
+              {{ collectionData.updated_at | date: 'shortDate' | date: 'dd/MM/yyyy' }}
+            </h5>
+
+          </div>
+
+          <!-- Descripción -->
+          <h3 style="text-decoration: underline; margin-bottom: 0.25em;">Descripción:</h3>
+          <div class="synopsis">
+            <p>{{ collectionData.synopsis }}</p>
+          </div>
+
+        </div>
+
+        <!-- Lista de publicaciones  -->
+        <div class="listado-biblioteca">
+
+          <div class="comic-thumbail" *ngFor="let publication of publicationList">
+            <app-publication-card-reader
+              [publication]="publication"
+              (click)="showPublicationInfo( publication.id )">
+            </app-publication-card-reader>
+          </div>
+
+        </div>
+
+      </div>
+
+    </span>
+
+  </div>
+
+  <div class="side"></div>
+
+</div>

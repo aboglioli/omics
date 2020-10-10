@@ -20,7 +20,6 @@ export class PublicationCardReaderComponent implements OnInit {
 
   ngOnInit(): void {
 
-    console.log(this.publication);
   }
 
 }

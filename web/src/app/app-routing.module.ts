@@ -24,6 +24,7 @@ import { SameUserGuard } from './guard/same-user.guard';
 import { PublicationOwnerGuard } from './guard/publication-owner.guard';
 import { CollectionNewEditComponent } from './pages/deskboard/collection-new-edit/collection-new-edit.component';
 import { CollectionOwnerGuard } from './guard/collection-owner.guard';
+import { CollectionInfoComponent } from './pages/collection-info/collection-info.component';
 
 
 
@@ -43,6 +44,7 @@ const routes: Routes = [
   { path: 'deskboard/collection/edit/:id', component:  CollectionNewEditComponent, canActivate: [CollectionOwnerGuard]},
   { path: 'profile/:id', component: PerfilComponent,  canActivate: [AuthLoginGuard] },
   { path: 'profile/:id/editUser', component: PerfilEditarComponent,  canActivate: [AuthLoginGuard, SameUserGuard]},
+  { path: 'collection/:id', component: CollectionInfoComponent },
   { path: 'about', component: AboutComponent },
   { path: 'read/:id', component: VisorComicComponent },
   { path: 'dashboard-reportes', component: DashboardReportesComponent },

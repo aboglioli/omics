@@ -1,9 +1,10 @@
+import { IAuthor } from './author';
 import { ICategory } from './category';
 
 export interface ICollection {
   id: string;
   author_id?: string;
-  author?: string;
+  author?: IAuthor;
   name: string;
   created_at: Date;
   updated_at?: Date;

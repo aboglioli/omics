@@ -2,8 +2,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ICollection } from '../../../domain/models/collection';
 import { faEdit, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
-import { CollectionInfoComponent } from '../../collection-info/collection-info.component';
 
 @Component({
   selector: 'app-collection-card-author',
@@ -20,8 +18,7 @@ export class CollectionCardAuthorComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private dialog: MatDialog,
+    private activatedRoute: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
@@ -31,17 +28,10 @@ export class CollectionCardAuthorComponent implements OnInit {
     this.router.navigate([`collection/edit/${this.collection.id}`], { relativeTo: this.activatedRoute });
   }
 
-  public onOpenInfo(): void {
+  public onGoToCollectionInfo(): void {
 
-    const dialogRef = this.dialog.open(
-      CollectionInfoComponent,
-      {
-        panelClass: 'info-publication',
-        data: {
-          idCollection: this.collection.id
-        }
-      }
-    );
+    this.router.navigate([`collection/${this.collection.id}`]);
+
   }
 
 }

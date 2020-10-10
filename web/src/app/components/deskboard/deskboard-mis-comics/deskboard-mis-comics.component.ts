@@ -35,10 +35,6 @@ export class DeskboardMisComicsComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
 
-    ( this.typeSearch === this.typeSearchList.publication  ) ?
-      this.getPublicationData() :
-      this.getCollectionData();
-
   }
 
   ngOnChanges( changes: SimpleChanges ): void {
@@ -89,7 +85,6 @@ export class DeskboardMisComicsComponent implements OnInit, OnChanges {
       (resData: IGetCollectionsResponse) => {
 
         this.collectionList = resData.collections;
-
         this.spinnerService.hide();
 
       },
