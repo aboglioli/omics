@@ -51,6 +51,7 @@ import { NotificationsComponent } from './pages/notifications/notifications.comp
 import { DevelopmentComponent } from './pages/development/development.component';
 import { DevUploadFileComponent } from './pages/development/upload-file/upload-file';
 import { DevNewPublicationComponent } from './pages/development/new-publication/new-publication';
+import { DevPaymentComponent } from './pages/development/payment/payment';
 
 // Domain
 import { DomainModule } from './domain/module';
@@ -106,6 +107,7 @@ import { CollectionInfoComponent } from './components/collection-info/collection
     DevelopmentComponent,
     DevUploadFileComponent,
     DevNewPublicationComponent,
+    DevPaymentComponent,
     SideNavMenuUserComponent,
     PerfilEditarComponent,
     PublicationApproveRejectMotiveComponent,

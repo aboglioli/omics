@@ -87,6 +87,8 @@ async fn subscribe(
         c.payment.plan_repo(),
         c.payment.reader_repo(),
         c.payment.subscription_repo(),
+        c.payment.user_repo(),
+        c.payment.payment_serv(),
     )
     .exec(auth_id, path.into_inner())
     .await

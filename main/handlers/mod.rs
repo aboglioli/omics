@@ -5,6 +5,7 @@ pub mod contract;
 pub mod event;
 pub mod file;
 pub mod notification;
+pub mod payment;
 pub mod plan;
 pub mod publication;
 pub mod reader;

@@ -27,6 +27,9 @@ pub struct Config {
     smtp_email: String,
     smtp_password: String,
     smtp_port: u16,
+
+    mp_public_key: String,
+    mp_access_token: String,
 }
 
 impl Config {
@@ -78,6 +81,9 @@ impl Config {
                     }
                 })
                 .unwrap_or_else(|_| 25),
+
+            mp_public_key: env::var("MP_PUBLIC_KEY").unwrap_or_else(|_| "".to_owned()),
+            mp_access_token: env::var("MP_ACCESS_TOKEN").unwrap_or_else(|_| "".to_owned()),
         }
     }
 
@@ -143,5 +149,13 @@ impl Config {
 
     pub fn smtp_port(&self) -> u16 {
         self.smtp_port
+    }
+
+    pub fn mp_public_key(&self) -> &str {
+        &self.mp_public_key
+    }
+
+    pub fn mp_access_token(&self) -> &str {
+        &self.mp_access_token
     }
 }

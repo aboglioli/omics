@@ -1,8 +1,10 @@
 mod get_all;
 mod get_by_reader;
+mod pay;
 mod subscribe;
 mod unsubscribe;
 pub use get_all::*;
 pub use get_by_reader::*;
+pub use pay::*;
 pub use subscribe::*;
 pub use unsubscribe::*;

@@ -44,10 +44,9 @@ impl<'a> ChargeForContract<'a> {
             return Err(Error::not_owner("contract"));
         }
 
-        let payment = contract.pay_summaries()?;
+        let _payment = contract.pay_summaries()?;
 
-        // TODO: use real user information
-        self.payment_serv.pay("some@one.com", &payment).await?;
+        // TODO: pay to author
 
         self.contract_repo.save(&mut contract).await?;
 
