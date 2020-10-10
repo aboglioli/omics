@@ -7,5 +7,6 @@ members = [
   "notification",
   "payment",
   "publishing",
+  "reports",
   "shared",
 ]

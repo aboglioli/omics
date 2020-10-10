@@ -13,6 +13,7 @@ use common::sql::where_builder::WhereBuilder;
 use identity::domain::user::UserId;
 
 use crate::domain::payment::Payment;
+use crate::domain::plan::PlanId;
 use crate::domain::subscription::{
     Status, Subscription, SubscriptionId, SubscriptionPlan, SubscriptionRepository,
 };
@@ -71,12 +72,28 @@ impl SubscriptionRepository for PostgresSubscriptionRepository {
         Subscription::from_row(row)
     }
 
+    async fn find_by_user_id(&self, id: &UserId) -> Result<Subscription> {
+        let row = self
+            .client
+            .query_one(
+                "SELECT * FROM subscriptions
+                WHERE user_id = $1",
+                &[&id.to_uuid()?],
+            )
+            .await
+            .map_err(|err| Error::not_found("subscription").wrap_raw(err))?;
+
+        Subscription::from_row(row)
+    }
+
     async fn search(
         &self,
         user_id: Option<&UserId>,
+        plan_id: Option<&PlanId>,
         status: Option<&String>,
     ) -> Result<Vec<Subscription>> {
         let user_id = user_id.map(|id| id.to_uuid()).transpose()?;
+        let _plan_id = plan_id.map(|id| id.value()); // TODO
 
         let (sql, params) = WhereBuilder::new()
             .add_param_opt("user_id = $$", &user_id, user_id.is_some())
@@ -131,8 +148,8 @@ impl SubscriptionRepository for PostgresSubscriptionRepository {
                         user_id,
                         plan,
                         payments,
-                        status_hustory,
-                        created_at,
+                        status_history,
+                        created_at
                     ) VALUES ($1, $2, $3, $4, $5, $6)",
                     &[
                         &subscription.base().id().to_uuid()?,
@@ -154,8 +171,8 @@ impl SubscriptionRepository for PostgresSubscriptionRepository {
                         plan = $3,
                         payments = $4,
                         status_history = $5,
-                        updated_at = $10,
-                        deleted_at = $11
+                        updated_at = $6,
+                        deleted_at = $7
                     WHERE
                         id = $1",
                     &[

@@ -1900,6 +1900,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "reports"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "common",
+ "identity",
+ "serde",
+ "serde_json",
+ "shared",
+]
+
+[[package]]
 name = "resolv-conf"
 version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"

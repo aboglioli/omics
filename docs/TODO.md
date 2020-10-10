@@ -12,6 +12,11 @@ Filtros:
 - Desde
 - Hast
 
+## Latest
+- [x] Add filters to publication Search.
+- [x] Returns ID after requesting contract.
+- [ ] Pagination
+
 ## Urgent
 - [x] Publication status should be an object in DTO to show comments.
 - [x] Get collections that a publication is in.

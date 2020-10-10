@@ -1,7 +1,9 @@
 mod amount;
 mod kind;
+mod service;
 pub use amount::*;
 pub use kind::*;
+pub use service::*;
 
 use chrono::{DateTime, Duration, Utc};
 use serde::{Deserialize, Serialize};

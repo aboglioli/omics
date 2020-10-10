@@ -13,4 +13,8 @@ export interface ICollection {
   category?: ICategory;
   cover: string;
   tags: string[];
+  cover: string;
+  publications: number;
+  created_at: string;
+  updated_at?: string;
 }

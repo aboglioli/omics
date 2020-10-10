@@ -1,6 +1,10 @@
+use std::str::FromStr;
+
+use chrono::DateTime;
 use serde::{Deserialize, Serialize};
 
-use common::request::Include;
+use common::error::Error;
+use common::request::{Include, PaginationParams};
 use common::result::Result;
 
 use crate::application::dtos::{AuthorDto, CategoryDto, CollectionDto};
@@ -16,6 +20,8 @@ pub struct SearchCommand {
     pub publication_id: Option<String>,
     pub tag: Option<String>,
     pub name: Option<String>,
+    pub date_from: Option<String>,
+    pub date_to: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -47,6 +53,7 @@ impl<'a> Search<'a> {
         _auth_id: Option<String>,
         cmd: SearchCommand,
         include: Include,
+        pagination: PaginationParams,
     ) -> Result<SearchResponse> {
         let collections = self
             .collection_repo
@@ -59,6 +66,18 @@ impl<'a> Search<'a> {
                     .as_ref(),
                 cmd.tag.map(Tag::new).transpose()?.as_ref(),
                 cmd.name.as_ref(),
+                cmd.date_from
+                    .map(|d| DateTime::from_str(&d))
+                    .transpose()
+                    .map_err(|err| Error::bad_format("date_from").wrap_raw(err))?
+                    .as_ref(),
+                cmd.date_to
+                    .map(|d| DateTime::from_str(&d))
+                    .transpose()
+                    .map_err(|err| Error::bad_format("date_to").wrap_raw(err))?
+                    .as_ref(),
+                pagination.offset,
+                pagination.limit,
             )
             .await?;
 

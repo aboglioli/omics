@@ -42,8 +42,8 @@ impl<'a> Cancel<'a> {
         }
 
         contract.cancel()?;
-
-        self.contract_repo.save(&mut contract).await?;
+        // self.contract_repo.save(&mut contract).await?;
+        self.contract_repo.delete(contract.base().id()).await?;
 
         self.event_pub
             .publish_all(contract.events().to_vec()?)

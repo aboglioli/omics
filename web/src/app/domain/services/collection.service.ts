@@ -11,6 +11,11 @@ export interface ISearchCommand {
   publication_id?: string;
   tag?: string;
   name?: string;
+  date_from?: string;
+  date_to?: string;
+  offset?: number;
+  limit?: number;
+  order_by?: string;
 }
 
 export interface ISearchResponse {

@@ -41,6 +41,7 @@ pub struct AuthorDto {
     pub biography: Option<String>,
     pub profile_image: Option<String>,
     pub followers: u32,
+    pub publications: u32,
     pub created_at: String,
     pub updated_at: Option<String>,
 }
@@ -55,6 +56,7 @@ impl AuthorDto {
             biography: author.biography().cloned(),
             profile_image: author.profile_image().cloned(),
             followers: author.followers(),
+            publications: author.publications(),
             created_at: author.base().created_at().to_rfc3339(),
             updated_at: author.base().updated_at().map(|d| d.to_rfc3339()),
         }
@@ -213,6 +215,7 @@ pub struct CollectionDto {
     pub category: Option<CategoryDto>,
     pub tags: Vec<String>,
     pub cover: String,
+    pub publications: u32,
     pub created_at: String,
     pub updated_at: Option<String>,
 }
@@ -234,6 +237,7 @@ impl From<&Collection> for CollectionDto {
                 .map(|tag| tag.name().to_string())
                 .collect(),
             cover: collection.header().cover().to_string(),
+            publications: collection.items().len() as u32,
             created_at: collection.base().created_at().to_rfc3339(),
             updated_at: collection.base().updated_at().map(|d| d.to_rfc3339()),
         }

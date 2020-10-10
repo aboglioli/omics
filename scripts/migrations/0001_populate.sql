@@ -81,3 +81,7 @@ VALUES
   ('waiting-approval'),
   ('published'),
   ('rejected');
+
+INSERT INTO plans(id, price, created_at)
+VALUES
+  ('basic', 75.0, NOW());

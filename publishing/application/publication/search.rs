@@ -1,6 +1,10 @@
+use std::str::FromStr;
+
+use chrono::DateTime;
 use serde::{Deserialize, Serialize};
 
-use common::request::Include;
+use common::error::Error;
+use common::request::{Include, PaginationParams};
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
 
@@ -16,6 +20,8 @@ pub struct SearchCommand {
     pub tag: Option<String>,
     pub status: Option<String>,
     pub name: Option<String>,
+    pub date_from: Option<String>,
+    pub date_to: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -50,6 +56,7 @@ impl<'a> Search<'a> {
         auth_id: Option<String>,
         cmd: SearchCommand,
         include: Include,
+        pagination: PaginationParams,
     ) -> Result<SearchResponse> {
         let is_content_manager = if let Some(auth_id) = &auth_id {
             let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
@@ -66,6 +73,18 @@ impl<'a> Search<'a> {
                 cmd.tag.map(Tag::new).transpose()?.as_ref(),
                 cmd.status.as_ref(),
                 cmd.name.as_ref(),
+                cmd.date_from
+                    .map(|d| DateTime::from_str(&d))
+                    .transpose()
+                    .map_err(|err| Error::bad_format("date_from").wrap_raw(err))?
+                    .as_ref(),
+                cmd.date_to
+                    .map(|d| DateTime::from_str(&d))
+                    .transpose()
+                    .map_err(|err| Error::bad_format("date_to").wrap_raw(err))?
+                    .as_ref(),
+                pagination.offset,
+                pagination.limit,
             )
             .await?;
 
@@ -85,6 +104,31 @@ impl<'a> Search<'a> {
                 matches!(publication.status_history().current(), Status::Published { .. })
             })
             .collect();
+
+        if let Some(order_by) = pagination.order_by {
+            match order_by.as_ref() {
+                "most_viewed" => {
+                    publications
+                        .sort_by(|a, b| b.statistics().views().cmp(&a.statistics().views()));
+                }
+                "most_liked" => {
+                    publications
+                        .sort_by(|a, b| b.statistics().likes().cmp(&a.statistics().likes()));
+                }
+                "newest" => {
+                    publications.reverse();
+                }
+                "best_reviews" => {
+                    publications.sort_by(|a, b| {
+                        b.statistics()
+                            .stars()
+                            .partial_cmp(&a.statistics().stars())
+                            .unwrap()
+                    });
+                }
+                _ => {}
+            }
+        }
 
         let mut publication_dtos = Vec::new();
 

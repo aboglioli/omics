@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS users (
   validation_code VARCHAR(255),
 
   followers INTEGER DEFAULT 0,
+  publications INTEGER DEFAULT 0,
   subscribed BOOLEAN DEFAULT FALSE,
 
   created_at TIMESTAMP WITH TIME ZONE NOT NULL,

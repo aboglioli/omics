@@ -16,6 +16,11 @@ use identity::infrastructure::service::{BcryptHasher, JWTEncoder};
 use notification::container::NotificationContainer;
 use notification::infrastructure::persistence::postgres::PostgresNotificationRepository;
 use notification::infrastructure::service::GmailService;
+use payment::container::PaymentContainer;
+use payment::infrastructure::persistence::postgres::{
+    PostgresContractRepository, PostgresPlanRepository, PostgresSubscriptionRepository,
+};
+use payment::infrastructure::service::MercadoPagoService;
 use publishing::container::PublishingContainer;
 use publishing::infrastructure::persistence::postgres::{
     PostgresAuthorRepository, PostgresCategoryRepository, PostgresCollectionRepository,
@@ -29,6 +34,7 @@ pub struct MainContainer {
     pub event_repo: Arc<PostgresEventRepository>,
     pub identity: IdentityContainer<InMemEventBus>,
     pub publishing: PublishingContainer<InMemEventBus>,
+    pub payment: PaymentContainer<InMemEventBus>,
     pub notification: NotificationContainer<InMemEventBus>,
 }
 
@@ -61,54 +67,72 @@ impl MainContainer {
         let event_repo = Arc::new(PostgresEventRepository::new(client.clone()));
 
         // Identity
-        let i_role_repo = Arc::new(PostgresRoleRepository::new(client.clone()));
-        let i_token_repo = Arc::new(InMemTokenRepository::new());
-        let i_user_repo = Arc::new(PostgresUserRepository::new(client.clone()));
-        let i_password_hasher = Arc::new(BcryptHasher::new());
-        let i_token_enc = Arc::new(JWTEncoder::new());
+        let id_role_repo = Arc::new(PostgresRoleRepository::new(client.clone()));
+        let id_tokenot_repo = Arc::new(InMemTokenRepository::new());
+        let id_user_repo = Arc::new(PostgresUserRepository::new(client.clone()));
+        let id_password_hasher = Arc::new(BcryptHasher::new());
+        let id_tokenot_enc = Arc::new(JWTEncoder::new());
 
         // Publishing
-        let p_author_repo = Arc::new(PostgresAuthorRepository::new(client.clone()));
-        let p_category_repo = Arc::new(PostgresCategoryRepository::new(client.clone()));
-        let p_collection_repo = Arc::new(PostgresCollectionRepository::new(client.clone()));
-        let p_interaction_repo = Arc::new(PostgresInteractionRepository::new(client.clone()));
-        let p_publication_repo = Arc::new(PostgresPublicationRepository::new(client.clone()));
-        let p_reader_repo = Arc::new(PostgresReaderRepository::new(client.clone()));
+        let pub_author_repo = Arc::new(PostgresAuthorRepository::new(client.clone()));
+        let pub_category_repo = Arc::new(PostgresCategoryRepository::new(client.clone()));
+        let pub_collectionot_repo = Arc::new(PostgresCollectionRepository::new(client.clone()));
+        let pub_interactionot_repo = Arc::new(PostgresInteractionRepository::new(client.clone()));
+        let pub_publicationot_repo = Arc::new(PostgresPublicationRepository::new(client.clone()));
+        let pub_reader_repo = Arc::new(PostgresReaderRepository::new(client.clone()));
+
+        // Payment
+        let pay_contract_repo = Arc::new(PostgresContractRepository::new(client.clone()));
+        let pay_plan_repo = Arc::new(PostgresPlanRepository::new(client.clone()));
+        let pay_subscription_repo = Arc::new(PostgresSubscriptionRepository::new(client.clone()));
+        let pay_payment_serv = Arc::new(MercadoPagoService::new());
 
         // Notification
-        let n_notification_repo = Arc::new(PostgresNotificationRepository::new(client));
-        let n_email_serv = Arc::new(GmailService::new());
+        let not_notificationot_repo = Arc::new(PostgresNotificationRepository::new(client));
+        let not_email_serv = Arc::new(GmailService::new());
 
         // Containers
         let identity = IdentityContainer::new(
             event_bus.clone(),
-            i_role_repo,
-            i_token_repo,
-            i_user_repo.clone(),
-            i_password_hasher,
-            i_token_enc,
+            id_role_repo,
+            id_tokenot_repo,
+            id_user_repo.clone(),
+            id_password_hasher,
+            id_tokenot_enc,
         );
 
         let publishing = PublishingContainer::new(
             event_bus.clone(),
-            p_author_repo.clone(),
-            p_category_repo,
-            p_collection_repo.clone(),
-            p_interaction_repo.clone(),
-            p_publication_repo.clone(),
-            p_reader_repo,
-            i_user_repo.clone(),
+            pub_author_repo.clone(),
+            pub_category_repo,
+            pub_collectionot_repo.clone(),
+            pub_interactionot_repo.clone(),
+            pub_publicationot_repo.clone(),
+            pub_reader_repo.clone(),
+            id_user_repo.clone(),
+        );
+
+        let payment = PaymentContainer::new(
+            event_bus.clone(),
+            pay_contract_repo,
+            pay_plan_repo,
+            pub_publicationot_repo.clone(),
+            pub_reader_repo.clone(),
+            pay_subscription_repo,
+            id_user_repo.clone(),
+            pay_payment_serv,
+            publishing.statistics_serv_clone(),
         );
 
         let notification = NotificationContainer::new(
             event_bus.clone(),
-            p_author_repo,
-            p_collection_repo,
-            p_interaction_repo,
-            n_notification_repo,
-            p_publication_repo,
-            i_user_repo,
-            n_email_serv,
+            pub_author_repo,
+            pub_collectionot_repo,
+            pub_interactionot_repo,
+            not_notificationot_repo,
+            pub_publicationot_repo,
+            id_user_repo,
+            not_email_serv,
         );
 
         MainContainer {
@@ -116,6 +140,7 @@ impl MainContainer {
             event_repo,
             identity,
             publishing,
+            payment,
             notification,
         }
     }
@@ -126,6 +151,7 @@ impl MainContainer {
 
         self.identity.subscribe(self.event_bus.as_ref()).await?;
         self.publishing.subscribe(self.event_bus.as_ref()).await?;
+        self.payment.subscribe(self.event_bus.as_ref()).await?;
         self.notification.subscribe(self.event_bus.as_ref()).await?;
 
         Ok(())

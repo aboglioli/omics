@@ -1,17 +1,15 @@
-const { client, clean } = require('../core/db');
+const { cleanDb } = require('../core/db');
 
 async function main() {
   console.log('[ CLEAN DATABASE ]');
-  client.connect();
   process.stdout.write('Droping tables...');
 
   try {
-    await clean();
+    await cleanDb();
   } catch(err) {
     console.log(err);
   } finally {
     console.log('READY');
-    client.end();
   }
 }
 

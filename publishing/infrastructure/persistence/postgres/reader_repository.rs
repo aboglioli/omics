@@ -79,7 +79,7 @@ impl ReaderRepository for PostgresReaderRepository {
             .execute(
                 "UPDATE users
                 SET
-                    subscribed = $2,
+                    subscribed = $2
                 WHERE
                     id = $1",
                 &[&reader.base().id().to_uuid()?, &reader.is_subscribed()],

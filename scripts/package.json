@@ -8,11 +8,13 @@
     "populate": "node scripts/populate",
     "migrate": "node scripts/migrate",
     "clean-db": "node scripts/clean-db",
-    "test": "jest core tests"
+    "test": "jest core tests",
+    "lint": "eslint '*/**/*.js' --fix"
   },
   "author": "Alan Boglioli <alan.boglioli@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "eslint": "^7.10.0",
     "jest": "^26.4.2"
   },
   "dependencies": {

@@ -1,10 +1,17 @@
+use serde::Serialize;
+
 use common::error::Error;
 use common::event::EventPublisher;
-use common::request::CommandResponse;
+
 use common::result::Result;
 use publishing::domain::publication::{PublicationId, PublicationRepository};
 
-use crate::domain::contract::{Contract, ContractRepository};
+use crate::domain::contract::{Contract, ContractRepository, Status};
+
+#[derive(Serialize)]
+pub struct RequestResponse {
+    id: String,
+}
 
 pub struct Request<'a> {
     event_pub: &'a dyn EventPublisher,
@@ -26,7 +33,7 @@ impl<'a> Request<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<CommandResponse> {
+    pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<RequestResponse> {
         let publication = self
             .publication_repo
             .find_by_id(&PublicationId::new(publication_id)?)
@@ -34,6 +41,17 @@ impl<'a> Request<'a> {
 
         if publication.author_id().value() != auth_id {
             return Err(Error::not_owner("publication"));
+        }
+
+        // TODO: should be done by a domain service
+        if let Ok(last) = self
+            .contract_repo
+            .find_by_publication_id(publication.base().id())
+            .await
+        {
+            if !matches!(last.status_history().current(), Status::Cancelled) {
+                return Err(Error::new("contract", "already_exists"));
+            }
         }
 
         let mut contract = Contract::new(self.contract_repo.next_id().await?, &publication)?;
@@ -44,6 +62,8 @@ impl<'a> Request<'a> {
             .publish_all(contract.events().to_vec()?)
             .await?;
 
-        Ok(CommandResponse::default())
+        Ok(RequestResponse {
+            id: contract.base().id().to_string(),
+        })
     }
 }

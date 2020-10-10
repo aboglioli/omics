@@ -1,7 +1,16 @@
 mod approve;
 mod cancel;
+mod charge_for_contract;
+mod generate_statistics;
+mod get_all;
+mod get_by_publication;
 mod reject;
 mod request;
+pub use approve::*;
 pub use cancel::*;
+pub use charge_for_contract::*;
+pub use generate_statistics::*;
+pub use get_all::*;
+pub use get_by_publication::*;
 pub use reject::*;
 pub use request::*;

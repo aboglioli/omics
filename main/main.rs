@@ -12,8 +12,8 @@ use common::config::Config;
 
 use container::MainContainer;
 use handlers::{
-    author, catalog, category, collection, event, file, notification, publication, reader, role,
-    user,
+    author, category, collection, contract, event, file, notification, plan, publication, reader,
+    role, subscription, user,
 };
 
 async fn index() -> impl Responder {
@@ -48,7 +48,6 @@ async fn main() -> std::io::Result<()> {
             .service(
                 web::scope("/api")
                     .route("/dev", web::get().to(index))
-                    .configure(catalog::routes)
                     .configure(file::routes)
                     .configure(author::routes)
                     .configure(category::routes)
@@ -58,6 +57,9 @@ async fn main() -> std::io::Result<()> {
                     .configure(role::routes)
                     .configure(user::routes)
                     .configure(reader::routes)
+                    .configure(plan::routes)
+                    .configure(subscription::routes)
+                    .configure(contract::routes)
                     .configure(notification::routes),
             )
     })

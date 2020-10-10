@@ -1,6 +1,7 @@
 use actix_web::{get, web, HttpRequest, HttpResponse, Responder};
 
 use common::request::IncludeParams;
+use payment::application::subscription::GetByReader as GetSubscriptionByReader;
 use publishing::application::reader::{GetById, GetFavorites, GetFollowing};
 
 use crate::authorization::auth;
@@ -80,11 +81,34 @@ async fn get_favorites(
     .map_err(PublicError::from)
 }
 
+#[get("/{reader_id}/subscription")]
+async fn get_subscription(
+    req: HttpRequest,
+    path: web::Path<String>,
+    c: web::Data<MainContainer>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    let mut user_id = path.into_inner();
+    user_id = if user_id == "me" {
+        auth_id.clone()
+    } else {
+        user_id
+    };
+
+    GetSubscriptionByReader::new(c.payment.subscription_repo())
+        .exec(auth_id, user_id)
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
+}
+
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/readers")
             .service(get_by_id)
             .service(get_following)
-            .service(get_favorites),
+            .service(get_favorites)
+            .service(get_subscription),
     );
 }

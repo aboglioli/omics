@@ -1,11 +1,13 @@
 pub mod author;
-pub mod catalog;
 pub mod category;
 pub mod collection;
+pub mod contract;
 pub mod event;
 pub mod file;
 pub mod notification;
+pub mod plan;
 pub mod publication;
 pub mod reader;
 pub mod role;
+pub mod subscription;
 pub mod user;

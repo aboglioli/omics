@@ -1,31 +1,29 @@
 const fs = require('fs');
-const { client } = require('../core/db');
+const { connectDb } = require('../core/db');
 const config = require('../core/config');
 
 async function main() {
   console.log('[ MIGRATE ]');
-  client.connect();
+  const knex = connectDb();
   console.log('Migrating...');
 
   try {
     let files = fs.readdirSync(config.migrations_dir);
 
-    await client.query(`
+    await knex.raw(`
       CREATE TABLE IF NOT EXISTS migrations (
         file VARCHAR(255) PRIMARY KEY,
         datetime TIMESTAMP NOT NULL
       );
     `);
 
-    const res = await client.query('SELECT * FROM migrations');
-    const existingFiles = res.rows.map(row => row.file);
+    const migrations = await knex.select('*').from('migrations');
+    const existingFiles = migrations.map(m => m.file);
 
     for (const file of files) {
       process.stdout.write(`${file}: `);
 
-      let existing = existingFiles.some(f => f === file);
-
-      if (existing) {
+      if (existingFiles.some(f => f === file)) {
         console.log('EXISTING');
         continue;
       }
@@ -33,11 +31,12 @@ async function main() {
       let content = fs.readFileSync(`${config.migrations_dir}/${file}`);
       content = content.toString();
 
-      await client.query(content);
-      await client.query(
-        'INSERT INTO migrations(file, datetime) VALUES($1, $2)',
-        [file, new Date()],
-      );
+      await knex.raw(content);
+      await knex('migrations')
+        .insert({
+          file,
+          datetime: new Date(),
+        });
 
       console.log('RUN');
     }
@@ -45,7 +44,7 @@ async function main() {
     console.log(err);
   } finally {
     console.log('READY');
-    client.end();
+    await knex.destroy();
   }
 }
 

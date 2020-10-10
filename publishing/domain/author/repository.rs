@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 use common::result::Result;
@@ -11,8 +12,15 @@ pub trait AuthorRepository: Sync + Send {
         AuthorId::new(Uuid::new_v4().to_string())
     }
 
-    async fn find_all(&self) -> Result<Vec<Author>>;
     async fn find_by_id(&self, id: &AuthorId) -> Result<Author>;
+    async fn search(
+        &self,
+        name: Option<&String>,
+        from: Option<&DateTime<Utc>>,
+        to: Option<&DateTime<Utc>>,
+        offset: Option<usize>,
+        limit: Option<usize>,
+    ) -> Result<Vec<Author>>;
 
     async fn save(&self, author: &mut Author) -> Result<()>;
 
