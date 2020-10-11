@@ -10,6 +10,7 @@ export interface ICollection {
   category_id?: string;
   category?: ICategory;
   tags: string[];
+  cover: string;
   publications: number;
   created_at: string;
   updated_at?: string;

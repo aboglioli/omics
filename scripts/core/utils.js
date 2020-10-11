@@ -19,6 +19,23 @@ const randArr = (arr, multiple = false) => {
   }, []);
 };
 
+// const randDate = (start, end, startHour, endHour) => {
+//   const date = new Date(+start + Math.random() * (end - start));
+//   const hour = startHour + Math.random() * (endHour - startHour) | 0;
+//   date.setHours(hour);
+//   return date;
+// }
+//
+// const randDate = () => {
+//   const month = rand(1, 13).toString().padStart(2, '0'); // 01-12
+//   const day = rand(1, 29).toString().padStart(2, '0'); // 01-28
+//   const hour = rand(0, 24).toString().padStart(2, '0'); // 00-23
+//   const minute = rand(0, 60).toString().padStart(2, '0'); // 00-59
+//
+//   // return `2020-${month}-${day}T${hour}:${minute}:00Z`;
+//   return `2020-${month}-${day} ${hour}:${minute}:00Z`;
+// };
+
 module.exports = {
   sleep,
   rand,
