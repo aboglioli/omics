@@ -36,7 +36,6 @@ import { DashboardGestionAdminComponent } from './pages/dashboard-gestion-admin/
 import { DashboardGestionContratosPublicacionesComponent } from './pages/dashboard-gestion-contratos-publicaciones/dashboard-gestion-contratos-publicaciones.component';
 import { DashboardReglasNegociosComponent } from './pages/dashboard-reglas-negocios/dashboard-reglas-negocios.component';
 import { CatalogoComponent } from './pages/catalogo/catalogo.component';
-import { ColeccionInfoComponent } from './pages/coleccion-info/coleccion-info.component';
 import { PublicationInfoComponent } from './components/publication/publication-info/publication-info.component';
 import { NavBarComponent } from './shared/nav-bar/nav-bar.component';
 import { SideNavMenuMainComponent } from './shared/side-nav-menu-main/side-nav-menu-main.component';
@@ -71,7 +70,7 @@ import { CollectionCardReaderComponent } from './components/collection-card-type
 import { CollectionCardAuthorComponent } from './components/collection-card-type/collection-card-author/collection-card-author.component';
 import { PublicationNewEditComponent } from './pages/deskboard/publication-new-edit/publication-new-edit.component';
 import { CollectionNewEditComponent } from './pages/deskboard/collection-new-edit/collection-new-edit.component';
-import { CollectionInfoComponent } from './components/collection-info/collection-info.component';
+import { CollectionInfoComponent } from './pages/collection-info/collection-info.component';
 
 
 @NgModule({
@@ -91,7 +90,6 @@ import { CollectionInfoComponent } from './components/collection-info/collection
     DashboardGestionContratosPublicacionesComponent,
     DashboardReglasNegociosComponent,
     CatalogoComponent,
-    ColeccionInfoComponent,
     PublicationInfoComponent,
     NavBarComponent,
     SideNavMenuMainComponent,

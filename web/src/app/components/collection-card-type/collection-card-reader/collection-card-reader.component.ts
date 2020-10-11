@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { ICollection } from '../../../domain/models/collection';
 
 @Component({
   selector: 'app-collection-card-reader',
@@ -7,9 +9,19 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CollectionCardReaderComponent implements OnInit {
 
-  constructor() { }
+  @Input() collection: ICollection;
+
+  constructor(
+    private router: Router,
+  ) { }
 
   ngOnInit(): void {
+  }
+
+  public onGoToCollection(): void {
+
+    this.router.navigate([`collection/${this.collection.id}`]);
+
   }
 
 }

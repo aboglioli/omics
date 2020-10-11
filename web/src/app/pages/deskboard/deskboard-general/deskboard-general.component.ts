@@ -29,7 +29,7 @@ export class DeskboardGeneralComponent implements OnInit {
   public currentOption = this.optionMenu.comics; // TODO: En vez de esto, debería usarse "patch child" (esto lo hice por tiempo)
 
   public optionTypeSearch = typeSearchCatalogue;
-  public currentTypeSearch = this.optionTypeSearch.collection;
+  public currentTypeSearch = this.optionTypeSearch.publication;
 
   constructor(
     private authService: AuthService,

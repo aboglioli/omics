@@ -1,0 +1,270 @@
+@import "src/scss/vars";
+
+div.deskboard-body {
+  display: flex;
+  flex-direction: row;
+
+  @media screen and (min-width: $break-small) {
+    min-height: calc(100vh - 4.6em);
+  }
+
+  @media screen and (max-width: $break-small) {
+    min-height: 100vh;
+  }
+
+
+  div.side {
+
+    // Mobile size
+    @media screen and (min-width: $break-small) {
+      flex: 1;
+      background-image: url('/assets/images/banners/rightBanner.jpg');
+      opacity: 0.25;
+    }
+
+  }
+
+  div.center {
+
+    flex: 4;
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 0px;
+
+    color: white;
+    background-color: $omics-background-menu;
+
+    // Mobile size
+    @media screen and (min-width: $break-small) {
+      box-shadow: 0px 22px 15px 8px $omics-neon-pink;
+    }
+
+    div.header {
+
+      min-height: 70px;
+      background-color: $omics-background-flat;
+      padding: 0.25em 1em;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      h1 {
+        font-style: italic;
+        font-weight: bolder;
+        margin: 0px;
+      }
+
+    }
+
+    div.body {
+
+      display: flex;
+      flex-direction: column;
+
+      margin: 0em 1em;
+
+      div.image-field {
+
+        display: flex;
+        justify-content: center;
+        padding: 1em;
+
+        .image-button {
+
+          cursor: pointer;
+          text-align: center;
+
+          min-width: 220px;
+          min-height: 320px;
+
+          &.portada {
+
+            img {
+              object-fit: cover;
+              width: 100%;
+              height: 100%;
+            }
+
+          }
+
+          &.no-image {
+
+            color: #838383;
+            background-color: #1B1A18;
+
+            span.text {
+
+              height: 100%;
+              width: 100%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+
+            }
+
+          }
+
+          user-select: none;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+
+          -webkit-user-drag: none;
+          -webkit-tap-highlight-color: transparent;
+
+
+        }
+
+      }
+
+      div.input-field-row {
+
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+
+        div.title-and-error {
+
+          display: flex;
+          justify-content: space-between;
+
+          p.text-danger {
+            text-align: end;
+            font-weight: 500;
+            font-size: medium;
+            margin: 0;
+          }
+
+          p.field-name {
+            display: flex;
+            align-items: center;
+            margin: 0px;
+            margin-right: 1em;
+
+            font-weight: bold;
+            font-size: initial;
+
+          }
+
+        }
+
+      }
+
+
+      .text-area {
+        margin-top: 0.5em;
+
+        ::ng-deep div.mat-form-field-flex {
+          background-color: white;
+          color: black;
+          border-radius: 6px;
+        }
+      }
+
+      div.tag-list {
+
+        ::ng-deep div.mat-form-field-flex {
+          margin-top: 0.5em;
+          background-color: white;
+          color: black;
+          padding-left: 0.5em;
+          padding-right: 0.5em;
+          border-radius: 6px;
+
+          ::ng-deep div.mat-form-field-infix{
+            border-top-width: 18px;
+          }
+
+        }
+
+      }
+
+    }
+
+
+  }
+
+}
+
+// Generales
+button.button-white-borders {
+
+  color: white;
+  border-color: white;
+
+}
+
+.border-pink-glow {
+
+  box-shadow: 0px 0px 4px 4px  $omics-neon-pink;
+
+}
+
+div.align-left {
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+
+}
+
+div.align-center {
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+}
+
+
+.dropdown, .dropup {
+
+  width: 100%;
+
+  button {
+    width: 100%;
+    background-color: $omics-background-flat;
+    text-align: initial;
+  }
+
+  .dropdown-menu {
+
+    width: 100%;
+    color: black;
+    background-color: white;
+    margin-top: 0px;
+
+    max-height: 250px;
+    overflow-y: auto;
+
+    ul {
+      list-style-type: none;
+      padding-left: 0px;
+      margin-top: 4px;
+      margin-bottom: 0px;
+    }
+  }
+
+}
+
+::ng-deep .mat-form-field-ripple {
+  background-color: $omics-neon-pink !important;
+}
+
+::ng-deep .mat-form-field-underline {
+  background-color: $omics-background-flat !important;
+  height: 2px !important;
+}
+
+
+.row {
+
+  margin: 0px;
+
+}

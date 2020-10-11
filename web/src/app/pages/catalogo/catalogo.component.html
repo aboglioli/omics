@@ -1,11 +1,46 @@
 <div class="listado-biblioteca">
 
-  <div class="comic-thumbail" *ngFor="let publication of publicationList">
+  <!-- Catalogo de publicaciones y colecciones -->
 
-    <app-publication-card-reader
-          [publication]="publication"
-          (click)="showPublicationInfo( publication.id )">
-    </app-publication-card-reader>
+  <!-- Publication -->
+  <div  *ngIf="currentTypeSearch ===  optionTypeSearch.publication"
+        class="catalogo">
+
+    <div class="card-thumbail" *ngFor="let publication of publicationList">
+      <app-publication-card-reader
+            [publication]="publication"
+            (click)="showPublicationInfo( publication.id )">
+      </app-publication-card-reader>
+    </div>
+
+  </div>
+
+  <!-- Collection -->
+  <div  *ngIf="currentTypeSearch ===  optionTypeSearch.collection"
+        class="catalogo">
+
+    <div class="card-thumbail" *ngFor="let collection of collectionList">
+      <app-collection-card-reader
+            [collection]="collection">
+      </app-collection-card-reader>
+    </div>
+
+  </div>
+
+  <!-- Filstros y búsqueda -->
+  <div class="search-filters">
+
+    <div class="box-type">
+      <div  [ngClass]="{'selected': ( currentTypeSearch === optionTypeSearch.publication )}"
+            (click)="changeTypeSearch( optionTypeSearch.publication )">
+        Publicaciones
+      </div>
+
+      <div  [ngClass]="{'selected': ( currentTypeSearch === optionTypeSearch.collection )}"
+            (click)="changeTypeSearch( optionTypeSearch.collection )">
+        Colecciones
+      </div>
+    </div>
 
   </div>
 

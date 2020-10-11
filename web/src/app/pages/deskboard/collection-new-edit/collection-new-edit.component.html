@@ -1,1 +1,238 @@
-<p>collection-new-edit works!</p>
+<div class="deskboard-body">
+
+  <div class="side"></div>
+
+  <div class="center">
+
+    <div class="header">
+
+      <button mat-stroked-button class="button-white-borders"
+              (click)="backToDeskboard()">
+          Volver
+      </button>
+
+      <button mat-flat-button color="accent"
+              class="button-white-borders"
+              (click)="submitCollectionForm()">
+
+            <span *ngIf="!isToEdit">Crear Colección</span>
+            <span *ngIf="isToEdit">Guardar cambios</span>
+
+      </button>
+
+
+    </div>
+
+    <div class="body">
+
+      <form autocomplete="off" [formGroup]="formCollection">
+
+        <!-- Block: Portada, campo nombre y categoria -->
+        <div class="row" style="width: 100%;">
+
+          <!-- Portada -->
+          <div class="image-field" style="flex: 1">
+
+            <div  class="image-button portada border-pink-glow"
+                  matRipple
+                  [ngClass]="{'no-image': !portadaImage.thumbail}"
+                  matRippleCentered="true"
+                  (click)="uploadImagePortada()">
+
+
+              <span *ngIf="!portadaImage.thumbail" class="text">Subir imagen de Portada</span>
+              <img  *ngIf="portadaImage.thumbail" [src]="portadaImage.thumbail" alt="Thumbail image">
+
+            </div>
+          </div>
+
+          <!-- Block campo nombre, categoria y tags -->
+          <div class="align-left" style="padding: 0px; flex: 3; width: 100%; margin: 1em 1em">
+
+            <!-- Block: campo nombre -->
+            <div class="input-field-row">
+
+              <div class="title-and-error">
+                <p class="field-name">Título: </p>
+
+                <!-- mensaje de error -->
+                <p  *ngIf="nombreNovalido"
+                    class="form-text text-danger">
+                    Ingrese un título válido
+                </p>
+              </div>
+
+              <!-- Input text -->
+              <input class="form-control"
+                      type="text"
+                      placeholder="Título"
+                      formControlName="name"
+                      [class.is-invalid]="nombreNovalido">
+
+
+            </div>
+
+            <br>
+
+            <!-- Categoria -->
+            <div class="align-left" style="padding: 0px; width: 100%;">
+
+              <div class="input-field-row">
+
+                <div class="title-and-error" >
+                  <p class="field-name">Categoría: </p>
+
+                  <!-- mensaje de error -->
+                  <p  *ngIf="categoryNoValido"
+                      class="form-text text-danger">
+
+                      Seleccione una categoría.
+
+                  </p>
+
+                </div>
+
+                <div  class="d-inline-block"
+                      ngbDropdown
+                      #dropdownCategory="ngbDropdown">
+
+                  <button class="btn button-white-borders hover-white mr-2"
+                          id="dropdown-category" ngbDropdownAnchor
+                          (focus)="dropdownCategory.open();">
+
+                            <span *ngIf="!categoryFormValueId">
+                              Lista de categorías disponibles
+                            </span>
+
+                            <span *ngIf="categoryFormValueId">
+                              {{ categoryValueName }}
+                            </span>
+                  </button>
+
+                  <div ngbDropdownMenu aria-labelledby="dropdown-category">
+
+                    <!-- Opciones únicas -->
+                    <mat-radio-group formControlName="category_id">
+                      <ul>
+                        <li style="width: 100%; padding-left: 1em;"
+                            *ngFor="let category of categoryList">
+
+                          <mat-radio-button color="primary"
+                                        [value]="category.valueId">
+                            {{ category.name }}
+                          </mat-radio-button>
+
+                        </li>
+                      </ul>
+                    </mat-radio-group>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- Tags -->
+            <div class="tag-list"  style="margin: 1em 0em; padding: 0em; width: 100%;">
+
+              <div class="input-field-row">
+
+                <div class="title-and-error">
+                  <p class="field-name">Etiquetas: </p>
+                </div>
+
+                <mat-form-field style="width: 100%">
+
+                  <mat-chip-list #chipTagList aria-label="Tag selection">
+
+                    <mat-chip *ngFor="let tag of tagsList"
+                              [selectable]="true"
+                              [removable]="true"
+                              (removed)="removeTag(tag)">
+                      {{tag}}
+                      <mat-icon matChipRemove>cancel</mat-icon>
+                    </mat-chip>
+
+                    <input  placeholder="Lista de Etiquetas..."
+                            [matChipInputFor]="chipTagList"
+                            [matChipInputAddOnBlur]="true"
+                            [matChipInputSeparatorKeyCodes]="chipTagsKeysCodes"
+                            (matChipInputTokenEnd)="addTag($event)">
+
+                  </mat-chip-list>
+
+                </mat-form-field>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Block: Descripción -->
+        <div class="row">
+
+          <div class="col-12">
+            <div class="input-field-row">
+
+              <div class="title-and-error" >
+                <p class="field-name">Descripción: </p>
+
+                <!-- mensaje de error -->
+                <p  *ngIf="synopsisNovalido"
+                    class="form-text text-danger">
+                  <mat-error>Requiere que sea más de 5 caracteres o menos de 512</mat-error>
+                </p>
+
+              </div>
+
+              <mat-form-field appearance="fill" class="text-area">
+                <mat-label>{{ synopsisLenght }} / 512</mat-label>
+                <textarea matInput
+                          formControlName="synopsis"></textarea>
+              </mat-form-field>
+
+            </div>
+          </div>
+        </div>
+
+
+
+      </form>
+
+    </div>
+
+  </div>
+
+  <div class="side"></div>
+
+</div>
+
+<!-- Swal Message -->
+<swal #formDataInvalid
+  title="Datos incompletos o erroneos"
+  text="Complete correctamente los datos necesarios"
+  icon="error"
+  [focusConfirm]="true">
+</swal>
+
+<swal #collectionValid
+  title="Colección creada"
+  text="Ya puedes asignar publicaciones a esta nueva colección"
+  icon="success"
+  [focusConfirm]="true"
+  (confirm)="backToDeskboard()">
+</swal>
+
+<swal #formEditCollectionValid
+  title="Colección editada"
+  text="¡Se ha actualizado correctamente!"
+  icon="success"
+  [focusConfirm]="true"
+  (confirm)="backToDeskboard()">
+</swal>
+

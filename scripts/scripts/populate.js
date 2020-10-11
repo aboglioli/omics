@@ -1,6 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 const { connectDb } = require('../core/db');
 const {
+  password,
   image,
   genders,
   categories,
@@ -24,12 +25,14 @@ async function main() {
           provider: 'local',
           username: `user-${i}`,
           email: `user-${i}@omics.com`,
+          password,
           name: 'Name',
           lastname: 'Lastname',
           birthdate: '1994-08-01 15:30:00Z',
           gender: randArr(genders),
           biography: 'My biography...',
           profile_image: image(200),
+          role_id: 'user',
           created_at: new Date(),
         });
 
