@@ -87,7 +87,7 @@
         <!-- Lista de publicaciones  -->
         <div class="listado-biblioteca">
 
-          <span *ngIf="publicationList.length > 0"  >
+          <span *ngIf="publicationList && publicationList.length > 0"  >
 
             <div class="comic-thumbail" *ngFor="let publication of publicationList">
               <app-publication-card-reader
@@ -98,7 +98,7 @@
 
           </span>
 
-          <span *ngIf="publicationList.length === 0">
+          <span *ngIf="!publicationList || publicationList.length === 0">
 
             <h1>No hay publicaciones añadidas</h1>
 

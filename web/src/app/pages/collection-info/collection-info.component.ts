@@ -40,7 +40,7 @@ export class CollectionInfoComponent implements OnInit {
 
         this.collectionService.getById(params.id, 'author, category').subscribe(
           ( resData: ICollection) => {
-            console.log(resData);
+            // console.log('TEST > ', resData);
 
             this.collectionData = resData;
             this.getPublicationsByCategory( this.collectionData.id );
