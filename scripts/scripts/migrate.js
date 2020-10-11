@@ -8,7 +8,7 @@ async function main() {
   console.log('Migrating...');
 
   try {
-    let files = fs.readdirSync(config.migrations_dir);
+    let files = fs.readdirSync(config.migrationsDir);
 
     await knex.raw(`
       CREATE TABLE IF NOT EXISTS migrations (
@@ -28,7 +28,7 @@ async function main() {
         continue;
       }
 
-      let content = fs.readFileSync(`${config.migrations_dir}/${file}`);
+      let content = fs.readFileSync(`${config.migrationsDir}/${file}`);
       content = content.toString();
 
       await knex.raw(content);

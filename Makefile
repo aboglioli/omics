@@ -23,20 +23,23 @@ build: dependencies
 api-test:
 	$(MAKE) -C $(SCRIPTS_DIR) test
 
-populate:
-	$(MAKE) -C $(SCRIPTS_DIR) populate
-
-api-populate:
-	$(MAKE) -C $(SCRIPTS_DIR) api-populate
+clean-db:
+	$(MAKE) -C $(SCRIPTS_DIR) clean-db
 
 migrate:
 	$(MAKE) -C $(SCRIPTS_DIR) migrate
 
-clean-db:
-	$(MAKE) -C $(SCRIPTS_DIR) clean-db
+populate:
+	$(MAKE) -C $(SCRIPTS_DIR) populate
+
+old-populate:
+	$(MAKE) -C $(SCRIPTS_DIR) old-populate
 
 test:
 	cargo test --color always
+
+update-samples:
+	$(MAKE) -C $(SCRIPTS_DIR) update-samples
 
 
 # ----------

@@ -3,10 +3,10 @@ const config = require('./config');
 const connectDb = () => require('knex')({
   client: 'pg',
   connection: {
-    host: config.postgres_host,
-    user: config.postgres_username,
-    password: config.postgres_password,
-    database: config.postgres_database,
+    host: config.postgresHost,
+    user: config.postgresUsername,
+    password: config.postgresPassword,
+    database: config.postgresDatabase,
   },
 });
 

@@ -6,3 +6,5 @@ target
 dist
 node_modules
 tmp
+
+docs/api_insomnia.json

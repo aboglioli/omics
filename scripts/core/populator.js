@@ -9,18 +9,26 @@ const {
   categories,
   tags,
 } = require('../core/constants');
-const { randArr } = require('../core/utils');
+const { rand, randArr } = require('../core/utils');
 
 class Populator {
-  constructor(db) {
+  constructor(db, comicSamples) {
     this.db = db;
+    this.comicSamples = comicSamples;
 
     this.events = [];
 
     this.users = {};
     this.publications = {};
-    this.publicationFavorites = {};
     this.collections = {};
+
+    this.publicationFavorites = [];
+    this.collectionFavorites = [];
+    this.views = [];
+    this.readings = [];
+    this.likes = [];
+    this.reviews = [];
+    this.follows = [];
   }
 
   createUser({
@@ -53,19 +61,21 @@ class Populator {
   }
 
   createPublication({
-    user,
+    userId,
     pageCount,
     status,
   }) {
     const id = uuid();
+    const sample = randArr(this.comicSamples);
     const publication = {
       id,
-      author_id: user.id,
-      name: faker.name.findName(),
-      synopsis: faker.lorem.paragraph(),
+      author_id: userId,
+      name: sample.title || faker.name.findName(),
+      synopsis: sample.description || faker.lorem.paragraph(),
       category_id: randArr(categories),
       tags: randArr(tags, true),
-      cover: image(250),
+      cover: `${sample.images[0].path}.${sample.images[0].extension}`,
+      // cover: image(250)// ,
       statistics: {
         views: 0,
         unique_views: 0,
@@ -129,26 +139,25 @@ class Populator {
     publication.status_history = statusHistory;
 
     this.publications[id] = publication;
-
-    user.publications += 1;
+    this.users[userId].publications += 1;
 
     return publication;
   }
 
   createCollection({
-    user,
-    publications,
+    userId,
+    publicationIds,
   }) {
     const id = uuid();
     const collection = {
       id,
-      author_id: user,
+      author_id: userId,
       name: faker.name.findName(),
       synopsis: faker.lorem.paragraph(),
       category_id: randArr(categories),
       tags: randArr(tags, true),
       cover: image(250),
-      items: publications.map(({ id }) => ({
+      items: publicationIds.map(id => ({
         pulication_id: id,
         date: new Date(),
       })),
@@ -156,6 +165,79 @@ class Populator {
     };
 
     return collection;
+  }
+
+  createView({ userId, publicationId, unique }) {
+    this.views.push({
+      reader_id: userId,
+      publication_id: publicationId,
+      datetime: new Date(),
+      is_unique: unique,
+    });
+
+    this.publications[publicationId].statistics.views += 1;
+  }
+
+  createReading({ userId, publicationId }) {
+    this.readings.push({
+      reader_id: userId,
+      publication_id: publicationId,
+      datetime: new Date(),
+    });
+
+    this.publications[publicationId].statistics.readings += 1;
+  }
+
+  createLike({ userId, publicationId }) {
+    this.likes.push({
+      reader_id: userId,
+      publication_id: publicationId,
+      datetime: new Date(),
+    });
+
+    this.publications[publicationId].statistics.likes += 1;
+  }
+
+  createReview({ userId, publicationId }) {
+    this.reviews.push({
+      reader_id: userId,
+      publication_id: publicationId,
+      datetime: new Date(),
+      stars: rand(0, 6),
+      comment: faker.lorem.paragraph(),
+    });
+
+    this.publications[publicationId].statistics.reviews += 1;
+    const stars =
+      this.reviews.reduce((acc, r) => acc + r.stars, 0.0) / this.reviews.length;
+    this.publications[publicationId].statistics.stars = +stars.toFixed(2);
+
+  }
+
+  createPublicationFavorite({ userId, publicationId }) {
+    this.publicationFavorites.push({
+      reader_id: userId,
+      publication_id: publicationId,
+      datetime: new Date(),
+    });
+  }
+
+  createCollectionFavorite({ userId, publicationId }) {
+    this.collectionFavorites.push({
+      reader_id: userId,
+      publication_id: publicationId,
+      datetime: new Date(),
+    });
+  }
+
+  createFollow({ readerId, authorId }) {
+    this.follows.push({
+      reader_id: readerId,
+      author_id: authorId,
+      datetime: new Date(),
+    });
+
+    this.users[authorId].followers += 1;
   }
 
   async save() {
@@ -183,8 +265,26 @@ class Populator {
           })),
       );
 
-    // await this.db('publication_favorites')
-    //   .insert(Object.values(this.publicationFavorites));
+    await this.db('views')
+      .insert(this.views);
+
+    await this.db('readings')
+      .insert(this.readings);
+
+    await this.db('likes')
+      .insert(this.likes);
+
+    await this.db('reviews')
+      .insert(this.reviews);
+
+    await this.db('publication_favorites')
+      .insert(this.publicationFavorites);
+
+    await this.db('collection_favorites')
+      .insert(this.collectionFavorites);
+
+    await this.db('follows')
+      .insert(this.follows);
   }
 }
 

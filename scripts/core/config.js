@@ -5,12 +5,14 @@ dotenv.config({
 });
 
 const config = {
-  postgres_host: process.env.POSTGRES_HOST,
-  postgres_port: process.env.POSTGRES_PORT,
-  postgres_username: process.env.POSTGRES_USERNAME,
-  postgres_password: process.env.POSTGRES_PASSWORD,
-  postgres_database: process.env.POSTGRES_DATABASE,
-  migrations_dir: './migrations',
+  postgresHost: process.env.POSTGRES_HOST,
+  postgresPort: process.env.POSTGRES_PORT,
+  postgresUsername: process.env.POSTGRES_USERNAME,
+  postgresPassword: process.env.POSTGRES_PASSWORD,
+  postgresDatabase: process.env.POSTGRES_DATABASE,
+  marvelPublicKey: process.env.MARVEL_PUBLIC_KEY,
+  marvelPrivateKey: process.env.MARVEL_PRIVATE_KEY,
+  migrationsDir: './migrations',
 };
 
 module.exports = config;

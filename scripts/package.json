@@ -5,9 +5,11 @@
   "main": "index.js",
   "scripts": {
     "api-populate": "node scripts/api-populate",
+    "old-populate": "node scripts/old-populate",
     "populate": "node scripts/populate",
     "migrate": "node scripts/migrate",
     "clean-db": "node scripts/clean-db",
+    "update-samples": "node scripts/update-samples",
     "test": "jest core tests",
     "lint": "eslint '*/**/*.js' --fix"
   },

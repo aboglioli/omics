@@ -1,159 +1,110 @@
-const { v4: uuidv4 } = require('uuid');
 const { connectDb } = require('../core/db');
-const {
-  password,
-  image,
-  genders,
-  categories,
-  tags,
-} = require('../core/constants');
 const { rand, randArr } = require('../core/utils');
+const samples = require('../comic-samples.json');
+
+const Populator = require('../core/populator');
 
 async function main() {
   console.log('[ POPULATE ]');
   const knex = connectDb();
   console.log('Populating DB...');
 
+  const populator = new Populator(knex, samples.comics);
+
   try {
-    // Create user, publications and collections
-    for (let i = 0; i < 10; i++) {
-      const userId = uuidv4();
+    // User
+    for (let i = 0; i < 1200; i++) {
+      const user = populator.createUser({ username: `user-${i}` });
 
-      await knex('users')
-        .insert({
-          id: userId,
-          provider: 'local',
-          username: `user-${i}`,
-          email: `user-${i}@omics.com`,
-          password,
-          name: 'Name',
-          lastname: 'Lastname',
-          birthdate: '1994-08-01 15:30:00Z',
-          gender: randArr(genders),
-          biography: 'My biography...',
-          profile_image: image(200),
-          role_id: 'user',
-          created_at: new Date(),
-        });
+      if (rand(0, 100) < 5) {
+        // Publications
+        for (let i = 0; i < rand(0, 10); i++) {
+          let status = null;
+          if (rand(0, 100) < 80) {
+            status = 'waiting-approval';
 
-      let publicationIds = [];
-      for (let j = 0; j < rand(1, 15); j++) {
-        const publicationId = uuidv4();
-
-        let pages = [];
-        for (let k = 0; k < rand(1,15); k++) {
-          pages.push({
-            number: k,
-            images: [{
-              url: image('663x1024'),
-            }],
-          });
-        }
-
-        const statusHistory = [{
-          status: 'draft',
-          datetime: new Date(),
-        }];
-
-        if (rand(0, 100) < 80) {
-          statusHistory.push({
-            status: 'waiting-approval',
-            datetime: new Date(),
-          });
-
-          if (rand(0, 100) < 60) {
-            statusHistory.push({
-              status: 'published',
-              admin_id: {
-                id: '00000000-0000-0000-0000-000000000002',
-              },
-              comment: {
-                comment: 'Todo está perfecto.',
-              },
-              datetime: new Date(),
-            });
-          } else if (rand(0, 100) < 40) {
-            statusHistory.push({
-              status: 'rejected',
-              admin_id: {
-                id: '00000000-0000-0000-0000-000000000002'
-              },
-              comment: {
-                comment: 'Tiene contenido que puede resultar ofensivo a los pandas.'
-              },
-              datetime: new Date(),
-            });
+            const r = rand(0, 100);
+            if (r < 40) {
+              status = 'published';
+            } else if (r < 60) {
+              status = 'rejected';
+            }
           }
+
+          populator.createPublication({
+            userId: user.id,
+            pageCount: rand(1, 20),
+            status,
+          });
         }
 
-        await knex('publications')
-          .insert({
-            id: publicationId,
-            author_id: userId,
-            name: `Publication ${i}-${j}`,
-            synopsis: 'Synopsis...',
-            category_id: randArr(categories),
-            tags: JSON.stringify(randArr(tags, true)),
-            cover: image(250),
-            statistics: {
-              views: rand(0, 1000),
-              unique_views: rand(0, 850),
-              readings: rand(0, 560),
-              likes: rand(0, 175),
-              reviews: rand(0, 85),
-              stars: rand(0, 51) / 10.0,
-            },
-            status_history: JSON.stringify(statusHistory),
-            pages: JSON.stringify(pages),
-            created_at: new Date(),
+        // Collections
+        for (let i = 0; i < rand(0, 5); i++) {
+          populator.createCollection({
+            userId: user.id,
+            publicationIds: randArr(
+              Object.values(populator.publications)
+                .filter(p => p.author_id === user.id)
+                .map(p => p.id),
+              true,
+            ),
           });
-
-        publicationIds.push(publicationId);
-      }
-
-      for (let j = 0; j < rand(1, 6); j++) {
-        const collectionId = uuidv4();
-
-        const items = publicationIds
-          .filter(() => rand(1, 100) < 20)
-          .map(pId => ({
-            publication_id: { id: pId },
-            date: new Date(),
-          }));
-
-        await knex('collections')
-          .insert({
-            id: collectionId,
-            author_id: userId,
-            name: `Collection ${i}-${j}`,
-            synopsis: 'I am a collection...',
-            category_id: randArr(categories),
-            tags: JSON.stringify(randArr(tags, true)),
-            cover: image(250),
-            items: JSON.stringify(items),
-            created_at: new Date(),
-          });
+        }
       }
     }
 
-    // Add interactions
-    const users = await knex('users');
-    const publications = await knex('publications');
+    // Follows
+    for (let i = 0; i < 200; i++) {
+      const reader = randArr(Object.values(populator.users));
+      const author = randArr(
+        Object.values(populator.users)
+          .filter(u => u.publications > 0),
+      );
 
-    for (const user of users) {
-      for (const publication of publications) {
-        if (user.id != publication.author_id) {
-          if (rand(0, 100) < 30) {
-            await knex('publication_favorites')
-              .insert({
-                reader_id: user.id,
-                publication_id: publication.id,
-                datetime: new Date(),
-              });
-          }
-        }
+      if (reader.id != author.id) {
+        populator.createFollow({ readerId: reader.id, authorId: author.id });
       }
     }
+
+    // Views
+    const interactions = [];
+    for (let i = 0; i < 10000; i++) {
+      const user = randArr(Object.values(populator.users));
+      const publication = randArr(
+        Object.values(populator.publications),
+      );
+      const unique = !interactions.some((i) => i[0] === user.id && i[1] === publication.id);
+
+      if (user.id == publication.author_id) {
+        continue;
+      }
+
+      populator.createView({ userId: user.id, publicationId: publication.id, unique });
+
+      // if (!unique) {
+      //   continue;
+      // }
+
+      if (rand(0, 100) < 70) {
+        populator.createReading({ userId: user.id, publicationId: publication.id });
+
+        if (rand(0, 100) < 40) {
+          populator.createLike({ userId: user.id, publicationId: publication.id });
+        }
+
+        if (rand(0, 100) < 20) {
+          populator.createReview({ userId: user.id, publicationId: publication.id });
+        }
+
+        if (rand(0, 100) < 20) {
+          populator.createPublicationFavorite({ userId: user.id, publicationId: publication.id });
+        }
+      }
+
+      interactions.push([user.id, publication.id]);
+    }
+
+    await populator.save();
   } catch (err) {
     console.log(err);
   } finally {
