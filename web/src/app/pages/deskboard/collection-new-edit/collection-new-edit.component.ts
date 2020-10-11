@@ -12,6 +12,8 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { ICreateCommand, CollectionService, ICreateResponse } from '../../../domain/services/collection.service';
 import { ICollection } from 'src/app/domain/models';
+import Swal from 'sweetalert2';
+import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-collection-new-edit',
@@ -22,6 +24,9 @@ export class CollectionNewEditComponent implements OnInit {
   @ViewChild('formDataInvalid') private swalFormDataInvalid: SwalComponent;
   @ViewChild('collectionValid') private swalCollectionValid: SwalComponent;
   @ViewChild('formEditCollectionValid') private swalFormEditCollectionValid: SwalComponent;
+
+  // FontAwesome Icon
+  public faDelete = faTrashAlt;
 
   // Usados para forms
   public formCollection: FormGroup;
@@ -350,6 +355,63 @@ export class CollectionNewEditComponent implements OnInit {
   }
 
   //#endregion
+
+
+  public onCollectionDelete(): void {
+
+    Swal.fire({
+      title: 'Eliminar colección',
+      text: '¿Estas seguro ',
+      icon: 'warning',
+      showCancelButton: true,
+      focusCancel: true,
+      confirmButtonColor: '#FC4850',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'No'
+    }).then((result) => {
+      if (result.isConfirmed) {
+
+        this.deleteCollectionConfirm();
+
+      }
+    });
+
+  }
+
+  private deleteCollectionConfirm(): void {
+
+    this.spinnerService.show();
+
+    this.collectionService.delete( this.collectionToEditId ).subscribe(
+      (res: any) => {
+
+        Swal.fire(
+          'Eliminado con éxito',
+          `${ this.formCollection.get('name').value } se ha eliminado.`,
+          'success'
+        ).then((result) => {
+          if (result.isConfirmed) {
+
+            this.backToDeskboard();
+
+          }
+        });
+
+        this.spinnerService.hide();
+
+      },
+      (err: Error) => {
+
+        this.sweetAlertGenericService.showAlertError('Ha ocurrido un problema al eliminar la colección', 'Error Servidor');
+        console.error(err);
+
+        this.spinnerService.hide();
+
+      }
+    );
+
+  }
 
   //#region Getters
 

@@ -49,6 +49,17 @@
           <!-- Block campo nombre, categoria y tags -->
           <div class="align-left" style="padding: 0px; flex: 3; width: 100%; margin: 1em 1em">
 
+          <!-- Eliminar coleción -->
+          <div  *ngIf="isToEdit"
+                style="display: flex; justify-content: center; width: 100%; margin-bottom: 1em;">
+            <button mat-flat-button color="warn"
+                    class="button-white-borders"
+                    (click)="onCollectionDelete()">
+              <fa-icon [icon]="faDelete" size="1x" style="margin-right: 0.5em"></fa-icon>
+              Eliminar Colección
+            </button>
+          </div>
+
             <!-- Block: campo nombre -->
             <div class="input-field-row">
 

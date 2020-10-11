@@ -5,7 +5,7 @@ import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@ang
 import { MatCheckbox } from '@angular/material/checkbox';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 
-import { faPlusCircle, faTimesCircle, faBookOpen } from '@fortawesome/free-solid-svg-icons';
+import { faPlusCircle, faTimesCircle, faBookOpen, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 
 import { AuthService } from '../../../domain/services/auth.service';
 import { FileService } from '../../../domain/services/file.service';
@@ -20,6 +20,7 @@ import { PublicationService, IUpdatePagesCommand, IGetByIdResponse, IGetCollecti
 import { ICreateCommand, CollectionService } from '../../../domain/services/collection.service';
 import { SweetAlertGenericMessageService } from '../../../services/sweet-alert-generic-message.service';
 import { ICollection } from '../../../domain/models/collection';
+import Swal from 'sweetalert2';
 
 export interface IPageForm {
   number: number;
@@ -49,6 +50,7 @@ export class PublicationNewEditComponent implements OnInit {
   public faPlus = faPlusCircle;
   public faCloseCircle = faTimesCircle;
   public faBoookOpen = faBookOpen;
+  public faDelete = faTrashAlt;
 
   // Usados para Forms
   public formPublication: FormGroup;
@@ -62,7 +64,7 @@ export class PublicationNewEditComponent implements OnInit {
 
 
   // Otros
-  private isToEdit: boolean;
+  public isToEdit: boolean;
   private isToSketch: boolean;
   private publicationToEditId: string;
 
@@ -237,6 +239,7 @@ export class PublicationNewEditComponent implements OnInit {
     });
 
   }
+
   // Generales
   public uploadImagePortada(): void {
 
@@ -299,6 +302,62 @@ export class PublicationNewEditComponent implements OnInit {
 
   }
 
+  public onPublicationDelete(): void {
+
+    Swal.fire({
+      title: 'Eliminar publicación',
+      text: '¿Estas seguro ',
+      icon: 'warning',
+      showCancelButton: true,
+      focusCancel: true,
+      confirmButtonColor: '#FC4850',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'No'
+    }).then((result) => {
+      if (result.isConfirmed) {
+
+        this.deletePublicationConfirm();
+
+      }
+    });
+
+  }
+
+  private deletePublicationConfirm(): void {
+
+    this.spinnerService.show();
+
+    this.publicationService.delete( this.publicationToEditId ).subscribe(
+      (res: any) => {
+
+        Swal.fire(
+          'Eliminado con éxito',
+          `${ this.formPublication.get('name').value } se ha eliminado.`,
+          'success'
+        ).then((result) => {
+          if (result.isConfirmed) {
+
+            this.backToDeskboard();
+
+          }
+        });
+
+        this.spinnerService.hide();
+
+      },
+      (err: Error) => {
+
+        this.sweetAlertGenericService.showAlertError('Ha ocurrido un problema al eliminar la publicación', 'Error Servidor');
+        console.error(err);
+
+        this.spinnerService.hide();
+
+      }
+    );
+
+
+  }
 
   //#region Realizar publicación
   public submitPublicationForm(): void {
