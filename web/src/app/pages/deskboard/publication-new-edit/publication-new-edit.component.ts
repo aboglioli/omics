@@ -330,7 +330,18 @@ export class PublicationNewEditComponent implements OnInit {
 
     this.publicationService.delete( this.publicationToEditId ).subscribe(
       (res: any) => {
-s
+
+        Swal.fire(
+          'Eliminado con éxito',
+          `${ this.formPublication.get('name').value } se ha eliminado.`,
+          'success'
+        ).then((result) => {
+          if (result.isConfirmed) {
+
+            this.backToDeskboard();
+
+          }
+        });
 
         this.spinnerService.hide();
 
@@ -344,6 +355,7 @@ s
 
       }
     );
+
 
   }
 
