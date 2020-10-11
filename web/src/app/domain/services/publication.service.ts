@@ -20,7 +20,7 @@ export interface ISearchCommand {
   date_to?: string;
   offset?: number;
   limit?: number;
-  order_by?: string;
+  order_by?: string; // 'most_viewed' 'most_liked' 'newest' 'best_reviews'
 }
 
 export interface ISearchResponse {

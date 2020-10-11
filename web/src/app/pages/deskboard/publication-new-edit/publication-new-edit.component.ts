@@ -62,7 +62,6 @@ export class PublicationNewEditComponent implements OnInit {
 
 
   // Otros
-  public ripplePortadaEnable = true;
   private isToEdit: boolean;
   private isToSketch: boolean;
   private publicationToEditId: string;
@@ -136,16 +135,16 @@ export class PublicationNewEditComponent implements OnInit {
           // Si no existe el id, es una nueva publicación, sino se busca con el ID la publicación
           if ( this.publicationToEditId === undefined ) {
 
-            this.spinnerService.hide();
             this.isToEdit = false;
 
           } else {
 
-            this.spinnerService.hide();
             this.isToEdit = true;
             this.getPublicationToEdit(this.publicationToEditId);
 
           }
+
+          this.spinnerService.hide();
 
 
         });
@@ -200,9 +199,10 @@ export class PublicationNewEditComponent implements OnInit {
       cover: publicationObject.cover,
       synopsis: publicationObject.synopsis,
       category_id: publicationObject.category_id,
+
     });
 
-    // Asignar las categorias
+    // Asignar las colecciones
     if ( collectionList.length > 0 ) {
 
       collectionList.forEach( (collection: ICollection) => {
@@ -309,7 +309,7 @@ export class PublicationNewEditComponent implements OnInit {
     const description = this.formPublication.get('synopsis');
     this.formPublication.get('synopsis').setValue(description.value.trim());
 
-    console.log('TEST > Submit Publication > ', this.formPublication.value );
+    // console.log('TEST > Submit Publication > ', this.formPublication.value );
 
     if ( this.formPublication.invalid ) {
 
@@ -379,7 +379,7 @@ export class PublicationNewEditComponent implements OnInit {
 
     forkJoin( arrayPageObervables ).subscribe( ( dataPage ) => {
 
-      console.log( 'TEST DATAPAGE > ', dataPage  );
+      // console.log( 'TEST DATAPAGE > ', dataPage  );
       pagesUrl = this.getUrlFromFileService(dataPage);
       this.uploadPublicationNewPages(pagesUrl);
 
@@ -653,7 +653,7 @@ export class PublicationNewEditComponent implements OnInit {
           const collectionRemoveSubscriptionList: any[] = [];
           collectionToRemove.forEach( (collection: ICollection) => {
 
-            console.log( 'TEST >>', collection.id );
+            // console.log( 'TEST >>', collection.id );
             collectionRemoveSubscriptionList.push( this.collectionService.removePublication( collection.id, idPubcalition ) );
 
           });
@@ -967,6 +967,7 @@ export class PublicationNewEditComponent implements OnInit {
   get categoryNoValido(): boolean {
     return ( this.formPublication.get('category_id').invalid && this.formPublication.get('category_id').touched );
   }
+
   get categoryFormValueId(): string {
 
     return this.formPublication.get('category_id').value;
@@ -981,8 +982,6 @@ export class PublicationNewEditComponent implements OnInit {
 
     } )[0].name;
   }
-
-
 
   //#endregion
 

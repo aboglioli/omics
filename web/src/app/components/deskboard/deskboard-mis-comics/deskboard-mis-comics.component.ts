@@ -55,6 +55,12 @@ export class DeskboardMisComicsComponent implements OnInit, OnChanges {
 
   }
 
+  public goToNewCollection(): void {
+
+    this.router.navigate(['collection/new'], { relativeTo: this.activatedRoute });
+
+  }
+
   private getPublicationData(): void {
 
     this.spinnerService.show();
