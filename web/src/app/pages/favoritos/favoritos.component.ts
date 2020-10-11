@@ -41,7 +41,8 @@ export class FavoritosComponent implements OnInit {
       {
         panelClass: 'info-publication',
         data: {
-          idPublication: idObra
+          idPublication: idObra,
+          showRead: true
         }
       }
     );
