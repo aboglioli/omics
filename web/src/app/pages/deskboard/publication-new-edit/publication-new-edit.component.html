@@ -51,6 +51,17 @@
           <!-- Block campo nombre y colección -->
           <div class="align-center" style="padding: 0px; flex: 3; width: 100%; margin: 0em 1em">
 
+          <!-- Eliminar publicación -->
+          <div  *ngIf="isToEdit"
+                style="display: flex; justify-content: center; margin-bottom: 1em;">
+            <button mat-flat-button color="warn"
+                    class="button-white-borders"
+                    (click)="onPublicationDelete()">
+              <fa-icon [icon]="faDelete" size="1x" style="margin-right: 0.5em"></fa-icon>
+              Eliminar Publicación
+            </button>
+          </div>
+
             <!-- Block: campo nombre -->
             <div class="input-field-row">
 
@@ -360,3 +371,4 @@
   [focusConfirm]="true"
   (confirm)="backToDeskboard()">
 </swal>
+
