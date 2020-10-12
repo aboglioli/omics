@@ -30,6 +30,8 @@ class Populator {
     this.likes = [];
     this.reviews = [];
     this.follows = [];
+
+    this.subscriptions = [];
   }
 
   nextDate() {
@@ -126,6 +128,17 @@ class Populator {
       created_at: this.nextDate(),
       updated_at: this.nextDate(),
     };
+    this.addEvent("publication", "created", {
+      Created: {
+        id: publication.id,
+        author_id: publication.author_id,
+        name: publication.name,
+        synopsis: publication.synopsis,
+        category_id: publication.category_id,
+        tags: publication.tags.map((t) => t.name),
+        cover: publication.cover,
+      },
+    });
 
     pageCount = pageCount || 0;
     const pages = [];
@@ -140,6 +153,12 @@ class Populator {
       });
     }
     publication.pages = pages;
+    this.addEvent("publication", "pages-updated", {
+      PagesUpdated: {
+        id: publication.id,
+        pages_count: publication.pages.length,
+      },
+    });
 
     const statusHistory = [
       {
@@ -153,6 +172,11 @@ class Populator {
         status: "waiting-approval",
         datetime: this.nextDate(),
       });
+      this.addEvent("publication", "approval-waited", {
+        ApprovalWaited: {
+          id: publication.id,
+        },
+      });
 
       if (status === "published") {
         statusHistory.push({
@@ -165,6 +189,18 @@ class Populator {
           },
           datetime: this.nextDate(),
         });
+        this.addEvent("publication", "published", {
+          Published: {
+            id: publication.id,
+            author_id: publication.author_id,
+            name: publication.name,
+            synopsis: publication.synopsis,
+            category_id: publication.category_id,
+            tags: publication.tags.map((t) => t.name),
+            cover: publication.cover,
+            pages_count: publication.pages.length,
+          },
+        });
       } else if (status === "rejected") {
         statusHistory.push({
           status: "rejected",
@@ -176,47 +212,17 @@ class Populator {
           },
           datetime: this.nextDate(),
         });
+        this.addEvent("publication", "rejected", {
+          Rejected: {
+            id: publication.id,
+          },
+        });
       }
     }
     publication.status_history = statusHistory;
 
     this.publications[id] = publication;
     this.users[userId].publications += 1;
-
-    this.addEvent("publication", "created", {
-      Created: {
-        id: publication.id,
-        author_id: publication.author_id,
-        name: publication.name,
-        synopsis: publication.synopsis,
-        category_id: publication.category_id,
-        tags: publication.tags.map((t) => t.name),
-        cover: publication.cover,
-      },
-    });
-    this.addEvent("publication", "pages-updated", {
-      PagesUpdated: {
-        id: publication.id,
-        pages_count: publication.pages.length,
-      },
-    });
-    this.addEvent("publication", "approval-waited", {
-      ApprovalWaited: {
-        id: publication.id,
-      },
-    });
-    this.addEvent("publication", "published", {
-      Published: {
-        id: publication.id,
-        author_id: publication.author_id,
-        name: publication.name,
-        synopsis: publication.synopsis,
-        category_id: publication.category_id,
-        tags: publication.tags.map((t) => t.name),
-        cover: publication.cover,
-        pages_count: publication.pages.length,
-      },
-    });
 
     return publication;
   }
@@ -383,6 +389,71 @@ class Populator {
     });
 
     this.users[authorId].followers += 1;
+  }
+
+  createSubscription({ userId, status }) {
+    const id = uuid();
+    const subscription = {
+      id,
+      user_id: userId,
+      plan: {
+        plan_id: {
+          id: "basic",
+        },
+        price: 75.0,
+        assigned_at: this.nextDate(),
+      },
+      created_at: this.nextDate(),
+      updated_at: this.nextDate(),
+    };
+    this.addEvent("subscription", "created", {
+      Created: {
+        id,
+        user_id: userId,
+        plan_id: "basic",
+      },
+    });
+
+    const statusHistory = [
+      {
+        status: "waiting-for-payment",
+        datetime: this.nextDate(),
+      },
+    ];
+    const payments = [];
+    if (status === "active") {
+      statusHistory.push([
+        {
+          status: "active",
+          datetime: this.nextDate(),
+        },
+      ]);
+      status.push({
+        kind: "income",
+        amount: subscription.plan.price,
+        datetime: this.nextDate(),
+      });
+      this.addEvent("subscription", "payment-added", {
+        PaymentAdded: {
+          id: subscription.id,
+          user_id: subscription.user_id,
+          amount: subscription.plan.price,
+        },
+      });
+    } else if (status === "inactive") {
+      statusHistory.push([
+        {
+          status: "inactive",
+          datetime: this.nextDate(),
+        },
+      ]);
+    }
+    subscription.status_history = statusHistory;
+    subscription.payments = payments;
+
+    this.subscriptions.push(subscription);
+
+    return subscription;
   }
 
   async save() {
