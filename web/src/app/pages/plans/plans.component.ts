@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { IPlan } from '../../domain/models';
@@ -10,7 +10,7 @@ import { ReaderService } from '../../domain/services/reader.service';
   templateUrl: './plans.component.html',
   styleUrls: ['./plans.component.scss']
 })
-export class PlansComponent implements OnInit {
+export class PlansComponent implements OnInit, OnDestroy {
   public plans: IPlan[];
   public readerPlanSubscription: string;
   private lastInterval: number;
@@ -38,6 +38,10 @@ export class PlansComponent implements OnInit {
         }
       }
     );
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.lastInterval);
   }
 
   subscribe(plan: IPlan): void {
