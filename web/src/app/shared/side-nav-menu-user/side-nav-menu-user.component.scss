@@ -55,6 +55,20 @@ div.menu-box {
       height: 50px;
       margin: 0.5em 1em;
 
+      &.subscription-button {
+        background-color: #ffb347;
+        color: #000;
+
+        &.active {
+          background-color: #755818;
+        }
+
+        &:disabled {
+          background-color: #ffb347;
+          color: #000;
+        }
+      }
+
       &.admin-button {
 
         background-color: $omics-background-flat;
@@ -72,9 +86,23 @@ div.menu-box {
         }
 
       }
+    }
 
+    .subscribed {
+      background-color: #ffb347;
+      color: #000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.2rem 0.5rem;
 
-
+      button {
+        border: none;
+        background-color: rgba(150, 0, 0, 0.2);
+        padding: 0.1rem 0.3rem;
+        margin: 0;
+        height: auto;
+      }
     }
 
   }

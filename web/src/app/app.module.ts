@@ -44,6 +44,7 @@ import { UnderConstructionComponent } from './shared/under-construction/under-co
 import { DeskboardMisComicsComponent } from './components/deskboard/deskboard-mis-comics/deskboard-mis-comics.component';
 import { PublicationCardManagerComponent } from './components/publication-card-type/publication-card/publication-card-manager.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
+import { PlansComponent } from './pages/plans/plans.component';
 // --->
 
 // Development
@@ -101,6 +102,7 @@ import { CollectionInfoComponent } from './pages/collection-info/collection-info
     PasswordRewriteComponent,
     PublicationCardManagerComponent,
     NotificationsComponent,
+    PlansComponent,
 
     DevelopmentComponent,
     DevUploadFileComponent,

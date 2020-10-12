@@ -296,7 +296,13 @@ mod tests {
 
         assert!(subscription
             .change_plan(
-                Plan::new(PlanId::new("#plan02").unwrap(), Price::new(175.75).unwrap(),).unwrap(),
+                Plan::new(
+                    PlanId::new("#plan02").unwrap(),
+                    "new-plan",
+                    "New Plan",
+                    Price::new(175.75).unwrap(),
+                )
+                .unwrap(),
             )
             .is_ok());
     }

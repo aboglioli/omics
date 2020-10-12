@@ -25,5 +25,11 @@ pub fn payment(kind: &str, amount: f64, _date: DateTime<Utc>) -> Payment {
 
 #[allow(dead_code)]
 pub fn plan(id: &str, price: f64) -> Plan {
-    Plan::new(PlanId::new(id).unwrap(), Price::new(price).unwrap()).unwrap()
+    Plan::new(
+        PlanId::new(id).unwrap(),
+        "basic".to_owned(),
+        "Basic".to_owned(),
+        Price::new(price).unwrap(),
+    )
+    .unwrap()
 }

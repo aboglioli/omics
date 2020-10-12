@@ -29,7 +29,7 @@ impl<'a> Reject<'a> {
     pub async fn exec(&self, auth_id: String, contract_id: String) -> Result<CommandResponse> {
         let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
 
-        if !user.is_admin() {
+        if !user.is_content_manager() {
             return Err(Error::unauthorized());
         }
 

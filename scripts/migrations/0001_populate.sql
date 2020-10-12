@@ -82,6 +82,10 @@ VALUES
   ('published'),
   ('rejected');
 
-INSERT INTO plans(id, price, created_at)
-VALUES
-  ('basic', 75.0, NOW());
+INSERT INTO plans(id, name, description, price, created_at) VALUES (
+  'basic',
+  'Plan Básico',
+  'Accedé a todo el catálogo de Omics.',
+  75.0,
+  NOW()
+);

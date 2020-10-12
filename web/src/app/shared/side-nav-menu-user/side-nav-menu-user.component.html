@@ -17,6 +17,24 @@
   <!-- Lista menu opciones -->
   <div class="body">
 
+    <!-- Subscription -->
+    <div
+      *ngIf="readerIsSubscribed"
+      class="subscribed"
+    >
+      <span>Estás suscripto.</span>
+      <button (click)="unsubscribe()">Desuscribirse</button>
+    </div>
+    <button
+      *ngIf="!readerIsSubscribed"
+      mat-stroked-button
+      class="button-white-borders subscription-button"
+      [ngClass]="{'active': ( activePathSelected === 'subscription' ) }"
+      (click)="goToPlanPage()"
+    >
+      Suscribirse
+    </button>
+
     <!-- Ver perfil -->
     <button mat-stroked-button class="button-white-borders user-button"
             [ngClass]="{'active': ( activePathSelected === 'userProfile' ) }"

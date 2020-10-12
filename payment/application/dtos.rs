@@ -12,6 +12,8 @@ use crate::domain::subscription::{Status as SubscriptionStatus, Subscription, Su
 #[derive(Serialize)]
 pub struct PlanDto {
     pub id: String,
+    pub name: String,
+    pub description: String,
     pub price: f64,
 }
 
@@ -19,6 +21,8 @@ impl PlanDto {
     pub fn from(plan: &Plan) -> Self {
         PlanDto {
             id: plan.base().id().to_string(),
+            name: plan.name().to_string(),
+            description: plan.description().to_string(),
             price: plan.price().value(),
         }
     }

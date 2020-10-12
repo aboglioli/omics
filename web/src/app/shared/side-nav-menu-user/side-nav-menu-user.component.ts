@@ -3,6 +3,8 @@ import { faChevronCircleRight } from '@fortawesome/free-solid-svg-icons';
 import { Router, NavigationStart, Event as NavigationEvent  } from '@angular/router';
 import { AuthService } from 'src/app/domain/services/auth.service';
 import { IdentityService } from '../../domain/services/identity.service';
+import { SubscriptionService } from '../../domain/services/subscription.service';
+import { ReaderService } from '../../domain/services/reader.service';
 import { IUser } from '../../domain/models/user';
 
 @Component({
@@ -22,11 +24,14 @@ export class SideNavMenuUserComponent implements OnInit {
   public activePathSelected: string;
   public userData: IUser;
   private userId: string;
+  public readerIsSubscribed = false;
 
   constructor(
     private router: Router,
     private authService: AuthService,
-    private identifyService: IdentityService
+    private identifyService: IdentityService,
+    private readerService: ReaderService,
+    private subscriptionService: SubscriptionService,
   ) {
 
   }
@@ -35,6 +40,17 @@ export class SideNavMenuUserComponent implements OnInit {
 
     this.userId = this.authService.getIdUser();
     this.setSubscribe();
+
+    this.readerService.getSubscription(this.userId).subscribe(
+      (res) => {
+        if (res && res.status.status === 'active') {
+          this.readerIsSubscribed = true;
+        }
+      },
+      (err) => {
+        console.log(err);
+      },
+    );
 
   }
 
@@ -101,6 +117,11 @@ export class SideNavMenuUserComponent implements OnInit {
 
   }
 
+  public goToPlanPage(): void {
+    this.router.navigate(['/plans']);
+    this.closeSideNavMenu();
+  }
+
   public goToUserPage( isEdit: boolean ): void {
 
     let goToUrl = `/profile/${this.userId}`;
@@ -137,6 +158,18 @@ export class SideNavMenuUserComponent implements OnInit {
 
     } );
 
+  }
+
+  public unsubscribe(): void {
+    this.subscriptionService.unsubscribe().subscribe(
+      (res) => {
+        this.readerIsSubscribed = false;
+        console.log(res);
+      },
+      (err) => {
+        console.log(err);
+      }
+    )
   }
 
   public logout(): void {

@@ -250,7 +250,7 @@ mod tests {
             _plan_id: Option<&PlanId>,
             _status: Option<&String>,
         ) -> Result<Vec<Subscription>> {
-            let plan = Plan::new(PlanId::new("basic")?, Price::new(75.0)?)?;
+            let plan = Plan::new(PlanId::new("basic")?, "Basic", "Basic", Price::new(75.0)?)?;
 
             let subscription_1 = Subscription::build(
                 AggregateRoot::new(SubscriptionId::new("#subscription01")?),

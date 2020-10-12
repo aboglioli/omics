@@ -10,6 +10,8 @@ use crate::domain::plan::{PlanId, PlanRepository, Price};
 
 #[derive(Deserialize)]
 pub struct UpdateCommand {
+    name: String,
+    description: String,
     price: f64,
 }
 
@@ -46,6 +48,8 @@ impl<'a> Update<'a> {
 
         let mut plan = self.plan_repo.find_by_id(&PlanId::new(plan_id)?).await?;
 
+        plan.set_name(cmd.name)?;
+        plan.set_description(cmd.description)?;
         plan.change_price(Price::new(cmd.price)?)?;
 
         self.plan_repo.save(&mut plan).await?;

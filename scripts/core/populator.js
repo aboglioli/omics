@@ -331,10 +331,13 @@ class Populator {
     });
 
     this.publications[publicationId].statistics.reviews += 1;
-    const avgStars =
-      this.reviews
-        .filter((r) => r.publication_id === publicationId)
-        .reduce((acc, r) => acc + r.stars, 0.0) / this.reviews.length;
+
+    const publicationReviews = this.reviews
+      .filter((r) => r.publication_id === publicationId);
+
+    const avgStars = publicationReviews
+      .reduce((acc, r) => acc + r.stars, 0.0) / publicationReviews.length;
+
     this.publications[publicationId].statistics.stars = +avgStars.toFixed(2);
 
     this.addEvent("publication", "reviewed", {

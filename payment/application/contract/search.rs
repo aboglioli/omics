@@ -53,7 +53,7 @@ impl<'a> Search<'a> {
         pagination: PaginationParams,
     ) -> Result<SearchResponse> {
         let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-        if !user.is_admin() {
+        if !user.is_content_manager() {
             return Err(Error::unauthorized());
         }
 

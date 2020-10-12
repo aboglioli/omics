@@ -14,6 +14,8 @@ use crate::domain::plan::{Plan, PlanId, PlanRepository, Price};
 impl Plan {
     fn from_row(row: Row) -> Result<Self> {
         let id: String = row.get("id");
+        let name: String = row.get("name");
+        let description: String = row.get("description");
         let price: f64 = row.get("price");
 
         let created_at: DateTime<Utc> = row.get("created_at");
@@ -22,6 +24,8 @@ impl Plan {
 
         Ok(Plan::build(
             AggregateRoot::build(PlanId::new(id)?, created_at, updated_at, deleted_at),
+            name,
+            description,
             Price::new(price)?,
         ))
     }

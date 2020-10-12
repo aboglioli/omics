@@ -25,7 +25,7 @@ import { PublicationOwnerGuard } from './guard/publication-owner.guard';
 import { CollectionNewEditComponent } from './pages/deskboard/collection-new-edit/collection-new-edit.component';
 import { CollectionOwnerGuard } from './guard/collection-owner.guard';
 import { CollectionInfoComponent } from './pages/collection-info/collection-info.component';
-
+import { PlansComponent } from './pages/plans/plans.component';
 
 
 const routes: Routes = [
@@ -51,7 +51,8 @@ const routes: Routes = [
   { path: 'dashboard-publicaciones-contratos', component: DashboardGestionContratosPublicacionesComponent },
   { path: 'dashboard-reglas-negocio', component: DashboardReglasNegociosComponent },
   { path: 'dashboard-general', component: DashboardGestionAdminComponent },
-  { path: '**', pathMatch: 'full', redirectTo: 'home' }
+  { path: 'plans', component: PlansComponent },
+  { path: '**', pathMatch: 'full', redirectTo: 'home' },
 
 ];
 

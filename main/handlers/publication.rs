@@ -394,11 +394,15 @@ async fn get_contract(
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
-    GetContractByPublication::new(c.payment.contract_repo(), c.payment.publication_repo())
-        .exec(auth_id, path.into_inner())
-        .await
-        .map(|res| HttpResponse::Ok().json(res))
-        .map_err(PublicError::from)
+    GetContractByPublication::new(
+        c.payment.contract_repo(),
+        c.payment.publication_repo(),
+        c.payment.user_repo(),
+    )
+    .exec(auth_id, path.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
 }
 
 #[post("/{publication_id}/contract")]

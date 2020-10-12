@@ -11,6 +11,8 @@ use crate::domain::plan::{Plan, PlanId, PlanRepository, Price};
 #[derive(Deserialize)]
 pub struct CreateCommand {
     id: String,
+    name: String,
+    description: String,
     price: f64,
 }
 
@@ -46,7 +48,7 @@ impl<'a> Create<'a> {
             return Err(Error::new("plan", "already_exists"));
         }
 
-        let mut plan = Plan::new(plan_id, Price::new(cmd.price)?)?;
+        let mut plan = Plan::new(plan_id, cmd.name, cmd.description, Price::new(cmd.price)?)?;
 
         self.plan_repo.save(&mut plan).await?;
 

@@ -58,6 +58,7 @@ impl<'a> Search<'a> {
         include: Include,
         pagination: PaginationParams,
     ) -> Result<SearchResponse> {
+        // TODO: filter by status instead of doing it manually
         let is_content_manager = if let Some(auth_id) = &auth_id {
             let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
             user.is_content_manager()

@@ -1,0 +1,22 @@
+<div class="plans-container">
+  <div class="plans" *ngFor="let plan of plans">
+    <div class="plan">
+      <h1 class="plan-title">{{plan.name}}</h1>
+      <span class="plan-price">$ {{plan.price.toFixed(2)}}</span>
+      <p class="plan-description">{{plan.description}}</p>
+      <button
+        *ngIf="readerPlanSubscription !== plan.id"
+        class="plan-button"
+        (click)="subscribe(plan)"
+      >
+        Suscribirse
+      </button>
+      <span
+        *ngIf="readerPlanSubscription === plan.id"
+        class="subscribed"
+      >
+        Ya estás suscripto a este plan.
+      </span>
+    </div>
+  </div>
+</div>
