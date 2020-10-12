@@ -10,6 +10,9 @@ import { IPublication } from 'src/app/domain/models';
 export class PublicationCardReaderComponent implements OnInit {
 
   @Input() publication: IPublication;
+  @Input() truncateStringLength = 26;
+  @Input() cardWidth = '250px';
+  @Input() cardHeight = '250px';
 
   // Font Awseome icons
   public faVistas = faEye;

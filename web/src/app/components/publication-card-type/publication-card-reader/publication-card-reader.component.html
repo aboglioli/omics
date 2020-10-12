@@ -1,9 +1,9 @@
 
-<div class="publication">
+<div class="publication" [ngStyle]="{'width': cardWidth, 'height': cardHeight}">
 
   <!-- Title -->
   <div class="title">
-    <h3>{{publication.name | truncateString: 25:true}}</h3>
+    <h3>{{publication.name | truncateString: truncateStringLength: false}}</h3>
   </div>
 
   <!-- Image cover with info -->

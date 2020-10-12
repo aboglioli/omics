@@ -1,1 +1,126 @@
-<app-under-construction></app-under-construction>
+
+<div class="home-box">
+
+
+  <div class="header">
+
+    <h2 style="margin: 0;">< Comics Destacados ></h2>
+
+    <button mat-stroked-button class="button-white-borders"
+            (click)="onGoToCatalogue()">
+        Ir a Biblioteca
+    </button>
+
+  </div>
+
+  <hr>
+
+  <!--#region Lista de publicaciones -->
+
+  <!-- Top nuevos -->
+  <div class="card-group" *ngIf="listTopPublcationNew">
+
+    <div class="card-box-title">
+      <h1>Últimas publicaciones</h1>
+    </div>
+
+    <div class="publication-block">
+
+      <div class="card-thumbail" *ngFor="let publication of listTopPublcationNew">
+        <app-publication-card-reader
+              [publication]="publication"
+              [truncateStringLength]="20"
+              [cardWidth]="cardSize"
+              [cardHeight]="cardSize"
+              (click)="showPublicationInfo( publication.id )">
+        </app-publication-card-reader>
+      </div>
+
+    </div>
+
+  </div>
+
+  <hr>
+  <br>
+
+  <!-- Top stars -->
+  <div class="card-group" *ngIf="listTopPublcationNew">
+
+    <div class="card-box-title">
+      <h1>Mejor comentado</h1>
+    </div>
+
+    <div class="publication-block">
+
+      <div class="card-thumbail" *ngFor="let publication of listTopPublcationStars">
+        <app-publication-card-reader
+              [publication]="publication"
+              [truncateStringLength]="20"
+              [cardWidth]="cardSize"
+              [cardHeight]="cardSize"
+              (click)="showPublicationInfo( publication.id )">
+        </app-publication-card-reader>
+      </div>
+
+    </div>
+
+  </div>
+
+  <hr>
+  <br>
+
+  <!-- Top likes -->
+  <div class="card-group" *ngIf="listTopPublcationNew">
+
+    <div class="card-box-title">
+      <h1>Favoritos comunidad</h1>
+    </div>
+
+    <div class="publication-block">
+
+      <div class="card-thumbail" *ngFor="let publication of listTopPublcationLikes">
+        <app-publication-card-reader
+              [publication]="publication"
+              [truncateStringLength]="20"
+              [cardWidth]="cardSize"
+              [cardHeight]="cardSize"
+              (click)="showPublicationInfo( publication.id )">
+        </app-publication-card-reader>
+      </div>
+
+    </div>
+
+  </div>
+
+  <hr>
+  <br>
+
+  <!-- Top views -->
+  <div class="card-group" *ngIf="listTopPublcationNew">
+
+    <div class="card-box-title">
+      <h1>Más leídos</h1>
+    </div>
+
+    <div class="publication-block">
+
+      <div class="card-thumbail" *ngFor="let publication of listTopPublcationViews">
+        <app-publication-card-reader
+              [publication]="publication"
+              [truncateStringLength]="20"
+              [cardWidth]="cardSize"
+              [cardHeight]="cardSize"
+              (click)="showPublicationInfo( publication.id )">
+        </app-publication-card-reader>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- #endregion -->
+
+  <br>
+
+</div>
+
