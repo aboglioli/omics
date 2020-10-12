@@ -123,8 +123,32 @@ export class PublicationService {
       params = params.append('status', cmd.status);
     }
 
+    if (cmd.tag) {
+      params = params.append('tag', cmd.tag);
+    }
+
     if (cmd.name) {
       params = params.append('name', cmd.name);
+    }
+
+    if (cmd.date_from) {
+      params = params.append('date_from', cmd.date_from);
+    }
+
+    if (cmd.date_to) {
+      params = params.append('date_to', cmd.date_to);
+    }
+
+    if (cmd.offset) {
+      params = params.append('offset', cmd.offset);
+    }
+
+    if (cmd.limit) {
+      params = params.append('limit', cmd.limit);
+    }
+
+    if (cmd.order_by) {
+      params = params.append('order_by', cmd.order_by);
     }
 
     if (include) {

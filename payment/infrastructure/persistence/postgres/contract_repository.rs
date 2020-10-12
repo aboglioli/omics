@@ -91,10 +91,18 @@ impl ContractRepository for PostgresContractRepository {
         &self,
         publication_id: Option<&PublicationId>,
         status: Option<&String>,
+        from: Option<&DateTime<Utc>>,
+        to: Option<&DateTime<Utc>>,
+        offset: Option<usize>,
+        limit: Option<usize>,
     ) -> Result<Vec<Contract>> {
         let publication_id = publication_id.map(|id| id.to_uuid()).transpose()?;
+        let offset = offset.unwrap_or_else(|| 0);
+        let limit = limit
+            .map(|l| if l <= 1000 { l } else { 1000 })
+            .unwrap_or_else(|| 100);
 
-        let (sql, params) = WhereBuilder::new()
+        let (mut sql, params) = WhereBuilder::new()
             .add_param_opt(
                 "publication_id = $$",
                 &publication_id,
@@ -105,19 +113,22 @@ impl ContractRepository for PostgresContractRepository {
                 &status,
                 status.is_some(),
             )
+            .add_param_opt("created_at >= $$", &from, from.is_some())
+            .add_param_opt("created_at <= $$", &to, to.is_some())
             .build();
+
+        sql = format!(
+            "SELECT * FROM contracts
+            {}
+            ORDER BY created_at ASC
+            OFFSET {}
+            LIMIT {}",
+            sql, offset, limit,
+        );
 
         let rows = self
             .client
-            .query(
-                &format!(
-                    "SELECT * FROM contracts
-                    {}
-                    ORDER BY created_at ASC",
-                    sql,
-                ) as &str,
-                &params,
-            )
+            .query(&sql as &str, &params)
             .await
             .map_err(|err| Error::not_found("contract").wrap_raw(err))?;
 

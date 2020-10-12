@@ -36,7 +36,7 @@ impl ContractService {
     ) -> Result<Vec<Contract>> {
         let contracts = self
             .contract_repo
-            .search(None, Some(&"approved".to_owned()))
+            .search(None, Some(&"approved".to_owned()), None, None, None, None)
             .await?;
         let subscriptions = self.subscription_repo.search(None, None, None).await?;
 
@@ -130,6 +130,10 @@ mod tests {
             &self,
             _publication_id: Option<&PublicationId>,
             status: Option<&String>,
+            _from: Option<&DateTime<Utc>>,
+            _to: Option<&DateTime<Utc>>,
+            _offset: Option<usize>,
+            _limit: Option<usize>,
         ) -> Result<Vec<Contract>> {
             assert_eq!(status.unwrap(), "approved");
 

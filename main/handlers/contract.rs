@@ -1,9 +1,9 @@
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse, Responder};
 
-use common::request::IncludeParams;
+use common::request::{IncludeParams, PaginationParams};
 use payment::application::contract::{
-    Approve, Cancel, ChargeForContract, GenerateStatistics, GenerateStatisticsCommand, GetAll,
-    Reject,
+    Approve, Cancel, ChargeForContract, GenerateStatistics, GenerateStatisticsCommand, Reject,
+    Search, SearchCommand,
 };
 
 use crate::authorization::auth;
@@ -11,19 +11,26 @@ use crate::container::MainContainer;
 use crate::error::PublicError;
 
 #[get("")]
-async fn get_all(
+async fn search(
     req: HttpRequest,
+    cmd: web::Query<SearchCommand>,
     include: web::Query<IncludeParams>,
+    pagination: web::Query<PaginationParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
-    GetAll::new(
+    Search::new(
         c.payment.contract_repo(),
         c.payment.publication_repo(),
         c.payment.user_repo(),
     )
-    .exec(auth_id, include.into_inner().into())
+    .exec(
+        auth_id,
+        cmd.into_inner(),
+        include.into_inner().into(),
+        pagination.into_inner(),
+    )
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -129,7 +136,7 @@ async fn charge(
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/contracts")
-            .service(get_all)
+            .service(search)
             .service(approve)
             .service(reject)
             .service(cancel)
