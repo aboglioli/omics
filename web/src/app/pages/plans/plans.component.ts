@@ -56,7 +56,7 @@ export class PlansComponent implements OnInit, OnDestroy {
               (res) => {
                 if (res.status.status === 'active') {
                   clearInterval(this.lastInterval);
-                  this.router.navigate(['']);
+                  this.router.navigate(['catalogue']);
                 }
               },
               (err) => {

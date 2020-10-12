@@ -11,6 +11,8 @@ import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-ge
 import { Router } from '@angular/router';
 import { PublicationReviewAddComponent } from '../publication-review-add/publication-review-add.component';
 import { IReview } from '../../../domain/models/review';
+import { ReaderService } from '../../../domain/services/reader.service';
+import { AuthService } from '../../../domain/services/auth.service';
 
 export interface DialogData {
   idPublication: string;
@@ -44,10 +46,16 @@ export class PublicationInfoComponent implements OnInit {
   public isReadButtonVisible: boolean;
   public totalLikes: number;
 
+  public readerIsSubscribed = false;
+  public canRequestContract = false;
+  public readerIsAuthor = false;
+
   constructor(
     public dialogRef: MatDialogRef<PublicationInfoComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     private publicationService: PublicationService,
+    private readerService: ReaderService,
+    private authService: AuthService,
     private spinnerService: NgxSpinnerService,
     private breakpointObserver: BreakpointObserver,
     private sweetAlertGenericService: SweetAlertGenericMessageService,
@@ -66,12 +74,25 @@ export class PublicationInfoComponent implements OnInit {
 
     this.getPublicationInfo();
 
+    this.readerService.getSubscription('me').subscribe(
+      (res) => {
+        this.readerIsSubscribed = res.status.status === 'active';
+      },
+      (err) => {
+        console.log(err);
+      },
+    )
+
   }
 
   private getPublicationInfo(): void {
 
     this.publicationService.getById( this.data.idPublication,  'author, category').subscribe(
       (resPub: IGetByIdResponse ) => {
+
+        const loggedInUserId = this.authService.getIdUser();
+        this.readerIsAuthor = resPub.publication.author.id === loggedInUserId;
+        this.canRequestContract = !resPub.publication.contract;
 
         // console.log('TEST > ', resPub);
 
