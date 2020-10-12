@@ -84,9 +84,9 @@ impl ToEvent for Event {
 }
 
 pub trait ApplyEvent<E> {
-    fn apply(&mut self, event: E) -> Result<()>;
+    fn apply(&mut self, event: &E) -> Result<()>;
 
-    fn apply_all(&mut self, events: Vec<E>) -> Result<()> {
+    fn apply_all(&mut self, events: Vec<&E>) -> Result<()> {
         for event in events.into_iter() {
             self.apply(event)?;
         }

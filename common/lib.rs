@@ -1,6 +1,7 @@
 pub mod cache;
 pub mod config;
 pub mod container;
+pub mod counter;
 pub mod error;
 pub mod event;
 pub mod infrastructure;
