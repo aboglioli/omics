@@ -45,6 +45,7 @@ where
     ) -> Self {
         let contract_serv = Arc::new(ContractService::new(
             contract_repo.clone(),
+            publication_repo.clone(),
             subscription_repo.clone(),
             statistics_serv.clone(),
         ));

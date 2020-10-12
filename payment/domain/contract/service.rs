@@ -1,16 +1,19 @@
 use std::sync::Arc;
 
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Duration, Utc};
 
 use common::error::Error;
 use common::result::Result;
-use publishing::domain::publication::StatisticsService;
+use publishing::domain::publication::{
+    PublicationId, PublicationRepository, StatisticsService, Status as PublicationStatus,
+};
 
-use crate::domain::contract::{Contract, ContractRepository, Summary};
+use crate::domain::contract::{Contract, ContractRepository, Status, Summary};
 use crate::domain::subscription::SubscriptionRepository;
 
 pub struct ContractService {
     contract_repo: Arc<dyn ContractRepository>,
+    publication_repo: Arc<dyn PublicationRepository>,
     subscription_repo: Arc<dyn SubscriptionRepository>,
 
     statistics_serv: Arc<StatisticsService>,
@@ -19,14 +22,55 @@ pub struct ContractService {
 impl ContractService {
     pub fn new(
         contract_repo: Arc<dyn ContractRepository>,
+        publication_repo: Arc<dyn PublicationRepository>,
         subscription_repo: Arc<dyn SubscriptionRepository>,
         statistics_serv: Arc<StatisticsService>,
     ) -> Self {
         ContractService {
             contract_repo,
+            publication_repo,
             subscription_repo,
             statistics_serv,
         }
+    }
+
+    pub async fn can_request(&self, publication_id: &PublicationId) -> Result<()> {
+        if let Ok(contract) = self
+            .contract_repo
+            .find_by_publication_id(&publication_id)
+            .await
+        {
+            if matches!(
+                contract.status_history().current(),
+                Status::Requested | Status::Approved { .. }
+            ) {
+                return Err(Error::new("contract", "already_exists"));
+            }
+        }
+
+        let publication = self.publication_repo.find_by_id(publication_id).await?;
+        if !matches!(publication.status_history().current(), PublicationStatus::Published { .. }) {
+            return Err(Error::new("publication", "not_published"));
+        }
+
+        let now = Utc::now();
+        let last_month = now - Duration::days(30);
+
+        let total_statistics = self
+            .statistics_serv
+            .get_history(None, None, Some(&last_month), Some(&now))
+            .await?;
+        let publication_statistics = self
+            .statistics_serv
+            .get_history(None, Some(publication_id), Some(&last_month), Some(&now))
+            .await?;
+        let p = publication_statistics.views() as f64 / total_statistics.views() as f64;
+
+        if p >= 0.01 {
+            return Ok(());
+        }
+
+        Err(Error::new("statistics", "publication_has_low_views"))
     }
 
     pub async fn calculate_summaries(
@@ -105,6 +149,7 @@ mod tests {
     };
     use publishing::domain::publication::{PublicationId, Statistics};
     use publishing::domain::reader::ReaderId;
+    use publishing::infrastructure::persistence::inmem::InMemPublicationRepository;
     use publishing::mocks as publishing_mocks;
 
     use crate::domain::contract::{ContractId, Status as ContractStatus};
@@ -555,6 +600,7 @@ mod tests {
     async fn calculate_summaries() {
         let contract_serv = ContractService::new(
             Arc::new(FakeContractRepository),
+            Arc::new(InMemPublicationRepository::new()),
             Arc::new(FakeSubscriptionRepository),
             Arc::new(StatisticsService::new(Arc::new(FakeInteractionRepository))),
         );

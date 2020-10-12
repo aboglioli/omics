@@ -30,10 +30,6 @@ pub struct Contract {
 
 impl Contract {
     pub fn new(id: ContractId, publication: &Publication) -> Result<Self> {
-        if publication.statistics().unique_views() < 1000 {
-            return Err(Error::new("contract", "publication_has_low_views"));
-        }
-
         if !publication.is_published() {
             return Err(Error::new("contract", "publication_is_not_published"));
         }
@@ -214,28 +210,6 @@ mod tests {
     use identity::mocks as identity_mocks;
     use publishing::domain::publication::Statistics;
     use publishing::mocks as publishing_mocks;
-
-    #[test]
-    fn low_statistics() {
-        let mut publication = publishing_mocks::publication(
-            "#publication01",
-            "#user01",
-            "Publication 1",
-            "#category01",
-            vec!["Tags"],
-            "domain.com/cover.jpg",
-            3,
-            true,
-            true,
-            false,
-        );
-        assert!(Contract::new(ContractId::new("#contract01").unwrap(), &publication,).is_err());
-
-        publication
-            .set_statistics(Statistics::new(500, 100, 45, 26, 2, 3.2).unwrap())
-            .unwrap();
-        assert!(Contract::new(ContractId::new("#contract01").unwrap(), &publication,).is_err());
-    }
 
     #[test]
     fn already_has_a_contract() {

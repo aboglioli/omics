@@ -1,4 +1,5 @@
 mod approve;
+mod can_request;
 mod cancel;
 mod charge_for_contract;
 mod generate_statistics;
@@ -7,6 +8,7 @@ mod reject;
 mod request;
 mod search;
 pub use approve::*;
+pub use can_request::*;
 pub use cancel::*;
 pub use charge_for_contract::*;
 pub use generate_statistics::*;

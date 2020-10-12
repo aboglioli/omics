@@ -90,6 +90,10 @@ export interface IRequestContractResponse {
   id: string;
 }
 
+export interface ICanRequestContractResponse {
+  can_request: boolean;
+}
+
 @Injectable()
 export class PublicationService {
   private baseUrl: string;
@@ -230,6 +234,10 @@ export class PublicationService {
 
   public getContract(id: string): Observable<IContract> {
     return this.http.get<IContract>(`${this.baseUrl}/${id}/contract`);
+  }
+
+  public canRequestContract(id: string): Observable<ICanRequestContractResponse> {
+    return this.http.get<ICanRequestContractResponse>(`${this.baseUrl}/${id}/contract/can-request`);
   }
 
   public requestContract(id: string): Observable<IRequestContractResponse> {

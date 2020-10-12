@@ -2,7 +2,8 @@ use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse, Responde
 
 use common::request::{IncludeParams, PaginationParams};
 use payment::application::contract::{
-    GetByPublication as GetContractByPublication, Request as RequestContract,
+    CanRequest as CanRequestContract, GetByPublication as GetContractByPublication,
+    Request as RequestContract,
 };
 use publishing::application::collection::{
     Search as SearchCollection, SearchCommand as SearchCollectionCommand,
@@ -405,6 +406,25 @@ async fn get_contract(
     .map_err(PublicError::from)
 }
 
+#[get("/{publication_id}/contract/can-request")]
+async fn can_request_contract(
+    req: HttpRequest,
+    path: web::Path<String>,
+    c: web::Data<MainContainer>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    CanRequestContract::new(
+        c.payment.contract_repo(),
+        c.payment.publication_repo(),
+        c.payment.contract_serv(),
+    )
+    .exec(auth_id, path.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
+}
+
 #[post("/{publication_id}/contract")]
 async fn request_contract(
     req: HttpRequest,
@@ -417,6 +437,7 @@ async fn request_contract(
         c.payment.event_pub(),
         c.payment.contract_repo(),
         c.payment.publication_repo(),
+        c.payment.contract_serv(),
     )
     .exec(auth_id, path.into_inner())
     .await
@@ -446,6 +467,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .service(add_to_favorites)
             .service(remove_from_favorites)
             .service(get_contract)
+            .service(can_request_contract)
             .service(request_contract),
     );
 }

@@ -6,7 +6,7 @@ use common::event::EventPublisher;
 use common::result::Result;
 use publishing::domain::publication::{PublicationId, PublicationRepository};
 
-use crate::domain::contract::{Contract, ContractRepository, Status};
+use crate::domain::contract::{Contract, ContractRepository, ContractService};
 
 #[derive(Serialize)]
 pub struct RequestResponse {
@@ -18,6 +18,8 @@ pub struct Request<'a> {
 
     contract_repo: &'a dyn ContractRepository,
     publication_repo: &'a dyn PublicationRepository,
+
+    contract_serv: &'a ContractService,
 }
 
 impl<'a> Request<'a> {
@@ -25,23 +27,25 @@ impl<'a> Request<'a> {
         event_pub: &'a dyn EventPublisher,
         contract_repo: &'a dyn ContractRepository,
         publication_repo: &'a dyn PublicationRepository,
+        contract_serv: &'a ContractService,
     ) -> Self {
         Request {
             event_pub,
             contract_repo,
             publication_repo,
+            contract_serv,
         }
     }
 
     pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<RequestResponse> {
-        let publication = self
-            .publication_repo
-            .find_by_id(&PublicationId::new(publication_id)?)
-            .await?;
+        let publication_id = PublicationId::new(publication_id)?;
+        let publication = self.publication_repo.find_by_id(&publication_id).await?;
 
         if publication.author_id().value() != auth_id {
             return Err(Error::not_owner("publication"));
         }
+
+        self.contract_serv.can_request(&publication_id).await?;
 
         // TODO: should be done by a domain service
         if let Ok(last) = self
@@ -49,9 +53,7 @@ impl<'a> Request<'a> {
             .find_by_publication_id(publication.base().id())
             .await
         {
-            if !matches!(last.status_history().current(), Status::Cancelled) {
-                return Err(Error::new("contract", "already_exists"));
-            }
+            self.contract_repo.delete(last.base().id()).await?;
         }
 
         let mut contract = Contract::new(self.contract_repo.next_id().await?, &publication)?;
