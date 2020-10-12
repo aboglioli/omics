@@ -23,6 +23,7 @@ pub struct SearchCommand {
     pub code: Option<String>,
     pub from: Option<DateTime<Utc>>,
     pub to: Option<DateTime<Utc>>,
+    pub order_by: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -43,7 +44,7 @@ async fn get(cmd: web::Query<SearchCommand>, c: web::Data<MainContainer>) -> imp
         )
         .await
         .map(|events| {
-            events
+            let mut events: Vec<PublicEvent> = events
                 .into_iter()
                 .map(|event| PublicEvent {
                     id: event.id().to_string(),
@@ -52,7 +53,15 @@ async fn get(cmd: web::Query<SearchCommand>, c: web::Data<MainContainer>) -> imp
                     timestamp: event.timestamp().to_rfc3339(),
                     payload: serde_json::from_value(event.payload()).unwrap(),
                 })
-                .collect()
+                .collect();
+
+            if let Some(order_by) = &cmd.order_by {
+                if order_by == "newest" {
+                    events.reverse();
+                }
+            }
+
+            events
         })
         .map(|events| HttpResponse::Ok().json(GetAllResponse { events }))
         .map_err(PublicError::from)
