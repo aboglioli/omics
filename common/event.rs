@@ -8,6 +8,7 @@ pub use repository::*;
 pub use subscriber::*;
 
 use chrono::{DateTime, Utc};
+use serde_json::Value;
 use uuid::Uuid;
 
 use crate::model::StringId;
@@ -21,11 +22,11 @@ pub struct Event {
     topic: String,
     code: String,
     timestamp: DateTime<Utc>,
-    payload: Vec<u8>,
+    payload: Value,
 }
 
 impl Event {
-    pub fn new<S: Into<String>>(topic: S, code: S, payload: Vec<u8>) -> Self {
+    pub fn new<S: Into<String>>(topic: S, code: S, payload: Value) -> Self {
         Event {
             id: EventId::new(Uuid::new_v4().to_string()).unwrap(),
             topic: topic.into(),
@@ -40,7 +41,7 @@ impl Event {
         topic: String,
         code: String,
         timestamp: DateTime<Utc>,
-        payload: Vec<u8>,
+        payload: Value,
     ) -> Self {
         Event {
             id,
@@ -67,8 +68,8 @@ impl Event {
         &self.timestamp
     }
 
-    pub fn payload(&self) -> &[u8] {
-        &self.payload
+    pub fn payload(&self) -> Value {
+        self.payload.clone()
     }
 }
 

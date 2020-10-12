@@ -54,7 +54,10 @@ impl ToString for ContractEvent {
 
 impl ToEvent for ContractEvent {
     fn to_event(&self) -> Result<Event> {
-        let payload = serde_json::to_vec(self)?;
-        Ok(Event::new("contract".to_owned(), self.to_string(), payload))
+        Ok(Event::new(
+            "contract".to_owned(),
+            self.to_string(),
+            serde_json::to_value(&self)?,
+        ))
     }
 }

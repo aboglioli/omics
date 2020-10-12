@@ -33,7 +33,7 @@ impl EventHandler for PublicationCounterHandler {
     }
 
     async fn handle(&mut self, event: &Event) -> Result<bool> {
-        let event: PublicationEvent = serde_json::from_slice(event.payload())?;
+        let event: PublicationEvent = serde_json::from_value(event.payload())?;
 
         match event {
             PublicationEvent::Created { author_id, .. } => {

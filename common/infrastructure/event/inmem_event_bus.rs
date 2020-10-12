@@ -85,10 +85,19 @@ mod tests {
 
     use std::sync::Arc;
 
+    use serde_json::json;
+
     use crate::mocks::Counter;
 
     fn create_event(topic: &str) -> Event {
-        Event::new(topic, topic, topic.as_bytes().to_vec())
+        Event::new(
+            topic,
+            topic,
+            serde_json::to_value(json!({
+                "topic": topic,
+            }))
+            .unwrap(),
+        )
     }
 
     struct BasicHandler {

@@ -22,7 +22,10 @@ impl ToString for PlanEvent {
 
 impl ToEvent for PlanEvent {
     fn to_event(&self) -> Result<Event> {
-        let payload = serde_json::to_vec(self)?;
-        Ok(Event::new("plan".to_owned(), self.to_string(), payload))
+        Ok(Event::new(
+            "plan".to_owned(),
+            self.to_string(),
+            serde_json::to_value(&self)?,
+        ))
     }
 }

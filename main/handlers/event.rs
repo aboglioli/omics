@@ -50,7 +50,7 @@ async fn get(cmd: web::Query<SearchCommand>, c: web::Data<MainContainer>) -> imp
                     topic: event.topic().to_string(),
                     code: event.code().to_string(),
                     timestamp: event.timestamp().to_rfc3339(),
-                    payload: serde_json::from_slice(event.payload()).unwrap(),
+                    payload: serde_json::from_value(event.payload()).unwrap(),
                 })
                 .collect()
         })

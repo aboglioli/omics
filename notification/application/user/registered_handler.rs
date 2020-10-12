@@ -25,7 +25,7 @@ impl EventHandler for RegisteredHandler {
     }
 
     async fn handle(&mut self, event: &Event) -> Result<bool> {
-        let event: UserEvent = serde_json::from_slice(event.payload())?;
+        let event: UserEvent = serde_json::from_value(event.payload())?;
 
         match event {
             UserEvent::Registered {

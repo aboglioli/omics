@@ -55,7 +55,7 @@ impl EventHandler for NotificationHandler {
     async fn handle(&mut self, event: &Event) -> Result<bool> {
         match event.topic() {
             "user" => {
-                let event: UserEvent = serde_json::from_slice(event.payload())?;
+                let event: UserEvent = serde_json::from_value(event.payload())?;
 
                 match event {
                     UserEvent::Validated { id } => {
@@ -85,7 +85,7 @@ impl EventHandler for NotificationHandler {
                 }
             }
             "publication" => {
-                let event: PublicationEvent = serde_json::from_slice(event.payload())?;
+                let event: PublicationEvent = serde_json::from_value(event.payload())?;
 
                 match event {
                     PublicationEvent::Published {
@@ -187,7 +187,7 @@ impl EventHandler for NotificationHandler {
                 }
             }
             "author" => {
-                let event: AuthorEvent = serde_json::from_slice(event.payload())?;
+                let event: AuthorEvent = serde_json::from_value(event.payload())?;
 
                 match event {
                     AuthorEvent::Followed {

@@ -3,8 +3,6 @@ use serde::{Deserialize, Serialize};
 use common::event::{Event, ToEvent};
 use common::result::Result;
 
-use crate::util;
-
 #[derive(Serialize, Deserialize, Debug)]
 pub enum PublicationEvent {
     Created {
@@ -120,12 +118,10 @@ impl ToString for PublicationEvent {
 
 impl ToEvent for PublicationEvent {
     fn to_event(&self) -> Result<Event> {
-        let payload = util::serialize(&self, "publication")?;
-
         Ok(Event::new(
             "publication".to_owned(),
             self.to_string(),
-            payload,
+            serde_json::to_value(&self)?,
         ))
     }
 }

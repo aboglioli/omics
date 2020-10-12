@@ -44,11 +44,10 @@ impl ToString for SubscriptionEvent {
 
 impl ToEvent for SubscriptionEvent {
     fn to_event(&self) -> Result<Event> {
-        let payload = serde_json::to_vec(self)?;
         Ok(Event::new(
             "subscription".to_owned(),
             self.to_string(),
-            payload,
+            serde_json::to_value(&self)?,
         ))
     }
 }

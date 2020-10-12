@@ -40,7 +40,9 @@ where
 mod tests {
     use super::*;
 
-    #[derive(Debug)]
+    use serde::{Deserialize, Serialize};
+
+    #[derive(Debug, Serialize, Deserialize)]
     enum AggRootEvent {
         Created { text: String },
         Updated { num: u32 },
@@ -50,15 +52,15 @@ mod tests {
     impl ToEvent for AggRootEvent {
         fn to_event(&self) -> Result<Event> {
             Ok(match self {
-                AggRootEvent::Created { text } => {
-                    Event::new("agg_root.created", "", text.as_bytes().to_vec())
+                AggRootEvent::Created { text: _ } => {
+                    Event::new("agg_root.created", "", serde_json::to_value(&self)?)
                 }
-                AggRootEvent::Updated { num } => Event::new(
-                    "agg_root.updated",
-                    "",
-                    vec![if num < &255 { 255 } else { 0 }],
-                ),
-                AggRootEvent::Deleted(_v) => Event::new("agg_root.deleted", "", vec![1]),
+                AggRootEvent::Updated { num: _ } => {
+                    Event::new("agg_root.updated", "", serde_json::to_value(&self)?)
+                }
+                AggRootEvent::Deleted(_v) => {
+                    Event::new("agg_root.deleted", "", serde_json::to_value(&self)?)
+                }
             })
         }
     }
@@ -96,10 +98,7 @@ mod tests {
         let events = ag.events().to_vec().unwrap();
         assert_eq!(events.len(), 3);
         assert_eq!(events[0].topic(), "agg_root.created");
-        assert_eq!(events[0].payload(), "agg_root.created".as_bytes());
         assert_eq!(events[1].topic(), "agg_root.updated");
-        assert_eq!(events[1].payload(), vec![255]);
         assert_eq!(events[2].topic(), "agg_root.deleted");
-        assert_eq!(events[2].payload(), vec![1]);
     }
 }

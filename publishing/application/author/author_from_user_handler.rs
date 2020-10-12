@@ -26,7 +26,7 @@ impl EventHandler for AuthorFromUserHandler {
     }
 
     async fn handle(&mut self, event: &Event) -> Result<bool> {
-        let event: UserEvent = serde_json::from_slice(event.payload())
+        let event: UserEvent = serde_json::from_value(event.payload())
             .map_err(|err| Error::new("author_from_user_handler", "deserialize").wrap_raw(err))?;
 
         match event {

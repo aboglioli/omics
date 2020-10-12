@@ -25,7 +25,7 @@ impl EventHandler for SubscriptionHandler {
     }
 
     async fn handle(&mut self, event: &Event) -> Result<bool> {
-        let event: SubscriptionEvent = serde_json::from_slice(event.payload())?;
+        let event: SubscriptionEvent = serde_json::from_value(event.payload())?;
 
         match event {
             SubscriptionEvent::PaymentAdded { user_id, .. } => {

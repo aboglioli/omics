@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
+use serde_json::Value;
 
 use tokio_postgres::Client;
 use uuid::Uuid;
@@ -61,7 +62,7 @@ impl EventRepository for PostgresEventRepository {
             let topic: String = row.get("topic");
             let code: String = row.get("code");
             let timestamp: DateTime<Utc> = row.get("timestamp");
-            let payload: Vec<u8> = serde_json::from_value(row.get("payload"))?;
+            let payload: Value = row.get("payload");
 
             events.push(Event::build(
                 EventId::new(id.to_string())?,
@@ -76,8 +77,6 @@ impl EventRepository for PostgresEventRepository {
     }
 
     async fn save(&self, event: &Event) -> Result<()> {
-        let payload = serde_json::to_value(event.payload())?;
-
         self.client
             .execute(
                 "INSERT INTO events (
@@ -98,7 +97,7 @@ impl EventRepository for PostgresEventRepository {
                     &event.topic(),
                     &event.code(),
                     &event.timestamp(),
-                    &payload,
+                    &event.payload(),
                 ],
             )
             .await

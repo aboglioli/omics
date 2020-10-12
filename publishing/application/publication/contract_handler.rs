@@ -25,7 +25,7 @@ impl EventHandler for ContractHandler {
     }
 
     async fn handle(&mut self, event: &Event) -> Result<bool> {
-        let event: ContractEvent = serde_json::from_slice(event.payload())?;
+        let event: ContractEvent = serde_json::from_value(event.payload())?;
 
         match event {
             ContractEvent::Approved { publication_id, .. } => {
