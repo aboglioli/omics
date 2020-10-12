@@ -15,6 +15,7 @@ class Populator {
   constructor(db, comicSamples) {
     this.db = db;
     this.comicSamples = comicSamples;
+    this.lastDate = new Date("2020-05-01T14:30:00");
 
     this.events = [];
 
@@ -31,13 +32,22 @@ class Populator {
     this.follows = [];
   }
 
+  nextDate() {
+    const date = new Date(this.lastDate);
+    date.setSeconds(date.getSeconds() + 10);
+
+    this.lastDate = date;
+
+    return date;
+  }
+
   addEvent(topic, code, payload) {
     const id = uuid();
     this.events.push({
       id,
       topic,
       code,
-      timestamp: new Date(),
+      timestamp: this.nextDate(),
       payload,
     });
   }
@@ -61,7 +71,8 @@ class Populator {
       followers: 0,
       publications: 0,
       subscribed: false,
-      created_at: new Date(),
+      created_at: this.nextDate(),
+      updated_at: this.nextDate(),
     };
 
     this.users[id] = user;
@@ -112,7 +123,8 @@ class Populator {
       },
       pages: [],
       status_history: [],
-      created_at: new Date(),
+      created_at: this.nextDate(),
+      updated_at: this.nextDate(),
     };
 
     pageCount = pageCount || 0;
@@ -132,14 +144,14 @@ class Populator {
     const statusHistory = [
       {
         status: "draft",
-        datetime: new Date(),
+        datetime: this.nextDate(),
       },
     ];
 
     if (status) {
       statusHistory.push({
         status: "waiting-approval",
-        datetime: new Date(),
+        datetime: this.nextDate(),
       });
 
       if (status === "published") {
@@ -151,7 +163,7 @@ class Populator {
           comment: {
             comment: faker.lorem.paragraph(),
           },
-          datetime: new Date(),
+          datetime: this.nextDate(),
         });
       } else if (status === "rejected") {
         statusHistory.push({
@@ -162,7 +174,7 @@ class Populator {
           comment: {
             comment: faker.lorem.paragraph(),
           },
-          datetime: new Date(),
+          datetime: this.nextDate(),
         });
       }
     }
@@ -221,9 +233,10 @@ class Populator {
       cover: image(250),
       items: publicationIds.map((id) => ({
         pulication_id: id,
-        date: new Date(),
+        date: this.nextDate(),
       })),
-      created_at: new Date(),
+      created_at: this.nextDate(),
+      updated_at: this.nextDate(),
     };
 
     this.addEvent("collection", "created", {
@@ -253,7 +266,7 @@ class Populator {
     this.views.push({
       reader_id: userId,
       publication_id: publicationId,
-      datetime: new Date(),
+      datetime: this.nextDate(),
       is_unique: unique,
     });
     this.addEvent("publication", "viewed", {
@@ -271,7 +284,7 @@ class Populator {
     this.readings.push({
       reader_id: userId,
       publication_id: publicationId,
-      datetime: new Date(),
+      datetime: this.nextDate(),
     });
     this.addEvent("publication", "read", {
       Read: {
@@ -287,7 +300,7 @@ class Populator {
     this.likes.push({
       reader_id: userId,
       publication_id: publicationId,
-      datetime: new Date(),
+      datetime: this.nextDate(),
     });
     this.addEvent("publication", "liked", {
       Liked: {
@@ -306,7 +319,7 @@ class Populator {
     this.reviews.push({
       reader_id: userId,
       publication_id: publicationId,
-      datetime: new Date(),
+      datetime: this.nextDate(),
       stars,
       comment,
     });
@@ -332,7 +345,7 @@ class Populator {
     this.publicationFavorites.push({
       reader_id: userId,
       publication_id: publicationId,
-      datetime: new Date(),
+      datetime: this.nextDate(),
     });
     this.addEvent("reader", "publication-added-to-favorites", {
       PublicationAddedToFavorites: {
@@ -346,7 +359,7 @@ class Populator {
     this.collectionFavorites.push({
       reader_id: userId,
       publication_id: publicationId,
-      datetime: new Date(),
+      datetime: this.nextDate(),
     });
     this.addEvent("reader", "collection-added-to-favorites", {
       CollectionAddedToFavorites: {
@@ -360,7 +373,7 @@ class Populator {
     this.follows.push({
       reader_id: readerId,
       author_id: authorId,
-      datetime: new Date(),
+      datetime: this.nextDate(),
     });
     this.addEvent("author", "followed", {
       Followed: {
@@ -407,7 +420,10 @@ class Populator {
     await this.db("follows").insert(this.follows);
 
     // Events
-    await this.db("events").insert(this.events);
+    for (; this.events.length > 0; ) {
+      const events = this.events.splice(0, 10000);
+      await this.db("events").insert(events);
+    }
   }
 }
 
