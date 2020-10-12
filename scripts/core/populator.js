@@ -31,6 +31,17 @@ class Populator {
     this.follows = [];
   }
 
+  addEvent(topic, code, payload) {
+    const id = uuid();
+    this.events.push({
+      id,
+      topic,
+      code,
+      timestamp: new Date(),
+      payload,
+    });
+  }
+
   createUser({
     username,
   }) {
@@ -56,6 +67,27 @@ class Populator {
     };
 
     this.users[id] = user;
+
+    this.addEvent('user', 'registered', {
+      Registered: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        validation_code: '#fake-code',
+      },
+    });
+    this.addEvent('user', 'validated', { Validated: { id: user.id } });
+    this.addEvent('user', 'updated', {
+      Updated: {
+        id: user.id,
+        name: user.name,
+        lastname: user.lastname,
+        birthdate: user.birthdate,
+        gender: user.gender,
+        biography: user.biography,
+        profile_image: user.profile_image,
+      },
+    });
 
     return user;
   }
@@ -141,6 +173,41 @@ class Populator {
     this.publications[id] = publication;
     this.users[userId].publications += 1;
 
+    this.addEvent('publication', 'created', {
+      Created: {
+        id: publication.id,
+        author_id: publication.author_id,
+        name: publication.name,
+        synopsis: publication.synopsis,
+        category_id: publication.category_id,
+        tags: publication.tags.map(t => t.name),
+        cover: publication.cover,
+      },
+    });
+    this.addEvent('publication', 'pages-updated', {
+      PagesUpdated: {
+        id: publication.id,
+        pages_count: publication.pages.length,
+      },
+    });
+    this.addEvent('publication', 'approval-waited', {
+      ApprovalWaited: {
+        id: publication.id,
+      },
+    });
+    this.addEvent('publication', 'published', {
+      Published: {
+        id: publication.id,
+        author_id: publication.author_id,
+        name: publication.name,
+        synopsis: publication.synopsis,
+        category_id: publication.category_id,
+        tags: publication.tags.map(t => t.name),
+        cover: publication.cover,
+        pages_count: publication.pages.length,
+      },
+    });
+
     return publication;
   }
 
@@ -164,6 +231,26 @@ class Populator {
       created_at: new Date(),
     };
 
+    this.addEvent('collection', 'created', {
+      Created: {
+        id: collection.id,
+        author_id: collection.author_id,
+        name: collection.name,
+        synopsis: collection.synopsis,
+        category_id: collection.category_id,
+        tags: collection.tags.map(t => t.name),
+        cover: collection.cover,
+      },
+    });
+    collection.items.forEach(item => {
+      this.addEvent('collection', 'publication-added', {
+        PublicationAdded: {
+          id: collection.id,
+          publication_id: item.publication_id,
+        },
+      });
+    });
+
     return collection;
   }
 
@@ -173,6 +260,13 @@ class Populator {
       publication_id: publicationId,
       datetime: new Date(),
       is_unique: unique,
+    });
+    this.addEvent('publication', 'viewed', {
+      Viewed: {
+        reader_id: userId,
+        publication_id: publicationId,
+        unique,
+      },
     });
 
     this.publications[publicationId].statistics.views += 1;
@@ -184,6 +278,12 @@ class Populator {
       publication_id: publicationId,
       datetime: new Date(),
     });
+    this.addEvent('publication', 'read', {
+      Read: {
+        reader_id: userId,
+        publication_id: publicationId,
+      },
+    });
 
     this.publications[publicationId].statistics.readings += 1;
   }
@@ -194,23 +294,41 @@ class Populator {
       publication_id: publicationId,
       datetime: new Date(),
     });
+    this.addEvent('publication', 'liked', {
+      Liked: {
+        reader_id: userId,
+        publication_id: publicationId,
+      },
+    });
 
     this.publications[publicationId].statistics.likes += 1;
   }
 
   createReview({ userId, publicationId }) {
+    const stars = rand(0, 6);
+    const comment = faker.lorem.paragraph();
+
     this.reviews.push({
       reader_id: userId,
       publication_id: publicationId,
       datetime: new Date(),
-      stars: rand(0, 6),
-      comment: faker.lorem.paragraph(),
+      stars,
+      comment,
     });
 
     this.publications[publicationId].statistics.reviews += 1;
     const stars =
       this.reviews.reduce((acc, r) => acc + r.stars, 0.0) / this.reviews.length;
     this.publications[publicationId].statistics.stars = +stars.toFixed(2);
+
+    this.addEvent('publication', 'reviewed', {
+      Reviewed: {
+        reader_id: userId,
+        publication_id: publicationId,
+        stars,
+        comment,
+      },
+    });
 
   }
 
@@ -220,6 +338,12 @@ class Populator {
       publication_id: publicationId,
       datetime: new Date(),
     });
+    this.addEvent('reader', 'publication-added-to-favorites', {
+      PublicationAddedToFavorites: {
+        reader_id: userId,
+        publication_id: publicationId,
+      },
+    });
   }
 
   createCollectionFavorite({ userId, publicationId }) {
@@ -228,6 +352,12 @@ class Populator {
       publication_id: publicationId,
       datetime: new Date(),
     });
+    this.addEvent('reader', 'collection-added-to-favorites', {
+      CollectionAddedToFavorites: {
+        reader_id: userId,
+        publication_id: publicationId,
+      },
+    });
   }
 
   createFollow({ readerId, authorId }) {
@@ -235,6 +365,12 @@ class Populator {
       reader_id: readerId,
       author_id: authorId,
       datetime: new Date(),
+    });
+    this.addEvent('author', 'followed', {
+      Followed: {
+        author_id: authorId,
+        reader_id: readerId,
+      },
     });
 
     this.users[authorId].followers += 1;
@@ -285,6 +421,10 @@ class Populator {
 
     await this.db('follows')
       .insert(this.follows);
+
+    // Events
+    await this.db('events')
+      .insert(this.events);
   }
 }
 
