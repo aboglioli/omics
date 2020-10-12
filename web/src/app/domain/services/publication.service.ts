@@ -140,11 +140,11 @@ export class PublicationService {
     }
 
     if (cmd.offset) {
-      params = params.append('offset', cmd.offset);
+      params = params.append('offset', cmd.offset.toString());
     }
 
     if (cmd.limit) {
-      params = params.append('limit', cmd.limit);
+      params = params.append('limit', cmd.limit.toString());
     }
 
     if (cmd.order_by) {
