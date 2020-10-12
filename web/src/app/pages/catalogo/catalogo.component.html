@@ -30,17 +30,9 @@
   <!-- Filstros y búsqueda -->
   <div class="search-filters">
 
-    <div class="box-type">
-      <div  [ngClass]="{'selected': ( currentTypeSearch === optionTypeSearch.publication )}"
-            (click)="changeTypeSearch( optionTypeSearch.publication )">
-        Publicaciones
-      </div>
-
-      <div  [ngClass]="{'selected': ( currentTypeSearch === optionTypeSearch.collection )}"
-            (click)="changeTypeSearch( optionTypeSearch.collection )">
-        Colecciones
-      </div>
-    </div>
+    <app-catalogue-filter
+      (typeSearch)="changeTypeSearch($event)">
+    </app-catalogue-filter>
 
   </div>
 

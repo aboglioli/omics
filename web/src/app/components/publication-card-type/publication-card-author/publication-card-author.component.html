@@ -17,7 +17,7 @@
   <!-- Info -->
   <div class="right">
 
-    <h2>{{publication.name}}</h2>
+    <h2>{{publication.name | truncateString: 32: false }}</h2>
 
     <div style="display: flex; flex-direction: column;">
       <small>Fecha creación:</small>

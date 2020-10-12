@@ -50,39 +50,6 @@ div.listado-biblioteca {
 
     padding: 1em 0em;
 
-    div.box-type {
-
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      padding: 0.1em 0.1em;
-
-      font-size: 12pt;
-
-      color: white;
-
-      div {
-        cursor: pointer;
-        padding: 0.5em 0.5em;
-
-        &.selected {
-          font-weight: bold;
-          color: $omics-background-flat;
-          background-color: white;
-        }
-
-        &:not(.selected) {
-          box-shadow: inset 0px 0px 0px 2px white;
-          background-color: #201D2E;
-        }
-
-        &:hover {
-          color: $omics-neon-pink;
-        }
-
-      }
-
-    }
 
   }
 

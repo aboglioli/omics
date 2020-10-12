@@ -1,0 +1,15 @@
+<div class="filter-box">
+
+  <div class="box-type">
+    <div  [ngClass]="{'selected': ( currentTypeSearch === optionTypeSearch.publication )}"
+          (click)="changeTypeSearch( optionTypeSearch.publication )">
+      Publicaciones
+    </div>
+
+    <div  [ngClass]="{'selected': ( currentTypeSearch === optionTypeSearch.collection )}"
+          (click)="changeTypeSearch( optionTypeSearch.collection )">
+      Colecciones
+    </div>
+  </div>
+
+</div>

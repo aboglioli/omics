@@ -71,6 +71,7 @@ import { CollectionCardAuthorComponent } from './components/collection-card-type
 import { PublicationNewEditComponent } from './pages/deskboard/publication-new-edit/publication-new-edit.component';
 import { CollectionNewEditComponent } from './pages/deskboard/collection-new-edit/collection-new-edit.component';
 import { CollectionInfoComponent } from './pages/collection-info/collection-info.component';
+import { CatalogueFilterComponent } from './components/catalogue-filter/catalogue-filter.component';
 
 
 @NgModule({
@@ -119,7 +120,8 @@ import { CollectionInfoComponent } from './pages/collection-info/collection-info
     CollectionCardReaderComponent,
     CollectionCardAuthorComponent,
     CollectionNewEditComponent,
-    CollectionInfoComponent
+    CollectionInfoComponent,
+    CatalogueFilterComponent
   ],
   imports: [
     BrowserModule,
