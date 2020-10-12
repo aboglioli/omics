@@ -3,7 +3,13 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ConfigService } from './config.service';
-import { IPublication, ICollection, IAuthor, IReader } from '../models';
+import {
+  IAuthor,
+  ICollection,
+  IPublication,
+  IReader,
+  ISubscription,
+} from '../models';
 
 export interface IGetFollowingResponse {
   authors: IAuthor[];
@@ -38,5 +44,9 @@ export class ReaderService {
     }
 
     return this.http.get<IGetFavoritesResponse>(`${this.baseUrl}/${id}/favorites`, { params });
+  }
+
+  public getSubscription(id: string): Observable<ISubscription> {
+    return this.http.get<ISubscription>(`${this.baseUrl}/${id}/subscription`);
   }
 }

@@ -3,7 +3,14 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ConfigService } from './config.service';
-import { IPublication, IReview, IPage, IReaderPublicationInteraction, ICollection } from '../models';
+import {
+  ICollection,
+  IContract,
+  IPage,
+  IPublication,
+  IReaderPublicationInteraction,
+  IReview,
+} from '../models';
 
 export interface IGetByIdResponse {
   publication: IPublication;
@@ -77,6 +84,10 @@ export interface IRejectCommand {
 
 export interface IGetCollectionsResponse {
   collections: ICollection[];
+}
+
+export interface IRequestContractResponse {
+  id: string;
 }
 
 @Injectable()
@@ -191,5 +202,13 @@ export class PublicationService {
 
   public removeFromFavorites(id: string): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${id}/favorite`);
+  }
+
+  public getContract(id: string): Observable<IContract> {
+    return this.http.get<IContract>(`${this.baseUrl}/${id}/contract`);
+  }
+
+  public requestContract(id: string): Observable<IRequestContractResponse> {
+    return this.http.post<IRequestContractResponse>(`${this.baseUrl}/${id}/contract`, {});
   }
 }

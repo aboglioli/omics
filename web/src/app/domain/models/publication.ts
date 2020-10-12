@@ -31,6 +31,7 @@ export interface IPublication {
   statistics?: IStatistics;
   status: IStatus;
   pages?: IPage[];
+  contract: boolean;
   created_at: string;
   updated_at?: string;
 }
