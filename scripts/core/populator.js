@@ -1,6 +1,6 @@
-const { v4: uuid } = require('uuid');
-const faker = require('faker');
-faker.locale = 'es';
+const { v4: uuid } = require("uuid");
+const faker = require("faker");
+faker.locale = "es";
 
 const {
   password,
@@ -8,8 +8,8 @@ const {
   genders,
   categories,
   tags,
-} = require('../core/constants');
-const { rand, randArr } = require('../core/utils');
+} = require("../core/constants");
+const { rand, randArr } = require("../core/utils");
 
 class Populator {
   constructor(db, comicSamples) {
@@ -42,24 +42,22 @@ class Populator {
     });
   }
 
-  createUser({
-    username,
-  }) {
+  createUser({ username }) {
     const id = uuid();
 
     const user = {
       id,
-      provider: 'local',
+      provider: "local",
       username,
       email: `${username}@omics.com`,
       password,
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      birthdate: '1994-08-01 15:30:00Z',
+      birthdate: "1994-08-01 15:30:00Z",
       gender: randArr(genders),
       biography: faker.lorem.paragraph(),
       profile_image: image(200),
-      role_id: 'user',
+      role_id: "user",
       followers: 0,
       publications: 0,
       subscribed: false,
@@ -68,16 +66,16 @@ class Populator {
 
     this.users[id] = user;
 
-    this.addEvent('user', 'registered', {
+    this.addEvent("user", "registered", {
       Registered: {
         id: user.id,
         username: user.username,
         email: user.email,
-        validation_code: '#fake-code',
+        validation_code: "#fake-code",
       },
     });
-    this.addEvent('user', 'validated', { Validated: { id: user.id } });
-    this.addEvent('user', 'updated', {
+    this.addEvent("user", "validated", { Validated: { id: user.id } });
+    this.addEvent("user", "updated", {
       Updated: {
         id: user.id,
         name: user.name,
@@ -92,11 +90,7 @@ class Populator {
     return user;
   }
 
-  createPublication({
-    userId,
-    pageCount,
-    status,
-  }) {
+  createPublication({ userId, pageCount, status }) {
     const id = uuid();
     const sample = randArr(this.comicSamples);
     const publication = {
@@ -126,43 +120,47 @@ class Populator {
     for (let i = 0; i < pageCount; i++) {
       pages.push({
         number: i,
-        images: [{
-          url: image('663x1024'),
-        }],
+        images: [
+          {
+            url: image("663x1024"),
+          },
+        ],
       });
     }
     publication.pages = pages;
 
-    const statusHistory = [{
-      status: 'draft',
-      datetime: new Date(),
-    }];
+    const statusHistory = [
+      {
+        status: "draft",
+        datetime: new Date(),
+      },
+    ];
 
     if (status) {
       statusHistory.push({
-        status: 'waiting-approval',
+        status: "waiting-approval",
         datetime: new Date(),
       });
 
-      if (status === 'published') {
+      if (status === "published") {
         statusHistory.push({
-          status: 'published',
+          status: "published",
           admin_id: {
-            id: '00000000-0000-0000-0000-000000000002',
+            id: "00000000-0000-0000-0000-000000000002",
           },
           comment: {
             comment: faker.lorem.paragraph(),
           },
           datetime: new Date(),
         });
-      } else if (status === 'rejected') {
+      } else if (status === "rejected") {
         statusHistory.push({
-          status: 'rejected',
+          status: "rejected",
           admin_id: {
-            id: '00000000-0000-0000-0000-000000000002'
+            id: "00000000-0000-0000-0000-000000000002",
           },
           comment: {
-            comment: faker.lorem.paragraph()
+            comment: faker.lorem.paragraph(),
           },
           datetime: new Date(),
         });
@@ -173,36 +171,36 @@ class Populator {
     this.publications[id] = publication;
     this.users[userId].publications += 1;
 
-    this.addEvent('publication', 'created', {
+    this.addEvent("publication", "created", {
       Created: {
         id: publication.id,
         author_id: publication.author_id,
         name: publication.name,
         synopsis: publication.synopsis,
         category_id: publication.category_id,
-        tags: publication.tags.map(t => t.name),
+        tags: publication.tags.map((t) => t.name),
         cover: publication.cover,
       },
     });
-    this.addEvent('publication', 'pages-updated', {
+    this.addEvent("publication", "pages-updated", {
       PagesUpdated: {
         id: publication.id,
         pages_count: publication.pages.length,
       },
     });
-    this.addEvent('publication', 'approval-waited', {
+    this.addEvent("publication", "approval-waited", {
       ApprovalWaited: {
         id: publication.id,
       },
     });
-    this.addEvent('publication', 'published', {
+    this.addEvent("publication", "published", {
       Published: {
         id: publication.id,
         author_id: publication.author_id,
         name: publication.name,
         synopsis: publication.synopsis,
         category_id: publication.category_id,
-        tags: publication.tags.map(t => t.name),
+        tags: publication.tags.map((t) => t.name),
         cover: publication.cover,
         pages_count: publication.pages.length,
       },
@@ -211,10 +209,7 @@ class Populator {
     return publication;
   }
 
-  createCollection({
-    userId,
-    publicationIds,
-  }) {
+  createCollection({ userId, publicationIds }) {
     const id = uuid();
     const collection = {
       id,
@@ -224,26 +219,26 @@ class Populator {
       category_id: randArr(categories),
       tags: randArr(tags, true),
       cover: image(250),
-      items: publicationIds.map(id => ({
+      items: publicationIds.map((id) => ({
         pulication_id: id,
         date: new Date(),
       })),
       created_at: new Date(),
     };
 
-    this.addEvent('collection', 'created', {
+    this.addEvent("collection", "created", {
       Created: {
         id: collection.id,
         author_id: collection.author_id,
         name: collection.name,
         synopsis: collection.synopsis,
         category_id: collection.category_id,
-        tags: collection.tags.map(t => t.name),
+        tags: collection.tags.map((t) => t.name),
         cover: collection.cover,
       },
     });
-    collection.items.forEach(item => {
-      this.addEvent('collection', 'publication-added', {
+    collection.items.forEach((item) => {
+      this.addEvent("collection", "publication-added", {
         PublicationAdded: {
           id: collection.id,
           publication_id: item.publication_id,
@@ -261,7 +256,7 @@ class Populator {
       datetime: new Date(),
       is_unique: unique,
     });
-    this.addEvent('publication', 'viewed', {
+    this.addEvent("publication", "viewed", {
       Viewed: {
         reader_id: userId,
         publication_id: publicationId,
@@ -278,7 +273,7 @@ class Populator {
       publication_id: publicationId,
       datetime: new Date(),
     });
-    this.addEvent('publication', 'read', {
+    this.addEvent("publication", "read", {
       Read: {
         reader_id: userId,
         publication_id: publicationId,
@@ -294,7 +289,7 @@ class Populator {
       publication_id: publicationId,
       datetime: new Date(),
     });
-    this.addEvent('publication', 'liked', {
+    this.addEvent("publication", "liked", {
       Liked: {
         reader_id: userId,
         publication_id: publicationId,
@@ -317,11 +312,13 @@ class Populator {
     });
 
     this.publications[publicationId].statistics.reviews += 1;
-    const stars =
-      this.reviews.reduce((acc, r) => acc + r.stars, 0.0) / this.reviews.length;
-    this.publications[publicationId].statistics.stars = +stars.toFixed(2);
+    const avgStars =
+      this.reviews
+        .filter((r) => r.publication_id === publicationId)
+        .reduce((acc, r) => acc + r.stars, 0.0) / this.reviews.length;
+    this.publications[publicationId].statistics.stars = +avgStars.toFixed(2);
 
-    this.addEvent('publication', 'reviewed', {
+    this.addEvent("publication", "reviewed", {
       Reviewed: {
         reader_id: userId,
         publication_id: publicationId,
@@ -329,7 +326,6 @@ class Populator {
         comment,
       },
     });
-
   }
 
   createPublicationFavorite({ userId, publicationId }) {
@@ -338,7 +334,7 @@ class Populator {
       publication_id: publicationId,
       datetime: new Date(),
     });
-    this.addEvent('reader', 'publication-added-to-favorites', {
+    this.addEvent("reader", "publication-added-to-favorites", {
       PublicationAddedToFavorites: {
         reader_id: userId,
         publication_id: publicationId,
@@ -352,7 +348,7 @@ class Populator {
       publication_id: publicationId,
       datetime: new Date(),
     });
-    this.addEvent('reader', 'collection-added-to-favorites', {
+    this.addEvent("reader", "collection-added-to-favorites", {
       CollectionAddedToFavorites: {
         reader_id: userId,
         publication_id: publicationId,
@@ -366,7 +362,7 @@ class Populator {
       author_id: authorId,
       datetime: new Date(),
     });
-    this.addEvent('author', 'followed', {
+    this.addEvent("author", "followed", {
       Followed: {
         author_id: authorId,
         reader_id: readerId,
@@ -377,54 +373,41 @@ class Populator {
   }
 
   async save() {
-    await this.db('users')
-      .insert(Object.values(this.users));
+    await this.db("users").insert(Object.values(this.users));
 
-    await this.db('publications')
-      .insert(
-        Object.values(this.publications)
-          .map(p => ({
-            ...p,
-            tags: JSON.stringify(p.tags),
-            pages: JSON.stringify(p.pages),
-            status_history: JSON.stringify(p.status_history),
-          })),
-      );
+    await this.db("publications").insert(
+      Object.values(this.publications).map((p) => ({
+        ...p,
+        tags: JSON.stringify(p.tags),
+        pages: JSON.stringify(p.pages),
+        status_history: JSON.stringify(p.status_history),
+      }))
+    );
 
-    await this.db('collections')
-      .insert(
-        Object.values(this.collections)
-          .map(c => ({
-            ...c,
-            tags: JSON.stringify(c.tags),
-            items: JSON.stringify(c.items),
-          })),
-      );
+    await this.db("collections").insert(
+      Object.values(this.collections).map((c) => ({
+        ...c,
+        tags: JSON.stringify(c.tags),
+        items: JSON.stringify(c.items),
+      }))
+    );
 
-    await this.db('views')
-      .insert(this.views);
+    await this.db("views").insert(this.views);
 
-    await this.db('readings')
-      .insert(this.readings);
+    await this.db("readings").insert(this.readings);
 
-    await this.db('likes')
-      .insert(this.likes);
+    await this.db("likes").insert(this.likes);
 
-    await this.db('reviews')
-      .insert(this.reviews);
+    await this.db("reviews").insert(this.reviews);
 
-    await this.db('publication_favorites')
-      .insert(this.publicationFavorites);
+    await this.db("publication_favorites").insert(this.publicationFavorites);
 
-    await this.db('collection_favorites')
-      .insert(this.collectionFavorites);
+    await this.db("collection_favorites").insert(this.collectionFavorites);
 
-    await this.db('follows')
-      .insert(this.follows);
+    await this.db("follows").insert(this.follows);
 
     // Events
-    await this.db('events')
-      .insert(this.events);
+    await this.db("events").insert(this.events);
   }
 }
 

@@ -1,13 +1,13 @@
-const { connectDb } = require('../core/db');
-const { rand, randArr } = require('../core/utils');
-const samples = require('../comic-samples.json');
+const { connectDb } = require("../core/db");
+const { rand, randArr } = require("../core/utils");
+const samples = require("../comic-samples.json");
 
-const Populator = require('../core/populator');
+const Populator = require("../core/populator");
 
 async function main() {
-  console.log('[ POPULATE ]');
+  console.log("[ POPULATE ]");
   const knex = connectDb();
-  console.log('Populating DB...');
+  console.log("Populating DB...");
 
   const populator = new Populator(knex, samples.comics);
 
@@ -21,13 +21,13 @@ async function main() {
         for (let i = 0; i < rand(0, 10); i++) {
           let status = null;
           if (rand(0, 100) < 80) {
-            status = 'waiting-approval';
+            status = "waiting-approval";
 
             const r = rand(0, 100);
             if (r < 40) {
-              status = 'published';
+              status = "published";
             } else if (r < 60) {
-              status = 'rejected';
+              status = "rejected";
             }
           }
 
@@ -44,9 +44,9 @@ async function main() {
             userId: user.id,
             publicationIds: randArr(
               Object.values(populator.publications)
-                .filter(p => p.author_id === user.id)
-                .map(p => p.id),
-              true,
+                .filter((p) => p.author_id === user.id)
+                .map((p) => p.id),
+              true
             ),
           });
         }
@@ -57,8 +57,7 @@ async function main() {
     for (let i = 0; i < 200; i++) {
       const reader = randArr(Object.values(populator.users));
       const author = randArr(
-        Object.values(populator.users)
-          .filter(u => u.publications > 0),
+        Object.values(populator.users).filter((u) => u.publications > 0)
       );
 
       if (reader.id != author.id) {
@@ -70,34 +69,50 @@ async function main() {
     const interactions = [];
     for (let i = 0; i < 10000; i++) {
       const user = randArr(Object.values(populator.users));
-      const publication = randArr(
-        Object.values(populator.publications),
+      const publication = randArr(Object.values(populator.publications));
+      const unique = !interactions.some(
+        (i) => i[0] === user.id && i[1] === publication.id
       );
-      const unique = !interactions.some((i) => i[0] === user.id && i[1] === publication.id);
 
       if (user.id == publication.author_id) {
         continue;
       }
 
-      populator.createView({ userId: user.id, publicationId: publication.id, unique });
+      populator.createView({
+        userId: user.id,
+        publicationId: publication.id,
+        unique,
+      });
 
       // if (!unique) {
       //   continue;
       // }
 
       if (rand(0, 100) < 70) {
-        populator.createReading({ userId: user.id, publicationId: publication.id });
+        populator.createReading({
+          userId: user.id,
+          publicationId: publication.id,
+        });
 
         if (rand(0, 100) < 40) {
-          populator.createLike({ userId: user.id, publicationId: publication.id });
+          populator.createLike({
+            userId: user.id,
+            publicationId: publication.id,
+          });
         }
 
         if (rand(0, 100) < 20) {
-          populator.createReview({ userId: user.id, publicationId: publication.id });
+          populator.createReview({
+            userId: user.id,
+            publicationId: publication.id,
+          });
         }
 
         if (rand(0, 100) < 20) {
-          populator.createPublicationFavorite({ userId: user.id, publicationId: publication.id });
+          populator.createPublicationFavorite({
+            userId: user.id,
+            publicationId: publication.id,
+          });
         }
       }
 
@@ -108,7 +123,7 @@ async function main() {
   } catch (err) {
     console.log(err);
   } finally {
-    console.log('READY');
+    console.log("READY");
     await knex.destroy();
   }
 }

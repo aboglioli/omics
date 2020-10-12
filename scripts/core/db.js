@@ -1,15 +1,15 @@
-const config = require('./config');
+const config = require("./config");
 
-const connectDb = () => require('knex')({
-  client: 'pg',
-  connection: {
-    host: config.postgresHost,
-    user: config.postgresUsername,
-    password: config.postgresPassword,
-    database: config.postgresDatabase,
-  },
-});
-
+const connectDb = () =>
+  require("knex")({
+    client: "pg",
+    connection: {
+      host: config.postgresHost,
+      user: config.postgresUsername,
+      password: config.postgresPassword,
+      database: config.postgresDatabase,
+    },
+  });
 
 // Clean db
 const cleanDb = async () => {

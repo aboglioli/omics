@@ -1,7 +1,7 @@
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
 
 dotenv.config({
-  path: '../.env',
+  path: "../.env",
 });
 
 const config = {
@@ -12,7 +12,7 @@ const config = {
   postgresDatabase: process.env.POSTGRES_DATABASE,
   marvelPublicKey: process.env.MARVEL_PUBLIC_KEY,
   marvelPrivateKey: process.env.MARVEL_PRIVATE_KEY,
-  migrationsDir: './migrations',
+  migrationsDir: "./migrations",
 };
 
 module.exports = config;

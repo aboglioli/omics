@@ -11,13 +11,15 @@
     "clean-db": "node scripts/clean-db",
     "update-samples": "node scripts/update-samples",
     "test": "jest core tests",
-    "lint": "eslint '*/**/*.js' --fix"
+    "lint": "eslint '*/**/*.js' --fix && prettier --check -w ."
   },
   "author": "Alan Boglioli <alan.boglioli@gmail.com>",
   "license": "MIT",
   "devDependencies": {
     "eslint": "^7.11.0",
-    "jest": "^26.4.2"
+    "eslint-config-prettier": "^6.12.0",
+    "jest": "^26.4.2",
+    "prettier": "^2.1.2"
   },
   "dependencies": {
     "axios": "^0.20.0",

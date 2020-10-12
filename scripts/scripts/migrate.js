@@ -1,11 +1,11 @@
-const fs = require('fs');
-const { connectDb } = require('../core/db');
-const config = require('../core/config');
+const fs = require("fs");
+const { connectDb } = require("../core/db");
+const config = require("../core/config");
 
 async function main() {
-  console.log('[ MIGRATE ]');
+  console.log("[ MIGRATE ]");
   const knex = connectDb();
-  console.log('Migrating...');
+  console.log("Migrating...");
 
   try {
     let files = fs.readdirSync(config.migrationsDir);
@@ -17,14 +17,14 @@ async function main() {
       );
     `);
 
-    const migrations = await knex.select('*').from('migrations');
-    const existingFiles = migrations.map(m => m.file);
+    const migrations = await knex.select("*").from("migrations");
+    const existingFiles = migrations.map((m) => m.file);
 
     for (const file of files) {
       process.stdout.write(`${file}: `);
 
-      if (existingFiles.some(f => f === file)) {
-        console.log('EXISTING');
+      if (existingFiles.some((f) => f === file)) {
+        console.log("EXISTING");
         continue;
       }
 
@@ -32,18 +32,17 @@ async function main() {
       content = content.toString();
 
       await knex.raw(content);
-      await knex('migrations')
-        .insert({
-          file,
-          datetime: new Date(),
-        });
+      await knex("migrations").insert({
+        file,
+        datetime: new Date(),
+      });
 
-      console.log('RUN');
+      console.log("RUN");
     }
-  } catch(err) {
+  } catch (err) {
     console.log(err);
   } finally {
-    console.log('READY');
+    console.log("READY");
     await knex.destroy();
   }
 }

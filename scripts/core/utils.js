@@ -1,8 +1,9 @@
-const sleep = ms => new Promise((resolve, _) => {
-  setTimeout(() => {
-    resolve();
-  }, ms);
-});
+const sleep = (ms) =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, ms);
+  });
 
 const rand = (min, max) => Math.floor(Math.random() * (max - min)) + min;
 const randArr = (arr, multiple = false) => {

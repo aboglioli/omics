@@ -1,14 +1,16 @@
-const assert = require('assert').strict;
-const { req } = require('../core/request');
-const { sleep } = require('../core/utils');
+const { req } = require("../core/request");
+const { sleep } = require("../core/utils");
 
 const rand = (min, max) => Math.floor(Math.random() * (max - min)) + min;
 
-const image = size => `https://via.placeholder.com/${size ? size : '256'}.jpg`;
-const password = 'P@asswd!';
+const image = (size) =>
+  `https://via.placeholder.com/${size ? size : "256"}.jpg`;
+const password = "P@asswd!";
 
-const registerAndValidate = async cmd => {
-  const { data: { id: userId } } = await req.post('/register', cmd);
+const registerAndValidate = async (cmd) => {
+  const {
+    data: { id: userId },
+  } = await req.post("/register", cmd);
 
   await sleep(100);
   const event = (await req.lastEvent()).payload.Registered;
@@ -33,7 +35,7 @@ async function user({
     password,
   });
   await req.login(username, password);
-  await req.put('/users/me', {
+  await req.put("/users/me", {
     name,
     lastname,
     birthdate,
@@ -51,7 +53,9 @@ async function publication({
   pagesCount,
   publish,
 }) {
-  const { data: { id: publicationId } } = await req.post('/publications', {
+  const {
+    data: { id: publicationId },
+  } = await req.post("/publications", {
     name,
     synopsis,
     category_id: categoryId,
@@ -65,7 +69,7 @@ async function publication({
 
   const pages = [];
   for (let i = 0; i < pagesCount; i++) {
-    pages.push({ images: [image('663x1024')] });
+    pages.push({ images: [image("663x1024")] });
   }
 
   await req.put(`/publications/${publicationId}/pages`, { pages });
@@ -82,7 +86,9 @@ async function collection({
   tags,
   publicationIds,
 }) {
-  const { data: { id: collectionId } } = await req.post('/collections', {
+  const {
+    data: { id: collectionId },
+  } = await req.post("/collections", {
     name,
     synopsis,
     category_id: categoryId,
@@ -96,7 +102,7 @@ async function collection({
 }
 
 async function main() {
-  console.log('Populating...');
+  console.log("Populating...");
 
   try {
     for (let i = 0; i < 5; i++) {
@@ -104,30 +110,34 @@ async function main() {
       await user({
         username: `user-${i}`,
         email: `user-${i}@omics.com`,
-        name: 'Name',
-        lastname: 'Lastname',
-        birthdate: '1994-05-06T15:30:00Z',
-        gender: rand(0, 100) < 50 ? 'male' : 'female',
-        biography: 'My amazing biography...',
+        name: "Name",
+        lastname: "Lastname",
+        birthdate: "1994-05-06T15:30:00Z",
+        gender: rand(0, 100) < 50 ? "male" : "female",
+        biography: "My amazing biography...",
       });
 
       // Publications
       const publicationsCount = rand(1, 10);
-      const { data: { categories } } = await req.get('/categories');
+      const {
+        data: { categories },
+      } = await req.get("/categories");
 
       for (let i = 0; i < publicationsCount; i++) {
         await publication({
           name: `Publication ${i}`,
-          synopsis: 'An amazing description...',
+          synopsis: "An amazing description...",
           categoryId: categories[rand(0, categories.length)].id,
-          tags: ['Tag 1', 'Tag 2'],
+          tags: ["Tag 1", "Tag 2"],
           pagesCount: rand(0, 20),
           publish: rand(0, 100) < 80,
         });
       }
 
       // Collections
-      const { data: { publications } } = await req.get('/authors/me/publications');
+      const {
+        data: { publications },
+      } = await req.get("/authors/me/publications");
       const collectionsCount = rand(1, 4);
       for (let i = 0; i < collectionsCount; i++) {
         const publicationIds = [];
@@ -139,31 +149,37 @@ async function main() {
 
         await collection({
           name: `Collection ${i}`,
-          synopsis: 'This is a collection.',
+          synopsis: "This is a collection.",
           categoryId: categories[rand(0, categories.length)].id,
-          tags: ['Tag 2', 'Tag 3'],
+          tags: ["Tag 2", "Tag 3"],
           publicationIds,
         });
       }
     }
 
-    await req.login('content-manager-1', password);
-    const { data: { publications: waitingApprovalPublications } } = await req.get('/publications?status=waiting-approval');
+    await req.login("content-manager-1", password);
+    const {
+      data: { publications: waitingApprovalPublications },
+    } = await req.get("/publications?status=waiting-approval");
     for (const publication of waitingApprovalPublications) {
       const r = rand(0, 100);
       if (r < 50) {
-        await req.post(`/publications/${publication.id}/approve`, { comment: 'Todo correcto' });
+        await req.post(`/publications/${publication.id}/approve`, {
+          comment: "Todo correcto",
+        });
       } else if (r < 70) {
-        await req.post(`/publications/${publication.id}/reject`, { comment: 'La obra puede resultar ofensiva' });
+        await req.post(`/publications/${publication.id}/reject`, {
+          comment: "La obra puede resultar ofensiva",
+        });
       }
     }
 
-    console.log('OK');
+    console.log("OK");
   } catch (err) {
     if (err.config && err.response) {
-      console.log('Config:', err.config);
-      console.log('Status:', err.response.status);
-      console.log('Response:', err.response.data);
+      console.log("Config:", err.config);
+      console.log("Status:", err.response.status);
+      console.log("Response:", err.response.data);
     } else {
       console.log(err);
     }
