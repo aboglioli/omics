@@ -3,6 +3,13 @@
 
   <!-- Title -->
   <div class="title">
+    <fa-icon
+      *ngIf="publication.contract"
+      style="color: #ffb347; margin-right: 0.3rem;"
+      [icon]="faStarFill"
+      size="1x"
+    >
+    </fa-icon>
     <h3>{{publication.name | truncateString: truncateStringLength: false}}</h3>
   </div>
 

@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, } from '@angular/core';
-import { faEye, faHeart, faStar } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faHeart, faStar, faDollarSign } from '@fortawesome/free-solid-svg-icons';
 import { IPublication } from 'src/app/domain/models';
 
 @Component({
@@ -18,6 +18,7 @@ export class PublicationCardReaderComponent implements OnInit {
   public faVistas = faEye;
   public faLike = faHeart;
   public faStarFill = faStar;
+  public faDollarSign = faDollarSign;
 
   constructor() { }
 

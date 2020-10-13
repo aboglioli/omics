@@ -14,6 +14,8 @@ import { IReview } from '../../../domain/models/review';
 import { ReaderService } from '../../../domain/services/reader.service';
 import { AuthService } from '../../../domain/services/auth.service';
 import { IContract } from '../../../domain/models/contract';
+import { IdentityService } from '../../../domain/services/identity.service';
+import { IUser } from '../../../domain/models/user';
 
 export interface DialogData {
   idPublication: string;
@@ -51,12 +53,14 @@ export class PublicationInfoComponent implements OnInit {
   public readerIsSubscribed = false;
   public canRequestContract = false;
   public readerIsAuthor = false;
+  public readerIsContentManager = false;
 
   constructor(
     public dialogRef: MatDialogRef<PublicationInfoComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     private publicationService: PublicationService,
     private readerService: ReaderService,
+    private identityService: IdentityService,
     private authService: AuthService,
     private spinnerService: NgxSpinnerService,
     private breakpointObserver: BreakpointObserver,
@@ -83,7 +87,13 @@ export class PublicationInfoComponent implements OnInit {
       (err) => {
         console.log(err);
       },
-    )
+    );
+
+    this.identityService.getById('me').subscribe(
+      (res) => {
+        this.readerIsContentManager = res.role_id === 'admin' || res.role_id === 'content-manager';
+      },
+    );
 
   }
 
@@ -264,6 +274,11 @@ export class PublicationInfoComponent implements OnInit {
         this.getPublicationInfo();
       }
     )
+  }
+
+  public subscribe(): void {
+    this.router.navigate(['/plans']);
+    this.onClose();
   }
 
 }
