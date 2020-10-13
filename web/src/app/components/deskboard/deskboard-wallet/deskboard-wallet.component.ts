@@ -13,6 +13,7 @@ import { ContractService } from '../../../domain/services/contract.service';
 })
 export class DeskboardWalletComponent implements OnInit {
   public contracts: IContract[];
+  public message: string;
 
   constructor(
     private authorService: AuthorService,
@@ -61,6 +62,25 @@ export class DeskboardWalletComponent implements OnInit {
         this.spinnerService.hide();
       },
     );
+  }
+
+  totalAmount(contract: IContract): number {
+    return contract
+      .summaries
+      .reduce((acc, s) => acc + s.amount, 0.0);
+  }
+
+  paidAmount(contract: IContract): number {
+    return contract
+      .payments
+      .reduce((acc, p) => acc + p.amount, 0.0);
+  }
+
+  chargeAmount(contract: IContract): number {
+    return contract
+      .summaries
+      .filter((s) => !s.paid)
+      .reduce((acc, s) => acc + s.amount, 0.0);
   }
 
   canCharge(contract: IContract): boolean {

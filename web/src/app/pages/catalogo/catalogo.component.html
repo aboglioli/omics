@@ -23,6 +23,7 @@
     <div class="card-thumbail" *ngFor="let publication of publicationList">
       <app-publication-card-reader
             [publication]="publication"
+            [truncateStringLength]="24"
             (click)="showPublicationInfo( publication.id )">
       </app-publication-card-reader>
     </div>

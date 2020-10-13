@@ -1,1 +1,28 @@
-<app-under-construction></app-under-construction>
+<div class="reports-container">
+  <h1>Últimos 7 días</h1>
+
+  <div class="publication" *ngFor="let publication of publications">
+    <h2>Estadísticas de {{publication.name}}</h2>
+
+    <div class="statistics">
+      <table>
+        <tr>
+          <th>Visualizaciones</th>
+          <th>Visualizaciones únicas</th>
+          <th>Lecturas</th>
+          <th>Likes</th>
+          <th>Reseñas</th>
+          <th>Calificación</th>
+        </tr>
+        <tr>
+          <td>{{publication.statistics.views}}</td>
+          <td>{{publication.statistics.unique_views}}</td>
+          <td>{{publication.statistics.readings}}</td>
+          <td>{{publication.statistics.likes}}</td>
+          <td>{{publication.statistics.reviews}}</td>
+          <td>{{publication.statistics.stars.toFixed(2)}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>

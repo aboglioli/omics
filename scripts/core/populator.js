@@ -500,7 +500,7 @@ class Populator {
           readings: rand(100, 1000),
           likes: rand(100, 1000),
           reviews: rand(100, 1000),
-          stars: rand(100, 1000) * 1.0,
+          stars: rand(0, 6) * 1.0,
         },
         total: rand(1000, 10000) * 1.0,
         amount: rand(10, 1000) * 1.0,

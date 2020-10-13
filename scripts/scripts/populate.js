@@ -111,7 +111,9 @@ async function main() {
     }
 
     // Follows
-    populator.lastDate.setHours(populator.lastDate.getHours() + 24 * 10);
+    const now = new Date();
+    now.setHours(now.getHours() - 24 * 8);
+    populator.lastDate = now;
     for (let i = 0; i < 200; i++) {
       const reader = randArr(Object.values(populator.users));
       const author = randArr(
