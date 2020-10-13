@@ -11,7 +11,7 @@ import { typeSearchCatalogue } from '../../models/enums.model';
 export class CatalogueFilterComponent implements OnInit {
 
   @Output() typeSearch = new EventEmitter();
-  @Output() searchByDate = new EventEmitter();
+  @Output() filterSearch = new EventEmitter();
 
   public optionTypeSearch = typeSearchCatalogue;
   public currentTypeSearch = this.optionTypeSearch.publication;
@@ -37,7 +37,6 @@ export class CatalogueFilterComponent implements OnInit {
   private createForm(): void {
 
     this.formFilterSearch = this.fb.group({
-
       name:          [],
       orderBy:       [''],
       category_id:   [''],
@@ -48,9 +47,14 @@ export class CatalogueFilterComponent implements OnInit {
 
   }
 
+  private resetForm(): void {
+    this.formFilterSearch.reset();
+  }
+
   public changeTypeSearch(type: typeSearchCatalogue): void {
 
     this.currentTypeSearch = type;
+    this.resetForm();
     this.typeSearch.emit(this.currentTypeSearch);
   }
 
@@ -72,7 +76,10 @@ export class CatalogueFilterComponent implements OnInit {
 
   public onSearchByDate(): void {
 
-    console.log('TEST > ', this.formFilterSearch.value);
+
+    if ( this.formFilterSearch.touched ) {
+      this.filterSearch.emit(  this.formFilterSearch.value );
+    }
 
   }
 
