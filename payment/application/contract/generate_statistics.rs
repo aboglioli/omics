@@ -13,8 +13,8 @@ use crate::domain::contract::{ContractRepository, ContractService};
 
 #[derive(Deserialize)]
 pub struct GenerateSummariesCommand {
-    from: Option<String>,
-    to: Option<String>,
+    from: String,
+    to: String,
 }
 
 #[derive(Serialize)]

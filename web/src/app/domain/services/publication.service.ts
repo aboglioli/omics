@@ -249,7 +249,7 @@ export class PublicationService {
       params = params.append('date_to', cmd.date_to);
     }
 
-    return this.http.get<IStatistics>(`${this.baseUrl}/${id}/statistics`)
+    return this.http.get<IStatistics>(`${this.baseUrl}/${id}/statistics`, { params });
   }
 
   public getContract(id: string): Observable<IContract> {

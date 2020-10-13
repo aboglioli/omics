@@ -2,7 +2,7 @@ use actix_web::{delete, get, post, web, HttpRequest, HttpResponse, Responder};
 
 use common::request::{IncludeParams, PaginationParams};
 use payment::application::contract::{
-    Approve, Cancel, ChargeForContract, GenerateStatistics, GenerateStatisticsCommand, Reject,
+    Approve, Cancel, ChargeForContract, GenerateSummaries, GenerateSummariesCommand, Reject,
     Search, SearchCommand,
 };
 
@@ -96,12 +96,12 @@ async fn cancel(
 #[post("/statistics")]
 async fn generate_statistics(
     req: HttpRequest,
-    cmd: web::Json<GenerateStatisticsCommand>,
+    cmd: web::Json<GenerateSummariesCommand>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
-    GenerateStatistics::new(
+    GenerateSummaries::new(
         c.payment.event_pub(),
         c.payment.contract_repo(),
         c.payment.user_repo(),
