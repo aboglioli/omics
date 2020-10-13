@@ -2,8 +2,8 @@ use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse, Responde
 
 use common::request::{IncludeParams, PaginationParams};
 use payment::application::contract::{
-    CanRequest as CanRequestContract, GetByPublication as GetContractByPublication,
-    Request as RequestContract,
+    CanRequest as CanRequestContract, GenerateSummariesForPublication,
+    GetByPublication as GetContractByPublication, Request as RequestContract,
 };
 use publishing::application::collection::{
     Search as SearchCollection, SearchCommand as SearchCollectionCommand,
@@ -418,6 +418,26 @@ async fn get_contract(
         c.payment.contract_repo(),
         c.payment.publication_repo(),
         c.payment.user_repo(),
+    )
+    .exec(auth_id, path.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
+}
+
+#[get("/{publication_id}/contract/summaries")]
+async fn generate_summaries(
+    req: HttpRequest,
+    path: web::Path<String>,
+    c: web::Data<MainContainer>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    GenerateSummariesForPublication::new(
+        c.payment.event_pub(),
+        c.payment.contract_repo(),
+        c.payment.publication_repo(),
+        c.payment.contract_serv(),
     )
     .exec(auth_id, path.into_inner())
     .await

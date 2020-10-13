@@ -256,6 +256,10 @@ export class PublicationService {
     return this.http.get<IContract>(`${this.baseUrl}/${id}/contract`);
   }
 
+  public generateSummaries(id: string): Observable<IContract> {
+    return this.http.get<IContract>(`${this.baseUrl}/${id}/contract/summaries`);
+  }
+
   public canRequestContract(id: string): Observable<ICanRequestContractResponse> {
     return this.http.get<ICanRequestContractResponse>(`${this.baseUrl}/${id}/contract/can-request`);
   }

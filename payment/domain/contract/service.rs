@@ -92,6 +92,7 @@ impl ContractService {
                 }
             }
         }
+        subscription_total = subscription_total * 0.3;
 
         if subscription_total == 0.0 {
             return Err(Error::new("subscription_total", "zero"));
@@ -128,6 +129,86 @@ impl ContractService {
         }
 
         Ok(contracts)
+    }
+
+    pub async fn calculate_summaries_for_publication(
+        &self,
+        publication_id: &PublicationId,
+    ) -> Result<Contract> {
+        let mut contract = self
+            .contract_repo
+            .find_by_publication_id(publication_id)
+            .await?;
+
+        if !matches!(contract.status_history().current(), Status::Approved{ .. }) {
+            return Err(Error::new("contract", "not_approved"));
+        }
+
+        let date_from = if let Some(last_summary) = contract.summaries().last() {
+            last_summary.to().clone()
+        } else {
+            contract.status_history().current_item().datetime().clone()
+        };
+
+        // Only update contracts older than 10 days
+        if date_from + Duration::days(10) > Utc::now() {
+            return Ok(contract);
+        }
+
+        let subscriptions = self.subscription_repo.search(None, None, None).await?;
+        let mut subscription_total: f64 = 0.0;
+        for subscription in subscriptions.iter() {
+            for payment in subscription.payments().iter() {
+                if payment.datetime() >= &date_from {
+                    subscription_total += payment.amount().value();
+                }
+            }
+        }
+        subscription_total = subscription_total * 0.3;
+
+        if subscription_total == 0.0 {
+            return Err(Error::new("subscription_total", "zero"));
+        }
+
+        let statistics = self
+            .statistics_serv
+            .get_history(
+                None,
+                Some(contract.publication_id()),
+                Some(&date_from),
+                None,
+            )
+            .await?;
+
+        let contracts = self
+            .contract_repo
+            .search(None, Some(&"approved".to_owned()), None, None, None, None)
+            .await?;
+        let mut total_views = 0;
+        for contract in contracts.into_iter() {
+            let statistics = self
+                .statistics_serv
+                .get_history(
+                    None,
+                    Some(contract.publication_id()),
+                    Some(&date_from),
+                    None,
+                )
+                .await?;
+
+            total_views += statistics.views();
+        }
+
+        let views = statistics.views();
+        contract.add_summary(Summary::new(
+            statistics,
+            subscription_total,
+            (views as f64 / total_views as f64) * subscription_total,
+            date_from.clone(),
+            Utc::now(),
+        )?)?;
+
+        Ok(contract)
     }
 }
 
@@ -167,8 +248,16 @@ mod tests {
             unimplemented!()
         }
 
-        async fn find_by_publication_id(&self, _id: &PublicationId) -> Result<Contract> {
-            unimplemented!()
+        async fn find_by_publication_id(&self, id: &PublicationId) -> Result<Contract> {
+            let contracts = self
+                .search(None, Some(&"approved".to_owned()), None, None, None, None)
+                .await?;
+            for contract in contracts.into_iter() {
+                if contract.publication_id() == id {
+                    return Ok(contract);
+                }
+            }
+            Err(Error::not_found("contract"))
         }
 
         async fn search(
@@ -620,19 +709,30 @@ mod tests {
         let summaries = contracts[0].summaries();
         assert_eq!(summaries.len(), 1);
         assert!(!summaries[0].is_paid());
-        assert_eq!(summaries[0].total(), 450.0);
-        assert_eq!(summaries[0].amount(), 2.0 / 3.0 * 450.0);
+        assert_eq!(summaries[0].total(), 450.0 * 0.3);
+        assert_eq!(summaries[0].amount(), 2.0 / 3.0 * 450.0 * 0.3);
 
         let summaries = contracts[1].summaries();
         assert_eq!(summaries.len(), 1);
         assert!(!summaries[0].is_paid());
-        assert_eq!(summaries[0].total(), 450.0);
-        assert_eq!(summaries[0].amount(), 1.0 / 3.0 * 450.0);
+        assert_eq!(summaries[0].total(), 450.0 * 0.3);
+        assert_eq!(summaries[0].amount(), 1.0 / 3.0 * 450.0 * 0.3);
 
         let summaries = contracts[2].summaries();
         assert_eq!(summaries.len(), 1);
         assert!(!summaries[0].is_paid());
-        assert_eq!(summaries[0].total(), 450.0);
-        assert_eq!(summaries[0].amount(), 0.0 / 3.0 * 450.0);
+        assert_eq!(summaries[0].total(), 450.0 * 0.3);
+        assert_eq!(summaries[0].amount(), 0.0 / 3.0 * 450.0 * 0.3);
+
+        // TODO: consider dates in status
+        // let contract = contract_serv
+        //     .calculate_summaries_for_publication(&PublicationId::new("#publication01").unwrap())
+        //     .await
+        //     .unwrap();
+        // let summaries = contract.summaries();
+        // assert_eq!(summaries.len(), 1);
+        // assert!(!summaries[0].is_paid());
+        // assert_eq!(summaries[0].total(), 450.0);
+        // assert_eq!(summaries[0].amount(), 2.0 / 3.0 * 450.0);
     }
 }

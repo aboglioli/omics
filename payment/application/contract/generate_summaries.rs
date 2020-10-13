@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
-
 use identity::domain::user::{UserId, UserRepository};
 
 use crate::domain::contract::{ContractRepository, ContractService};
