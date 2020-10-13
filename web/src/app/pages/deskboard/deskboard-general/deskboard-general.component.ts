@@ -26,8 +26,7 @@ export class DeskboardGeneralComponent implements OnInit {
   public isBigScreen = true;
 
   public optionMenu = DeskboardOptionMenu;
-  // public currentOption = this.optionMenu.comics; // TODO: En vez de esto, debería usarse "patch child" (esto lo hice por tiempo)
-  public currentOption = this.optionMenu.reports; // TODO: En vez de esto, debería usarse "patch child" (esto lo hice por tiempo)
+  public currentOption = this.optionMenu.comics; // TODO: En vez de esto, debería usarse "patch child" (esto lo hice por tiempo)
 
   public optionTypeSearch = typeSearchCatalogue;
   public currentTypeSearch = this.optionTypeSearch.publication;
