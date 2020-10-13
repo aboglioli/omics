@@ -112,3 +112,9 @@ button.button-white-borders {
 
 
 }
+
+
+// Superposición de estilos
+::ng-deep .mat-chip-list-wrapper {
+  justify-content: center;
+}

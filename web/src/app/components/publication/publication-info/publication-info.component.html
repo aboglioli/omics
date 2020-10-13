@@ -179,7 +179,7 @@
 
     <div class="side opacity-background">
 
-      <div  *ngIf="readerInfo"
+      <div  *ngIf="readerInfo && readerIsSubscribed"
             class="fila" style="justify-content: center;">
         <bar-rating [(rate)]="ratingPublication" [max]="5" [theme]="'stars'"
                     (rateChange)="addReview($event)">

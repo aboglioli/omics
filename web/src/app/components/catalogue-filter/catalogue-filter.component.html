@@ -69,33 +69,29 @@
 
       <br>
 
-      <mat-chip-list #chipTagList aria-label="Tag selection">
-
-        <!-- <mat-chip *ngFor="let tag of tagsList"
-                  [selectable]="true"
-                  [removable]="true"
-                  (removed)="removeTag(tag)">
-          {{tag}}
-          <mat-icon matChipRemove>cancel</mat-icon>
-        </mat-chip> -->
+      <span *ngIf="currentTypeSearch === optionTypeSearch.publication">
+      <mat-chip-list #chipTagList aria-label="Tag selection" style="margin: 0em 0.5em;">
 
         <mat-chip
-          style="cursor: pointer;"
-          color="primary"
-          selected
-          [selectable]="true"
-          (click)="onFilterSelected('hola')"
-          [removable]="false">
-          Filtro
-        </mat-chip>
+            *ngFor="let filter of publicationFilterTypesOrderList; let i = index"
+            style="cursor: pointer;"
+            [color]="(filter.selected) ? 'accent': 'primary'"
+            selected
+            [selectable]="true"
+            (click)="onFilterSelected(i, !filter.selected, filter.value)"
+            [removable]="false">
+            {{ filter.name }}
+          </mat-chip>
 
-      </mat-chip-list>
+
+        </mat-chip-list>
+      </span>
 
       <br>
       <!-- Categorias -->
-      <div class="title-row">
+      <!-- <div class="title-row">
         <h2>Categorías</h2>
-      </div>
+      </div> -->
 
     </form>
 
