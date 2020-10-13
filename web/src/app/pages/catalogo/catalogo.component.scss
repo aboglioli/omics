@@ -3,6 +3,7 @@
 div.listado-biblioteca {
 
   min-height: 93.4vh;
+  color: white;
 
   display: flex;
 
@@ -54,6 +55,12 @@ div.listado-biblioteca {
 
   }
 
+  .text-no-found {
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    margin: 2em;
+  }
 
   .search-filters {
     flex: 1;
