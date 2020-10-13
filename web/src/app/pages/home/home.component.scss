@@ -1,3 +1,125 @@
-p {
+@import "src/scss/vars";
+
+div.home-box {
+
   color: white;
+
+  .header{
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5em 1em;
+  }
+
+  .card-group {
+    display: flex;
+    flex-wrap: nowrap;
+
+    // Pantalla grande
+    @media screen and (min-width: $break-small) {
+      flex-direction: row;
+    }
+
+    // Pantalla chica
+    @media screen and (max-width: $break-small) {
+      flex-direction: column;
+    }
+
+    margin: 0em 1em;
+
+    .card-box-title {
+
+      display: flex;
+      align-items: center;
+
+      // Pantalla grande
+      @media screen and (min-width: $break-small) {
+        margin-right: 1em;
+        margin-top: 1em;
+        width: 200px;
+        height: 200px;
+      }
+
+      // Pantalla chica
+      @media screen and (max-width: $break-small) {
+        margin-bottom: 1em;
+        align-self: center;
+        width: 250px;
+        height: 250px;
+      }
+
+      background-color: $omics-background-button;
+
+      h1 {
+        text-align: center;
+        margin: 0em;
+        width: 100%;
+      }
+
+    }
+
+    .publication-block {
+
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+
+      padding: 1em 0em;
+      overflow-x: auto;
+
+      max-height: 93.4vh;
+      overflow-y: auto;
+
+      div.card-thumbail {
+
+        margin: 0em 0.5em;
+
+        cursor: pointer;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+          box-shadow:  0px 0px 15px 4px rgba(0, 255, 255, 0.5)
+        }
+
+      }
+
+    }
+
+  }
+
+}
+
+// Generales
+hr {
+  border: 0;
+  border-top: 2px solid white;
+  margin: 1em;
+  box-shadow: 0px 0px 4px 4px $omics-neon-pink;
+}
+
+button.button-white-borders {
+
+  color: white;
+  border-color: white;
+
+  &:hover {
+    box-shadow: 0px 0px 4px 4px  $omics-neon-pink;
+  }
+
+}
+
+
+
+// Scrollbar
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: $omics-background-menu;
+  border-radius: 10px;
 }

@@ -1,0 +1,81 @@
+<div class="filter-box">
+
+  <div class="box-type">
+    <div  [ngClass]="{'selected': ( currentTypeSearch === optionTypeSearch.publication )}"
+          (click)="changeTypeSearch( optionTypeSearch.publication )">
+      Publicaciones
+    </div>
+
+    <div  [ngClass]="{'selected': ( currentTypeSearch === optionTypeSearch.collection )}"
+          (click)="changeTypeSearch( optionTypeSearch.collection )">
+      Colecciones
+    </div>
+  </div>
+
+  <br>
+
+  <!-- Solo para pantalla grande -->
+  <span *ngIf="isBigScreen" style="width: 100%;">
+
+    <form [formGroup]="formFilterSearch" class="big-screen">
+
+      <!-- Filtros -->
+      <div class="title-row">
+        <h2>Filtros</h2>
+      </div>
+
+      <div class="date-filter">
+        <h3 style="text-align: center; margin: 0">Fecha publicación: </h3>
+
+        <div class="fila center">
+
+          <!-- Fecha desde -->
+          <mat-form-field appearance="fill" class="matDate">
+            <mat-label>Desde...</mat-label>
+            <input  matInput
+                    [max]="maxDateToSerch"
+                    [matDatepicker]="pickerFrom"
+                    formControlName="dateFrom"
+                    (dateChange)="convertDateToRFC3339($event.value, 'dateFrom')">
+            <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+            <mat-datepicker #pickerFrom></mat-datepicker>
+          </mat-form-field>
+
+          <!-- Fecha hasta -->
+          <mat-form-field appearance="fill" class="matDate">
+            <mat-label>...Hasta</mat-label>
+            <input  matInput
+                    [max]="maxDateToSerch"
+                    [matDatepicker]="pickerTo"
+                    formControlName="dateTo"
+                    (dateChange)="convertDateToRFC3339($event.value, 'dateTo')">
+            <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
+            <mat-datepicker #pickerTo></mat-datepicker>
+          </mat-form-field>
+
+        </div>
+
+        <div class="fila center">
+
+          <button mat-stroked-button class="button-white-borders"
+                style="font-size: 1rem; width: 80%;"
+                (click)="onSearchByDate()">
+            <h4>Buscar por fecha</h4>
+          </button>
+
+        </div>
+
+      </div>
+
+      <br>
+
+      <!-- Categorias -->
+      <div class="title-row">
+        <h2>Categorías</h2>
+      </div>
+
+    </form>
+
+  </span>
+
+</div>

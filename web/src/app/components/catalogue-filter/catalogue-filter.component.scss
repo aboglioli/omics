@@ -1,0 +1,114 @@
+@import "src/scss/vars";
+
+div.filter-box {
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  width: 100%;
+  color: white;
+
+  div.box-type {
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0.1em 0.1em;
+
+    font-size: 12pt;
+
+    color: white;
+
+    div {
+      cursor: pointer;
+      padding: 0.5em 0.5em;
+
+      &.selected {
+        font-weight: bold;
+        color: $omics-background-flat;
+        background-color: white;
+      }
+
+      &:not(.selected) {
+        box-shadow: inset 0px 0px 0px 2px white;
+        background-color: #201D2E;
+      }
+
+      &:hover {
+        color: $omics-neon-pink;
+      }
+
+    }
+
+  }
+
+  form {
+    display: flex;
+    width: 100%;
+
+    &.big-screen {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+
+  div.title-row {
+
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    background-color: $omics-background-menu;
+
+    h2 {
+      margin: 0em;
+    }
+
+  }
+
+
+  mat-form-field.matDate {
+
+    width: 126px;
+    margin: 0.25em;
+
+    ::ng-deep div.mat-form-field-flex {
+      background-color: white;
+      color: black;
+    }
+  }
+
+}
+
+
+// Generales
+.fila {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+
+  &.center {
+    justify-content: center;
+  }
+
+}
+
+button.button-white-borders {
+
+  color: white;
+  border-color: white;
+
+  &:hover {
+    box-shadow: 0px 0px 6px 2px $omics-aqua-button
+  }
+
+  h4 {
+    margin: 5px 0px;
+    letter-spacing: 2px;
+    font-weight: 400;
+  }
+
+
+}
