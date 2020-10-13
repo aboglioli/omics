@@ -1,1 +1,7 @@
-<app-under-construction></app-under-construction>
+<div class="wallter-container">
+  <div class="contract" *ngFor="let contract of contracts">
+    <h2>{{contract.publication.name}}</h2>
+    <p>{{contract.summaries.length}}</p>
+    <p>{{contract.payments.length}}</p>
+  </div>
+</div>

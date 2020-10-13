@@ -1,5 +1,6 @@
 import { IPayment } from './payment';
 import { IStatistics } from './statistics';
+import { IPublication } from './publication';
 
 export interface ISummary {
   statistics: IStatistics;
@@ -19,7 +20,7 @@ export interface IContractStatus {
 export interface IContract {
   id: string;
   publication_id?: string;
-  publication?: string;
+  publication?: IPublication;
   summaries: ISummary[];
   payments: IPayment[];
   status: IContractStatus;
