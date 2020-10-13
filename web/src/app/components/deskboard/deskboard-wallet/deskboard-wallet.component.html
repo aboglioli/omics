@@ -3,5 +3,18 @@
     <h2>{{contract.publication.name}}</h2>
     <p>{{contract.summaries.length}}</p>
     <p>{{contract.payments.length}}</p>
+
+    <button
+      (click)="generateSummaries(contract)"
+    >
+      Actualizar resumen
+    </button>
+
+    <button
+      [disabled]="!canCharge(contract)"
+      (click)="charge(contract)"
+    >
+      Cobrar
+    </button>
   </div>
 </div>

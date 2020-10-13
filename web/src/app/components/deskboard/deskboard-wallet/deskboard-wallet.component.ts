@@ -4,6 +4,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { IContract } from '../../../domain/models/contract';
 import { PublicationService } from '../../../domain/services/publication.service';
 import { AuthorService } from '../../../domain/services/author.service';
+import { ContractService } from '../../../domain/services/contract.service';
 
 @Component({
   selector: 'app-deskboard-wallet',
@@ -11,16 +12,23 @@ import { AuthorService } from '../../../domain/services/author.service';
   styleUrls: ['./deskboard-wallet.component.scss']
 })
 export class DeskboardWalletComponent implements OnInit {
-  private contracts: IContract[] = [];
+  public contracts: IContract[];
 
   constructor(
     private authorService: AuthorService,
     private publicationService: PublicationService,
+    private contractService: ContractService,
     private spinnerService: NgxSpinnerService,
   ) { }
 
   ngOnInit(): void {
+    this.getContracts();
+  }
+
+  private getContracts(): void {
     this.spinnerService.show();
+
+    this.contracts = [];
 
     this.authorService.getPublications('me').subscribe(
       (res) => {
@@ -40,6 +48,34 @@ export class DeskboardWalletComponent implements OnInit {
 
         this.spinnerService.hide();
       },
+    );
+  }
+
+  generateSummaries(contract: IContract): void {
+    this.spinnerService.show();
+
+    this.publicationService.generateSummaries(contract.publication.id).subscribe(
+      (res) => {
+        this.getContracts();
+
+        this.spinnerService.hide();
+      },
+    );
+  }
+
+  canCharge(contract: IContract): boolean {
+    return contract.summaries.some((s) => !s.paid);
+  }
+
+  charge(contract: IContract): void {
+    this.spinnerService.show();
+
+    this.contractService.charge(contract.id).subscribe(
+      (res) => {
+        this.getContracts();
+
+        this.spinnerService.hide();
+      }
     );
   }
 
