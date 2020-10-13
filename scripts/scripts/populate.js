@@ -63,11 +63,22 @@ async function main() {
             }
           }
 
-          populator.createPublication({
+          const publication = populator.createPublication({
             userId: user.id,
             pageCount: rand(1, 20),
             status,
           });
+
+          const is_published =
+            publication.status_history[publication.status_history.length - 1]
+              .status === "published";
+          if (is_published && rand(0, 100) < 30) {
+            populator.createContract({
+              publicationId: publication.id,
+              userId: user.id,
+              summaryCount: rand(0, 15),
+            });
+          }
         }
 
         // Collections
@@ -100,8 +111,10 @@ async function main() {
     // Views
     const interactions = [];
     const users = Object.values(populator.users);
-    const publications = Object.values(populator.publications)
-      .filter(p => p.status_history[p.status_history.length - 1].status === "published");
+    const publications = Object.values(populator.publications).filter(
+      (p) =>
+        p.status_history[p.status_history.length - 1].status === "published"
+    );
     for (let i = 0; i < 10000; i++) {
       const user = randArr(users);
       const publication = randArr(publications);
@@ -119,10 +132,6 @@ async function main() {
         publicationId: publication.id,
         unique,
       });
-
-      // if (!unique) {
-      //   continue;
-      // }
 
       if (rand(0, 100) < 70) {
         populator.createReading({

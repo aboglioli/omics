@@ -51,7 +51,7 @@ const routes: Routes = [
   { path: 'dashboard-publicaciones-contratos', component: DashboardGestionContratosPublicacionesComponent },
   { path: 'dashboard-reglas-negocio', component: DashboardReglasNegociosComponent },
   { path: 'dashboard-general', component: DashboardGestionAdminComponent },
-  { path: 'plans', component: PlansComponent },
+  { path: 'plans', component: PlansComponent, canActivate: [AuthLoginGuard] },
   { path: '**', pathMatch: 'full', redirectTo: 'home' },
 
 ];

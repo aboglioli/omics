@@ -35,6 +35,7 @@ class Populator {
     this.follows = [];
 
     this.subscriptions = [];
+    this.contracts = [];
   }
 
   nextDate() {
@@ -335,11 +336,13 @@ class Populator {
 
     this.publications[publicationId].statistics.reviews += 1;
 
-    const publicationReviews = this.reviews
-      .filter((r) => r.publication_id === publicationId);
+    const publicationReviews = this.reviews.filter(
+      (r) => r.publication_id === publicationId
+    );
 
-    const avgStars = publicationReviews
-      .reduce((acc, r) => acc + r.stars, 0.0) / publicationReviews.length;
+    const avgStars =
+      publicationReviews.reduce((acc, r) => acc + r.stars, 0.0) /
+      publicationReviews.length;
 
     this.publications[publicationId].statistics.stars = +avgStars.toFixed(2);
 
@@ -462,6 +465,104 @@ class Populator {
     return subscription;
   }
 
+  createContract({ publicationId, userId, summaryCount }) {
+    const id = uuid();
+    const contract = {
+      id,
+      publication_id: publicationId,
+      status_history: [
+        {
+          status: "requested",
+          datetime: new Date(),
+        },
+        {
+          status: "approved",
+          admin_id: {
+            id: "00000000-0000-0000-0000-000000000002",
+          },
+          datetime: new Date(),
+        },
+      ],
+      created_at: new Date(),
+    };
+
+    this.addEvent("contract", "requested", {
+      Requested: {
+        id,
+        publication_id: publicationId,
+        author_id: userId,
+      },
+    });
+    this.addEvent("contract", "approved", {
+      Approved: {
+        id,
+        publication_id: publicationId,
+        admin_id: "00000000-0000-0000-0000-000000000002",
+      },
+    });
+
+    const summaries = [];
+    const date = new Date(this.nextDate());
+    for (let i = 0; i < summaryCount; i++) {
+      date.setHours(date.getHours() + 24);
+      const to = new Date(date);
+      to.setHours(date.getHours() + 24);
+
+      const summary = {
+        statistics: {
+          views: rand(100, 1000),
+          unique_views: rand(100, 1000),
+          readings: rand(100, 1000),
+          likes: rand(100, 1000),
+          reviews: rand(100, 1000),
+          stars: rand(100, 1000) * 1.0,
+        },
+        total: rand(1000, 10000) * 1.0,
+        amount: rand(10, 1000) * 1.0,
+        paid: i / summaryCount <= 0.75,
+        from: new Date(date),
+        to,
+      };
+
+      summaries.push(summary);
+
+      this.addEvent("contract", "summary-added", {
+        SummaryAdded: {
+          id,
+          publication_id: publicationId,
+          total: summary.total,
+          amount: summary.amount,
+          from: summary.from,
+          to: summary.to,
+        },
+      });
+    }
+    contract.summaries = summaries;
+
+    contract.payments = [
+      {
+        kind: "outcome",
+        amount: summaries
+          .filter((s) => s.paid)
+          .reduce((acc, s) => acc + s.amount, 0.0),
+        datetime: new Date(),
+      },
+    ];
+    this.addEvent("contract", "payment-added", {
+      PaymentAdded: {
+        id,
+        publication_id: publicationId,
+        amount: contract.payments[0].amount,
+      },
+    });
+
+    this.contracts.push(contract);
+
+    this.publications[publicationId].contract = true;
+
+    return contract;
+  }
+
   async save() {
     await this.db("users").insert(Object.values(this.users));
 
@@ -495,6 +596,15 @@ class Populator {
     await this.db("collection_favorites").insert(this.collectionFavorites);
 
     await this.db("follows").insert(this.follows);
+
+    await this.db("contracts").insert(
+      this.contracts.map((c) => ({
+        ...c,
+        summaries: JSON.stringify(c.summaries),
+        payments: JSON.stringify(c.payments),
+        status_history: JSON.stringify(c.status_history),
+      }))
+    );
 
     // Events
     for (; this.events.length > 0; ) {

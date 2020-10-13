@@ -507,6 +507,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .service(remove_from_favorites)
             .service(get_statistics)
             .service(get_contract)
+            .service(generate_summaries)
             .service(can_request_contract)
             .service(request_contract),
     );
