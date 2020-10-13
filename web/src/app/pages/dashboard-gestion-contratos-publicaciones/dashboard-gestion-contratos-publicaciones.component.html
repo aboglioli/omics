@@ -12,7 +12,15 @@
         </h2>
 
         <div class="box-type">
-          Publicaciones
+          <button  [ngClass]="{'selected': selectedPanel === 'publication'}"
+                (click)="selectPanel('publication')">
+            Publicaciones
+          </button>
+
+          <button  [ngClass]="{'selected': selectedPanel === 'contract'}"
+                (click)="selectPanel('contract')">
+            Contratos
+          </button>
         </div>
 
       </div>
@@ -26,11 +34,10 @@
       <div class="button-action" style="flex: 1">
         <button mat-stroked-button class="button-white-borders rounded border-wide neon-shadow-hover"
                 style="padding-top: 0.25em;"
-                (click)="getAllPublication()">
+                (click)="selectedPanel === 'publication' ? getAllPublication() : getAllContracts()">
 
           <fa-icon [icon]="faRefresh" size="2x"></fa-icon>
           Actualizar Solicitudes
-
         </button>
       </div>
 
@@ -39,12 +46,15 @@
 
   </div>
 
-  <div class="body">
+  <div *ngIf="selectedPanel === 'publication'" class="body">
 
     <div *ngFor="let publication of publicationList" class="publication-box">
 
       <!-- Publication Thumbail -->
-      <app-publication-card-manager [publication]="publication"></app-publication-card-manager>
+      <app-publication-card-manager
+        [publication]="publication"
+      >
+      </app-publication-card-manager>
 
       <!-- Action Buttons -->
       <div class="action-button-publication">
@@ -69,6 +79,40 @@
 
     </div>
 
+  </div>
+
+  <div *ngIf="selectedPanel === 'contract'" class="body">
+
+    <div *ngFor="let contract of contracts" class="publication-box">
+
+      <!-- Publication Thumbail -->
+      <app-publication-card-manager
+        [publication]="contract.publication"
+      >
+      </app-publication-card-manager>
+
+      <!-- Action Buttons -->
+      <div class="action-button-publication">
+        <button
+          mat-flat-button
+          color="warn"
+          (click)="rejectContract(contract)"
+        >
+          <fa-icon [icon]="faReject" size="1x"></fa-icon>
+          <span *ngIf="isBigScreen">Rechazar</span>
+        </button>
+
+        <button
+          mat-flat-button color="accent"
+          (click)="approveContract(contract)"
+        >
+          <fa-icon [icon]="faApprove" size="1x"></fa-icon>
+          <span *ngIf="isBigScreen">Aprobar</span>
+        </button>
+
+      </div>
+
+    </div>
   </div>
 
 

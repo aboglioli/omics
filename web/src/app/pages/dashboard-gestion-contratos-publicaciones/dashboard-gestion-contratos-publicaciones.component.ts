@@ -8,6 +8,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 import { PublicationApproveRejectMotiveComponent } from 'src/app/components/dashboard/publication-approve-reject-motive/publication-approve-reject-motive.component';
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { ContractService } from '../../domain/services/contract.service';
+import { IContract } from '../../domain/models/contract';
 
 @Component({
   selector: 'app-dashboard-gestion-contratos-publicaciones',
@@ -21,11 +23,15 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
   public faReject = faBan;
   public faApprove = faCheckCircle;
 
+  public selectedPanel = 'publication';
+
   public publicationList: IPublication[];
+  public contracts: IContract[];
   public isBigScreen = true;
 
   constructor(
     private publicationService: PublicationService,
+    private contractService: ContractService,
     private spinnerService: NgxSpinnerService,
     public dialog: MatDialog,
     private sweetAlertGenericService: SweetAlertGenericMessageService,
@@ -37,6 +43,16 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
     this.checkWidthScreen();
     this.getAllPublication();
 
+  }
+
+  selectPanel(panel: string): void {
+    this.selectedPanel = panel;
+
+    if (panel === 'publication') {
+      this.getAllPublication();
+    } else if (panel === 'contract') {
+      this.getAllContracts();
+    }
   }
 
 
@@ -63,6 +79,17 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
 
   }
 
+  public getAllContracts(): void {
+    this.contractService.search({ status: 'requested' }, 'publication').subscribe(
+      (res) => {
+        this.contracts = res.contracts;
+      },
+      (err) => {
+        console.log(err);
+      },
+    );
+  }
+
   private checkWidthScreen(): void {
 
     this.breakpointObserver.observe(['(max-width: 950px)']).subscribe(
@@ -72,8 +99,6 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
 
       });
   }
-
-
 
   public openMessageReasonDialog( publication: IPublication, isApproved: boolean ): void {
 
@@ -140,6 +165,22 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
         this.spinnerService.hide();
 
       }
+    );
+  }
+
+  public approveContract(contract: IContract): void {
+    this.contractService.approve(contract.id).subscribe(
+      (res) => {
+        this.getAllContracts();
+      },
+    );
+  }
+
+  public rejectContract(contract: IContract): void {
+    this.contractService.reject(contract.id).subscribe(
+      (res) => {
+        this.getAllContracts();
+      },
     );
   }
 

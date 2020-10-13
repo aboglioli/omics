@@ -64,19 +64,27 @@ div.container-box {
       }
 
       div.box-type {
-
+        margin-left: 1rem;
         display: flex;
         flex-direction: row;
         align-items: center;
-        margin: 0em 2em;
-        padding: 0.5em 1em;
 
-        font-weight: bold;
         font-size: 12pt;
         color: $omics-background-flat;
 
-        background-color: white;
 
+        button {
+          padding: 0.5em 1em;
+          background-color: #201d22;
+          border: 2px solid #fff;
+          color: #fff;
+
+          &.selected {
+            font-weight: bold;
+            background-color: #fff;
+            color: $omics-background-flat;
+          }
+        }
       }
 
     }

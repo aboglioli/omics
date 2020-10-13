@@ -3,7 +3,7 @@ import { IPublication } from 'src/app/domain/models';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 import { IStatus } from '../../../domain/models/publication';
 import { Router, ActivatedRoute } from '@angular/router';
-import { faEdit, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faInfoCircle, faDollarSign } from '@fortawesome/free-solid-svg-icons';
 import { PublicationInfoComponent } from '../../publication/publication-info/publication-info.component';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -19,6 +19,7 @@ export class PublicationCardAuthorComponent implements OnInit {
   // Font Awseome icons
   public faEdit = faEdit;
   public faInfo = faInfoCircle;
+  public faDollarSign = faDollarSign;
 
   public statusToShow = {
     msg: '',

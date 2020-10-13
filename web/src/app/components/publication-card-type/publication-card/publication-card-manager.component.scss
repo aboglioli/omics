@@ -68,6 +68,17 @@ div.card-box {
       display: flex;
       flex-direction: row;
       align-items: center;
+      justify-content: center;
+      margin-bottom: 0.3rem;
+
+      h3 {
+        margin: 0;
+      }
+
+      p {
+        margin: 0;
+        margin-left: 0.5rem;
+      }
 
       p {
         &:hover {

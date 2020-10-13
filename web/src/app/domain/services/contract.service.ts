@@ -62,7 +62,7 @@ export class ContractService {
       params = params.append('include', include);
     }
 
-    return this.http.get<ISearchResponse>(this.baseUrl);
+    return this.http.get<ISearchResponse>(this.baseUrl, { params });
   }
 
   public approve(id: string): Observable<any> {
