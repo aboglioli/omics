@@ -1,4 +1,6 @@
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { typeSearchCatalogue } from '../../models/enums.model';
 
 @Component({
@@ -9,19 +11,69 @@ import { typeSearchCatalogue } from '../../models/enums.model';
 export class CatalogueFilterComponent implements OnInit {
 
   @Output() typeSearch = new EventEmitter();
+  @Output() searchByDate = new EventEmitter();
 
   public optionTypeSearch = typeSearchCatalogue;
   public currentTypeSearch = this.optionTypeSearch.publication;
 
-  constructor() { }
+  public isBigScreen = true;
+
+  // Del formulario
+  public formFilterSearch: FormGroup;
+  public maxDateToSerch: Date = new Date();
+
+  constructor(
+    private breakpointObserver: BreakpointObserver,
+    private fb: FormBuilder,
+  ) { }
 
   ngOnInit(): void {
+
+    this.createForm();
+    this.checkWidthScreen();
+
+  }
+
+  private createForm(): void {
+
+    this.formFilterSearch = this.fb.group({
+
+      name:          [],
+      orderBy:       [''],
+      category_id:   [''],
+      dateFrom:      [],
+      dateTo:        [],
+    });
+
+
   }
 
   public changeTypeSearch(type: typeSearchCatalogue): void {
 
     this.currentTypeSearch = type;
     this.typeSearch.emit(this.currentTypeSearch);
+  }
+
+  private checkWidthScreen(): void {
+
+    this.breakpointObserver.observe(['(max-width: 950px)']).subscribe(
+      (result: any) => {
+
+        this.isBigScreen = (result.matches) ? false : true;
+
+      });
+  }
+
+  public convertDateToRFC3339(changeDate: Date, controlName: string): void {
+
+    this.formFilterSearch.get(controlName).setValue( changeDate.toISOString() );
+
+  }
+
+  public onSearchByDate(): void {
+
+    console.log('TEST > ', this.formFilterSearch.value);
+
   }
 
 

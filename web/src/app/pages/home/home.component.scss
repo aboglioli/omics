@@ -34,6 +34,7 @@ div.home-box {
       // Pantalla grande
       @media screen and (min-width: $break-small) {
         margin-right: 1em;
+        margin-top: 1em;
         width: 200px;
         height: 200px;
       }
@@ -64,7 +65,7 @@ div.home-box {
       flex-wrap: nowrap;
       justify-content: flex-start;
 
-      padding-bottom: 1em;
+      padding: 1em 0em;
       overflow-x: auto;
 
       max-height: 93.4vh;
