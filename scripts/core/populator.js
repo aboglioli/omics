@@ -12,13 +12,10 @@ const {
 const { rand, randArr } = require("../core/utils");
 
 class Populator {
-  constructor(db, comicSamples) {
+  constructor(db, comicSamples, startingDate) {
     this.db = db;
     this.comicSamples = comicSamples;
-
-    const now = new Date();
-    now.setHours(now.getHours() - 24 * 15);
-    this.lastDate = now;
+    this.lastDate = startingDate;
 
     this.events = [];
 
@@ -400,7 +397,7 @@ class Populator {
     this.users[authorId].followers += 1;
   }
 
-  createSubscription({ userId, status }) {
+  createSubscription({ userId }) {
     const id = uuid();
     const subscription = {
       id,
@@ -412,6 +409,23 @@ class Populator {
         price: 75.0,
         assigned_at: this.nextDate(),
       },
+      payments: [
+        {
+          kind: "income",
+          amount: 75.0,
+          datetime: this.nextDate(),
+        },
+      ],
+      status_history: [
+        {
+          status: "waiting-for-payment",
+          datetime: this.nextDate(),
+        },
+        {
+          status: "active",
+          datetime: this.nextDate(),
+        },
+      ],
       created_at: this.nextDate(),
       updated_at: this.nextDate(),
     };
@@ -422,45 +436,16 @@ class Populator {
         plan_id: "basic",
       },
     });
-
-    const statusHistory = [
-      {
-        status: "waiting-for-payment",
-        datetime: this.nextDate(),
-      },
-    ];
-    const payments = [];
-    if (status === "active") {
-      statusHistory.push([
-        {
-          status: "active",
-          datetime: this.nextDate(),
-        },
-      ]);
-      status.push({
-        kind: "income",
+    this.addEvent("subscription", "payment-added", {
+      PaymentAdded: {
+        id,
+        user_id: userId,
         amount: subscription.plan.price,
-        datetime: this.nextDate(),
-      });
-      this.addEvent("subscription", "payment-added", {
-        PaymentAdded: {
-          id: subscription.id,
-          user_id: subscription.user_id,
-          amount: subscription.plan.price,
-        },
-      });
-    } else if (status === "inactive") {
-      statusHistory.push([
-        {
-          status: "inactive",
-          datetime: this.nextDate(),
-        },
-      ]);
-    }
-    subscription.status_history = statusHistory;
-    subscription.payments = payments;
+      },
+    });
 
     this.subscriptions.push(subscription);
+    this.users[userId].subscribed = true;
 
     return subscription;
   }
@@ -603,6 +588,14 @@ class Populator {
         summaries: JSON.stringify(c.summaries),
         payments: JSON.stringify(c.payments),
         status_history: JSON.stringify(c.status_history),
+      }))
+    );
+
+    await this.db("subscriptions").insert(
+      this.subscriptions.map((s) => ({
+        ...s,
+        payments: JSON.stringify(s.payments),
+        status_history: JSON.stringify(s.status_history),
       }))
     );
 

@@ -41,7 +41,10 @@ async function main() {
   const knex = connectDb();
   console.log("Populating DB...");
 
-  const populator = new Populator(knex, samples.comics);
+  const date = new Date();
+  date.setHours(date.getHours() - 24 * 60);
+
+  const populator = new Populator(knex, samples.comics, date);
 
   try {
     // User
@@ -94,9 +97,21 @@ async function main() {
           });
         }
       }
+
+      const oldLastDate = new Date(populator.lastDate);
+      const newDate = new Date();
+      newDate.setHours(newDate.getHours() - 24 * 10);
+      populator.lastDate = newDate;
+      if (rand(0, 100) < 5) {
+        populator.createSubscription({
+          userId: user.id,
+        });
+      }
+      populator.lastDate = oldLastDate;
     }
 
     // Follows
+    populator.lastDate.setHours(populator.lastDate.getHours() + 24 * 10);
     for (let i = 0; i < 200; i++) {
       const reader = randArr(Object.values(populator.users));
       const author = randArr(
