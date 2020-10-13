@@ -74,6 +74,12 @@ export class CatalogueFilterComponent implements OnInit {
 
   }
 
+  public onFilterSelected( changeEvent: string ): void {
+
+    console.log(changeEvent);
+
+  }
+
   public onSearchByDate(): void {
 
 

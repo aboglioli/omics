@@ -69,6 +69,29 @@
 
       <br>
 
+      <mat-chip-list #chipTagList aria-label="Tag selection">
+
+        <!-- <mat-chip *ngFor="let tag of tagsList"
+                  [selectable]="true"
+                  [removable]="true"
+                  (removed)="removeTag(tag)">
+          {{tag}}
+          <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip> -->
+
+        <mat-chip
+          style="cursor: pointer;"
+          color="primary"
+          selected
+          [selectable]="true"
+          (click)="onFilterSelected('hola')"
+          [removable]="false">
+          Filtro
+        </mat-chip>
+
+      </mat-chip-list>
+
+      <br>
       <!-- Categorias -->
       <div class="title-row">
         <h2>Categorías</h2>
