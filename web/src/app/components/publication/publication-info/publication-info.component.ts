@@ -13,6 +13,7 @@ import { PublicationReviewAddComponent } from '../publication-review-add/publica
 import { IReview } from '../../../domain/models/review';
 import { ReaderService } from '../../../domain/services/reader.service';
 import { AuthService } from '../../../domain/services/auth.service';
+import { IContract } from '../../../domain/models/contract';
 
 export interface DialogData {
   idPublication: string;
@@ -38,6 +39,7 @@ export class PublicationInfoComponent implements OnInit {
   public ratingPublication = 0;
   private oldRatingPublication = this.ratingPublication;
   public publication: IPublication;
+  public contract: IContract;
   public readerInfo: IReaderPublicationInteraction;
 
   public reviewList: IReview[];
@@ -92,7 +94,18 @@ export class PublicationInfoComponent implements OnInit {
 
         const loggedInUserId = this.authService.getIdUser();
         this.readerIsAuthor = resPub.publication.author.id === loggedInUserId;
-        this.canRequestContract = !resPub.publication.contract;
+
+        this.publicationService.canRequestContract(this.data.idPublication).subscribe(
+          (res) => {
+            this.canRequestContract = res.can_request;
+          },
+        );
+
+        this.publicationService.getContract(this.data.idPublication).subscribe(
+          (res) => {
+            this.contract = res;
+          },
+        )
 
         // console.log('TEST > ', resPub);
 
@@ -243,6 +256,14 @@ export class PublicationInfoComponent implements OnInit {
   public onGoToAuthorProfile(): void {
     this.router.navigate( [`/profile/${this.publication.author.id}`] );
     this.onClose();
+  }
+
+  public requestContract(): void {
+    this.publicationService.requestContract(this.publication.id).subscribe(
+      (res) => {
+        this.getPublicationInfo();
+      }
+    )
   }
 
 }

@@ -15,7 +15,10 @@ class Populator {
   constructor(db, comicSamples) {
     this.db = db;
     this.comicSamples = comicSamples;
-    this.lastDate = new Date("2020-05-01T14:30:00");
+
+    const now = new Date();
+    now.setHours(now.getHours() - 24 * 15);
+    this.lastDate = now;
 
     this.events = [];
 

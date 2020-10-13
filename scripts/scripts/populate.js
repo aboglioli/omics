@@ -4,6 +4,38 @@ const samples = require("../comic-samples.json");
 
 const Populator = require("../core/populator");
 
+function createCompleteUser(populator) {
+  const user = populator.createUser({
+    username: "the-user",
+  });
+
+  const publication = populator.createPublication({
+    userId: user.id,
+    pageCount: 5,
+    status: "published",
+  });
+
+  for (const reader of Object.values(populator.users)) {
+    if (user.id === reader.id) {
+      continue;
+    }
+
+    populator.createView({
+      userId: reader.id,
+      publicationId: publication.id,
+      unique: true,
+    });
+    populator.createReading({
+      userId: reader.id,
+      publicationId: publication.id,
+    });
+    populator.createLike({
+      userId: reader.id,
+      publicationId: publication.id,
+    });
+  }
+}
+
 async function main() {
   console.log("[ POPULATE ]");
   const knex = connectDb();
@@ -67,9 +99,13 @@ async function main() {
 
     // Views
     const interactions = [];
+    const users = Object.values(populator.users);
+    const publications = Object.values(populator.publications)
+      .filter(p => p.status_history[p.status_history.length - 1].status === "published");
     for (let i = 0; i < 10000; i++) {
-      const user = randArr(Object.values(populator.users));
-      const publication = randArr(Object.values(populator.publications));
+      const user = randArr(users);
+      const publication = randArr(publications);
+
       const unique = !interactions.some(
         (i) => i[0] === user.id && i[1] === publication.id
       );
@@ -118,6 +154,8 @@ async function main() {
 
       interactions.push([user.id, publication.id]);
     }
+
+    createCompleteUser(populator);
 
     await populator.save();
   } catch (err) {
