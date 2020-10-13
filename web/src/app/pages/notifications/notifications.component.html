@@ -61,6 +61,38 @@
             El usuario <b>{{notification.body.reader_username}}</b> comenzó a seguirte.
           </div>
 
+          <div *ngSwitchCase="'subscription-activated'">
+            Se ha activado tu suscripción. Ya puedes disfrutar todo el
+            contenido que Omics tiene para ofrecerte.
+          </div>
+
+          <div *ngSwitchCase="'contract-approved'">
+            El contrato para tu obra
+            <a href="/deskboard">
+               {{notification.body.publication_name}}
+            </a>
+            fue aprobado. Ya puedes comenzar a cobrar por las interacciones que
+            tus publicaciones generen.
+          </div>
+
+          <div *ngSwitchCase="'contract-rejected'">
+            Lo sentimos. El contrato que requeriste para
+            <a href="/deskboard">
+               {{notification.body.publication_name}}
+            </a>
+            fue rechazado. Puedes ponerte en contacto con nuestro soporte
+            técnico para consultar el motivo.
+          </div>
+
+          <div *ngSwitchCase="'contract-payment-added'">
+            Se añadió un pago para el contrato de tu publicación
+            <a href="/deskboard">
+               {{notification.body.publication_name}}
+            </a>
+            . Revisa tu cuenta de MercadoPago. Gracias por formar parte de
+            nuestro equipo.
+          </div>
+
         </div>
       </div>
     </div>

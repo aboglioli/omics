@@ -8,7 +8,7 @@ use identity::domain::user::{UserId, UserRepository};
 use publishing::domain::author::{AuthorId, AuthorRepository};
 use publishing::domain::interaction::InteractionRepository;
 use publishing::domain::publication::{PublicationId, PublicationRepository};
-use shared::event::{AuthorEvent, PublicationEvent, UserEvent};
+use shared::event::{AuthorEvent, PublicationEvent, UserEvent, SubscriptionEvent, ContractEvent};
 
 use crate::domain::notification::{Body, Notification, NotificationRepository};
 
@@ -217,6 +217,88 @@ impl EventHandler for NotificationHandler {
 
                         self.notification_repo.save(&mut notification).await?;
                     }
+                    _ => return Ok(false),
+                }
+            },
+            "subscription" => {
+                let event: SubscriptionEvent = serde_json::from_value(event.payload())?;
+
+                match event {
+                    SubscriptionEvent::PaymentAdded { id, user_id, .. } => {
+                        let user =self.user_repo.find_by_id(&UserId::new(user_id)?).await?;
+
+                        let body = Body::new().reader(
+                            user.base().id().value(),
+                            user.identity().username().value(),
+                        );
+
+                        let mut notification = Notification::new(
+                            self.notification_repo.next_id().await?,
+                            user.base().id().clone(),
+                            "subscription-activated",
+                            body,
+                        )?;
+
+                        self.notification_repo.save(&mut notification).await?;
+                    }
+                    _ => return Ok(false),
+                }
+            },
+            "contract" => {
+                let event: ContractEvent = serde_json::from_value(event.payload())?;
+
+                match event {
+                    ContractEvent::Approved { publication_id, .. } => {
+                        let publication = self.publication_repo.find_by_id(&PublicationId::new(publication_id)?).await?;
+
+                        let body = Body::new().publication(
+                            publication.base().id().value(),
+                            publication.header().name().value(),
+                        );
+
+                        let mut notification = Notification::new(
+                            self.notification_repo.next_id().await?,
+                            publication.author_id().clone(),
+                            "contract-approved",
+                            body,
+                        )?;
+
+                        self.notification_repo.save(&mut notification).await?;
+                    },
+                    ContractEvent::Rejected { publication_id, .. } => {
+                        let publication = self.publication_repo.find_by_id(&PublicationId::new(publication_id)?).await?;
+
+                        let body = Body::new().publication(
+                            publication.base().id().value(),
+                            publication.header().name().value(),
+                        );
+
+                        let mut notification = Notification::new(
+                            self.notification_repo.next_id().await?,
+                            publication.author_id().clone(),
+                            "contract-rejected",
+                            body,
+                        )?;
+
+                        self.notification_repo.save(&mut notification).await?;
+                    },
+                    ContractEvent::PaymentAdded { publication_id, .. } => {
+                        let publication = self.publication_repo.find_by_id(&PublicationId::new(publication_id)?).await?;
+
+                        let body = Body::new().publication(
+                            publication.base().id().value(),
+                            publication.header().name().value(),
+                        );
+
+                        let mut notification = Notification::new(
+                            self.notification_repo.next_id().await?,
+                            publication.author_id().clone(),
+                            "contract-payment-added",
+                            body,
+                        )?;
+
+                        self.notification_repo.save(&mut notification).await?;
+                    },
                     _ => return Ok(false),
                 }
             }

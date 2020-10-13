@@ -10,6 +10,7 @@ path = "lib.rs"
 [dependencies]
 common = { path = "../common" }
 identity = { path = "../identity" }
+payment = { path = "../payment" }
 publishing = { path = "../publishing" }
 shared = { path = "../shared" }
 
