@@ -93,8 +93,8 @@ impl CollectionRepository for PostgresCollectionRepository {
         publication_id: Option<&PublicationId>,
         tag: Option<&Tag>,
         name: Option<&String>,
-        _from: Option<&DateTime<Utc>>,
-        _to: Option<&DateTime<Utc>>,
+        from: Option<&DateTime<Utc>>,
+        to: Option<&DateTime<Utc>>,
         offset: Option<usize>,
         limit: Option<usize>,
     ) -> Result<Vec<Collection>> {
@@ -130,6 +130,8 @@ impl CollectionRepository for PostgresCollectionRepository {
                 &name,
                 name.is_some(),
             )
+            .add_param_opt("created_at >= $$", &from, from.is_some())
+            .add_param_opt("created_at <= $$", &to, to.is_some())
             .build();
 
         sql = format!(

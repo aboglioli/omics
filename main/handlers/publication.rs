@@ -10,9 +10,9 @@ use publishing::application::collection::{
 };
 use publishing::application::publication::{
     AddReview, AddReviewCommand, AddToFavorites, Approve, ApproveCommand, Create, CreateCommand,
-    Delete, DeleteReview, GetById, GetReviews, Like, Publish, Read, Reject, RejectCommand,
-    RemoveFromFavorites, Search, SearchCommand, Unlike, Update, UpdateCommand, UpdatePages,
-    UpdatePagesCommand,
+    Delete, DeleteReview, GetById, GetReviews, GetStatistics, GetStatisticsCommand, Like, Publish,
+    Read, Reject, RejectCommand, RemoveFromFavorites, Search, SearchCommand, Unlike, Update,
+    UpdateCommand, UpdatePages, UpdatePagesCommand,
 };
 
 use crate::authorization::auth;
@@ -387,6 +387,25 @@ async fn remove_from_favorites(
     .map_err(PublicError::from)
 }
 
+#[get("/{publication_id}/statistics")]
+async fn get_statistics(
+    req: HttpRequest,
+    path: web::Path<String>,
+    cmd: web::Query<GetStatisticsCommand>,
+    c: web::Data<MainContainer>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    GetStatistics::new(
+        c.publishing.publication_repo(),
+        c.publishing.statistics_serv(),
+    )
+    .exec(auth_id, path.into_inner(), cmd.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
+}
+
 #[get("/{publication_id}/contract")]
 async fn get_contract(
     req: HttpRequest,
@@ -466,6 +485,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .service(get_collections)
             .service(add_to_favorites)
             .service(remove_from_favorites)
+            .service(get_statistics)
             .service(get_contract)
             .service(can_request_contract)
             .service(request_contract),

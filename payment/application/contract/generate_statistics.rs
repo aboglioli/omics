@@ -12,17 +12,17 @@ use identity::domain::user::{UserId, UserRepository};
 use crate::domain::contract::{ContractRepository, ContractService};
 
 #[derive(Deserialize)]
-pub struct GenerateStatisticsCommand {
-    from: String,
-    to: String,
+pub struct GenerateSummariesCommand {
+    from: Option<String>,
+    to: Option<String>,
 }
 
 #[derive(Serialize)]
-pub struct GenerateStatisticsResponse {
+pub struct GenerateSummariesResponse {
     updated_contracts: u64,
 }
 
-pub struct GenerateStatistics<'a> {
+pub struct GenerateSummaries<'a> {
     event_pub: &'a dyn EventPublisher,
 
     contract_repo: &'a dyn ContractRepository,
@@ -31,14 +31,14 @@ pub struct GenerateStatistics<'a> {
     contract_serv: &'a ContractService,
 }
 
-impl<'a> GenerateStatistics<'a> {
+impl<'a> GenerateSummaries<'a> {
     pub fn new(
         event_pub: &'a dyn EventPublisher,
         contract_repo: &'a dyn ContractRepository,
         user_repo: &'a dyn UserRepository,
         contract_serv: &'a ContractService,
     ) -> Self {
-        GenerateStatistics {
+        GenerateSummaries {
             event_pub,
             contract_repo,
             user_repo,
@@ -49,8 +49,8 @@ impl<'a> GenerateStatistics<'a> {
     pub async fn exec(
         &self,
         auth_id: String,
-        cmd: GenerateStatisticsCommand,
-    ) -> Result<GenerateStatisticsResponse> {
+        cmd: GenerateSummariesCommand,
+    ) -> Result<GenerateSummariesResponse> {
         let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
         if !user.is_content_manager() {
             return Err(Error::unauthorized());
@@ -72,7 +72,7 @@ impl<'a> GenerateStatistics<'a> {
                 .await?;
         }
 
-        Ok(GenerateStatisticsResponse {
+        Ok(GenerateSummariesResponse {
             updated_contracts: total_contracts as u64,
         })
     }

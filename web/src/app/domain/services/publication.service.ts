@@ -10,6 +10,7 @@ import {
   IPublication,
   IReaderPublicationInteraction,
   IReview,
+  IStatistics,
 } from '../models';
 
 export interface IGetByIdResponse {
@@ -92,6 +93,11 @@ export interface IRequestContractResponse {
 
 export interface ICanRequestContractResponse {
   can_request: boolean;
+}
+
+export interface IGetStatisticsCommand {
+  date_from: string;
+  date_to: string;
 }
 
 @Injectable()
@@ -230,6 +236,20 @@ export class PublicationService {
 
   public removeFromFavorites(id: string): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${id}/favorite`);
+  }
+
+  public getStatistics(id: string, cmd: IGetStatisticsCommand): Observable<IStatistics> {
+    let params = new HttpParams();
+
+    if (cmd.date_from) {
+      params = params.append('date_from', cmd.date_from);
+    }
+
+    if (cmd.date_to) {
+      params = params.append('date_to', cmd.date_to);
+    }
+
+    return this.http.get<IStatistics>(`${this.baseUrl}/${id}/statistics`)
   }
 
   public getContract(id: string): Observable<IContract> {
