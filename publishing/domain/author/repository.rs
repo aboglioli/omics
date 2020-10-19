@@ -18,8 +18,9 @@ pub trait AuthorRepository: Sync + Send {
         name: Option<&String>,
         from: Option<&DateTime<Utc>>,
         to: Option<&DateTime<Utc>>,
-        offset: Option<usize>,
+        // offset: Option<usize>// ,
         limit: Option<usize>,
+        order_by: Option<String>,
     ) -> Result<Vec<Author>>;
 
     async fn save(&self, author: &mut Author) -> Result<()>;

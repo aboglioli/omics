@@ -76,9 +76,17 @@ impl AuthorRepository for PostgresAuthorRepository {
         name: Option<&String>,
         from: Option<&DateTime<Utc>>,
         to: Option<&DateTime<Utc>>,
+        // order_by: Option<&String>,
         offset: Option<usize>,
         limit: Option<usize>,
     ) -> Result<Vec<Author>> {
+        // let order_by = match order_by.as_deref() {
+        //     Some("followers") => "followers DESC",
+        //     Some("publications") => "publications DESC",
+        //     Some("newest") => "created_at DESC",
+        //     _ => "created_at ASC",
+        // };
+        let order_by = "created_at ASC";
         let offset = offset.unwrap_or_else(|| 0);
         let limit = limit
             .map(|l| if l <= 1000 { l } else { 1000 })
@@ -100,10 +108,10 @@ impl AuthorRepository for PostgresAuthorRepository {
         sql = format!(
             "SELECT * FROM users
             {}
-            ORDER BY created_at ASC
+            ORDER BY {}
             OFFSET {}
             LIMIT {}",
-            sql, offset, limit,
+            sql, order_by, offset, limit,
         );
 
         let rows = self
