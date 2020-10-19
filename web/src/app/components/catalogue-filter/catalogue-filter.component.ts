@@ -18,6 +18,32 @@ export class CatalogueFilterComponent implements OnInit {
 
   public isBigScreen = true;
 
+  public publicationFilterTypesOrderList = [
+
+    {
+      value: 'most_viewed',
+      name: 'Top Visualizaciones',
+      selected: false,
+    },
+    {
+      value: 'most_liked',
+      name: 'Top Likes',
+      selected: false,
+    },
+    {
+      value: 'newest',
+      name: 'Más nuevos',
+      selected: false,
+    },
+    {
+      value: 'best_reviews',
+      name: 'Mejor calificado',
+      selected: false,
+    }
+
+  ];
+
+
   // Del formulario
   public formFilterSearch: FormGroup;
   public maxDateToSerch: Date = new Date();
@@ -70,13 +96,31 @@ export class CatalogueFilterComponent implements OnInit {
 
   public convertDateToRFC3339(changeDate: Date, controlName: string): void {
 
+    if ( controlName === 'dateTo'){
+
+      changeDate = new Date(changeDate);
+      changeDate.setHours( 23 );
+
+    }
     this.formFilterSearch.get(controlName).setValue( changeDate.toISOString() );
 
   }
 
-  public onFilterSelected( changeEvent: string ): void {
+  public onFilterSelected( indexTypeFilter: number, isSelected: boolean, sortValue: string ): void {
 
-    console.log(changeEvent);
+    this.publicationFilterTypesOrderList.forEach( filter => {
+      filter.selected = false;
+    });
+
+    this.publicationFilterTypesOrderList[indexTypeFilter].selected = isSelected;
+
+    if ( isSelected  ) {
+      this.formFilterSearch.get('orderBy').setValue( sortValue );
+    } else {
+      this.formFilterSearch.get('orderBy').setValue(null);
+    }
+
+    this.filterSearch.emit(  this.formFilterSearch.value );
 
   }
 

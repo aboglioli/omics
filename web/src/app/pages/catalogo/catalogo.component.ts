@@ -90,7 +90,7 @@ export class CatalogoComponent implements OnInit {
 
     this.collectionService.search( this.searchObjectCollection ).subscribe(
       (searchRes: ISearchResponse ) => {
-        console.log( 'Test > ', searchRes );
+        // console.log( 'Test > ', searchRes );
         this.collectionList = searchRes.collections;
         this.spinnerService.hide();
         this.isSpinnerLoading = false;
@@ -131,6 +131,7 @@ export class CatalogoComponent implements OnInit {
 
       this.searchObjectPublication.date_from = objectToSearch.dateFrom;
       this.searchObjectPublication.date_to = objectToSearch.dateTo;
+      this.searchObjectPublication.order_by = objectToSearch.orderBy;
       this.getPublicationData();
 
     } else {
