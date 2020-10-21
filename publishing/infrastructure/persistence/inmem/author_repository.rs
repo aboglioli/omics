@@ -4,9 +4,10 @@ use chrono::{DateTime, Utc};
 use common::cache::Cache;
 use common::error::Error;
 use common::infrastructure::cache::InMemCache;
+use common::model::Pagination;
 use common::result::Result;
 
-use crate::domain::author::{Author, AuthorId, AuthorRepository};
+use crate::domain::author::{Author, AuthorId, AuthorOrderBy, AuthorRepository};
 
 pub struct InMemAuthorRepository {
     cache: InMemCache<AuthorId, Author>,
@@ -42,8 +43,10 @@ impl AuthorRepository for InMemAuthorRepository {
         _to: Option<&DateTime<Utc>>,
         _offset: Option<usize>,
         _limit: Option<usize>,
-    ) -> Result<Vec<Author>> {
-        Ok(self.cache.all().await)
+        _order_by: Option<&AuthorOrderBy>,
+    ) -> Result<Pagination<Author>> {
+        let authors = self.cache.all().await;
+        Ok(Pagination::new(0, authors.len(), authors.len(), authors.len()).add_items(authors))
     }
 
     async fn save(&self, author: &mut Author) -> Result<()> {

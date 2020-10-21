@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use serde::{Deserialize, Serialize};
 
 use common::error::Error;
@@ -14,9 +16,15 @@ pub enum Status {
     #[serde(rename = "waiting-approval")]
     WaitingApproval,
     #[serde(rename = "published")]
-    Published { admin_id: UserId, comment: Comment },
+    Published {
+        admin_id: Option<UserId>,
+        comment: Option<Comment>,
+    },
     #[serde(rename = "rejected")]
-    Rejected { admin_id: UserId, comment: Comment },
+    Rejected {
+        admin_id: Option<UserId>,
+        comment: Option<Comment>,
+    },
 }
 
 impl ToString for Status {
@@ -26,6 +34,26 @@ impl ToString for Status {
             Status::WaitingApproval => "waiting-approval".to_owned(),
             Status::Published { .. } => "published".to_owned(),
             Status::Rejected { .. } => "rejected".to_owned(),
+        }
+    }
+}
+
+impl FromStr for Status {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self> {
+        match s {
+            "draft" => Ok(Status::Draft),
+            "waiting-approval" => Ok(Status::WaitingApproval),
+            "published" => Ok(Status::Published {
+                admin_id: None,
+                comment: None,
+            }),
+            "rejected" => Ok(Status::Rejected {
+                admin_id: None,
+                comment: None,
+            }),
+            _ => Err(Error::new("publication_status", "invalid")),
         }
     }
 }
@@ -48,8 +76,8 @@ impl Status {
     pub fn approve(&self, user_id: UserId, comment: Comment) -> Result<Self> {
         match self {
             Status::WaitingApproval => Ok(Status::Published {
-                admin_id: user_id,
-                comment,
+                admin_id: Some(user_id),
+                comment: Some(comment),
             }),
             _ => Err(Error::new("publication", "not_waiting_approval")),
         }
@@ -58,8 +86,8 @@ impl Status {
     pub fn reject(&self, user_id: UserId, comment: Comment) -> Result<Self> {
         match self {
             Status::WaitingApproval => Ok(Status::Rejected {
-                admin_id: user_id,
-                comment,
+                admin_id: Some(user_id),
+                comment: Some(comment),
             }),
             _ => Err(Error::new("publication", "not_waiting_approval")),
         }

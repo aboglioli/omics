@@ -4,11 +4,14 @@ use chrono::{DateTime, Utc};
 use common::cache::Cache;
 use common::error::Error;
 use common::infrastructure::cache::InMemCache;
+use common::model::Pagination;
 use common::result::Result;
 
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
-use crate::domain::publication::{Publication, PublicationId, PublicationRepository, Tag};
+use crate::domain::publication::{
+    Publication, PublicationId, PublicationOrderBy, PublicationRepository, Status, Tag,
+};
 
 pub struct InMemPublicationRepository {
     cache: InMemCache<PublicationId, Publication>,
@@ -42,13 +45,14 @@ impl PublicationRepository for InMemPublicationRepository {
         author_id: Option<&AuthorId>,
         category_id: Option<&CategoryId>,
         _tag: Option<&Tag>,
-        status: Option<&String>,
+        status: Option<&Status>,
         name: Option<&String>,
         _from: Option<&DateTime<Utc>>,
         _to: Option<&DateTime<Utc>>,
         _offset: Option<usize>,
         _limit: Option<usize>,
-    ) -> Result<Vec<Publication>> {
+        _order_by: Option<&PublicationOrderBy>,
+    ) -> Result<Pagination<Publication>> {
         let mut publications = self.cache.all().await;
 
         if let Some(author_id) = author_id {
@@ -68,7 +72,9 @@ impl PublicationRepository for InMemPublicationRepository {
         if let Some(status) = status {
             publications = publications
                 .into_iter()
-                .filter(|publication| &publication.status_history().current().to_string() == status)
+                .filter(|publication| {
+                    publication.status_history().current().to_string() == status.to_string()
+                })
                 .collect();
         }
 
@@ -79,7 +85,13 @@ impl PublicationRepository for InMemPublicationRepository {
                 .collect();
         }
 
-        Ok(publications)
+        Ok(Pagination::new(
+            0,
+            publications.len(),
+            publications.len(),
+            publications.len(),
+        )
+        .add_items(publications))
     }
 
     async fn save(&self, publication: &mut Publication) -> Result<()> {

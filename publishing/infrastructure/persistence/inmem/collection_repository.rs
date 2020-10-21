@@ -4,11 +4,14 @@ use chrono::{DateTime, Utc};
 use common::cache::Cache;
 use common::error::Error;
 use common::infrastructure::cache::InMemCache;
+use common::model::Pagination;
 use common::result::Result;
 
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
-use crate::domain::collection::{Collection, CollectionId, CollectionRepository};
+use crate::domain::collection::{
+    Collection, CollectionId, CollectionOrderBy, CollectionRepository,
+};
 use crate::domain::publication::{PublicationId, Tag};
 
 pub struct InMemCollectionRepository {
@@ -49,7 +52,8 @@ impl CollectionRepository for InMemCollectionRepository {
         _to: Option<&DateTime<Utc>>,
         _offset: Option<usize>,
         _limit: Option<usize>,
-    ) -> Result<Vec<Collection>> {
+        _order_by: Option<&CollectionOrderBy>,
+    ) -> Result<Pagination<Collection>> {
         let mut collections = self.cache.all().await;
 
         if let Some(author_id) = author_id {
@@ -88,7 +92,10 @@ impl CollectionRepository for InMemCollectionRepository {
                 .collect();
         }
 
-        Ok(collections)
+        Ok(
+            Pagination::new(0, collections.len(), collections.len(), collections.len())
+                .add_items(collections),
+        )
     }
 
     async fn save(&self, collection: &mut Collection) -> Result<()> {

@@ -130,7 +130,14 @@ impl From<&StatusItem<Status>> for PublicationStatusDto {
         };
 
         match status {
-            Status::Published { admin_id, comment } | Status::Rejected { admin_id, comment } => {
+            Status::Published {
+                admin_id: Some(admin_id),
+                comment: Some(comment),
+            }
+            | Status::Rejected {
+                admin_id: Some(admin_id),
+                comment: Some(comment),
+            } => {
                 dto.changed_by = Some(admin_id.to_string());
                 dto.comment = Some(comment.to_string());
             }

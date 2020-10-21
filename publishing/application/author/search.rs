@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use chrono::DateTime;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 use common::error::Error;
 use common::request::{PaginationParams, PaginationResponse};

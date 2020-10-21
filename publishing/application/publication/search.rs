@@ -1,17 +1,17 @@
 use std::str::FromStr;
 
 use chrono::DateTime;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 use common::error::Error;
-use common::request::{Include, PaginationResponse, PaginationParams};
+use common::request::{Include, PaginationParams, PaginationResponse};
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
 
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};
 use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::category::CategoryRepository;
-use crate::domain::publication::{PublicationRepository, Status, Tag, PublicationOrderBy};
+use crate::domain::publication::{PublicationOrderBy, PublicationRepository, Status, Tag};
 
 #[derive(Deserialize)]
 pub struct SearchCommand {
@@ -61,13 +61,29 @@ impl<'a> Search<'a> {
             false
         };
 
-        let mut pagination_publications = self
+        let is_reader_author = if let (Some(auth_id), Some(author_id)) = (&auth_id, &cmd.author_id)
+        {
+            auth_id == author_id
+        } else {
+            false
+        };
+
+        let status = if is_content_manager || is_reader_author {
+            cmd.status.map(|s| Status::from_str(&s)).transpose()?
+        } else {
+            Some(Status::Published {
+                admin_id: None,
+                comment: None,
+            })
+        };
+
+        let pagination_publications = self
             .publication_repo
             .search(
                 cmd.author_id.map(AuthorId::new).transpose()?.as_ref(),
                 cmd.category_id.map(AuthorId::new).transpose()?.as_ref(),
                 cmd.tag.map(Tag::new).transpose()?.as_ref(),
-                cmd.status.as_ref(),
+                status.as_ref(),
                 cmd.name.as_ref(),
                 cmd.date_from
                     .map(|d| DateTime::from_str(&d))
@@ -89,70 +105,15 @@ impl<'a> Search<'a> {
             )
             .await?;
 
-        let publications = pagination_publications
-            .items()
-            .iter()
-            .filter(|publication| {
-                if is_content_manager {
-                    return true;
-                }
+        let mut res = PaginationResponse::new(
+            pagination_publications.offset(),
+            pagination_publications.limit(),
+            pagination_publications.total(),
+            pagination_publications.matching_criteria(),
+        );
 
-                if let Some(auth_id) = &auth_id {
-                    if publication.author_id().value() == auth_id {
-                        return true;
-                    }
-                }
-
-                matches!(publication.status_history().current(), Status::Published { .. })
-            })
-            .collect();
-
-        publications = publications
-            .into_iter()
-            .filter(|publication| {
-                if is_content_manager {
-                    return true;
-                }
-
-                if let Some(auth_id) = &auth_id {
-                    if publication.author_id().value() == auth_id {
-                        return true;
-                    }
-                }
-
-                matches!(publication.status_history().current(), Status::Published { .. })
-            })
-            .collect();
-
-        if let Some(order_by) = pagination.order_by {
-            match order_by.as_ref() {
-                "most_viewed" => {
-                    publications
-                        .sort_by(|a, b| b.statistics().views().cmp(&a.statistics().views()));
-                }
-                "most_liked" => {
-                    publications
-                        .sort_by(|a, b| b.statistics().likes().cmp(&a.statistics().likes()));
-                }
-                "newest" => {
-                    publications.reverse();
-                }
-                "best_reviews" => {
-                    publications.sort_by(|a, b| {
-                        b.statistics()
-                            .stars()
-                            .partial_cmp(&a.statistics().stars())
-                            .unwrap()
-                    });
-                }
-                _ => {}
-            }
-        }
-
-        let mut publication_dtos = Vec::new();
-
-        for publication in publications.iter() {
-            let mut publication_dto = PublicationDto::from(publication);
+        for publication in pagination_publications.into_items().into_iter() {
+            let mut publication_dto = PublicationDto::from(&publication);
 
             if include.has("author") {
                 let author = self.author_repo.find_by_id(publication.author_id()).await?;
@@ -173,11 +134,77 @@ impl<'a> Search<'a> {
                 }
             }
 
-            publication_dtos.push(publication_dto);
+            res.add_item(publication_dto);
         }
 
-        Ok(SearchResponse {
-            publications: publication_dtos,
-        })
+        Ok(res)
+
+        // publications = publications
+        //     .into_iter()
+        //     .filter(|publication| {
+        //         if is_content_manager {
+        //             return true;
+        //         }
+        //
+        //         if let Some(auth_id) = &auth_id {
+        //             if publication.author_id().value() == auth_id {
+        //                 return true;
+        //             }
+        //         }
+        //
+        //         matches!(publication.status_history().current(), Status::Published { .. })
+        //     })
+        //     .collect();
+
+        // if let Some(order_by) = pagination.order_by {
+        //     match order_by.as_ref() {
+        //         "most_viewed" => {
+        //             publications
+        //                 .sort_by(|a, b| b.statistics().views().cmp(&a.statistics().views()));
+        //         }
+        //         "most_liked" => {
+        //             publications
+        //                 .sort_by(|a, b| b.statistics().likes().cmp(&a.statistics().likes()));
+        //         }
+        //         "newest" => {
+        //             publications.reverse();
+        //         }
+        //         "best_reviews" => {
+        //             publications.sort_by(|a, b| {
+        //                 b.statistics()
+        //                     .stars()
+        //                     .partial_cmp(&a.statistics().stars())
+        //                     .unwrap()
+        //             });
+        //         }
+        //         _ => {}
+        //     }
+        // }
+
+        // let mut publication_dtos = Vec::new();
+        // for publication in publications.iter() {
+        //     let mut publication_dto = PublicationDto::from(publication);
+        //
+        //     if include.has("author") {
+        //         let author = self.author_repo.find_by_id(publication.author_id()).await?;
+        //         publication_dto = publication_dto.author(AuthorDto::from(&author));
+        //     }
+        //
+        //     if include.has("category") {
+        //         let category = self
+        //             .category_repo
+        //             .find_by_id(publication.header().category_id())
+        //             .await?;
+        //         publication_dto = publication_dto.category(CategoryDto::from(&category));
+        //     }
+        //
+        //     if let Some(auth_id) = &auth_id {
+        //         if publication.author_id().value() == auth_id {
+        //             publication_dto = publication_dto.pages(&publication)
+        //         }
+        //     }
+        //
+        //     publication_dtos.push(publication_dto);
+        // }
     }
 }

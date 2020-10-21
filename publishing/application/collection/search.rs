@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use chrono::DateTime;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 use common::error::Error;
 use common::request::{Include, PaginationParams, PaginationResponse};
@@ -10,7 +10,7 @@ use common::result::Result;
 use crate::application::dtos::{AuthorDto, CategoryDto, CollectionDto};
 use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::category::{CategoryId, CategoryRepository};
-use crate::domain::collection::{CollectionRepository, CollectionOrderBy};
+use crate::domain::collection::{CollectionOrderBy, CollectionRepository};
 use crate::domain::publication::{PublicationId, Tag};
 
 #[derive(Deserialize)]

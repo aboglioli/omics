@@ -124,7 +124,11 @@ mod tests {
             "rejected"
         );
 
-        if let Status::Rejected { admin_id, comment } = publication.status_history().current() {
+        if let Status::Rejected {
+            admin_id: Some(admin_id),
+            comment: Some(comment),
+        } = publication.status_history().current()
+        {
             assert_eq!(admin_id, user.base().id());
             assert_eq!(comment.value(), "All is OK");
         }
