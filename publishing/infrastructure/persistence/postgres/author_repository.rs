@@ -6,12 +6,13 @@ use tokio_postgres::row::Row;
 use tokio_postgres::Client;
 use uuid::Uuid;
 
+use common::config::Config;
 use common::error::Error;
-use common::model::AggregateRoot;
+use common::model::{AggregateRoot, Pagination};
 use common::result::Result;
 use common::sql::where_builder::WhereBuilder;
 
-use crate::domain::author::{Author, AuthorId, AuthorRepository};
+use crate::domain::author::{Author, AuthorId, AuthorOrderBy, AuthorRepository};
 
 impl Author {
     fn from_row(row: Row) -> Result<Self> {
@@ -76,23 +77,30 @@ impl AuthorRepository for PostgresAuthorRepository {
         name: Option<&String>,
         from: Option<&DateTime<Utc>>,
         to: Option<&DateTime<Utc>>,
-        // order_by: Option<&String>,
         offset: Option<usize>,
         limit: Option<usize>,
-    ) -> Result<Vec<Author>> {
-        // let order_by = match order_by.as_deref() {
-        //     Some("followers") => "followers DESC",
-        //     Some("publications") => "publications DESC",
-        //     Some("newest") => "created_at DESC",
-        //     _ => "created_at ASC",
-        // };
-        let order_by = "created_at ASC";
+        order_by: Option<&AuthorOrderBy>,
+    ) -> Result<Pagination<Author>> {
+        let config = Config::get();
+
         let offset = offset.unwrap_or_else(|| 0);
         let limit = limit
-            .map(|l| if l <= 1000 { l } else { 1000 })
-            .unwrap_or_else(|| 100);
+            .map(|l| {
+                if l <= config.pagination_limit() {
+                    l
+                } else {
+                    config.pagination_limit()
+                }
+            })
+            .unwrap_or_else(|| config.pagination_limit());
+        let order_by = match order_by {
+            Some(AuthorOrderBy::Newest) => "created_at DESC",
+            Some(AuthorOrderBy::Followers) => "followers DESC",
+            Some(AuthorOrderBy::Publications) => "publications DESC",
+            _ => "created_at ASC",
+        };
 
-        let (mut sql, params) = WhereBuilder::new()
+        let (sql, params) = WhereBuilder::new()
             .add_param_opt(
                 "(
                     LOWER(username) LIKE '%' || LOWER($$) || '%'
@@ -105,28 +113,55 @@ impl AuthorRepository for PostgresAuthorRepository {
             .add_param_opt("created_at <= $$", &to, to.is_some())
             .build();
 
-        sql = format!(
-            "SELECT * FROM users
-            {}
-            ORDER BY {}
-            OFFSET {}
-            LIMIT {}",
-            sql, order_by, offset, limit,
-        );
+        // Total
+        let row = self
+            .client
+            .query_one(&format!("SELECT COUNT(*) FROM users") as &str, &[])
+            .await
+            .map_err(|err| Error::new("author", "total").wrap_raw(err))?;
+        let total: i64 = row.get(0);
 
+        // Matching criteria
+        let row = self
+            .client
+            .query_one(
+                &format!(
+                    "SELECT COUNT(*) FROM users
+                    {}",
+                    sql,
+                ) as &str,
+                &params,
+            )
+            .await
+            .map_err(|err| Error::new("author", "matching_criteria").wrap_raw(err))?;
+        let matching_criteria: i64 = row.get(0);
+
+        // Query
         let rows = self
             .client
-            .query(&sql as &str, &params)
+            .query(
+                &format!(
+                    "SELECT * FROM users
+                    {}
+                    ORDER BY {}
+                    OFFSET {}
+                    LIMIT {}",
+                    sql, order_by, offset, limit,
+                ) as &str,
+                &params,
+            )
             .await
             .map_err(|err| Error::not_found("author").wrap_raw(err))?;
 
         let mut authors = Vec::new();
-
         for row in rows.into_iter() {
             authors.push(Author::from_row(row)?);
         }
 
-        Ok(authors)
+        Ok(
+            Pagination::new(offset, limit, total as usize, matching_criteria as usize)
+                .add_items(authors),
+        )
     }
 
     async fn save(&self, author: &mut Author) -> Result<()> {

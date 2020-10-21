@@ -6,14 +6,17 @@ use tokio_postgres::row::Row;
 use tokio_postgres::Client;
 use uuid::Uuid;
 
+use common::config::Config;
 use common::error::Error;
-use common::model::AggregateRoot;
+use common::model::{AggregateRoot, Pagination};
 use common::result::Result;
 use common::sql::where_builder::WhereBuilder;
 
 use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
-use crate::domain::collection::{Collection, CollectionId, CollectionRepository, Item};
+use crate::domain::collection::{
+    Collection, CollectionId, CollectionOrderBy, CollectionRepository, Item,
+};
 use crate::domain::publication::{Header, Image, Name, PublicationId, Synopsis, Tag};
 
 impl Collection {
@@ -97,17 +100,31 @@ impl CollectionRepository for PostgresCollectionRepository {
         to: Option<&DateTime<Utc>>,
         offset: Option<usize>,
         limit: Option<usize>,
-    ) -> Result<Vec<Collection>> {
+        order_by: Option<&CollectionOrderBy>,
+    ) -> Result<Pagination<Collection>> {
+        let config = Config::get();
+
+        let offset = offset.unwrap_or_else(|| 0);
+        let limit = limit
+            .map(|l| {
+                if l <= config.pagination_limit() {
+                    l
+                } else {
+                    config.pagination_limit()
+                }
+            })
+            .unwrap_or_else(|| config.pagination_limit());
+        let order_by = match order_by {
+            Some(CollectionOrderBy::Newest) => "created_at DESC",
+            _ => "created_at ASC",
+        };
+
         let author_id = author_id.map(|id| id.to_uuid()).transpose()?;
         let category_id = category_id.map(|id| id.value());
         let publication_id = publication_id.map(|id| id.value());
         let tag = tag.map(|t| t.slug());
-        let offset = offset.unwrap_or_else(|| 0);
-        let limit = limit
-            .map(|l| if l <= 1000 { l } else { 1000 })
-            .unwrap_or_else(|| 100);
 
-        let (mut sql, params) = WhereBuilder::new()
+        let (sql, params) = WhereBuilder::new()
             .add_param_opt("author_id = $$", &author_id, author_id.is_some())
             .add_param_opt("category_id = $$", &category_id, category_id.is_some())
             .add_param_opt(
@@ -134,18 +151,43 @@ impl CollectionRepository for PostgresCollectionRepository {
             .add_param_opt("created_at <= $$", &to, to.is_some())
             .build();
 
-        sql = format!(
-            "SELECT * FROM collections
-            {}
-            ORDER BY created_at ASC
-            OFFSET {}
-            LIMIT {}",
-            sql, offset, limit,
-        );
+        // Total
+        let row = self
+            .client
+            .query_one(&format!("SELECT COUNT(*) FROM collections") as &str, &[])
+            .await
+            .map_err(|err| Error::new("collection", "total").wrap_raw(err))?;
+        let total: i64 = row.get(0);
 
+        // Matching criteria
+        let row = self
+            .client
+            .query_one(
+                &format!(
+                    "SELECT COUNT(*) FROM collections
+                    {}",
+                    sql,
+                ) as &str,
+                &params,
+            )
+            .await
+            .map_err(|err| Error::new("collection", "matching_criteria").wrap_raw(err))?;
+        let matching_criteria: i64 = row.get(0);
+
+        // Query
         let rows = self
             .client
-            .query(&sql as &str, &params)
+            .query(
+                &format!(
+                    "SELECT * FROM collections
+                    {}
+                    ORDER BY {}
+                    OFFSET {}
+                    LIMIT {}",
+                    sql, order_by, offset, limit,
+                ) as &str,
+                &params,
+            )
             .await
             .map_err(|err| Error::not_found("collection").wrap_raw(err))?;
 
@@ -154,7 +196,10 @@ impl CollectionRepository for PostgresCollectionRepository {
             collections.push(Collection::from_row(row)?);
         }
 
-        Ok(collections)
+        Ok(
+            Pagination::new(offset, limit, total as usize, matching_criteria as usize)
+                .add_items(collections),
+        )
     }
 
     async fn save(&self, collection: &mut Collection) -> Result<()> {

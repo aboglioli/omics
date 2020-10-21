@@ -1,28 +1,19 @@
-use serde::Serialize;
-
-use crate::config::Config;
-
-#[derive(Serialize)]
 pub struct Pagination<T> {
-    offset: usize,
-    limit: usize,
-    total: usize,
-    count: usize,
-    items: Vec<T>,
+    pub offset: usize,
+    pub limit: usize,
+    pub total: usize,
+    pub matching_criteria: usize,
+    pub count: usize,
+    pub items: Vec<T>,
 }
 
 impl<T> Pagination<T> {
-    pub fn new(offset: usize, limit: usize, total: usize) -> Self {
-        let config = Config::get();
-
+    pub fn new(offset: usize, limit: usize, total: usize, matching_criteria: usize) -> Self {
         Pagination {
             offset,
-            limit: if limit < config.pagination_limit() {
-                limit
-            } else {
-                config.pagination_limit()
-            },
+            limit,
             total,
+            matching_criteria,
             count: 0,
             items: Vec::new(),
         }
@@ -38,6 +29,10 @@ impl<T> Pagination<T> {
 
     pub fn total(&self) -> usize {
         self.total
+    }
+
+    pub fn matching_criteria(&self) -> usize {
+        self.matching_criteria
     }
 
     pub fn count(&self) -> usize {

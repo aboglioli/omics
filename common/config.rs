@@ -48,7 +48,7 @@ impl Config {
                 .unwrap_or_else(|_| 3000),
             env: env::var("ENV").unwrap_or_else(|_| "development".to_owned()),
 
-            pagination_limit: 1000,
+            pagination_limit: 100,
 
             aws_key: env::var("AWS_ACCESS_KEY_ID").unwrap_or_else(|_| "".to_owned()),
             aws_secret: env::var("AWS_SECRET_ACCESS_KEY").unwrap_or_else(|_| "".to_owned()),

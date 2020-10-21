@@ -4,14 +4,14 @@ use chrono::DateTime;
 use serde::{Deserialize, Serialize};
 
 use common::error::Error;
-use common::request::{Include, PaginationParams};
+use common::request::{Include, PaginationResponse, PaginationParams};
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
 
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};
 use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::category::CategoryRepository;
-use crate::domain::publication::{PublicationRepository, Status, Tag};
+use crate::domain::publication::{PublicationRepository, Status, Tag, PublicationOrderBy};
 
 #[derive(Deserialize)]
 pub struct SearchCommand {
@@ -22,11 +22,6 @@ pub struct SearchCommand {
     pub name: Option<String>,
     pub date_from: Option<String>,
     pub date_to: Option<String>,
-}
-
-#[derive(Serialize)]
-pub struct SearchResponse {
-    publications: Vec<PublicationDto>,
 }
 
 pub struct Search<'a> {
@@ -57,7 +52,7 @@ impl<'a> Search<'a> {
         cmd: SearchCommand,
         include: Include,
         pagination: PaginationParams,
-    ) -> Result<SearchResponse> {
+    ) -> Result<PaginationResponse<PublicationDto>> {
         // TODO: filter by status instead of doing it manually
         let is_content_manager = if let Some(auth_id) = &auth_id {
             let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
@@ -66,7 +61,7 @@ impl<'a> Search<'a> {
             false
         };
 
-        let mut publications = self
+        let mut pagination_publications = self
             .publication_repo
             .search(
                 cmd.author_id.map(AuthorId::new).transpose()?.as_ref(),
@@ -86,8 +81,31 @@ impl<'a> Search<'a> {
                     .as_ref(),
                 pagination.offset,
                 pagination.limit,
+                pagination
+                    .order_by
+                    .map(|o| PublicationOrderBy::from_str(&o))
+                    .transpose()?
+                    .as_ref(),
             )
             .await?;
+
+        let publications = pagination_publications
+            .items()
+            .iter()
+            .filter(|publication| {
+                if is_content_manager {
+                    return true;
+                }
+
+                if let Some(auth_id) = &auth_id {
+                    if publication.author_id().value() == auth_id {
+                        return true;
+                    }
+                }
+
+                matches!(publication.status_history().current(), Status::Published { .. })
+            })
+            .collect();
 
         publications = publications
             .into_iter()

@@ -4,13 +4,13 @@ use chrono::DateTime;
 use serde::{Deserialize, Serialize};
 
 use common::error::Error;
-use common::request::{Include, PaginationParams};
+use common::request::{Include, PaginationParams, PaginationResponse};
 use common::result::Result;
 
 use crate::application::dtos::{AuthorDto, CategoryDto, CollectionDto};
 use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::category::{CategoryId, CategoryRepository};
-use crate::domain::collection::CollectionRepository;
+use crate::domain::collection::{CollectionRepository, CollectionOrderBy};
 use crate::domain::publication::{PublicationId, Tag};
 
 #[derive(Deserialize)]
@@ -22,11 +22,6 @@ pub struct SearchCommand {
     pub name: Option<String>,
     pub date_from: Option<String>,
     pub date_to: Option<String>,
-}
-
-#[derive(Serialize)]
-pub struct SearchResponse {
-    collections: Vec<CollectionDto>,
 }
 
 pub struct Search<'a> {
@@ -54,8 +49,8 @@ impl<'a> Search<'a> {
         cmd: SearchCommand,
         include: Include,
         pagination: PaginationParams,
-    ) -> Result<SearchResponse> {
-        let collections = self
+    ) -> Result<PaginationResponse<CollectionDto>> {
+        let pagination_collections = self
             .collection_repo
             .search(
                 cmd.author_id.map(AuthorId::new).transpose()?.as_ref(),
@@ -78,13 +73,23 @@ impl<'a> Search<'a> {
                     .as_ref(),
                 pagination.offset,
                 pagination.limit,
+                pagination
+                    .order_by
+                    .map(|o| CollectionOrderBy::from_str(&o))
+                    .transpose()?
+                    .as_ref(),
             )
             .await?;
 
-        let mut collection_dtos = Vec::new();
+        let mut res = PaginationResponse::new(
+            pagination_collections.offset(),
+            pagination_collections.limit(),
+            pagination_collections.total(),
+            pagination_collections.matching_criteria(),
+        );
 
-        for collection in collections.iter() {
-            let mut collection_dto = CollectionDto::from(collection);
+        for collection in pagination_collections.into_items().into_iter() {
+            let mut collection_dto = CollectionDto::from(&collection);
 
             if include.has("author") {
                 let author = self.author_repo.find_by_id(collection.author_id()).await?;
@@ -99,11 +104,9 @@ impl<'a> Search<'a> {
                 collection_dto = collection_dto.category(CategoryDto::from(&category));
             }
 
-            collection_dtos.push(collection_dto);
+            res.add_item(collection_dto);
         }
 
-        Ok(SearchResponse {
-            collections: collection_dtos,
-        })
+        Ok(res)
     }
 }

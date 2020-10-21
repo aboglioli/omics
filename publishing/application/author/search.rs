@@ -4,22 +4,17 @@ use chrono::DateTime;
 use serde::{Deserialize, Serialize};
 
 use common::error::Error;
-use common::request::PaginationParams;
+use common::request::{PaginationParams, PaginationResponse};
 use common::result::Result;
 
 use crate::application::dtos::AuthorDto;
-use crate::domain::author::AuthorRepository;
+use crate::domain::author::{AuthorOrderBy, AuthorRepository};
 
 #[derive(Deserialize)]
 pub struct SearchCommand {
     pub name: Option<String>,
     pub date_from: Option<String>,
     pub date_to: Option<String>,
-}
-
-#[derive(Serialize)]
-pub struct SearchResponse {
-    authors: Vec<AuthorDto>,
 }
 
 pub struct Search<'a> {
@@ -35,8 +30,8 @@ impl<'a> Search<'a> {
         _auth_id: Option<String>,
         cmd: SearchCommand,
         pagination: PaginationParams,
-    ) -> Result<SearchResponse> {
-        let mut authors = self
+    ) -> Result<PaginationResponse<AuthorDto>> {
+        let pagination_authors = self
             .author_repo
             .search(
                 cmd.name.as_ref(),
@@ -52,39 +47,31 @@ impl<'a> Search<'a> {
                     .as_ref(),
                 pagination.offset,
                 pagination.limit,
+                pagination
+                    .order_by
+                    .map(|o| AuthorOrderBy::from_str(&o))
+                    .transpose()?
+                    .as_ref(),
             )
             .await?;
 
-        if let Some(order_by) = pagination.order_by {
-            match order_by.as_ref() {
-                "followers" => {
-                    authors.sort_by(|a, b| b.followers().cmp(&a.followers()));
-                }
-                "publications" => {
-                    authors.sort_by(|a, b| b.publications().cmp(&a.publications()));
-                }
-                "newest" => {
-                    authors.reverse();
-                }
-                _ => {}
-            }
-        }
+        let mut res = PaginationResponse::new(
+            pagination_authors.offset(),
+            pagination_authors.limit(),
+            pagination_authors.total(),
+            pagination_authors.matching_criteria(),
+        );
 
-        let mut author_dtos = Vec::new();
-
-        // TODO: improve this, please...
-        for author in authors.into_iter() {
+        for author in pagination_authors.into_items().into_iter() {
             if author.username().starts_with("admin")
                 || author.username().starts_with("content-manager")
             {
                 continue;
             }
 
-            author_dtos.push(AuthorDto::from(&author));
+            res.add_item(AuthorDto::from(&author));
         }
 
-        Ok(SearchResponse {
-            authors: author_dtos,
-        })
+        Ok(res)
     }
 }

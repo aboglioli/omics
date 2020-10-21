@@ -2,13 +2,13 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-
 use tokio_postgres::row::Row;
 use tokio_postgres::Client;
 use uuid::Uuid;
 
+use common::config::Config;
 use common::error::Error;
-use common::model::{AggregateRoot, StatusHistory, StatusItem};
+use common::model::{AggregateRoot, Pagination, StatusHistory, StatusItem};
 use common::result::Result;
 use common::sql::where_builder::WhereBuilder;
 
@@ -16,8 +16,8 @@ use crate::domain::author::AuthorId;
 use crate::domain::category::CategoryId;
 
 use crate::domain::publication::{
-    Header, Image, Name, Page, Publication, PublicationId, PublicationRepository, Statistics,
-    Status, Synopsis, Tag,
+    Header, Image, Name, Page, Publication, PublicationId, PublicationOrderBy,
+    PublicationRepository, Statistics, Status, Synopsis, Tag,
 };
 
 impl Publication {
@@ -98,22 +98,41 @@ impl PublicationRepository for PostgresPublicationRepository {
         author_id: Option<&AuthorId>,
         category_id: Option<&CategoryId>,
         tag: Option<&Tag>,
-        status: Option<&String>,
+        status: Option<&Status>,
         name: Option<&String>,
         from: Option<&DateTime<Utc>>,
         to: Option<&DateTime<Utc>>,
         offset: Option<usize>,
         limit: Option<usize>,
-    ) -> Result<Vec<Publication>> {
+        order_by: Option<&PublicationOrderBy>,
+    ) -> Result<Pagination<Publication>> {
+        let config = Config::get();
+
+        let offset = offset.unwrap_or_else(|| 0);
+        let limit = limit
+            .map(|l| {
+                if l <= config.pagination_limit() {
+                    l
+                } else {
+                    config.pagination_limit()
+                }
+            })
+            .unwrap_or_else(|| config.pagination_limit());
+        // TODO: complete
+        let order_by = match order_by {
+            Some(PublicationOrderBy::Newest) => "created_at DESC",
+            Some(PublicationOrderBy::MostViewed) => "created_at DESC",
+            Some(PublicationOrderBy::MostLiked) => "created_at DESC",
+            Some(PublicationOrderBy::BestReviews) => "created_at DESC",
+            _ => "created_at ASC",
+        };
+
         let author_id = author_id.map(|id| id.to_uuid()).transpose()?;
         let category_id = category_id.map(|id| id.value());
         let tag = tag.map(|t| t.slug());
-        let offset = offset.unwrap_or_else(|| 0);
-        let limit = limit
-            .map(|l| if l <= 1000 { l } else { 1000 })
-            .unwrap_or_else(|| 100);
+        let status = status.map(|s| s.to_string());
 
-        let (mut sql, params) = WhereBuilder::new()
+        let (sql, params) = WhereBuilder::new()
             .add_param_opt("author_id = $$", &author_id, author_id.is_some())
             .add_param_opt("category_id = $$", &category_id, category_id.is_some())
             .add_param_opt(
@@ -139,18 +158,43 @@ impl PublicationRepository for PostgresPublicationRepository {
             .add_param_opt("created_at <= $$", &to, to.is_some())
             .build();
 
-        sql = format!(
-            "SELECT * FROM publications
-            {}
-            ORDER BY created_at ASC
-            OFFSET {}
-            LIMIT {}",
-            sql, offset, limit,
-        );
+        // Total
+        let row = self
+            .client
+            .query_one(&format!("SELECT COUNT(*) FROM publications") as &str, &[])
+            .await
+            .map_err(|err| Error::new("publication", "total").wrap_raw(err))?;
+        let total: i64 = row.get(0);
 
+        // Matching criteria
+        let row = self
+            .client
+            .query_one(
+                &format!(
+                    "SELECT COUNT(*) FROM publications
+                    {}",
+                    sql,
+                ) as &str,
+                &params,
+            )
+            .await
+            .map_err(|err| Error::new("publication", "matching_criteria").wrap_raw(err))?;
+        let matching_criteria: i64 = row.get(0);
+
+        // Query
         let rows = self
             .client
-            .query(&sql as &str, &params)
+            .query(
+                &format!(
+                    "SELECT * FROM publications
+                    {}
+                    ORDER BY {}
+                    OFFSET {}
+                    LIMIT {}",
+                    sql, order_by, offset, limit,
+                ) as &str,
+                &params,
+            )
             .await
             .map_err(|err| Error::not_found("publication").wrap_raw(err))?;
 
@@ -159,7 +203,10 @@ impl PublicationRepository for PostgresPublicationRepository {
             publications.push(Publication::from_row(row)?);
         }
 
-        Ok(publications)
+        Ok(
+            Pagination::new(offset, limit, total as usize, matching_criteria as usize)
+                .add_items(publications),
+        )
     }
 
     async fn save(&self, publication: &mut Publication) -> Result<()> {

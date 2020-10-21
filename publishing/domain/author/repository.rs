@@ -1,7 +1,11 @@
+use std::str::FromStr;
+
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
+use common::error::Error;
+use common::model::Pagination;
 use common::result::Result;
 
 use crate::domain::author::{Author, AuthorId};
@@ -18,12 +22,32 @@ pub trait AuthorRepository: Sync + Send {
         name: Option<&String>,
         from: Option<&DateTime<Utc>>,
         to: Option<&DateTime<Utc>>,
-        // offset: Option<usize>// ,
+        offset: Option<usize>,
         limit: Option<usize>,
-        order_by: Option<String>,
-    ) -> Result<Vec<Author>>;
+        order_by: Option<&AuthorOrderBy>,
+    ) -> Result<Pagination<Author>>;
 
     async fn save(&self, author: &mut Author) -> Result<()>;
 
     async fn delete(&self, id: &AuthorId) -> Result<()>;
+}
+
+pub enum AuthorOrderBy {
+    Oldest,
+    Newest,
+    Followers,
+    Publications,
+}
+
+impl FromStr for AuthorOrderBy {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self> {
+        Ok(match s {
+            "newest" => AuthorOrderBy::Newest,
+            "followers" => AuthorOrderBy::Followers,
+            "publications" => AuthorOrderBy::Publications,
+            _ => AuthorOrderBy::Oldest,
+        })
+    }
 }
