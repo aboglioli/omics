@@ -7,6 +7,7 @@ import {
   ICollection,
   IContract,
   IPage,
+  IPagination,
   IPublication,
   IReaderPublicationInteraction,
   IReview,
@@ -29,10 +30,6 @@ export interface ISearchCommand {
   offset?: number;
   limit?: number;
   order_by?: string; // 'most_viewed' 'most_liked' 'newest' 'best_reviews'
-}
-
-export interface ISearchResponse {
-  publications: IPublication[];
 }
 
 export interface ICreateCommand {
@@ -118,7 +115,7 @@ export class PublicationService {
     return this.http.get<IGetByIdResponse>(`${this.baseUrl}/${id}`, { params });
   }
 
-  public search(cmd: ISearchCommand, include: string = ''): Observable<ISearchResponse> {
+  public search(cmd: ISearchCommand, include: string = ''): Observable<IPagination<IPublication>> {
     let params = new HttpParams();
 
     if (cmd.author_id) {
@@ -165,7 +162,7 @@ export class PublicationService {
       params = params.append('include', include);
     }
 
-    return this.http.get<ISearchResponse>(`${this.baseUrl}`, { params });
+    return this.http.get(`${this.baseUrl}`, { params });
   }
 
   public create(cmd: ICreateCommand): Observable<ICreateResponse> {

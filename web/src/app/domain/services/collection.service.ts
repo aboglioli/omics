@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ConfigService } from './config.service';
-import { ICollection, IPublication } from '../models';
+import { ICollection, IPagination, IPublication } from '../models';
 
 export interface ISearchCommand {
   author_id?: string;
@@ -16,10 +16,6 @@ export interface ISearchCommand {
   offset?: number;
   limit?: number;
   order_by?: string;
-}
-
-export interface ISearchResponse {
-  collections: ICollection[];
 }
 
 export interface ICreateCommand {
@@ -73,7 +69,7 @@ export class CollectionService {
     return this.http.get<IGetPublicationsResponse>(`${this.baseUrl}/${id}/publications`, { params });
   }
 
-  public search(cmd: ISearchCommand, include: string = ''): Observable<ISearchResponse> {
+  public search(cmd: ISearchCommand, include: string = ''): Observable<IPagination<ICollection>> {
     let params = new HttpParams();
 
     if (cmd.author_id) {

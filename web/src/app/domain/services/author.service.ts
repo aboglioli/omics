@@ -3,7 +3,13 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ConfigService } from './config.service';
-import { IAuthor, IPublication, ICollection, IReaderAuthorInteraction } from '../models';
+import {
+  IAuthor,
+  ICollection,
+  IPagination,
+  IPublication,
+  IReaderAuthorInteraction,
+} from '../models';
 
 export interface IGetByIdResponse {
   author: IAuthor;
@@ -18,10 +24,6 @@ export interface ISearchCommand {
   limit?: number;
   // followers, publications, newest
   order_by?: string;
-}
-
-export interface ISearchResponse {
-  authors: IAuthor[];
 }
 
 export interface IGetPublicationsResponse {
@@ -44,7 +46,7 @@ export class AuthorService {
     return this.http.get<IGetByIdResponse>(`${this.baseUrl}/${id}`);
   }
 
-  public search(cmd: ISearchCommand): Observable<ISearchResponse> {
+  public search(cmd: ISearchCommand): Observable<IPagination<IAuthor>> {
     let params = new HttpParams();
 
     if (cmd.name) {
