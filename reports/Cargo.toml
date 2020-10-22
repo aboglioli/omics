@@ -9,8 +9,10 @@ path = "lib.rs"
 
 [dependencies]
 common = { path = "../common" }
-shared = { path = "../shared" }
 identity = { path = "../identity" }
+payment = { path = "../payment" }
+publishing = { path = "../publishing" }
+shared = { path = "../shared" }
 
 chrono = "0.4"
 serde = { version = "1.0", features = ["derive"] }

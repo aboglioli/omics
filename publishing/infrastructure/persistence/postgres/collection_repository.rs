@@ -6,7 +6,7 @@ use tokio_postgres::row::Row;
 use tokio_postgres::Client;
 use uuid::Uuid;
 
-use common::config::Config;
+
 use common::error::Error;
 use common::model::{AggregateRoot, Pagination};
 use common::result::Result;
@@ -102,23 +102,6 @@ impl CollectionRepository for PostgresCollectionRepository {
         limit: Option<usize>,
         order_by: Option<&CollectionOrderBy>,
     ) -> Result<Pagination<Collection>> {
-        let config = Config::get();
-
-        let offset = offset.unwrap_or_else(|| 0);
-        let limit = limit
-            .map(|l| {
-                if l <= config.pagination_limit() {
-                    l
-                } else {
-                    config.pagination_limit()
-                }
-            })
-            .unwrap_or_else(|| config.pagination_limit());
-        let order_by = match order_by {
-            Some(CollectionOrderBy::Newest) => "created_at DESC",
-            _ => "created_at ASC",
-        };
-
         let author_id = author_id.map(|id| id.to_uuid()).transpose()?;
         let category_id = category_id.map(|id| id.value());
         let publication_id = publication_id.map(|id| id.value());
@@ -175,6 +158,14 @@ impl CollectionRepository for PostgresCollectionRepository {
         let matching_criteria: i64 = row.get(0);
 
         // Query
+        let offset_sql =
+            offset.map_or_else(|| "".to_owned(), |offset| format!("OFFSET {}", offset));
+        let limit_sql = limit.map_or_else(|| "".to_owned(), |limit| format!("LIMIT {}", limit));
+        let order_by = match order_by {
+            Some(CollectionOrderBy::Newest) => "created_at DESC",
+            _ => "created_at ASC",
+        };
+
         let rows = self
             .client
             .query(
@@ -182,9 +173,9 @@ impl CollectionRepository for PostgresCollectionRepository {
                     "SELECT * FROM collections
                     {}
                     ORDER BY {}
-                    OFFSET {}
-                    LIMIT {}",
-                    sql, order_by, offset, limit,
+                    {}
+                    {}",
+                    sql, order_by, offset_sql, limit_sql,
                 ) as &str,
                 &params,
             )

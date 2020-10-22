@@ -1924,6 +1924,8 @@ dependencies = [
  "chrono",
  "common",
  "identity",
+ "payment",
+ "publishing",
  "serde",
  "serde_json",
  "shared",

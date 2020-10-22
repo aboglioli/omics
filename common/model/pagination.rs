@@ -1,6 +1,6 @@
 pub struct Pagination<T> {
-    pub offset: usize,
-    pub limit: usize,
+    pub offset: Option<usize>,
+    pub limit: Option<usize>,
     pub total: usize,
     pub matching_criteria: usize,
     pub count: usize,
@@ -8,7 +8,12 @@ pub struct Pagination<T> {
 }
 
 impl<T> Pagination<T> {
-    pub fn new(offset: usize, limit: usize, total: usize, matching_criteria: usize) -> Self {
+    pub fn new(
+        offset: Option<usize>,
+        limit: Option<usize>,
+        total: usize,
+        matching_criteria: usize,
+    ) -> Self {
         Pagination {
             offset,
             limit,
@@ -19,11 +24,11 @@ impl<T> Pagination<T> {
         }
     }
 
-    pub fn offset(&self) -> usize {
+    pub fn offset(&self) -> Option<usize> {
         self.offset
     }
 
-    pub fn limit(&self) -> usize {
+    pub fn limit(&self) -> Option<usize> {
         self.limit
     }
 

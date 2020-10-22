@@ -53,7 +53,6 @@ impl<'a> Search<'a> {
         include: Include,
         pagination: PaginationParams,
     ) -> Result<PaginationResponse<PublicationDto>> {
-        // TODO: filter by status instead of doing it manually
         let is_content_manager = if let Some(auth_id) = &auth_id {
             let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
             user.is_content_manager()
@@ -95,10 +94,10 @@ impl<'a> Search<'a> {
                     .transpose()
                     .map_err(|err| Error::bad_format("date_to").wrap_raw(err))?
                     .as_ref(),
-                pagination.offset,
-                pagination.limit,
+                pagination.offset(),
+                pagination.limit(),
                 pagination
-                    .order_by
+                    .order_by()
                     .map(|o| PublicationOrderBy::from_str(&o))
                     .transpose()?
                     .as_ref(),

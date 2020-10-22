@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::config::Config;
+
 #[derive(Deserialize)]
 pub struct PaginationParams {
     pub offset: Option<usize>,
@@ -7,11 +9,37 @@ pub struct PaginationParams {
     pub order_by: Option<String>,
 }
 
+impl PaginationParams {
+    pub fn offset(&self) -> Option<usize> {
+        self.offset.or_else(|| Some(0))
+    }
+
+    pub fn limit(&self) -> Option<usize> {
+        let config = Config::get();
+
+        self.limit
+            .map(|limit| {
+                if limit <= config.pagination_limit() {
+                    limit
+                } else {
+                    config.pagination_limit()
+                }
+            })
+            .or_else(|| Some(config.pagination_limit()))
+    }
+
+    pub fn order_by(&self) -> Option<String> {
+        self.order_by.clone()
+    }
+}
+
 impl Default for PaginationParams {
     fn default() -> Self {
+        let config = Config::get();
+
         PaginationParams {
             offset: Some(0),
-            limit: Some(100),
+            limit: Some(config.pagination_limit()),
             order_by: None,
         }
     }
@@ -22,8 +50,8 @@ pub struct PaginationResponse<T>
 where
     T: Serialize,
 {
-    pub offset: usize,
-    pub limit: usize,
+    pub offset: Option<usize>,
+    pub limit: Option<usize>,
     pub total: usize,
     pub matching_criteria: usize,
     pub count: usize,
@@ -34,7 +62,12 @@ impl<T> PaginationResponse<T>
 where
     T: Serialize,
 {
-    pub fn new(offset: usize, limit: usize, total: usize, matching_criteria: usize) -> Self {
+    pub fn new(
+        offset: Option<usize>,
+        limit: Option<usize>,
+        total: usize,
+        matching_criteria: usize,
+    ) -> Self {
         PaginationResponse {
             offset,
             limit,

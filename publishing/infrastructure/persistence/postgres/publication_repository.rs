@@ -6,7 +6,7 @@ use tokio_postgres::row::Row;
 use tokio_postgres::Client;
 use uuid::Uuid;
 
-use common::config::Config;
+
 use common::error::Error;
 use common::model::{AggregateRoot, Pagination, StatusHistory, StatusItem};
 use common::result::Result;
@@ -106,27 +106,6 @@ impl PublicationRepository for PostgresPublicationRepository {
         limit: Option<usize>,
         order_by: Option<&PublicationOrderBy>,
     ) -> Result<Pagination<Publication>> {
-        let config = Config::get();
-
-        let offset = offset.unwrap_or_else(|| 0);
-        let limit = limit
-            .map(|l| {
-                if l <= config.pagination_limit() {
-                    l
-                } else {
-                    config.pagination_limit()
-                }
-            })
-            .unwrap_or_else(|| config.pagination_limit());
-        // TODO: complete
-        let order_by = match order_by {
-            Some(PublicationOrderBy::Newest) => "created_at DESC",
-            Some(PublicationOrderBy::MostViewed) => "statistics->'views' DESC",
-            Some(PublicationOrderBy::MostLiked) => "statistics->'likes' DESC",
-            Some(PublicationOrderBy::BestReviews) => "statistics->'stars' DESC",
-            _ => "created_at ASC",
-        };
-
         let author_id = author_id.map(|id| id.to_uuid()).transpose()?;
         let category_id = category_id.map(|id| id.value());
         let tag = tag.map(|t| t.slug());
@@ -182,6 +161,17 @@ impl PublicationRepository for PostgresPublicationRepository {
         let matching_criteria: i64 = row.get(0);
 
         // Query
+        let offset_sql =
+            offset.map_or_else(|| "".to_owned(), |offset| format!("OFFSET {}", offset));
+        let limit_sql = limit.map_or_else(|| "".to_owned(), |limit| format!("LIMIT {}", limit));
+        let order_by = match order_by {
+            Some(PublicationOrderBy::Newest) => "created_at DESC",
+            Some(PublicationOrderBy::MostViewed) => "statistics->'views' DESC",
+            Some(PublicationOrderBy::MostLiked) => "statistics->'likes' DESC",
+            Some(PublicationOrderBy::BestReviews) => "statistics->'stars' DESC",
+            _ => "created_at ASC",
+        };
+
         let rows = self
             .client
             .query(
@@ -189,9 +179,9 @@ impl PublicationRepository for PostgresPublicationRepository {
                     "SELECT * FROM publications
                     {}
                     ORDER BY {}
-                    OFFSET {}
-                    LIMIT {}",
-                    sql, order_by, offset, limit,
+                    {}
+                    {}",
+                    sql, order_by, offset_sql, limit_sql,
                 ) as &str,
                 &params,
             )

@@ -3,6 +3,7 @@ use std::str::FromStr;
 use chrono::DateTime;
 use serde::Deserialize;
 
+use common::config::Config;
 use common::error::Error;
 use common::request::{PaginationParams, PaginationResponse};
 use common::result::Result;
@@ -31,6 +32,8 @@ impl<'a> Search<'a> {
         cmd: SearchCommand,
         pagination: PaginationParams,
     ) -> Result<PaginationResponse<AuthorDto>> {
+        let _config = Config::get();
+
         let pagination_authors = self
             .author_repo
             .search(
@@ -45,10 +48,10 @@ impl<'a> Search<'a> {
                     .transpose()
                     .map_err(|err| Error::bad_format("date_to").wrap_raw(err))?
                     .as_ref(),
-                pagination.offset,
-                pagination.limit,
+                pagination.offset(),
+                pagination.limit(),
                 pagination
-                    .order_by
+                    .order_by()
                     .map(|o| AuthorOrderBy::from_str(&o))
                     .transpose()?
                     .as_ref(),

@@ -8,11 +8,17 @@ pub struct NamedParam<'a> {
 #[derive(Default)]
 pub struct WhereBuilder<'a> {
     params: Vec<NamedParam<'a>>,
+    offset: Option<usize>,
+    limit: Option<usize>,
 }
 
 impl<'a> WhereBuilder<'a> {
     pub fn new() -> Self {
-        WhereBuilder { params: Vec::new() }
+        WhereBuilder {
+            params: Vec::new(),
+            offset: None,
+            limit: None,
+        }
     }
 
     pub fn add_param(self, k: &'a str, v: &'a (dyn ToSql + Sync)) -> Self {
@@ -23,6 +29,16 @@ impl<'a> WhereBuilder<'a> {
         if add {
             self.params.push(NamedParam { name: k, param: v });
         }
+        self
+    }
+
+    pub fn offset(mut self, offset: Option<usize>) -> Self {
+        self.offset = offset;
+        self
+    }
+
+    pub fn limit(mut self, limit: Option<usize>) -> Self {
+        self.limit = limit;
         self
     }
 
@@ -41,7 +57,29 @@ impl<'a> WhereBuilder<'a> {
             params.push(p.param);
         }
 
-        (format!("WHERE {}", statements.join(" AND ")), params)
+        let mut sql = if statements.len() > 0 {
+            format!("WHERE {}", statements.join(" AND "))
+        } else {
+            "".to_owned()
+        };
+
+        if let Some(offset) = self.offset {
+            sql = format!(
+                "{}
+                OFFSET {}",
+                sql, offset,
+            );
+        }
+
+        if let Some(limit) = self.limit {
+            sql = format!(
+                "{}
+                LIMIT {}",
+                sql, limit,
+            );
+        }
+
+        (sql, params)
     }
 }
 

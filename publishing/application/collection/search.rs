@@ -71,10 +71,10 @@ impl<'a> Search<'a> {
                     .transpose()
                     .map_err(|err| Error::bad_format("date_to").wrap_raw(err))?
                     .as_ref(),
-                pagination.offset,
-                pagination.limit,
+                pagination.offset(),
+                pagination.limit(),
                 pagination
-                    .order_by
+                    .order_by()
                     .map(|o| CollectionOrderBy::from_str(&o))
                     .transpose()?
                     .as_ref(),

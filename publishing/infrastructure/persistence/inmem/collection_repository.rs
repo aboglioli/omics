@@ -92,10 +92,13 @@ impl CollectionRepository for InMemCollectionRepository {
                 .collect();
         }
 
-        Ok(
-            Pagination::new(0, collections.len(), collections.len(), collections.len())
-                .add_items(collections),
+        Ok(Pagination::new(
+            Some(0),
+            Some(collections.len()),
+            collections.len(),
+            collections.len(),
         )
+        .add_items(collections))
     }
 
     async fn save(&self, collection: &mut Collection) -> Result<()> {

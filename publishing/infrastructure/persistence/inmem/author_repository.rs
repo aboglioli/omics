@@ -46,7 +46,10 @@ impl AuthorRepository for InMemAuthorRepository {
         _order_by: Option<&AuthorOrderBy>,
     ) -> Result<Pagination<Author>> {
         let authors = self.cache.all().await;
-        Ok(Pagination::new(0, authors.len(), authors.len(), authors.len()).add_items(authors))
+        Ok(
+            Pagination::new(Some(0), Some(authors.len()), authors.len(), authors.len())
+                .add_items(authors),
+        )
     }
 
     async fn save(&self, author: &mut Author) -> Result<()> {
