@@ -117,9 +117,8 @@ impl AuthorRepository for PostgresAuthorRepository {
         let matching_criteria: i64 = row.get(0);
 
         // Query
-        let offset_sql =
-            offset.map_or_else(|| "".to_owned(), |offset| format!("OFFSET {}", offset));
-        let limit_sql = limit.map_or_else(|| "".to_owned(), |limit| format!("LIMIT {}", limit));
+        let offset = offset.unwrap_or_else(|| 0);
+        let limit = limit.unwrap_or_else(|| total as usize);
         let order_by = match order_by {
             Some(AuthorOrderBy::Newest) => "created_at DESC",
             Some(AuthorOrderBy::Followers) => "followers DESC",
@@ -134,9 +133,9 @@ impl AuthorRepository for PostgresAuthorRepository {
                     "SELECT * FROM users
                     {}
                     ORDER BY {}
-                    {}
-                    {}",
-                    sql, order_by, offset_sql, limit_sql,
+                    OFFSET {}
+                    LIMIT {}",
+                    sql, order_by, offset, limit,
                 ) as &str,
                 &params,
             )

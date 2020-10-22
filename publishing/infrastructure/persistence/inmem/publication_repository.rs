@@ -86,8 +86,8 @@ impl PublicationRepository for InMemPublicationRepository {
         }
 
         Ok(Pagination::new(
-            Some(0),
-            Some(publications.len()),
+            0,
+            publications.len(),
             publications.len(),
             publications.len(),
         )

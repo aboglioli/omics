@@ -6,7 +6,6 @@ use tokio_postgres::row::Row;
 use tokio_postgres::Client;
 use uuid::Uuid;
 
-
 use common::error::Error;
 use common::model::{AggregateRoot, Pagination};
 use common::result::Result;
@@ -158,9 +157,8 @@ impl CollectionRepository for PostgresCollectionRepository {
         let matching_criteria: i64 = row.get(0);
 
         // Query
-        let offset_sql =
-            offset.map_or_else(|| "".to_owned(), |offset| format!("OFFSET {}", offset));
-        let limit_sql = limit.map_or_else(|| "".to_owned(), |limit| format!("LIMIT {}", limit));
+        let offset = offset.unwrap_or_else(|| 0);
+        let limit = limit.unwrap_or_else(|| total as usize);
         let order_by = match order_by {
             Some(CollectionOrderBy::Newest) => "created_at DESC",
             _ => "created_at ASC",
@@ -173,9 +171,9 @@ impl CollectionRepository for PostgresCollectionRepository {
                     "SELECT * FROM collections
                     {}
                     ORDER BY {}
-                    {}
-                    {}",
-                    sql, order_by, offset_sql, limit_sql,
+                    OFFSET {}
+                    LIMIT {}",
+                    sql, order_by, offset, limit,
                 ) as &str,
                 &params,
             )

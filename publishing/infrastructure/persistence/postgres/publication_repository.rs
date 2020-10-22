@@ -6,7 +6,6 @@ use tokio_postgres::row::Row;
 use tokio_postgres::Client;
 use uuid::Uuid;
 
-
 use common::error::Error;
 use common::model::{AggregateRoot, Pagination, StatusHistory, StatusItem};
 use common::result::Result;
@@ -161,9 +160,8 @@ impl PublicationRepository for PostgresPublicationRepository {
         let matching_criteria: i64 = row.get(0);
 
         // Query
-        let offset_sql =
-            offset.map_or_else(|| "".to_owned(), |offset| format!("OFFSET {}", offset));
-        let limit_sql = limit.map_or_else(|| "".to_owned(), |limit| format!("LIMIT {}", limit));
+        let offset = offset.unwrap_or_else(|| 0);
+        let limit = limit.unwrap_or_else(|| total as usize);
         let order_by = match order_by {
             Some(PublicationOrderBy::Newest) => "created_at DESC",
             Some(PublicationOrderBy::MostViewed) => "statistics->'views' DESC",
@@ -179,9 +177,9 @@ impl PublicationRepository for PostgresPublicationRepository {
                     "SELECT * FROM publications
                     {}
                     ORDER BY {}
-                    {}
-                    {}",
-                    sql, order_by, offset_sql, limit_sql,
+                    OFFSET {}
+                    LIMIT {}",
+                    sql, order_by, offset, limit,
                 ) as &str,
                 &params,
             )
