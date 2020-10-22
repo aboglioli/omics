@@ -7,12 +7,14 @@ use tokio_postgres::Client;
 use uuid::Uuid;
 
 use common::error::Error;
-use common::model::{AggregateRoot, StatusHistory, StatusItem};
+use common::model::{AggregateRoot, Pagination, StatusHistory, StatusItem};
 use common::result::Result;
 use common::sql::where_builder::WhereBuilder;
 use publishing::domain::publication::PublicationId;
 
-use crate::domain::contract::{Contract, ContractId, ContractRepository, Status, Summary};
+use crate::domain::contract::{
+    Contract, ContractId, ContractOrderBy, ContractRepository, Status, Summary,
+};
 use crate::domain::payment::Payment;
 
 impl Contract {
@@ -90,19 +92,17 @@ impl ContractRepository for PostgresContractRepository {
     async fn search(
         &self,
         publication_id: Option<&PublicationId>,
-        status: Option<&String>,
+        status: Option<&Status>,
         from: Option<&DateTime<Utc>>,
         to: Option<&DateTime<Utc>>,
         offset: Option<usize>,
         limit: Option<usize>,
-    ) -> Result<Vec<Contract>> {
+        order_by: Option<&ContractOrderBy>,
+    ) -> Result<Pagination<Contract>> {
         let publication_id = publication_id.map(|id| id.to_uuid()).transpose()?;
-        let offset = offset.unwrap_or_else(|| 0);
-        let limit = limit
-            .map(|l| if l <= 1000 { l } else { 1000 })
-            .unwrap_or_else(|| 100);
+        let status = status.map(|s| s.to_string());
 
-        let (mut sql, params) = WhereBuilder::new()
+        let (sql, params) = WhereBuilder::new()
             .add_param_opt(
                 "publication_id = $$",
                 &publication_id,
@@ -117,18 +117,50 @@ impl ContractRepository for PostgresContractRepository {
             .add_param_opt("created_at <= $$", &to, to.is_some())
             .build();
 
-        sql = format!(
-            "SELECT * FROM contracts
-            {}
-            ORDER BY created_at ASC
-            OFFSET {}
-            LIMIT {}",
-            sql, offset, limit,
-        );
+        // Total
+        let row = self
+            .client
+            .query_one(&format!("SELECT COUNT(*) FROM contracts") as &str, &[])
+            .await
+            .map_err(|err| Error::new("contract", "total").wrap_raw(err))?;
+        let total: i64 = row.get(0);
+
+        // Matching criteria
+        let row = self
+            .client
+            .query_one(
+                &format!(
+                    "SELECT COUNT(*) FROM contracts
+                    {}",
+                    sql,
+                ) as &str,
+                &params,
+            )
+            .await
+            .map_err(|err| Error::new("contract", "matching_criteria").wrap_raw(err))?;
+        let matching_criteria: i64 = row.get(0);
+
+        // Query
+        let offset = offset.unwrap_or_else(|| 0);
+        let limit = limit.unwrap_or_else(|| total as usize);
+        let order_by = match order_by {
+            Some(ContractOrderBy::Newest) => "created_at DESC",
+            _ => "created_at ASC",
+        };
 
         let rows = self
             .client
-            .query(&sql as &str, &params)
+            .query(
+                &format!(
+                    "SELECT * FROM contracts
+                    {}
+                    ORDER BY {}
+                    OFFSET {}
+                    LIMIT {}",
+                    sql, order_by, offset, limit,
+                ) as &str,
+                &params,
+            )
             .await
             .map_err(|err| Error::not_found("contract").wrap_raw(err))?;
 
@@ -137,7 +169,10 @@ impl ContractRepository for PostgresContractRepository {
             contracts.push(Contract::from_row(row)?);
         }
 
-        Ok(contracts)
+        Ok(
+            Pagination::new(offset, limit, total as usize, matching_criteria as usize)
+                .add_items(contracts),
+        )
     }
 
     async fn save(&self, contract: &mut Contract) -> Result<()> {

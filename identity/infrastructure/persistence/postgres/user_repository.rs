@@ -8,13 +8,14 @@ use tokio_postgres::Client;
 use uuid::Uuid;
 
 use common::error::Error;
-use common::model::AggregateRoot;
+use common::model::{AggregateRoot, Pagination};
 use common::result::Result;
+use common::sql::where_builder::WhereBuilder;
 
 use crate::domain::role::RoleId;
 use crate::domain::user::{
     Biography, Birthdate, Email, Fullname, Gender, Identity, Image, Password, Person, Provider,
-    User, UserId, UserRepository, Username, Validation,
+    User, UserId, UserOrderBy, UserRepository, Username, Validation,
 };
 
 impl User {
@@ -94,7 +95,6 @@ impl UserRepository for PostgresUserRepository {
             .map_err(|err| Error::not_found("user").wrap_raw(err))?;
 
         let mut users = Vec::new();
-
         for row in rows.into_iter() {
             users.push(User::from_row(row)?);
         }
@@ -162,6 +162,81 @@ impl UserRepository for PostgresUserRepository {
         }
 
         Ok(users)
+    }
+
+    async fn search(
+        &self,
+        role_id: Option<&RoleId>,
+        from: Option<&DateTime<Utc>>,
+        to: Option<&DateTime<Utc>>,
+        offset: Option<usize>,
+        limit: Option<usize>,
+        order_by: Option<&UserOrderBy>,
+    ) -> Result<Pagination<User>> {
+        let role_id = role_id.map(|id| id.value());
+
+        let (sql, params) = WhereBuilder::new()
+            .add_param_opt("role_id $$", &role_id, role_id.is_some())
+            .add_param_opt("created_at >= $$", &from, from.is_some())
+            .add_param_opt("created_at <= $$", &to, to.is_some())
+            .build();
+
+        // Total
+        let row = self
+            .client
+            .query_one("SELECT COUNT(*) FROM users", &[])
+            .await
+            .map_err(|err| Error::new("user", "total").wrap_raw(err))?;
+        let total: i64 = row.get(0);
+
+        // Matching criteria
+        let row = self
+            .client
+            .query_one(
+                &format!(
+                    "SELECT COUNT(*) FROM users
+                    {}",
+                    sql,
+                ) as &str,
+                &params,
+            )
+            .await
+            .map_err(|err| Error::new("user", "matching_criteria").wrap_raw(err))?;
+        let matching_criteria: i64 = row.get(0);
+
+        // Query
+        let offset = offset.unwrap_or_else(|| 0);
+        let limit = limit.unwrap_or_else(|| total as usize);
+        let order_by = match order_by {
+            Some(UserOrderBy::Newest) => "created_at DESC",
+            _ => "created_at ASC",
+        };
+
+        let rows = self
+            .client
+            .query(
+                &format!(
+                    "SELECT * FROM users
+                    {}
+                    ORDER BY {}
+                    OFFSET {}
+                    LIMIT {}",
+                    sql, order_by, offset, limit,
+                ) as &str,
+                &params,
+            )
+            .await
+            .map_err(|err| Error::not_found("user").wrap_raw(err))?;
+
+        let mut users = Vec::new();
+        for row in rows.into_iter() {
+            users.push(User::from_row(row)?);
+        }
+
+        Ok(
+            Pagination::new(offset, limit, total as usize, matching_criteria as usize)
+                .add_items(users),
+        )
     }
 
     async fn save(&self, user: &mut User) -> Result<()> {

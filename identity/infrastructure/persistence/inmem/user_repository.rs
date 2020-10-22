@@ -1,12 +1,14 @@
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 
 use common::cache::Cache;
 use common::error::Error;
 use common::infrastructure::cache::InMemCache;
+use common::model::Pagination;
 use common::result::Result;
 
 use crate::domain::role::RoleId;
-use crate::domain::user::{Email, User, UserId, UserRepository, Username};
+use crate::domain::user::{Email, User, UserId, UserOrderBy, UserRepository, Username};
 
 pub struct InMemUserRepository {
     cache: InMemCache<UserId, User>,
@@ -58,6 +60,19 @@ impl UserRepository for InMemUserRepository {
             .cache
             .filter(|(_, user)| user.role_id() == role_id)
             .await)
+    }
+
+    async fn search(
+        &self,
+        _role_id: Option<&RoleId>,
+        _from: Option<&DateTime<Utc>>,
+        _to: Option<&DateTime<Utc>>,
+        _offset: Option<usize>,
+        _limit: Option<usize>,
+        _order_by: Option<&UserOrderBy>,
+    ) -> Result<Pagination<User>> {
+        let users = self.cache.all().await;
+        Ok(Pagination::new(0, users.len(), users.len(), users.len()).add_items(users))
     }
 
     async fn save(&self, user: &mut User) -> Result<()> {

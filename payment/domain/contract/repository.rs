@@ -1,11 +1,15 @@
+use std::str::FromStr;
+
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
+use common::error::Error;
+use common::model::Pagination;
 use common::result::Result;
 use publishing::domain::publication::PublicationId;
 
-use crate::domain::contract::{Contract, ContractId};
+use crate::domain::contract::{Contract, ContractId, Status};
 
 #[async_trait]
 pub trait ContractRepository: Sync + Send {
@@ -18,14 +22,31 @@ pub trait ContractRepository: Sync + Send {
     async fn search(
         &self,
         publication_id: Option<&PublicationId>,
-        status: Option<&String>,
+        status: Option<&Status>,
         from: Option<&DateTime<Utc>>,
         to: Option<&DateTime<Utc>>,
         offset: Option<usize>,
         limit: Option<usize>,
-    ) -> Result<Vec<Contract>>;
+        order_by: Option<&ContractOrderBy>,
+    ) -> Result<Pagination<Contract>>;
 
     async fn save(&self, contract: &mut Contract) -> Result<()>;
 
     async fn delete(&self, id: &ContractId) -> Result<()>;
+}
+
+pub enum ContractOrderBy {
+    Oldest,
+    Newest,
+}
+
+impl FromStr for ContractOrderBy {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self> {
+        Ok(match s {
+            "newest" => ContractOrderBy::Newest,
+            _ => ContractOrderBy::Oldest,
+        })
+    }
 }

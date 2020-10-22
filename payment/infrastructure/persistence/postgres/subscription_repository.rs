@@ -7,7 +7,7 @@ use tokio_postgres::Client;
 use uuid::Uuid;
 
 use common::error::Error;
-use common::model::{AggregateRoot, StatusHistory, StatusItem};
+use common::model::{AggregateRoot, Pagination, StatusHistory, StatusItem};
 use common::result::Result;
 use common::sql::where_builder::WhereBuilder;
 use identity::domain::user::UserId;
@@ -15,7 +15,8 @@ use identity::domain::user::UserId;
 use crate::domain::payment::Payment;
 use crate::domain::plan::PlanId;
 use crate::domain::subscription::{
-    Status, Subscription, SubscriptionId, SubscriptionPlan, SubscriptionRepository,
+    Status, Subscription, SubscriptionId, SubscriptionOrderBy, SubscriptionPlan,
+    SubscriptionRepository,
 };
 
 impl Subscription {
@@ -90,10 +91,16 @@ impl SubscriptionRepository for PostgresSubscriptionRepository {
         &self,
         user_id: Option<&UserId>,
         plan_id: Option<&PlanId>,
-        status: Option<&String>,
-    ) -> Result<Vec<Subscription>> {
+        status: Option<&Status>,
+        from: Option<&DateTime<Utc>>,
+        to: Option<&DateTime<Utc>>,
+        offset: Option<usize>,
+        limit: Option<usize>,
+        order_by: Option<&SubscriptionOrderBy>,
+    ) -> Result<Pagination<Subscription>> {
         let user_id = user_id.map(|id| id.to_uuid()).transpose()?;
-        let _plan_id = plan_id.map(|id| id.value()); // TODO
+        let plan_id = plan_id.map(|id| id.value()); // TODO: use
+        let status = status.map(|s| s.to_string());
 
         let (sql, params) = WhereBuilder::new()
             .add_param_opt("user_id = $$", &user_id, user_id.is_some())
@@ -102,7 +109,40 @@ impl SubscriptionRepository for PostgresSubscriptionRepository {
                 &status,
                 status.is_some(),
             )
+            .add_param_opt("created_at >= $$", &from, from.is_some())
+            .add_param_opt("created_at <= $$", &to, to.is_some())
             .build();
+
+        // Total
+        let row = self
+            .client
+            .query_one(&format!("SELECT COUNT(*) FROM subscriptions") as &str, &[])
+            .await
+            .map_err(|err| Error::new("subscription", "total").wrap_raw(err))?;
+        let total: i64 = row.get(0);
+
+        // Matching criteria
+        let row = self
+            .client
+            .query_one(
+                &format!(
+                    "SELECT COUNT(*) FROM subscriptions
+                    {}",
+                    sql,
+                ) as &str,
+                &params,
+            )
+            .await
+            .map_err(|err| Error::new("subscription", "matching_criteria").wrap_raw(err))?;
+        let matching_criteria: i64 = row.get(0);
+        //
+        // Query
+        let offset = offset.unwrap_or_else(|| 0);
+        let limit = limit.unwrap_or_else(|| total as usize);
+        let order_by = match order_by {
+            Some(SubscriptionOrderBy::Newest) => "created_at DESC",
+            _ => "created_at ASC",
+        };
 
         let rows = self
             .client
@@ -110,8 +150,10 @@ impl SubscriptionRepository for PostgresSubscriptionRepository {
                 &format!(
                     "SELECT * FROM subscriptions
                     {}
-                    ORDER BY created_at ASC",
-                    sql,
+                    ORDER BY {}
+                    OFFSET {}
+                    LIMIT {}",
+                    sql, order_by, offset, limit,
                 ) as &str,
                 &params,
             )
@@ -123,7 +165,10 @@ impl SubscriptionRepository for PostgresSubscriptionRepository {
             subscriptions.push(Subscription::from_row(row)?);
         }
 
-        Ok(subscriptions)
+        Ok(
+            Pagination::new(offset, limit, total as usize, matching_criteria as usize)
+                .add_items(subscriptions),
+        )
     }
 
     async fn save(&self, subscription: &mut Subscription) -> Result<()> {
