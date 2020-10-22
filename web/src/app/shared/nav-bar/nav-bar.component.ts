@@ -7,6 +7,7 @@ import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-ge
 import { IdentityService } from 'src/app/domain/services/identity.service';
 import { IUser } from 'src/app/domain/models';
 import { LoginRegisterComponent } from 'src/app/components/user/login-register/login-register.component';
+import { SubscriptionService } from 'src/app/domain/services/subscription.service';
 
 @Component({
   selector: 'app-nav-bar',
@@ -47,6 +48,7 @@ export class NavBarComponent implements OnInit {
     }
 
   }
+
 
   public toggleSideNavMainMenu(): void {
 

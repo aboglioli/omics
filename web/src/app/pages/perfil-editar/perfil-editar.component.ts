@@ -12,6 +12,7 @@ import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-ge
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { PasswordRewriteComponent } from 'src/app/components/user/password-recovery/password-rewrite/password-rewrite.component';
+import { SubscriptionService } from 'src/app/domain/services/subscription.service';
 
 @Component({
   selector: 'app-perfil-editar',
@@ -31,6 +32,8 @@ export class PerfilEditarComponent implements OnInit {
   // Usuario
   private userId: string;
   public userData: IUser;
+
+  public readerIsSubscribed = false;
 
   // Del formulario
   public formProfile: FormGroup;
@@ -71,7 +74,8 @@ export class PerfilEditarComponent implements OnInit {
     private router: Router,
     private dialog: MatDialog,
     private sweetAlertGenericService: SweetAlertGenericMessageService,
-    public readonly swalTargets: SwalPortalTargets
+    public readonly swalTargets: SwalPortalTargets,
+    private subscriptionService: SubscriptionService,
 
   ) {}
 
@@ -254,10 +258,27 @@ export class PerfilEditarComponent implements OnInit {
 
   public onSuscribirse(): void {
 
-    // TODO: Agregar pantalla de suscripción
-    this.sweetAlertGenericService.showUnderConstrucction();
+    if ( this.readerIsSubscribed ) {
+
+      // Desubrirse
+      this.subscriptionService.unsubscribe().subscribe(
+      (res) => {
+        this.readerIsSubscribed = false;
+        // console.log(res);
+      },
+      (err) => {
+        console.error(err);
+      });
+
+    } else {
+
+      // Ir a página de suscripción
+      this.router.navigate(['/plans']);
+
+    }
 
   }
+
 
   public onMedioCobro(): void {
 

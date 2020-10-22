@@ -299,4 +299,18 @@ button.button-white-borders {
     box-shadow: inset 0px 0px 0px 2px white;
   }
 
+  &.subscription-button {
+    background-color: #ffb347;
+    color: #000;
+
+    &.active {
+      background-color: #755818;
+    }
+
+    &:disabled {
+      background-color: #ffb347;
+      color: #000;
+    }
+  }
+
 }
