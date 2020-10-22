@@ -167,91 +167,6 @@ div.perfil-editar-body {
 
       display: flex;
       flex-direction: column;
-
-      div.box-row {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-      }
-
-      div.block-field {
-
-        display: flex;
-        flex: 1;
-        flex-direction: column;
-        margin: 1em 2em;
-        min-width: 200px;
-
-        div.input-field-row {
-
-          display: flex;
-          flex-direction: column;
-          width: 100%;
-
-          div.title-and-error {
-
-            display: flex;
-            justify-content: space-between;
-
-            p.text-danger {
-              text-align: end;
-              font-weight: 500;
-              font-size: medium;
-              margin: 0;
-            }
-
-            p.field-name {
-              display: flex;
-              align-items: center;
-              margin: 0px;
-              margin-right: 1em;
-
-              font-weight: bold;
-              font-size: initial;
-
-            }
-
-          }
-
-        }
-
-        .text-area {
-          margin-top: 0.5em;
-
-          ::ng-deep div.mat-form-field-flex {
-            background-color: white;
-            color: black;
-            border-radius: 6px;
-          }
-        }
-
-        mat-radio-group {
-
-          display: flex;
-          flex-direction: row;
-          background-color: white;
-          color: black;
-          border-radius: 6px;
-
-          mat-radio-button {
-            margin: 1em 1em;
-          }
-
-        }
-
-        mat-form-field.matDate {
-
-          max-width: 296px;
-
-          ::ng-deep div.mat-form-field-flex {
-            background-color: white;
-            color: black;
-          }
-        }
-
-
-      }
-
     }
 
   }
@@ -265,6 +180,112 @@ div.perfil-editar-body {
       margin: 1em 2em;
     }
 
+  }
+
+}
+
+
+div.box-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+div.block-field {
+
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin: 1em 2em;
+  min-width: 200px;
+
+  div.input-field-row {
+
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    div.title-and-error {
+
+      display: flex;
+      justify-content: space-between;
+
+      p.text-danger {
+        text-align: end;
+        font-weight: 500;
+        font-size: medium;
+        margin: 0;
+      }
+
+      p.field-name {
+        display: flex;
+        align-items: center;
+        margin: 0px;
+        margin-right: 1em;
+
+        font-weight: bold;
+        font-size: initial;
+
+      }
+
+    }
+
+  }
+
+  .text-area {
+    margin-top: 0.5em;
+
+    ::ng-deep div.mat-form-field-flex {
+      background-color: white;
+      color: black;
+      border-radius: 6px;
+    }
+  }
+
+  mat-radio-group {
+
+    display: flex;
+    flex-direction: row;
+    background-color: white;
+    color: black;
+    border-radius: 6px;
+
+    mat-radio-button {
+      margin: 1em 1em;
+    }
+
+  }
+
+  mat-form-field.matDate {
+
+    max-width: 296px;
+
+    ::ng-deep div.mat-form-field-flex {
+      background-color: white;
+      color: black;
+    }
+  }
+
+
+}
+
+div.input-with-icon {
+
+  display: flex;
+  flex-direction: row;
+
+  position: relative;
+
+  input {
+    padding-left: 30px;
+  }
+
+  fa-icon {
+    position: absolute;
+    height: 100%;
+    left: 6px;
+    display: flex;
+    align-items: center;
   }
 
 }

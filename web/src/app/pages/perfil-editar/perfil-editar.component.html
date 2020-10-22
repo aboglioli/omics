@@ -266,7 +266,7 @@
             <button mat-flat-button color="warn"
                     class="button-white-borders"
                     style="width: 50%;"
-                    (click)="onChangePassword()">
+                    (click)="onEliminarCuenta()">
               Eliminar Cuenta
             </button>
           </div>
@@ -282,9 +282,73 @@
 </div>
 
 <!-- Swal Message -->
-<swal #formDataInvalid
+<swal #swalDataInvalid
   title="Datos incompletos o erroneos"
   text="Complete correctamente los datos necesarios"
   icon="error"
   [focusConfirm]="true">
+</swal>
+
+
+<!-- Confirm Delete Account -->
+<swal #swalDeleteAccount icon="info"
+      title="¿Estas seguro que deseas eliminar tu cuenta?"
+      [showConfirmButton]="false"
+      [showCloseButton]="true"
+      (close)="formDeleteAccount.reset()">
+
+      <form *swalPortal [formGroup]="formDeleteAccount">
+
+        <!-- Mensaje de alerta -->
+        <div class="alert alert-danger">
+          <small>Tus obras, datos y publicación dejarán de ser visibles en la plataforma.</small>
+        </div>
+
+        <div class="alert alert-info">
+          <small>Ingresar contraseña para confirmar.</small>
+        </div>
+
+        <!-- Contraseña ingresar para eliminar -->
+        <div class="block-field" style="margin: 0em;">
+
+          <div class="input-field-row">
+
+          <div class="title-and-error">
+            <p class="field-name">Contraseña: </p>
+
+          </div>
+
+          </div>
+
+          <!-- Input text -->
+          <div class="input-with-icon">
+            <input  class="form-control"
+                    [type]="passwordProperties.type"
+                    placeholder="Contraseña"
+                    formControlName="password">
+
+            <fa-icon  class="button"
+                      (click)="showPassword( passwordProperties.visible )"
+                      [icon]="(passwordProperties.visible) ? faEyeSlash : faEyeOpen"
+                      size="1x">
+            </fa-icon>
+          </div>
+
+
+        </div>
+
+        <!-- Botón confirmar eliminar cuenta -->
+        <div style="display: flex; justify-content: center; margin: 1em;">
+          <button mat-flat-button color="warn"
+                  class="button-white-borders"
+                  style="width: 50%;"
+                  [disabled]="formDeleteAccount.invalid"
+                  (click)="eliminarCuentaConfirm()">
+            Confirmar Eliminar Cuenta
+          </button>
+        </div>
+
+      </form>
+
+
 </swal>

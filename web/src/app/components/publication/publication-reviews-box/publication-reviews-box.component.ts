@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { IReview } from '../../../domain/models/review';
 import { IReaderPublicationInteraction } from '../../../domain/models/reader';
-import { faChevronLeft, faChevronRight, faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faStar } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarAlt } from '@fortawesome/free-regular-svg-icons';
 import { NgbCarousel } from '@ng-bootstrap/ng-bootstrap';
 

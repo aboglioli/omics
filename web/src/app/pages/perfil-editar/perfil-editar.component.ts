@@ -2,12 +2,12 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { AuthService } from 'src/app/domain/services/auth.service';
 import { IUser } from '../../domain/models/user';
-import { faEdit } from '@fortawesome/free-solid-svg-icons';
-import { IdentityService, IUpdateCommandUser } from '../../domain/services/identity.service';
+import { faEdit, faEyeSlash, faEye } from '@fortawesome/free-solid-svg-icons';
+import { IdentityService, IUpdateCommandUser, ILoginCommand, ILoginResponse } from '../../domain/services/identity.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { FileService } from 'src/app/domain/services/file.service';
 import { MatDialog } from '@angular/material/dialog';
-import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { SwalComponent, SwalPortalTargets } from '@sweetalert2/ngx-sweetalert2';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
@@ -20,10 +20,13 @@ import { PasswordRewriteComponent } from 'src/app/components/user/password-recov
 })
 export class PerfilEditarComponent implements OnInit {
 
-  @ViewChild('formDataInvalid') private swalFormDataInvalid: SwalComponent;
+  @ViewChild('swalDataInvalid') private swalFormDataInvalid: SwalComponent;
+  @ViewChild('swalDeleteAccount') private swalFormDeleteAccount: SwalComponent;
 
   // FontAwesome Icon
   public faEditField = faEdit;
+  public faEyeOpen = faEye;
+  public faEyeSlash = faEyeSlash;
 
   // Usuario
   private userId: string;
@@ -31,6 +34,8 @@ export class PerfilEditarComponent implements OnInit {
 
   // Del formulario
   public formProfile: FormGroup;
+  public formDeleteAccount: FormGroup;
+
   public maxDateBirthday: Date;
 
   public generosList  = [
@@ -48,6 +53,14 @@ export class PerfilEditarComponent implements OnInit {
     }
   ];
 
+
+  // Otros
+  passwordProperties =  {
+    type: 'password',
+    visible: false
+  };
+
+
   constructor(
 
     private spinnerService: NgxSpinnerService,
@@ -57,7 +70,8 @@ export class PerfilEditarComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private dialog: MatDialog,
-    private sweetAlertGenericService: SweetAlertGenericMessageService
+    private sweetAlertGenericService: SweetAlertGenericMessageService,
+    public readonly swalTargets: SwalPortalTargets
 
   ) {}
 
@@ -87,6 +101,11 @@ export class PerfilEditarComponent implements OnInit {
       biography:      ['', [Validators.maxLength(256) ] ],
     });
 
+    this.formDeleteAccount = this.fb.group({
+
+      password  : ['', [ Validators.required, Validators.minLength(8) ] ],
+
+    });
   }
 
   private buildFormByIdentityService(): void {
@@ -126,7 +145,7 @@ export class PerfilEditarComponent implements OnInit {
 
     });
 
-    console.log(this.formProfile.value);
+    // console.log(this.formProfile.value);
 
   }
 
@@ -176,7 +195,7 @@ export class PerfilEditarComponent implements OnInit {
 
   public onGuardarCambios(): void {
 
-    console.log(this.formProfile.value);
+    // console.log(this.formProfile.value);
 
     if ( this.formProfile.invalid ) {
 
@@ -250,7 +269,82 @@ export class PerfilEditarComponent implements OnInit {
   public onEliminarCuenta(): void {
 
     // TODO: Agregar pantalla de eliminar
-    this.sweetAlertGenericService.showUnderConstrucction();
+
+    this.swalFormDeleteAccount.fire();
+
+  }
+
+  public eliminarCuentaConfirm(): void {
+
+    this.spinnerService.show();
+    const auxLogin: ILoginCommand = {
+      username: this.userData.username,
+      password: this.formDeleteAccount.get('password').value
+    };
+
+    // Comprobar si la contraseña es válida
+    this.identityService.login(auxLogin).subscribe(
+      (res: ILoginResponse) => {
+
+        // Eliminar cuenta
+        this.identityService.delete(this.userData.id).subscribe(
+          () => {
+
+            this.spinnerService.hide();
+
+            Swal.fire({
+              icon: 'success',
+              title: 'Cuenta eliminada',
+              text: 'Si deaseas recuperar tu cuenta, contáctate con un administrador de Omics',
+              confirmButtonText: 'Volver',
+            }).then( () => {
+
+              this.authService.logout();
+              this.router.navigate(['/home']);
+
+            } );
+
+          },
+          (err: Error) => {
+
+            this.spinnerService.hide();
+            this.sweetAlertGenericService.showAlertError( 'Error con el servidor' );
+          }
+        );
+
+
+
+
+      },
+      (err: Error) => {
+
+        // Contraseña no válida
+        this.spinnerService.hide();
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'La contraseña ingresada no es correcta',
+          confirmButtonText: 'Volver',
+        }).then( res => {
+          if ( res.isConfirmed ) {
+            this.swalFormDeleteAccount.fire();
+          }
+        } );
+      }
+
+    );
+    // this.identityService.delete
+
+
+  }
+
+  public showPassword( show: boolean ): void {
+
+    const newValueVisible = !show;
+
+    this.passwordProperties.visible = newValueVisible;
+    this.passwordProperties.type = ( newValueVisible ) ? 'text' : 'password';
 
   }
 
@@ -299,6 +393,8 @@ export class PerfilEditarComponent implements OnInit {
     return ( bio ) ? bio.length : 0;
 
   }
+
+
 
   // #endregion
 
