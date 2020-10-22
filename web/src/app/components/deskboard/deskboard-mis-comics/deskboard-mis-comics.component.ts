@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { faFileUpload, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { Router, ActivatedRoute } from '@angular/router';
-import { AuthorService, IGetCollectionsResponse } from '../../../domain/services/author.service';
+import { AuthorService } from '../../../domain/services/author.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { IGetPublicationsResponse } from 'src/app/domain/services/collection.service';
 import { IPublication } from '../../../domain/models/publication';
@@ -66,9 +66,9 @@ export class DeskboardMisComicsComponent implements OnInit, OnChanges {
     this.spinnerService.show();
 
     this.authorService.getPublications('me').subscribe(
-      (resData: IGetPublicationsResponse) => {
+      (resData) => {
 
-        this.publicationList = resData.publications;
+        this.publicationList = resData.items;
 
         this.spinnerService.hide();
 
@@ -88,9 +88,9 @@ export class DeskboardMisComicsComponent implements OnInit, OnChanges {
     this.spinnerService.show();
 
     this.authorService.getCollections('me').subscribe(
-      (resData: IGetCollectionsResponse) => {
+      (resData) => {
 
-        this.collectionList = resData.collections;
+        this.collectionList = resData.items;
         this.spinnerService.hide();
 
       },

@@ -16,7 +16,7 @@ import { IPublication, IPage } from '../../../domain/models/publication';
 import { IDropdownItem } from '../../../models/dropdown-item.interface';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
-import { PublicationService, IUpdatePagesCommand, IGetByIdResponse, IGetCollectionsResponse, IUpdateCommand, IReadResponse } from '../../../domain/services/publication.service';
+import { PublicationService, IUpdatePagesCommand, IGetByIdResponse, IUpdateCommand, IReadResponse } from '../../../domain/services/publication.service';
 import { ICreateCommand, CollectionService } from '../../../domain/services/collection.service';
 import { SweetAlertGenericMessageService } from '../../../services/sweet-alert-generic-message.service';
 import { ICollection } from '../../../domain/models/collection';
@@ -165,9 +165,9 @@ export class PublicationNewEditComponent implements OnInit {
         this.spinnerService.hide();
         const publicationEdit: IPublication = res.publication;
         this.publicationService.getCollections(publicationId).subscribe(
-          (collectionRes: IGetCollectionsResponse) => {
+          (collectionRes) => {
 
-            this.setFormPublicationByObject(publicationEdit, collectionRes.collections);
+            this.setFormPublicationByObject(publicationEdit, collectionRes.items);
 
           },
           (err: Error) => {
@@ -701,9 +701,9 @@ export class PublicationNewEditComponent implements OnInit {
     let collectionToRemove: ICollection[] = [];
 
     this.publicationService.getCollections( idPubcalition ).subscribe(
-      ( resCollection: IGetCollectionsResponse ) => {
+      (resCollection) => {
 
-        collectionToRemove = resCollection.collections;
+        collectionToRemove = resCollection.items;
 
         if ( collectionToRemove.length === 0 ) {
           this.assignCollectionToPublication(idPubcalition);

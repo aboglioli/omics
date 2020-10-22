@@ -33,7 +33,7 @@ export class DeskboardWalletComponent implements OnInit {
 
     this.authorService.getPublications('me').subscribe(
       (res) => {
-        const publications = res.publications
+        const publications = res.items
           .filter((p) => p.contract);
 
         for (const publication of publications) {

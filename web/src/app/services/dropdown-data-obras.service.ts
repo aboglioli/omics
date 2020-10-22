@@ -19,7 +19,7 @@ export class DropdownDataObrasService {
 
     return this.collectionService.search({ author_id: idUser }, '').pipe(
       map(data => {
-        return data.collections.map(collection => {
+        return data.items.map(collection => {
           return {
             valueId: collection.id,
             name: collection.name,

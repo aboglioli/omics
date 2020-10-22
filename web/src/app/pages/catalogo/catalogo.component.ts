@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { PublicationService, ISearchResponse as PublicationSearchResponnse, ISearchCommand as ISearchCommandPublication } from '../../domain/services/publication.service';
+import { PublicationService, ISearchCommand as ISearchCommandPublication } from '../../domain/services/publication.service';
 import { IPublication } from '../../domain/models/publication';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { PublicationInfoComponent } from '../../components/publication/publication-info/publication-info.component';
 import { MatDialog } from '@angular/material/dialog';
 import { typeSearchCatalogue } from 'src/app/models/enums.model';
-import { CollectionService, ISearchResponse, ISearchCommand as ISearchCommandCollection } from '../../domain/services/collection.service';
+import { CollectionService, ISearchCommand as ISearchCommandCollection } from '../../domain/services/collection.service';
 import { ICollection } from '../../domain/models/collection';
 
 @Component({
@@ -67,10 +67,10 @@ export class CatalogoComponent implements OnInit {
   private getPublicationData(): void {
 
     this.publicationService.search( this.searchObjectPublication, 'category' ).subscribe(
-      (searchRes: PublicationSearchResponnse ) => {
+      (searchRes) => {
 
         // console.log( 'Test > ', searchRes );
-        this.publicationList = searchRes.publications;
+        this.publicationList = searchRes.items;
         this.spinnerService.hide();
         this.isSpinnerLoading = false;
       },
@@ -89,9 +89,9 @@ export class CatalogoComponent implements OnInit {
 
 
     this.collectionService.search( this.searchObjectCollection ).subscribe(
-      (searchRes: ISearchResponse ) => {
+      (searchRes) => {
         // console.log( 'Test > ', searchRes );
-        this.collectionList = searchRes.collections;
+        this.collectionList = searchRes.items;
         this.spinnerService.hide();
         this.isSpinnerLoading = false;
       },

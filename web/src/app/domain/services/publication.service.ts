@@ -80,10 +80,6 @@ export interface IRejectCommand {
   comment: string;
 }
 
-export interface IGetCollectionsResponse {
-  collections: ICollection[];
-}
-
 export interface IRequestContractResponse {
   id: string;
 }
@@ -162,7 +158,7 @@ export class PublicationService {
       params = params.append('include', include);
     }
 
-    return this.http.get(`${this.baseUrl}`, { params });
+    return this.http.get<IPagination<IPublication>>(`${this.baseUrl}`, { params });
   }
 
   public create(cmd: ICreateCommand): Observable<ICreateResponse> {
@@ -217,14 +213,14 @@ export class PublicationService {
     return this.http.get<IGetReviewsResponse>(`${this.baseUrl}/${id}/reviews`);
   }
 
-  public getCollections(id: string, include: string = ''): Observable<IGetCollectionsResponse> {
+  public getCollections(id: string, include: string = ''): Observable<IPagination<ICollection>> {
     let params = new HttpParams();
 
     if (include) {
       params = params.append('include', include);
     }
 
-    return this.http.get<IGetCollectionsResponse>(`${this.baseUrl}/${id}/collections`, { params });
+    return this.http.get<IPagination<ICollection>>(`${this.baseUrl}/${id}/collections`, { params });
   }
 
   public addToFavorites(id: string): Observable<any> {

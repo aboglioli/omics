@@ -3,18 +3,15 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ConfigService } from './config.service';
-import { ICategory, IPublication, ICollection } from '../models';
+import {
+  ICategory,
+  ICollection,
+  IPagination,
+  IPublication,
+} from '../models';
 
 export interface IGetAllResponse {
   categories: ICategory[];
-}
-
-export interface IGetPublicationsResponse {
-  publications: IPublication[];
-}
-
-export interface IGetCollectionsResponse {
-  collections: ICollection[];
 }
 
 @Injectable()
@@ -33,23 +30,23 @@ export class CategoryService {
     return this.http.get<ICategory>(`${this.baseUrl}/${id}`);
   }
 
-  public getPublications(id: string, include: string = ''): Observable<IGetPublicationsResponse> {
+  public getPublications(id: string, include: string = ''): Observable<IPagination<IPublication>> {
     let params = new HttpParams();
 
     if (include) {
       params = params.append('include', include);
     }
 
-    return this.http.get<IGetPublicationsResponse>(`${this.baseUrl}/${id}/publications`, { params });
+    return this.http.get<IPagination<IPublication>>(`${this.baseUrl}/${id}/publications`, { params });
   }
 
-  public getCollections(id: string, include: string = ''): Observable<IGetCollectionsResponse> {
+  public getCollections(id: string, include: string = ''): Observable<IPagination<ICollection>> {
     let params = new HttpParams();
 
     if (include) {
       params = params.append('include', include);
     }
 
-    return this.http.get<IGetCollectionsResponse>(`${this.baseUrl}/${id}/collections`, { params });
+    return this.http.get<IPagination<ICollection>>(`${this.baseUrl}/${id}/collections`, { params });
   }
 }

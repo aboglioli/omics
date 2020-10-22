@@ -22,16 +22,7 @@ export interface ISearchCommand {
   date_to?: string;
   offset?: number;
   limit?: number;
-  // followers, publications, newest
-  order_by?: string;
-}
-
-export interface IGetPublicationsResponse {
-  publications: IPublication[];
-}
-
-export interface IGetCollectionsResponse {
-  collections: ICollection[];
+  order_by?: string; // followers, publications, newest
 }
 
 @Injectable()
@@ -73,27 +64,27 @@ export class AuthorService {
       params = params.append('order_by', cmd.order_by);
     }
 
-    return this.http.get<ISearchResponse>(`${this.baseUrl}`, { params });
+    return this.http.get<IPagination<IAuthor>>(`${this.baseUrl}`, { params });
   }
 
-  public getPublications(id: string, include: string = ''): Observable<IGetPublicationsResponse> {
+  public getPublications(id: string, include: string = ''): Observable<IPagination<IPublication>> {
     let params = new HttpParams();
 
     if (include) {
       params = params.append('include', include);
     }
 
-    return this.http.get<IGetPublicationsResponse>(`${this.baseUrl}/${id}/publications`, { params });
+    return this.http.get<IPagination<IPublication>>(`${this.baseUrl}/${id}/publications`, { params });
   }
 
-  public getCollections(id: string, include: string = ''): Observable<IGetCollectionsResponse> {
+  public getCollections(id: string, include: string = ''): Observable<IPagination<ICollection>> {
     let params = new HttpParams();
 
     if (include) {
       params = params.append('include', include);
     }
 
-    return this.http.get<IGetCollectionsResponse>(`${this.baseUrl}/${id}/collections`, { params });
+    return this.http.get<IPagination<ICollection>>(`${this.baseUrl}/${id}/collections`, { params });
   }
 
   public follow(id: string): Observable<any> {

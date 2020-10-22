@@ -116,7 +116,7 @@ export class CollectionService {
       params = params.append('include', include);
     }
 
-    return this.http.get<ISearchResponse>(`${this.baseUrl}`, { params });
+    return this.http.get<IPagination<ICollection>>(`${this.baseUrl}`, { params });
   }
 
   public create(cmd: ICreateCommand): Observable<ICreateResponse> {

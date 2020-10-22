@@ -47,6 +47,7 @@ export class AuthService {
   public logout(): void {
 
     this.updateStateSession(false);
+    this.authToken = null;
     localStorage.removeItem('auth_token');
     localStorage.removeItem('id_user');
 

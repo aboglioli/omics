@@ -61,9 +61,9 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
     this.spinnerService.show();
 
     this.publicationService.search({ status: 'waiting-approval' }, 'author,category').subscribe(
-      (res: any) => {
+      (res) => {
 
-        this.publicationList = res.publications;
+        this.publicationList = res.items;
         console.log(this.publicationList);
 
         this.spinnerService.hide();

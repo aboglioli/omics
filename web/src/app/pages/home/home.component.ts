@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { PasswordRewriteComponent } from '../../components/user/password-recovery/password-rewrite/password-rewrite.component';
-import { ISearchResponse, PublicationService } from '../../domain/services/publication.service';
+import { PublicationService } from '../../domain/services/publication.service';
 import { forkJoin } from 'rxjs';
 import { IPublication } from '../../domain/models/publication';
 import { NgxSpinnerService } from 'ngx-spinner';
@@ -66,10 +66,15 @@ export class HomeComponent implements OnInit {
 
         this.spinnerService.hide();
 
-        this.listTopPublcationNew = (dataTopNew as ISearchResponse).publications;
-        this.listTopPublcationStars = (dataTopStars as ISearchResponse).publications;
-        this.listTopPublcationLikes = (dataTopLikes as ISearchResponse).publications;
-        this.listTopPublcationViews = (dataTopViews as ISearchResponse).publications;
+        this.listTopPublcationNew = dataTopNew.items;
+        this.listTopPublcationStars = dataTopStars.items;
+        this.listTopPublcationLikes = dataTopLikes.items;
+        this.listTopPublcationViews = dataTopViews.items;
+
+        // this.listTopPublcationNew = (dataTopNew as ISearchResponse).publications;
+        // this.listTopPublcationStars = (dataTopStars as ISearchResponse).publications;
+        // this.listTopPublcationLikes = (dataTopLikes as ISearchResponse).publications;
+        // this.listTopPublcationViews = (dataTopViews as ISearchResponse).publications;
 
         // console.log('Top New: ', this.listTopPublcationNew);
         // console.log('Top Stars', this.listTopPublcationStars);

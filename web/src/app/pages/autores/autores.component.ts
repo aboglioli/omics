@@ -23,7 +23,7 @@ export class AutoresComponent implements OnInit {
   ngOnInit(): void {
     this.authorService.search({order_by: 'newest' }).subscribe(
       res => {
-        this.authors = res.authors;
+        this.authors = res.items;
       },
       err => {
         console.log(err);

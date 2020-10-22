@@ -34,7 +34,7 @@ export class DeskboardReportComponent implements OnInit {
 
     this.authorService.getPublications('me').subscribe(
       (res) => {
-        const publications = res.publications
+        const publications = res.items
           .filter((p) => p.status.status === 'published');
 
         for (const publication of publications) {

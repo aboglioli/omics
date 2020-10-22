@@ -3,6 +3,7 @@ export * from './category';
 export * from './collection';
 export * from './contract';
 export * from './notification';
+export * from './pagination';
 export * from './payment';
 export * from './plan';
 export * from './publication';
