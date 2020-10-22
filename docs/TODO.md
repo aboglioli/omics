@@ -52,20 +52,20 @@ Filtros:
 - [x] Redirect after user validation.
 - [x] Recover password: send email.
 
-- [ ] Create Author from UserService when a new publication is created.
+- [-] Create Author from UserService when a new publication is created.
 - [ ] Make /events accessible only in development env.
 - [x] If request is a GET and an error occurs, a 404 error should be returned.
 - [ ] Use username as user id too.
 - [ ] Add 'username' as ID of user.
-- [ ] Search by tags for publications and collections.
-- [ ] Consider deleted_at in repositories to not return deleted entities.
+- [x] Search by tags for publications and collections.
+- [x] Consider deleted_at in repositories to not return deleted entities.
 - [ ] Allow change 'username' and 'email' in IdentityService.
 - [ ] Merge 'code' with 'topic' in Event.
-- [ ] Add Uuid as base id (StringId for string id only).
+- [-] Add Uuid as base id (StringId for string id only).
 - [x] Add timestamps to events.
 - [x] Improve enum serializatiion/deserialization.
 - [ ] Replace rename of each enum for serde by rename_all = "kebab-case".
-- [ ] Serialize directly (without util) in shared::event.
+- [x] Serialize directly (without util) in shared::event.
 
 # Progress
 
@@ -117,7 +117,7 @@ Filtros:
 - [x] CU 31 - Aceptar/Rechazar Contrato  
 
 ## Módulo de Reportes 
-- [x] CU 32 - Generar y Visualizar Reportes 
+- [ ] CU 32 - Generar y Visualizar Reportes 
 
 ## Módulo de Configuración
 - [ ] CU 33 - Configurar Reglas de Negocio  

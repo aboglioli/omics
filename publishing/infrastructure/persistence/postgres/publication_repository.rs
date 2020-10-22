@@ -121,9 +121,9 @@ impl PublicationRepository for PostgresPublicationRepository {
         // TODO: complete
         let order_by = match order_by {
             Some(PublicationOrderBy::Newest) => "created_at DESC",
-            Some(PublicationOrderBy::MostViewed) => "created_at DESC",
-            Some(PublicationOrderBy::MostLiked) => "created_at DESC",
-            Some(PublicationOrderBy::BestReviews) => "created_at DESC",
+            Some(PublicationOrderBy::MostViewed) => "statistics->'views' DESC",
+            Some(PublicationOrderBy::MostLiked) => "statistics->'likes' DESC",
+            Some(PublicationOrderBy::BestReviews) => "statistics->'stars' DESC",
             _ => "created_at ASC",
         };
 
