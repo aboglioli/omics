@@ -15,11 +15,11 @@ impl ConfigService {
         ConfigService { cache }
     }
 
-    pub async fn get<T, S>(&self, k: S) -> Result<T>
+    pub async fn get<K, V>(&self, k: K) -> Result<V>
     where
-        T: FromStr,
-        <T as FromStr>::Err: std::error::Error,
-        S: Into<String>,
+        V: FromStr,
+        <V as FromStr>::Err: std::error::Error,
+        K: Into<String>,
     {
         let k: String = k.into();
 
@@ -30,12 +30,12 @@ impl ConfigService {
         return Err(Error::not_found(k));
     }
 
-    pub async fn set<T, S>(&self, k: S, v: S) -> Result<()>
+    pub async fn set<K, V>(&self, k: K, v: V) -> Result<()>
     where
-        T: ToString,
-        S: Into<String>,
+        K: Into<String>,
+        V: ToString,
     {
-        self.cache.set(k.into(), v.into()).await?;
+        self.cache.set(k.into(), v.to_string()).await?;
         Ok(())
     }
 
