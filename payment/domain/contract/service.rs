@@ -80,9 +80,22 @@ impl ContractService {
     ) -> Result<Vec<Contract>> {
         let contracts = self
             .contract_repo
-            .search(None, Some(&"approved".to_owned()), None, None, None, None)
-            .await?;
-        let subscriptions = self.subscription_repo.search(None, None, None).await?;
+            .search(
+                None,
+                Some(&Status::Approved { admin_id: None }),
+                None,
+                None,
+                None,
+                None,
+                None,
+            )
+            .await?
+            .into_items();
+        let subscriptions = self
+            .subscription_repo
+            .search(None, None, None, None, None, None, None, None)
+            .await?
+            .into_items();
 
         let mut subscription_total: f64 = 0.0;
         for subscription in subscriptions.iter() {
@@ -155,7 +168,11 @@ impl ContractService {
             return Ok(contract);
         }
 
-        let subscriptions = self.subscription_repo.search(None, None, None).await?;
+        let subscriptions = self
+            .subscription_repo
+            .search(None, None, None, None, None, None, None, None)
+            .await?
+            .into_items();
         let mut subscription_total: f64 = 0.0;
         for subscription in subscriptions.iter() {
             for payment in subscription.payments().iter() {
@@ -182,8 +199,17 @@ impl ContractService {
 
         let contracts = self
             .contract_repo
-            .search(None, Some(&"approved".to_owned()), None, None, None, None)
-            .await?;
+            .search(
+                None,
+                Some(&Status::Approved { admin_id: None }),
+                None,
+                None,
+                None,
+                None,
+                None,
+            )
+            .await?
+            .into_items();
         let mut total_views = 0;
         for contract in contracts.into_iter() {
             let statistics = self
@@ -220,7 +246,7 @@ mod tests {
 
     use async_trait::async_trait;
 
-    use common::model::{AggregateRoot, StatusHistory, StatusItem};
+    use common::model::{AggregateRoot, Pagination, StatusHistory, StatusItem};
     use identity::domain::user::UserId;
     use publishing::domain::author::AuthorId;
     use publishing::domain::collection::CollectionId;
@@ -233,11 +259,12 @@ mod tests {
     use publishing::infrastructure::persistence::inmem::InMemPublicationRepository;
     use publishing::mocks as publishing_mocks;
 
-    use crate::domain::contract::{ContractId, Status as ContractStatus};
+    use crate::domain::contract::{ContractId, ContractOrderBy, Status as ContractStatus};
     use crate::domain::payment::{Amount, Kind, Payment};
     use crate::domain::plan::{Plan, PlanId, Price};
     use crate::domain::subscription::{
-        Status as SubscriptionStatus, Subscription, SubscriptionId, SubscriptionPlan,
+        Status as SubscriptionStatus, Subscription, SubscriptionId, SubscriptionOrderBy,
+        SubscriptionPlan,
     };
 
     struct FakeContractRepository;
@@ -250,8 +277,17 @@ mod tests {
 
         async fn find_by_publication_id(&self, id: &PublicationId) -> Result<Contract> {
             let contracts = self
-                .search(None, Some(&"approved".to_owned()), None, None, None, None)
-                .await?;
+                .search(
+                    None,
+                    Some(&ContractStatus::Approved { admin_id: None }),
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                )
+                .await?
+                .into_items();
             for contract in contracts.into_iter() {
                 if contract.publication_id() == id {
                     return Ok(contract);
@@ -263,13 +299,14 @@ mod tests {
         async fn search(
             &self,
             _publication_id: Option<&PublicationId>,
-            status: Option<&String>,
+            status: Option<&ContractStatus>,
             _from: Option<&DateTime<Utc>>,
             _to: Option<&DateTime<Utc>>,
             _offset: Option<usize>,
             _limit: Option<usize>,
-        ) -> Result<Vec<Contract>> {
-            assert_eq!(status.unwrap(), "approved");
+            _order_by: Option<&ContractOrderBy>,
+        ) -> Result<Pagination<Contract>> {
+            assert_eq!(status.unwrap().to_string(), "approved");
 
             let statistics = Statistics::new(5000, 5000, 5000, 5000, 5000, 4.5)?;
 
@@ -315,7 +352,7 @@ mod tests {
             );
             publication_3.set_statistics(statistics)?;
 
-            Ok(vec![
+            let contracts = vec![
                 Contract::build(
                     AggregateRoot::new(ContractId::new("#contract01")?),
                     PublicationId::new("#publication01")?,
@@ -324,7 +361,7 @@ mod tests {
                     StatusHistory::build(vec![
                         StatusItem::new(ContractStatus::init()),
                         StatusItem::new(ContractStatus::Approved {
-                            admin_id: UserId::new("#admin")?,
+                            admin_id: Some(UserId::new("#admin")?),
                         }),
                     ]),
                 ),
@@ -336,7 +373,7 @@ mod tests {
                     StatusHistory::build(vec![
                         StatusItem::new(ContractStatus::init()),
                         StatusItem::new(ContractStatus::Approved {
-                            admin_id: UserId::new("#admin")?,
+                            admin_id: Some(UserId::new("#admin")?),
                         }),
                     ]),
                 ),
@@ -348,11 +385,16 @@ mod tests {
                     StatusHistory::build(vec![
                         StatusItem::new(ContractStatus::init()),
                         StatusItem::new(ContractStatus::Approved {
-                            admin_id: UserId::new("#admin")?,
+                            admin_id: Some(UserId::new("#admin")?),
                         }),
                     ]),
                 ),
-            ])
+            ];
+
+            Ok(
+                Pagination::new(0, contracts.len(), contracts.len(), contracts.len())
+                    .add_items(contracts),
+            )
         }
 
         async fn save(&self, _contract: &mut Contract) -> Result<()> {
@@ -382,8 +424,13 @@ mod tests {
             &self,
             _user_id: Option<&UserId>,
             _plan_id: Option<&PlanId>,
-            _status: Option<&String>,
-        ) -> Result<Vec<Subscription>> {
+            _status: Option<&SubscriptionStatus>,
+            _from: Option<&DateTime<Utc>>,
+            _to: Option<&DateTime<Utc>>,
+            _offset: Option<usize>,
+            _limit: Option<usize>,
+            _order_by: Option<&SubscriptionOrderBy>,
+        ) -> Result<Pagination<Subscription>> {
             let plan = Plan::new(PlanId::new("basic")?, "Basic", "Basic", Price::new(75.0)?)?;
 
             let subscription_1 = Subscription::build(
@@ -455,7 +502,15 @@ mod tests {
                 ]),
             );
 
-            Ok(vec![subscription_1, subscription_2])
+            let subscriptions = vec![subscription_1, subscription_2];
+
+            Ok(Pagination::new(
+                0,
+                subscriptions.len(),
+                subscriptions.len(),
+                subscriptions.len(),
+            )
+            .add_items(subscriptions))
         }
 
         async fn save(&self, _subscription: &mut Subscription) -> Result<()> {

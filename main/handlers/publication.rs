@@ -340,7 +340,7 @@ async fn get_collections(
         auth_id,
         cmd,
         include.into_inner().into(),
-        PaginationParams::default(),
+        PaginationParams::default(), // TODO: use real PaginationParams
     )
     .await
     .map(|res| HttpResponse::Ok().json(res))

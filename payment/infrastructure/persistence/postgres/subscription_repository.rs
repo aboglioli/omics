@@ -99,7 +99,7 @@ impl SubscriptionRepository for PostgresSubscriptionRepository {
         order_by: Option<&SubscriptionOrderBy>,
     ) -> Result<Pagination<Subscription>> {
         let user_id = user_id.map(|id| id.to_uuid()).transpose()?;
-        let plan_id = plan_id.map(|id| id.value()); // TODO: use
+        let _plan_id = plan_id.map(|id| id.value()); // TODO: use
         let status = status.map(|s| s.to_string());
 
         let (sql, params) = WhereBuilder::new()

@@ -153,7 +153,12 @@ impl ContractStatusDto {
         };
 
         match status {
-            ContractStatus::Approved { admin_id } | ContractStatus::Rejected { admin_id } => {
+            ContractStatus::Approved {
+                admin_id: Some(admin_id),
+            }
+            | ContractStatus::Rejected {
+                admin_id: Some(admin_id),
+            } => {
                 dto.changed_by = Some(admin_id.to_string());
             }
             _ => {}

@@ -26,8 +26,18 @@ impl<'a> Unsubscribe<'a> {
     pub async fn exec(&self, auth_id: String) -> Result<CommandResponse> {
         let mut subscriptions = self
             .subscription_repo
-            .search(Some(&UserId::new(auth_id)?), None, None)
-            .await?;
+            .search(
+                Some(&UserId::new(auth_id)?),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            )
+            .await?
+            .into_items();
 
         subscriptions = subscriptions
             .into_iter()

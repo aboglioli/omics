@@ -69,6 +69,7 @@ Filtros:
 - [ ] Add Pagination<T> to each repository.
 - [x] Don't use a default limit in repository (it's a complexity to generate
   reports). Add the default limit in use cases. Or make reports from events.
+- [ ] 'Cancel' publication for content managers
 
 # Progress
 

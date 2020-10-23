@@ -1,6 +1,6 @@
 use actix_web::{get, web, HttpRequest, HttpResponse, Responder};
 
-use common::request::IncludeParams;
+use common::request::{IncludeParams, PaginationParams};
 use identity::application::role::{GetAll, GetById};
 use identity::application::user::{Search as SearchUser, SearchCommand as SearchUserCommand};
 
@@ -39,18 +39,22 @@ async fn get_by_id(
 async fn get_users(
     req: HttpRequest,
     path: web::Path<String>,
+    cmd: web::Query<SearchUserCommand>,
     include: web::Query<IncludeParams>,
+    pagination: web::Query<PaginationParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
+    let mut cmd = cmd.into_inner();
+    cmd.role_id = Some(path.into_inner());
+
     SearchUser::new(c.identity.role_repo(), c.identity.user_repo())
         .exec(
             auth_id,
-            SearchUserCommand {
-                role_id: Some(path.into_inner()),
-            },
+            cmd,
             include.into_inner().into(),
+            pagination.into_inner(),
         )
         .await
         .map(|res| HttpResponse::Ok().json(res))
