@@ -70,6 +70,7 @@ Filtros:
 - [x] Don't use a default limit in repository (it's a complexity to generate
   reports). Add the default limit in use cases. Or make reports from events.
 - [ ] 'Cancel' publication for content managers
+- [ ] Generated descriptions in scripts/populate.js are longer than limit in value object.
 
 # Progress
 
