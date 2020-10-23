@@ -12,6 +12,8 @@ import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-ge
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { PasswordRewriteComponent } from 'src/app/components/user/password-recovery/password-rewrite/password-rewrite.component';
+import { SubscriptionService } from 'src/app/domain/services/subscription.service';
+import { ReaderService } from 'src/app/domain/services/reader.service';
 
 @Component({
   selector: 'app-perfil-editar',
@@ -31,6 +33,8 @@ export class PerfilEditarComponent implements OnInit {
   // Usuario
   private userId: string;
   public userData: IUser;
+
+  public readerIsSubscribed = false;
 
   // Del formulario
   public formProfile: FormGroup;
@@ -70,8 +74,10 @@ export class PerfilEditarComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private dialog: MatDialog,
+    private readerService: ReaderService,
     private sweetAlertGenericService: SweetAlertGenericMessageService,
-    public readonly swalTargets: SwalPortalTargets
+    public readonly swalTargets: SwalPortalTargets,
+    private subscriptionService: SubscriptionService,
 
   ) {}
 
@@ -83,6 +89,18 @@ export class PerfilEditarComponent implements OnInit {
     this.userId = this.authService.getIdUser();
 
     this.buildFormByIdentityService();
+
+    this.readerService.getSubscription(this.userId).subscribe(
+      (res) => {
+        if (res && res.status.status === 'active') {
+          this.readerIsSubscribed = true;
+        }
+      },
+      (err) => {
+        console.log(err);
+      },
+    );
+
 
   }
 
@@ -254,10 +272,27 @@ export class PerfilEditarComponent implements OnInit {
 
   public onSuscribirse(): void {
 
-    // TODO: Agregar pantalla de suscripción
-    this.sweetAlertGenericService.showUnderConstrucction();
+    if ( this.readerIsSubscribed ) {
+
+      // Desubrirse
+      this.subscriptionService.unsubscribe().subscribe(
+      (res) => {
+        this.readerIsSubscribed = false;
+        // console.log(res);
+      },
+      (err) => {
+        console.error(err);
+      });
+
+    } else {
+
+      // Ir a página de suscripción
+      this.router.navigate(['/plans']);
+
+    }
 
   }
+
 
   public onMedioCobro(): void {
 

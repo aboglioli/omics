@@ -164,10 +164,10 @@ export class SideNavMenuUserComponent implements OnInit {
     this.subscriptionService.unsubscribe().subscribe(
       (res) => {
         this.readerIsSubscribed = false;
-        console.log(res);
+        // console.log(res);
       },
       (err) => {
-        console.log(err);
+        console.error(err);
       }
     )
   }
