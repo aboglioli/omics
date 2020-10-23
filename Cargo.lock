@@ -1334,6 +1334,7 @@ dependencies = [
  "notification",
  "payment",
  "publishing",
+ "reports",
  "sanitize-filename",
  "serde",
  "serde_json",

@@ -21,6 +21,7 @@ identity = { path = "../identity" }
 notification = { path = "../notification" }
 payment = { path = "../payment" }
 publishing = { path = "../publishing" }
+reports = { path = "../reports" }
 shared = { path = "../shared" }
 
 actix-cors = "0.3"
