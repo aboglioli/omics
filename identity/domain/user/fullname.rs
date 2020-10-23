@@ -32,13 +32,17 @@ impl Fullname {
             err = err.add_context("lastname", "too_long");
         }
 
-        match Regex::new("^[a-zA-ZáéíóúñÁÉÍÓÚÑ]+ *[a-zA-ZáéíóúñÁÉÍÓÚÑ]+$") {
+        match Regex::new("^[a-zA-ZáéíóúñüÁÉÍÓÚÑÜ ]+$") {
             Ok(re) => {
                 if !re.is_match(&name) {
-                    err = err.add_context("name", "invalid_characters");
+                    err = err
+                        .add_context("name", "invalid_characters")
+                        .add_context("name.value", &name);
                 }
                 if !re.is_match(&lastname) {
-                    err = err.add_context("lastname", "invalid_characters");
+                    err = err
+                        .add_context("lastname", "invalid_characters")
+                        .add_context("lastname.value", &lastname);
                 }
             }
             Err(_) => {
@@ -84,6 +88,7 @@ mod tests {
         assert!(Fullname::new("Alan Daniel", "Boglioli Caffe").is_ok());
         assert!(Fullname::new("Julián", "Muñoz Velázquez").is_ok());
         assert!(Fullname::new("Ítalo É", "Éáó ú").is_ok());
+        assert!(Fullname::new(" User", "One ").is_ok());
     }
 
     #[test]
@@ -93,6 +98,5 @@ mod tests {
         assert!(Fullname::new("User-Invalid", "One").is_err());
         assert!(Fullname::new("User", "One_Two").is_err());
         assert!(Fullname::new("User", "One@Two").is_err());
-        assert!(Fullname::new(" User", "One ").is_err());
     }
 }

@@ -13,7 +13,7 @@ use common::config::Config;
 use container::MainContainer;
 use handlers::{
     author, category, collection, contract, event, file, notification, payment, plan, publication,
-    reader, role, subscription, user,
+    reader, report, role, subscription, user,
 };
 
 async fn index() -> impl Responder {
@@ -61,7 +61,8 @@ async fn main() -> std::io::Result<()> {
                     .configure(subscription::routes)
                     .configure(contract::routes)
                     .configure(payment::routes)
-                    .configure(notification::routes),
+                    .configure(notification::routes)
+                    .configure(report::routes),
             )
     })
     .bind(format!("0.0.0.0:{}", config.port()))?
