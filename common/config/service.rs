@@ -31,14 +31,29 @@ impl ConfigService {
         return Err(Error::not_found(k));
     }
 
+    pub async fn days_to_generate_summaries(&self) -> Result<u64> {
+        self.get_from_cache("days_to_generate_summaries").await
+    }
+
+    pub async fn donation_percentage_retention(&self) -> Result<f64> {
+        self.get_from_cache("donation_percentage_retention").await
+    }
+
+    pub async fn minimum_charge_amount(&self) -> Result<f64> {
+        self.get_from_cache("minimum_charge_amount").await
+    }
+
     pub async fn minimum_donation_amount(&self) -> Result<f64> {
-        // if let Some(v) = self.cache.get(&"minimum_donation_amount".to_owned()).await {
-        //     return v
-        //         .parse()
-        //         .map_err(|err| Error::bad_format("minimum_donation_amount").wrap_raw(err));
-        // }
-        //
-        // return Err(Error::not_found("minimum_donation_amount"));
         self.get_from_cache("minimum_donation_amount").await
+    }
+
+    pub async fn minimum_views_percentage_to_require_contract(&self) -> Result<f64> {
+        self.get_from_cache("minimum_views_percentage_to_require_contract")
+            .await
+    }
+
+    pub async fn subscription_percentage_retention(&self) -> Result<f64> {
+        self.get_from_cache("subscription_percentage_retention")
+            .await
     }
 }

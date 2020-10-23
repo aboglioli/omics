@@ -1,3 +1,12 @@
+INSERT INTO configuration (key, value)
+VALUES
+  ('days_to_generate_summaries', '10'),
+  ('donation_percentage_retention', '0.3'),
+  ('minimum_charge_amount', '200.0'),
+  ('minimum_donation_amount', '50.0'),
+  ('minimum_views_percentage_to_require_contract', '0.01'),
+  ('subscription_percentage_retention', '0.7');
+
 INSERT INTO roles(id, name, created_at)
 VALUES
   ('admin', 'Administrador', NOW()),
