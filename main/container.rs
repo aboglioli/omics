@@ -3,8 +3,10 @@ use std::sync::Arc;
 use tokio_postgres::NoTls;
 
 use common::config::Config;
+use common::config::ConfigService;
 use common::container::Container;
 use common::event::EventSubscriber;
+use common::infrastructure::cache::PostgresCache;
 use common::infrastructure::event::{InMemEventBus, PostgresEventRepository};
 use common::result::Result;
 use identity::container::IdentityContainer;
@@ -32,6 +34,8 @@ use crate::development::EventLogger;
 pub struct MainContainer {
     pub event_bus: Arc<InMemEventBus>,
     pub event_repo: Arc<PostgresEventRepository>,
+    pub config_serv: Arc<ConfigService>,
+
     pub identity: IdentityContainer<InMemEventBus>,
     pub publishing: PublishingContainer<InMemEventBus>,
     pub payment: PaymentContainer<InMemEventBus>,
@@ -65,6 +69,8 @@ impl MainContainer {
         // Common
         let event_bus = Arc::new(InMemEventBus::new());
         let event_repo = Arc::new(PostgresEventRepository::new(client.clone()));
+        let cache = Arc::new(PostgresCache::new("configuration", client.clone()));
+        let config_serv = Arc::new(ConfigService::new(cache));
 
         // Identity
         let id_role_repo = Arc::new(PostgresRoleRepository::new(client.clone()));
@@ -138,6 +144,8 @@ impl MainContainer {
         MainContainer {
             event_bus,
             event_repo,
+            config_serv,
+
             identity,
             publishing,
             payment,
@@ -164,5 +172,9 @@ impl MainContainer {
 
     pub fn event_repo(&self) -> &PostgresEventRepository {
         &self.event_repo
+    }
+
+    pub fn config_serv(&self) -> &ConfigService {
+        &self.config_serv
     }
 }

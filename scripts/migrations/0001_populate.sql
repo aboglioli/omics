@@ -1,4 +1,4 @@
-INSERT INTO configuration (key, value)
+INSERT INTO configuration(key, value)
 VALUES
   ('days_to_generate_summaries', '10'),
   ('donation_percentage_retention', '0.3'),

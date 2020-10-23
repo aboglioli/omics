@@ -1,6 +1,7 @@
 pub mod author;
 pub mod category;
 pub mod collection;
+pub mod configuration;
 pub mod contract;
 pub mod event;
 pub mod file;
