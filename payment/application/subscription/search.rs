@@ -6,36 +6,34 @@ use serde::{Deserialize, Serialize};
 use common::error::Error;
 use common::request::{Include, PaginationParams, PaginationResponse};
 use common::result::Result;
+use identity::application::dtos::UserDto;
 use identity::domain::user::{UserId, UserRepository};
-use publishing::application::dtos::PublicationDto;
-use publishing::domain::publication::{PublicationId, PublicationRepository};
 
-use crate::application::dtos::ContractDto;
-use crate::domain::contract::{ContractOrderBy, ContractRepository, Status};
+use crate::application::dtos::SubscriptionDto;
+use crate::domain::plan::PlanId;
+use crate::domain::subscription::{Status, SubscriptionOrderBy, SubscriptionRepository};
 
 #[derive(Deserialize)]
 pub struct SearchCommand {
-    pub publication_id: Option<String>,
+    pub user_id: Option<String>,
+    pub plan_id: Option<String>,
     pub status: Option<String>,
     pub date_from: Option<String>,
     pub date_to: Option<String>,
 }
 
 pub struct Search<'a> {
-    contract_repo: &'a dyn ContractRepository,
-    publication_repo: &'a dyn PublicationRepository,
+    subscription_repo: &'a dyn SubscriptionRepository,
     user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Search<'a> {
     pub fn new(
-        contract_repo: &'a dyn ContractRepository,
-        publication_repo: &'a dyn PublicationRepository,
+        subscription_repo: &'a dyn SubscriptionRepository,
         user_repo: &'a dyn UserRepository,
     ) -> Self {
         Search {
-            contract_repo,
-            publication_repo,
+            subscription_repo,
             user_repo,
         }
     }
@@ -46,19 +44,17 @@ impl<'a> Search<'a> {
         cmd: SearchCommand,
         include: Include,
         pagination: PaginationParams,
-    ) -> Result<PaginationResponse<ContractDto>> {
+    ) -> Result<PaginationResponse<SubscriptionDto>> {
         let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-        if !user.is_content_manager() {
+        if !user.is_admin() {
             return Err(Error::unauthorized());
         }
 
-        let pagination_contracts = self
-            .contract_repo
+        let pagination_subscriptions = self
+            .subscription_repo
             .search(
-                cmd.publication_id
-                    .map(PublicationId::new)
-                    .transpose()?
-                    .as_ref(),
+                cmd.user_id.map(UserId::new).transpose()?.as_ref(),
+                cmd.plan_id.map(PlanId::new).transpose()?.as_ref(),
                 cmd.status
                     .map(|s| Status::from_str(&s))
                     .transpose()?
@@ -77,32 +73,23 @@ impl<'a> Search<'a> {
                 pagination.limit(),
                 pagination
                     .order_by()
-                    .map(|o| ContractOrderBy::from_str(&o))
+                    .map(|o| SubscriptionOrderBy::from_str(&o))
                     .transpose()?
                     .as_ref(),
             )
             .await?;
 
-        let mut res = PaginationResponse::from(&pagination_contracts);
-        // let mut res = PaginationResponse::new(
-        //     pagination_contracts.offset(),
-        //     pagination_contracts.limit(),
-        //     pagination_contracts.total(),
-        //     pagination_contracts.matching_criteria(),
-        // );
+        let mut res = PaginationResponse::from(&pagination_subscriptions);
 
-        for contract in pagination_contracts.into_items().into_iter() {
-            let mut contract_dto = ContractDto::from(&contract);
+        for subscription in pagination_subscriptions.into_items().into_iter() {
+            let mut subscription_dto = SubscriptionDto::from(&subscription);
 
-            if include.has("publication") {
-                let publication = self
-                    .publication_repo
-                    .find_by_id(contract.publication_id())
-                    .await?;
-                contract_dto = contract_dto.publication(PublicationDto::from(&publication));
+            if include.has("user") {
+                let user = self.user_repo.find_by_id(subscription.user_id()).await?;
+                subscription_dto = subscription_dto.user(UserDto::from(&user));
             }
 
-            res.add_item(contract_dto);
+            res.add_item(subscription_dto);
         }
 
         Ok(res)

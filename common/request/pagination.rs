@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::config::Config;
+use crate::model::Pagination;
 
 #[derive(Deserialize)]
 pub struct PaginationParams {
@@ -81,5 +82,14 @@ where
     pub fn add_item(&mut self, result: T) {
         self.items.push(result);
         self.count = self.items.len();
+    }
+}
+
+impl<T1, T2> From<&Pagination<T1>> for PaginationResponse<T2>
+where
+    T2: Serialize,
+{
+    fn from(p: &Pagination<T1>) -> Self {
+        PaginationResponse::new(p.offset(), p.limit(), p.total(), p.matching_criteria())
     }
 }

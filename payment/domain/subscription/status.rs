@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use serde::{Deserialize, Serialize};
 
 use common::error::Error;
@@ -20,6 +22,19 @@ impl ToString for Status {
             Status::WaitingForPayment => "waiting-for-payment".to_owned(),
             Status::Active => "active".to_owned(),
             Status::Inactive => "inactive".to_owned(),
+        }
+    }
+}
+
+impl FromStr for Status {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self> {
+        match s {
+            "waiting-for-payment" => Ok(Status::WaitingForPayment),
+            "active" => Ok(Status::Active),
+            "inactive" => Ok(Status::Inactive),
+            _ => Err(Error::new("subscription_status", "invalid")),
         }
     }
 }

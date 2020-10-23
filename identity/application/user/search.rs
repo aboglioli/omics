@@ -1,21 +1,22 @@
-use serde::{Deserialize, Serialize};
+use std::str::FromStr;
+
+use chrono::DateTime;
+use serde::Deserialize;
 
 use common::error::Error;
 use common::request::Include;
+use common::request::{PaginationParams, PaginationResponse};
 use common::result::Result;
 
 use crate::application::dtos::{RoleDto, UserDto};
 use crate::domain::role::{RoleId, RoleRepository};
-use crate::domain::user::{UserId, UserRepository};
+use crate::domain::user::{UserId, UserOrderBy, UserRepository};
 
 #[derive(Deserialize)]
 pub struct SearchCommand {
     pub role_id: Option<String>,
-}
-
-#[derive(Serialize)]
-pub struct SearchResponse {
-    users: Vec<UserDto>,
+    pub date_from: Option<String>,
+    pub date_to: Option<String>,
 }
 
 pub struct Search<'a> {
@@ -36,37 +37,55 @@ impl<'a> Search<'a> {
         auth_id: String,
         cmd: SearchCommand,
         include: Include,
-    ) -> Result<SearchResponse> {
+        pagination: PaginationParams,
+    ) -> Result<PaginationResponse<UserDto>> {
         let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
         if !user.is_admin() {
             return Err(Error::unauthorized());
         }
 
-        let mut users = Vec::new();
+        let pagination_users = self
+            .user_repo
+            .search(
+                cmd.role_id.map(RoleId::new).transpose()?.as_ref(),
+                cmd.date_from
+                    .map(|d| DateTime::from_str(&d))
+                    .transpose()
+                    .map_err(|err| Error::bad_format("date_from").wrap_raw(err))?
+                    .as_ref(),
+                cmd.date_to
+                    .map(|d| DateTime::from_str(&d))
+                    .transpose()
+                    .map_err(|err| Error::bad_format("date_to").wrap_raw(err))?
+                    .as_ref(),
+                pagination.offset(),
+                pagination.limit(),
+                pagination
+                    .order_by()
+                    .map(|o| UserOrderBy::from_str(&o))
+                    .transpose()?
+                    .as_ref(),
+            )
+            .await?;
 
-        if cmd.role_id.is_none() {
-            users.extend(self.user_repo.find_all().await?);
-        } else if let Some(role_id) = cmd.role_id {
-            users.extend(
-                self.user_repo
-                    .find_by_role_id(&RoleId::new(role_id)?)
-                    .await?,
-            );
-        }
+        let mut res = PaginationResponse::new(
+            pagination_users.offset(),
+            pagination_users.limit(),
+            pagination_users.total(),
+            pagination_users.matching_criteria(),
+        );
 
-        let mut user_dtos = Vec::new();
-
-        for user in users.iter() {
-            let mut user_dto = UserDto::from(user);
+        for user in pagination_users.into_items().into_iter() {
+            let mut user_dto = UserDto::from(&user);
 
             if include.has("role") {
                 let role = self.role_repo.find_by_id(user.role_id()).await?;
                 user_dto = user_dto.role(RoleDto::from(&role));
             }
 
-            user_dtos.push(user_dto);
+            res.add_item(user_dto);
         }
 
-        Ok(SearchResponse { users: user_dtos })
+        Ok(res)
     }
 }
