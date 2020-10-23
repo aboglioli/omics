@@ -1,3 +1,4 @@
+use std::str::FromStr;
 use std::sync::Arc;
 
 use crate::cache::Cache;
@@ -18,13 +19,26 @@ impl ConfigService {
         Ok(Config::get())
     }
 
-    pub async fn minimum_donation_amount<S: Into<String>>(&self, k: S) -> Result<f64> {
+    async fn get_from_cache<T>(&self, k: &str) -> Result<T>
+    where
+        T: FromStr,
+        <T as FromStr>::Err: std::error::Error,
+    {
         if let Some(v) = self.cache.get(&k.into()).await {
-            return v
-                .parse()
-                .map_err(|err| Error::bad_format("minimum_donation_amount").wrap_raw(err));
+            return v.parse().map_err(|err| Error::bad_format(k).wrap_raw(err));
         }
 
-        return Err(Error::not_found("minimum_donation_amount"));
+        return Err(Error::not_found(k));
+    }
+
+    pub async fn minimum_donation_amount(&self) -> Result<f64> {
+        // if let Some(v) = self.cache.get(&"minimum_donation_amount".to_owned()).await {
+        //     return v
+        //         .parse()
+        //         .map_err(|err| Error::bad_format("minimum_donation_amount").wrap_raw(err));
+        // }
+        //
+        // return Err(Error::not_found("minimum_donation_amount"));
+        self.get_from_cache("minimum_donation_amount").await
     }
 }
