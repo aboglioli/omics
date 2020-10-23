@@ -82,7 +82,7 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
   public getAllContracts(): void {
     this.contractService.search({ status: 'requested' }, 'publication').subscribe(
       (res) => {
-        this.contracts = res.contracts;
+        this.contracts = res.items;
       },
       (err) => {
         console.log(err);

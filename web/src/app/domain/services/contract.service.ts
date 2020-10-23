@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ConfigService } from './config.service';
-import { IContract } from '../models';
+import { IContract, IPagination } from '../models';
 
 export interface ISearchCommand {
   publication_id?: string;
@@ -12,7 +12,7 @@ export interface ISearchCommand {
   date_to?: string;
   offset?: number;
   limit?: number;
-  order_by?: string; // 'most_viewed' 'most_liked' 'newest' 'best_reviews'
+  order_by?: string; // 'newest' 'oldest'
 }
 
 export interface ISearchResponse {
@@ -27,7 +27,7 @@ export class ContractService {
     this.baseUrl = `${configServ.baseUrl()}/contracts`;
   }
 
-  public search(cmd: ISearchCommand, include: string = ''): Observable<ISearchResponse> {
+  public search(cmd: ISearchCommand, include: string = ''): Observable<IPagination<IContract>> {
     let params = new HttpParams();
 
     if (cmd.publication_id) {
@@ -62,7 +62,7 @@ export class ContractService {
       params = params.append('include', include);
     }
 
-    return this.http.get<ISearchResponse>(this.baseUrl, { params });
+    return this.http.get<IPagination<IContract>>(this.baseUrl, { params });
   }
 
   public approve(id: string): Observable<any> {
