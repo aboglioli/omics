@@ -14,6 +14,19 @@ export interface IGetAllResponse {
   categories: ICategory[];
 }
 
+export interface ICreateCommand {
+  id: string;
+  name: string;
+}
+
+export interface ICreateResponse {
+  id: string;
+}
+
+export interface IUpdateCommand {
+  name: string;
+}
+
 @Injectable()
 export class CategoryService {
   private baseUrl: string;
@@ -48,5 +61,17 @@ export class CategoryService {
     }
 
     return this.http.get<IPagination<ICollection>>(`${this.baseUrl}/${id}/collections`, { params });
+  }
+
+  public create(cmd: ICreateCommand): Observable<any> {
+    return this.http.post<ICreateResponse>(`${this.baseUrl}`, cmd);
+  }
+
+  public update(id: string, cmd: IUpdateCommand): Observable<any> {
+    return this.http.put(`${this.baseUrl}/${id}`, cmd);
+  }
+
+  public delete(id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${id}`);
   }
 }
