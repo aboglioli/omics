@@ -15,6 +15,7 @@ import { NotificationService } from './services/notification.service';
 import { PlanService } from './services/plan.service';
 import { PublicationService } from './services/publication.service';
 import { ReaderService } from './services/reader.service';
+import { ReportService } from "./services/report.service";
 import { SubscriptionService } from './services/subscription.service';
 
 @NgModule({
@@ -36,6 +37,7 @@ import { SubscriptionService } from './services/subscription.service';
     PlanService,
     PublicationService,
     ReaderService,
+    ReportService,
     SubscriptionService,
 
     // Auth interceptor

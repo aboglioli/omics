@@ -9,6 +9,7 @@ export * from './payment';
 export * from './plan';
 export * from './publication';
 export * from './reader';
+export * from "./report";
 export * from './review';
 export * from './statistics';
 export * from './subscription';
