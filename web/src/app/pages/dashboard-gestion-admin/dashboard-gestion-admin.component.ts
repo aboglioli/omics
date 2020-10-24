@@ -1,4 +1,7 @@
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, OnInit } from '@angular/core';
+import { faClone } from '@fortawesome/free-solid-svg-icons';
+import { DashboardGeneralOptionMenu } from 'src/app/models/enums.model';
 
 @Component({
   selector: 'app-dashboard-gestion-admin',
@@ -7,9 +10,37 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DashboardGestionAdminComponent implements OnInit {
 
-  constructor() { }
+  // FontAwesome Icon
+  public faCategory = faClone;
+
+
+  public optionMenu = DashboardGeneralOptionMenu;
+  public currentOption = this.optionMenu.categories; // TODO: En vez de esto, debería usarse "patch child" (esto lo hice por tiempo)
+
+  public isBigScreen = true;
+
+  constructor(
+    private breakpointObserver: BreakpointObserver
+  ) { }
 
   ngOnInit(): void {
+
+    this.checkWidthScreen();
+
+  }
+
+  public onChangeTopMenu( option: number ): void {
+
+  }
+
+  private checkWidthScreen(): void {
+
+    this.breakpointObserver.observe(['(max-width: 950px)']).subscribe(
+      (result: any) => {
+
+        this.isBigScreen = (result.matches) ? false : true;
+
+      });
   }
 
 }

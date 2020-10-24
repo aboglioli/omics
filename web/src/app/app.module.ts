@@ -73,6 +73,7 @@ import { PublicationNewEditComponent } from './pages/deskboard/publication-new-e
 import { CollectionNewEditComponent } from './pages/deskboard/collection-new-edit/collection-new-edit.component';
 import { CollectionInfoComponent } from './pages/collection-info/collection-info.component';
 import { CatalogueFilterComponent } from './components/catalogue-filter/catalogue-filter.component';
+import { AdminCategoriesComponent } from './components/dashboard/admin-categories/admin-categories.component';
 
 
 @NgModule({
@@ -123,7 +124,8 @@ import { CatalogueFilterComponent } from './components/catalogue-filter/catalogu
     CollectionCardAuthorComponent,
     CollectionNewEditComponent,
     CollectionInfoComponent,
-    CatalogueFilterComponent
+    CatalogueFilterComponent,
+    AdminCategoriesComponent,
   ],
   imports: [
     BrowserModule,

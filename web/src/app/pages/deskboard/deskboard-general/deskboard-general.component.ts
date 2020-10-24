@@ -5,7 +5,7 @@ import { IUser } from 'src/app/domain/models';
 import { NgxSpinnerService } from 'ngx-spinner';
 import {BreakpointObserver } from '@angular/cdk/layout';
 import { Router } from '@angular/router';
-import { faBookOpen, faChartPie, faCommentDots, faWallet, faDesktop } from '@fortawesome/free-solid-svg-icons';
+import { faBookOpen, faChartPie, faWallet, faDesktop } from '@fortawesome/free-solid-svg-icons';
 import { DeskboardOptionMenu, typeSearchCatalogue } from '../../../models/enums.model';
 
 

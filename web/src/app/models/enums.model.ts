@@ -8,3 +8,7 @@ export enum typeSearchCatalogue {
   publication,
   collection
 }
+
+export enum DashboardGeneralOptionMenu {
+  categories,
+}

@@ -26,6 +26,7 @@ import { CollectionNewEditComponent } from './pages/deskboard/collection-new-edi
 import { CollectionOwnerGuard } from './guard/collection-owner.guard';
 import { CollectionInfoComponent } from './pages/collection-info/collection-info.component';
 import { PlansComponent } from './pages/plans/plans.component';
+import { AdminGuard } from './guard/admin.guard';
 
 
 const routes: Routes = [
@@ -46,11 +47,11 @@ const routes: Routes = [
   { path: 'profile/:id/editUser', component: PerfilEditarComponent,  canActivate: [AuthLoginGuard, SameUserGuard]},
   { path: 'collection/:id', component: CollectionInfoComponent },
   { path: 'about', component: AboutComponent },
-  { path: 'read/:id', component: VisorComicComponent },
+  { path: 'read/:id', component: VisorComicComponent, canActivate: [AuthLoginGuard] },
   { path: 'dashboard-reportes', component: DashboardReportesComponent },
   { path: 'dashboard-publicaciones-contratos', component: DashboardGestionContratosPublicacionesComponent },
   { path: 'dashboard-reglas-negocio', component: DashboardReglasNegociosComponent },
-  { path: 'dashboard-general', component: DashboardGestionAdminComponent },
+  { path: 'dashboard-general', component: DashboardGestionAdminComponent, canActivate: [AuthLoginGuard, AdminGuard ] },
   { path: 'plans', component: PlansComponent, canActivate: [AuthLoginGuard] },
   { path: '**', pathMatch: 'full', redirectTo: 'home' },
 

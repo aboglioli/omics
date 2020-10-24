@@ -1,1 +1,45 @@
-<app-under-construction></app-under-construction>
+<div class="dashboard-general">
+
+  <div class="side"></div>
+
+  <div class="center">
+
+    <div class="header">
+
+      <h1>Gestionar: </h1>
+
+      <div style="display: flex; justify-content: space-between; margin-left: 1em;">
+
+        <button mat-stroked-button class="button-white-borders pink-hover top-menu"
+                [ngClass]="{'current-menu': ( currentOption === optionMenu.categories )}"
+                (click)="onChangeTopMenu( optionMenu.categories )"
+                >
+
+          <span *ngIf="isBigScreen">
+            <fa-icon [icon]="faCategory" size="2x" style="margin-right: 1em;"></fa-icon>
+            CATEGORÍAS
+          </span>
+
+          <span *ngIf="!isBigScreen">
+            <fa-icon [icon]="faCategory" size="2x" style="margin-right: 0em;"></fa-icon>
+          </span>
+
+        </button>
+
+      </div>
+
+    </div>
+
+    <div class="body" [ngSwitch]="currentOption">
+
+      <div  *ngSwitchCase="optionMenu.categories">
+        <app-admin-categories></app-admin-categories>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="side"></div>
+
+</div>
