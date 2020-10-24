@@ -38,30 +38,4 @@ impl ConfigService {
         self.cache.set(k.into(), v.to_string()).await?;
         Ok(())
     }
-
-    // TODO: delete
-    pub async fn days_to_generate_summaries(&self) -> Result<u64> {
-        self.get("days_to_generate_summaries").await
-    }
-
-    pub async fn donation_percentage_retention(&self) -> Result<f64> {
-        self.get("donation_percentage_retention").await
-    }
-
-    pub async fn minimum_charge_amount(&self) -> Result<f64> {
-        self.get("minimum_charge_amount").await
-    }
-
-    pub async fn minimum_donation_amount(&self) -> Result<f64> {
-        self.get("minimum_donation_amount").await
-    }
-
-    pub async fn minimum_views_percentage_to_require_contract(&self) -> Result<f64> {
-        self.get("minimum_views_percentage_to_require_contract")
-            .await
-    }
-
-    pub async fn subscription_percentage_retention(&self) -> Result<f64> {
-        self.get("subscription_percentage_retention").await
-    }
 }
