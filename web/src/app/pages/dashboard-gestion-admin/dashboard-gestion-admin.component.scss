@@ -59,7 +59,6 @@ div.dashboard-general {
 
       display: flex;
       align-items: center;
-      justify-content: space-between;
 
 
     }
@@ -77,22 +76,39 @@ div.dashboard-general {
 button.button-white-borders {
 
   color: white;
+  padding-top: 0.25em;
 
-  // Pantalla grande
-  @media screen and (min-width: $break-small) {
-    border-color: white;
-  }
+  border-color: white;
+  border-style: solid;
+  border-width: 2px;
 
   &.pink-hover:hover {
 
     background-color: rgba($color: $omics-background-flat, $alpha: 0.2);
     color: $omics-neon-pink;
 
-    // Pantalla grande
-    @media screen and (min-width: $break-small) {
-      border-color: $omics-neon-pink;
-    }
+    border-color: $omics-neon-pink;
 
   }
+
+  &.top-menu {
+
+    flex: 1;
+
+    // Pantalla grande
+    @media screen and (min-width: $break-small) {
+      margin: 0.5em 1em;
+    }
+
+
+  }
+
+  &.current-menu {
+
+    color: $omics-aqua-button;
+    border-color: $omics-aqua-button;
+
+  }
+
 
 }
