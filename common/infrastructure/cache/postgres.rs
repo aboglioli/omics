@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use serde::de::DeserializeOwned;
+use serde::{Serialize};
 
 use tokio_postgres::types::ToSql;
 use tokio_postgres::Client;
@@ -24,7 +25,7 @@ impl PostgresCache {
 impl<K, V> Cache<K, V> for PostgresCache
 where
     K: ToSql + Sync + Send + 'static,
-    V: ToSql + DeserializeOwned + Sync + Send + 'static,
+    V: Serialize + DeserializeOwned + Sync + Send + 'static,
 {
     async fn get(&self, k: &K) -> Option<V> {
         let row = self
@@ -59,12 +60,14 @@ where
             .await
             .is_err();
 
+        let value = serde_json::to_value(v)?;
+
         if create {
             self.client
                 .execute(
                     "INSERT INTO cache(key, value)
                     VALUES ($1, $2)",
-                    &[&k, &v],
+                    &[&k, &value],
                 )
                 .await
                 .map_err(|err| Error::new("cache", "create").wrap_raw(err))?;
@@ -75,7 +78,7 @@ where
                     SET
                         value = $2
                     WHERE key = $1",
-                    &[&k, &v],
+                    &[&k, &value],
                 )
                 .await
                 .map_err(|err| Error::new("cache", "update").wrap_raw(err))?;
