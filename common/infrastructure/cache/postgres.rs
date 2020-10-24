@@ -1,7 +1,9 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
+use serde::de::DeserializeOwned;
 
+use tokio_postgres::types::ToSql;
 use tokio_postgres::Client;
 
 use crate::cache::Cache;
@@ -9,92 +11,88 @@ use crate::error::Error;
 use crate::result::Result;
 
 pub struct PostgresCache {
-    table: String,
     client: Arc<Client>,
 }
 
 impl PostgresCache {
-    pub fn new<S: Into<String>>(table: S, client: Arc<Client>) -> Self {
-        PostgresCache {
-            table: table.into(),
-            client,
-        }
+    pub fn new(client: Arc<Client>) -> Self {
+        PostgresCache { client }
     }
 }
 
 #[async_trait]
-impl Cache<String, String> for PostgresCache {
-    async fn get(&self, k: &String) -> Option<String> {
+impl<K, V> Cache<K, V> for PostgresCache
+where
+    K: ToSql + Sync + Send + 'static,
+    V: ToSql + DeserializeOwned + Sync + Send + 'static,
+{
+    async fn get(&self, k: &K) -> Option<V> {
         let row = self
             .client
             .query_one(
-                &format!(
-                    "SELECT value FROM {}
-                    WHERE key = $1",
-                    self.table,
-                ) as &str,
+                "SELECT value FROM cache
+                WHERE key = $1",
                 &[&k],
             )
             .await
             .ok();
 
         if let Some(row) = row {
-            let value: Option<String> = row.try_get("value").ok();
-
-            if value.is_some() {
-                return value;
+            if let Ok(value) = row.try_get("value") {
+                if let Ok(value) = serde_json::from_value(value) {
+                    return Some(value);
+                }
             }
         }
 
         None
     }
 
-    async fn set(&self, k: String, v: String) -> Result<()> {
-        let create = self.get(&k).await.is_none();
+    async fn set(&self, k: K, v: V) -> Result<()> {
+        let create = self
+            .client
+            .query_one(
+                "SELECT value FROM cache
+                WHERE key = $1",
+                &[&k],
+            )
+            .await
+            .is_err();
 
         if create {
             self.client
                 .execute(
-                    &format!(
-                        "INSERT INTO {}(key, value)
-                        VALUES ($1, $2)",
-                        self.table,
-                    ) as &str,
+                    "INSERT INTO cache(key, value)
+                    VALUES ($1, $2)",
                     &[&k, &v],
                 )
                 .await
-                .map_err(|err| Error::new(&self.table as &str, "create").wrap_raw(err))?;
+                .map_err(|err| Error::new("cache", "create").wrap_raw(err))?;
         } else {
             self.client
                 .execute(
-                    &format!(
-                        "UPDATE {}
-                        SET
-                            value = $2
-                        WHERE key = $1",
-                        self.table,
-                    ) as &str,
+                    "UPDATE cache
+                    SET
+                        value = $2
+                    WHERE key = $1",
                     &[&k, &v],
                 )
                 .await
-                .map_err(|err| Error::new(&self.table as &str, "update").wrap_raw(err))?;
+                .map_err(|err| Error::new("cache", "update").wrap_raw(err))?;
         }
 
         Ok(())
     }
 
-    async fn delete(&self, k: &String) -> Result<()> {
+    async fn delete(&self, k: &K) -> Result<()> {
         self.client
             .execute(
-                &format!(
-                    "DELETE FROM {}
-                    WHERE key = $1",
-                    self.table,
-                ) as &str,
+                "DELETE FROM cache
+                WHERE key = $1",
                 &[&k],
             )
             .await
-            .map_err(|err| Error::new(&self.table as &str, "delete").wrap_raw(err))?;
+            .map_err(|err| Error::new("cache", "delete").wrap_raw(err))?;
 
         Ok(())
     }

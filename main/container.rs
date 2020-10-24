@@ -69,7 +69,7 @@ impl MainContainer {
         // Common
         let event_bus = Arc::new(InMemEventBus::new());
         let event_repo = Arc::new(PostgresEventRepository::new(client.clone()));
-        let cache = Arc::new(PostgresCache::new("configuration", client.clone()));
+        let cache = Arc::new(PostgresCache::new(client.clone()));
         let config_serv = Arc::new(ConfigService::new(cache));
 
         // Identity
