@@ -1,0 +1,157 @@
+@import "src/scss/vars";
+
+div.parent {
+
+  display: flex;
+  flex-direction: column;
+
+  .form-category {
+
+    margin: 1em 2em;
+    background-color: $omics-background-flat;
+
+    display: flex;
+    flex-direction: column;
+
+    .header {
+
+      background-color: $omics-background-menu;
+      padding: 0.5em 1em;
+
+    }
+
+    .body {
+
+      display: flex;
+
+      // Pantalla grande
+      @media screen and (min-width: $break-small) {
+        flex-direction: row;
+      }
+
+      // Mobile size
+      @media screen and (max-width: $break-small) {
+        flex-direction: column;
+      }
+
+      min-height: 50px;
+
+    }
+
+  }
+
+  mat-chip {
+
+    padding: 1.5em;
+    fa-icon {
+
+      color: $omics-background-flat;
+      margin-right: 0.25em;
+
+      cursor: pointer;
+
+      &:hover {
+        color: $omics-neon-pink;
+      }
+
+    }
+
+    mat-icon:hover {
+      color: $omics-neon-pink;
+    }
+
+  }
+
+}
+
+// General
+
+div.block-field {
+
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin: 1em 2em;
+  min-width: 200px;
+
+  div.input-field-row {
+
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    div.title-and-error {
+
+      display: flex;
+      justify-content: space-between;
+
+      p.text-danger {
+        text-align: end;
+        font-weight: 500;
+        font-size: medium;
+        margin: 0;
+      }
+
+      p.field-name {
+        display: flex;
+        align-items: center;
+        margin: 0px;
+        margin-right: 1em;
+
+        font-weight: bold;
+        font-size: initial;
+
+      }
+
+    }
+
+  }
+
+  .text-area {
+    margin-top: 0.5em;
+
+    ::ng-deep div.mat-form-field-flex {
+      background-color: white;
+      color: black;
+      border-radius: 6px;
+    }
+  }
+
+  mat-radio-group {
+
+    display: flex;
+    flex-direction: row;
+    background-color: white;
+    color: black;
+    border-radius: 6px;
+
+    mat-radio-button {
+      margin: 1em 1em;
+    }
+
+  }
+
+  mat-form-field.matDate {
+
+    max-width: 296px;
+
+    ::ng-deep div.mat-form-field-flex {
+      background-color: white;
+      color: black;
+    }
+  }
+
+
+}
+
+button.button-white-borders {
+
+  color: white;
+  &:hover {
+    box-shadow: inset 0px 0px 0px 2px white;
+    font-weight: bold;
+  }
+
+  padding-top: 0.1em;
+
+}

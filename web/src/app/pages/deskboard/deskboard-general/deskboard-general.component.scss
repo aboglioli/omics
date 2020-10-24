@@ -37,7 +37,7 @@ div.deskboard-body {
     color: white;
     background-color: $omics-background-button;
 
-    // Mobile size
+    // Pantalla grande
     @media screen and (min-width: $break-small) {
       box-shadow: 0px 22px 15px 8px $omics-neon-pink;
     }

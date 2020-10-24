@@ -11,4 +11,5 @@ export enum typeSearchCatalogue {
 
 export enum DashboardGeneralOptionMenu {
   categories,
+  tags
 }

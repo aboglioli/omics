@@ -6,10 +6,11 @@
 
     <div class="header">
 
-      <h1>Gestionar: </h1>
+      <h1 style="margin: 0;">Gestionar: </h1>
 
       <div style="display: flex; justify-content: space-between; margin-left: 1em;">
 
+        <!-- Categorias -->
         <button mat-stroked-button class="button-white-borders pink-hover top-menu"
                 [ngClass]="{'current-menu': ( currentOption === optionMenu.categories )}"
                 (click)="onChangeTopMenu( optionMenu.categories )"
@@ -26,6 +27,25 @@
 
         </button>
 
+        <!-- Etiquetas -->
+        <!--
+        <button mat-stroked-button class="button-white-borders pink-hover top-menu"
+                [ngClass]="{'current-menu': ( currentOption === optionMenu.tags )}"
+                (click)="onChangeTopMenu( optionMenu.tags )"
+                >
+
+          <span *ngIf="isBigScreen">
+            <fa-icon [icon]="faTag" size="2x" style="margin-right: 1em;"></fa-icon>
+            Etiquetas
+          </span>
+
+          <span *ngIf="!isBigScreen">
+            <fa-icon [icon]="faTag" size="2x" style="margin-right: 0em;"></fa-icon>
+          </span>
+
+        </button>
+        -->
+
       </div>
 
     </div>
@@ -34,6 +54,10 @@
 
       <div  *ngSwitchCase="optionMenu.categories">
         <app-admin-categories></app-admin-categories>
+      </div>
+
+      <div  *ngSwitchCase="optionMenu.tags">
+        <app-admin-tags></app-admin-tags>
       </div>
 
     </div>

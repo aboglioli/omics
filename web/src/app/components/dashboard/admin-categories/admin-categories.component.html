@@ -1,1 +1,89 @@
-<p>admin-categories works!</p>
+<div class="parent">
+
+  <div class="form-category">
+
+    <div class="header">
+      <h1 style="margin: 0;">Agregar categoría nueva:</h1>
+    </div>
+
+    <form class="body" [formGroup]="formCategory">
+
+      <!-- Block: campo nombre -->
+      <div class="block-field">
+
+        <div class="input-field-row">
+
+        <div class="title-and-error">
+          <p class="field-name">Nombre: </p>
+
+          <!-- mensaje de error -->
+          <p  *ngIf="nombreNovalido"
+              class="form-text text-danger">
+              Ingrese un nombre de al menos 2 caracteres
+          </p>
+        </div>
+
+        </div>
+
+        <!-- Input text -->
+        <input  class="form-control"
+                type="text"
+                placeholder="Nombre categoría"
+                formControlName="name"
+                [class.is-invalid]="nombreNovalido">
+
+
+      </div>
+
+      <button mat-flat-button
+              color="accent"
+              class="button-white-borders"
+              style="margin: 1em"
+              [disabled]="formCategory.invalid"
+              (click)="onSubmitForm()">
+
+        <span *ngIf="!isEditCategory">
+          <fa-icon  [icon]="faAdd" size="1x"></fa-icon>
+          Agregar
+        </span>
+
+        <span *ngIf="isEditCategory">
+          <fa-icon  [icon]="faEdit" size="1x"></fa-icon>
+          Editar
+        </span>
+
+      </button>
+
+      <button mat-flat-button
+              color="warn"
+              class="button-white-borders"
+              style="margin: 1em"
+              (click)="resetForm()">
+
+        <fa-icon  [icon]="faCancel" size="1x"></fa-icon>
+        Cancelar
+      </button>
+
+    </form>
+
+  </div>
+
+  <mat-chip-list #chipTagList aria-label="Tag selection">
+
+    <mat-chip *ngFor="let category of categoryList, let i = index"
+              [selectable]="false"
+              [removable]="true"
+              (removed)="removeCategory(category, i)">
+
+      <fa-icon  [icon]="faEdit"
+                (click)="editCategory(category, i)">
+      </fa-icon>
+
+        <h2 style="margin: 0;">{{ category.name }}</h2>
+
+      <mat-icon matChipRemove>cancel</mat-icon>
+    </mat-chip>
+
+  </mat-chip-list>
+
+</div>
