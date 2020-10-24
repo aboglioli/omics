@@ -1,0 +1,162 @@
+mod status;
+pub use status::*;
+
+use common::error::Error;
+use common::model::{AggregateRoot, Events, StatusHistory, StringId};
+use common::result::Result;
+use identity::domain::user::UserId;
+use publishing::domain::author::Author;
+use publishing::domain::reader::Reader;
+use shared::event::DonationEvent;
+
+use crate::domain::payment::{Amount, Kind, Payment};
+
+pub type DonationId = StringId;
+
+#[derive(Debug, Clone)]
+pub struct Donation {
+    base: AggregateRoot<DonationId>,
+    events: Events<DonationEvent>,
+    author_id: UserId,
+    reader_id: UserId,
+    reader_username: String,
+    amount: Amount,
+    comment: String,
+    payment: Option<Payment>,
+    status_history: StatusHistory<Status>,
+}
+
+impl Donation {
+    pub fn new<S: Into<String>>(
+        id: DonationId,
+        author: &Author,
+        reader: &Reader,
+        amount: Amount,
+        comment: S,
+    ) -> Result<Self> {
+        let mut donation = Donation {
+            base: AggregateRoot::new(id),
+            events: Events::new(),
+            author_id: author.base().id().clone(),
+            reader_id: reader.base().id().clone(),
+            reader_username: reader.username().to_string(),
+            amount,
+            comment: comment.into(),
+            payment: None,
+            status_history: StatusHistory::new(Status::init()),
+        };
+
+        donation.events.record_event(DonationEvent::Created {
+            id: donation.base().id().to_string(),
+            author_id: donation.author_id().to_string(),
+            reader_id: donation.reader_id().to_string(),
+            amount: donation.amount().value(),
+            comment: donation.comment().to_string(),
+        });
+
+        Ok(donation)
+    }
+
+    pub fn build(
+        base: AggregateRoot<DonationId>,
+        author_id: UserId,
+        reader_id: UserId,
+        reader_username: String,
+        amount: Amount,
+        comment: String,
+        payment: Option<Payment>,
+        status_history: StatusHistory<Status>,
+    ) -> Self {
+        Donation {
+            base,
+            events: Events::new(),
+            author_id,
+            reader_id,
+            reader_username,
+            amount,
+            comment,
+            payment,
+            status_history,
+        }
+    }
+
+    pub fn base(&self) -> &AggregateRoot<DonationId> {
+        &self.base
+    }
+
+    pub fn events(&self) -> &Events<DonationEvent> {
+        &self.events
+    }
+
+    pub fn author_id(&self) -> &UserId {
+        &self.author_id
+    }
+
+    pub fn reader_id(&self) -> &UserId {
+        &self.reader_id
+    }
+
+    pub fn reader_username(&self) -> &str {
+        &self.reader_username
+    }
+
+    pub fn amount(&self) -> &Amount {
+        &self.amount
+    }
+
+    pub fn comment(&self) -> &str {
+        &self.comment
+    }
+
+    pub fn payment(&self) -> Option<&Payment> {
+        self.payment.as_ref()
+    }
+
+    pub fn status_history(&self) -> &StatusHistory<Status> {
+        &self.status_history
+    }
+
+    pub fn is_paid(&self) -> bool {
+        matches!(self.status_history.current(), Status::Paid) && self.payment.is_some()
+    }
+
+    pub fn pay(&mut self) -> Result<Payment> {
+        if self.is_paid() {
+            return Err(Error::new("donation", "already_paid"));
+        }
+
+        let payment = Payment::new(Kind::Income, self.amount().clone())?;
+
+        let status = self.status_history.current().pay()?;
+        self.status_history.add_status(status);
+
+        self.payment = Some(payment.clone());
+
+        self.events.record_event(DonationEvent::Paid {
+            id: self.base().id().to_string(),
+            author_id: self.author_id().to_string(),
+            reader_id: self.reader_id().to_string(),
+            amount: self.amount().value(),
+            comment: self.comment().to_string(),
+        });
+
+        Ok(payment)
+    }
+
+    pub fn cancel(&mut self) -> Result<()> {
+        let status = self.status_history.current().cancel()?;
+        self.status_history.add_status(status);
+
+        self.base.delete();
+
+        self.events.record_event(DonationEvent::Cancelled {
+            id: self.base().id().to_string(),
+            author_id: self.author_id().to_string(),
+            reader_id: self.reader_id().to_string(),
+            amount: self.amount().value(),
+            comment: self.comment().to_string(),
+        });
+
+        Ok(())
+    }
+}

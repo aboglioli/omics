@@ -11,7 +11,7 @@ use crate::domain::plan::{PlanId, PlanRepository};
 use crate::domain::subscription::{Status, Subscription, SubscriptionRepository};
 
 #[derive(Serialize)]
-pub struct SubscriptionCommand {
+pub struct SubscriptionResponse {
     id: String,
     payment_link: String,
 }
@@ -46,7 +46,7 @@ impl<'a> Subscribe<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, plan_id: String) -> Result<SubscriptionCommand> {
+    pub async fn exec(&self, auth_id: String, plan_id: String) -> Result<SubscriptionResponse> {
         let user_id = UserId::new(auth_id)?;
         let user = self.user_repo.find_by_id(&user_id).await?;
         let reader = self.reader_repo.find_by_id(&user_id).await?;
@@ -86,7 +86,7 @@ impl<'a> Subscribe<'a> {
             .publish_all(subscription.events().to_vec()?)
             .await?;
 
-        Ok(SubscriptionCommand {
+        Ok(SubscriptionResponse {
             id: subscription.base().id().to_string(),
             payment_link,
         })
