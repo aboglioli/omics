@@ -1,4 +1,5 @@
 export * from './author';
+export * from "./business-rules";
 export * from './category';
 export * from './collection';
 export * from './contract';

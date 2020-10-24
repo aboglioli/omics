@@ -4,6 +4,7 @@ import { NgModule } from '@angular/core';
 
 import { AuthorService } from './services/author.service';
 import { AuthService, AuthInterceptor } from './services/auth.service';
+import { BusinessRulesService } from './services/business-rules.service';
 import { CategoryService } from './services/category.service';
 import { CollectionService } from './services/collection.service';
 import { ConfigService } from './services/config.service';
@@ -24,16 +25,17 @@ import { SubscriptionService } from './services/subscription.service';
   providers: [
     AuthorService,
     AuthService,
+    BusinessRulesService,
     CategoryService,
     CollectionService,
     ConfigService,
+    ContractService,
     FileService,
     IdentityService,
     NotificationService,
+    PlanService,
     PublicationService,
     ReaderService,
-    PlanService,
-    ContractService,
     SubscriptionService,
 
     // Auth interceptor
