@@ -64,7 +64,7 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
       (res) => {
 
         this.publicationList = res.items;
-        console.log(this.publicationList);
+        // console.log(this.publicationList);
 
         this.spinnerService.hide();
 

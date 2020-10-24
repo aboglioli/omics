@@ -30,9 +30,11 @@
 
     </div>
 
-    <div class="body">
+    <div class="body" [ngSwitch]="currentOption">
 
-
+      <div  *ngSwitchCase="optionMenu.categories">
+        <app-admin-categories></app-admin-categories>
+      </div>
 
     </div>
 
