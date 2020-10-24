@@ -3,6 +3,8 @@ mod repository;
 pub use name::*;
 pub use repository::*;
 
+use slug::slugify;
+
 use common::model::{AggregateRoot, Events, StringId};
 use common::result::Result;
 use shared::event::CategoryEvent;
@@ -17,7 +19,10 @@ pub struct Category {
 }
 
 impl Category {
-    pub fn new(id: CategoryId, name: Name) -> Result<Self> {
+    pub fn new(name: Name) -> Result<Self> {
+        let id = slugify(name.value());
+        let id = CategoryId::new(id)?;
+
         let mut category = Category {
             base: AggregateRoot::new(id),
             events: Events::new(),

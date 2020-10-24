@@ -101,19 +101,21 @@ where
     where
         ES: EventSubscriber + Sync + Send,
     {
-        let _config = Config::get();
+        let config = Config::get();
 
-        let registered_handler = RegisteredHandler::new(self.email_serv.clone());
-        event_sub.subscribe(Box::new(registered_handler)).await?;
+        if config.env() == "production" {
+            let registered_handler = RegisteredHandler::new(self.email_serv.clone());
+            event_sub.subscribe(Box::new(registered_handler)).await?;
 
-        let approved_rejected_publication_handler = ApprovedRejectedPublicationHandler::new(
-            self.publication_repo.clone(),
-            self.user_repo.clone(),
-            self.email_serv.clone(),
-        );
-        event_sub
-            .subscribe(Box::new(approved_rejected_publication_handler))
-            .await?;
+            let approved_rejected_publication_handler = ApprovedRejectedPublicationHandler::new(
+                self.publication_repo.clone(),
+                self.user_repo.clone(),
+                self.email_serv.clone(),
+            );
+            event_sub
+                .subscribe(Box::new(approved_rejected_publication_handler))
+                .await?;
+        }
 
         let notification_handler = NotificationHandler::new(
             self.author_repo.clone(),

@@ -89,12 +89,8 @@ pub fn collection(
     collection
 }
 
-pub fn category(id: &str, name: &str) -> Category {
-    Category::new(
-        CategoryId::new(id).unwrap(),
-        CategoryName::new(name).unwrap(),
-    )
-    .unwrap()
+pub fn category(_id: &str, name: &str) -> Category {
+    Category::new(CategoryName::new(name).unwrap()).unwrap()
 }
 
 pub fn author(id: &str, username: &str) -> Author {

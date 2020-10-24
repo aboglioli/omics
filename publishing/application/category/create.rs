@@ -5,7 +5,7 @@ use common::event::EventPublisher;
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
 
-use crate::domain::category::{Category, CategoryId, CategoryRepository, Name};
+use crate::domain::category::{Category, CategoryRepository, Name};
 
 #[derive(Serialize)]
 pub struct CreateResponse {
@@ -14,7 +14,6 @@ pub struct CreateResponse {
 
 #[derive(Deserialize)]
 pub struct CreateCommand {
-    id: String,
     name: String,
 }
 
@@ -44,13 +43,16 @@ impl<'a> Create<'a> {
             return Err(Error::unauthorized());
         }
 
-        let category_id = CategoryId::new(cmd.id)?;
+        let mut category = Category::new(Name::new(cmd.name)?)?;
 
-        if self.category_repo.find_by_id(&category_id).await.is_ok() {
+        if self
+            .category_repo
+            .find_by_id(category.base().id())
+            .await
+            .is_ok()
+        {
             return Err(Error::new("category", "already_exists"));
         }
-
-        let mut category = Category::new(category_id, Name::new(cmd.name)?)?;
 
         self.category_repo.save(&mut category).await?;
 

@@ -15,7 +15,6 @@ export interface IGetAllResponse {
 }
 
 export interface ICreateCommand {
-  id: string;
   name: string;
 }
 
