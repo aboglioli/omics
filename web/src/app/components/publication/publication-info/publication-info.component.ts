@@ -15,7 +15,7 @@ import { ReaderService } from '../../../domain/services/reader.service';
 import { AuthService } from '../../../domain/services/auth.service';
 import { IContract } from '../../../domain/models/contract';
 import { IdentityService } from '../../../domain/services/identity.service';
-import { IUser } from '../../../domain/models/user';
+import { LoginRegisterComponent } from '../../user/login-register/login-register.component';
 
 export interface DialogData {
   idPublication: string;
@@ -38,6 +38,8 @@ export class PublicationInfoComponent implements OnInit {
   public faVistas = faEye;
   public faStarFill = faStar;
 
+
+  public isUserLogIn = false;
   public ratingPublication = 0;
   private oldRatingPublication = this.ratingPublication;
   public publication: IPublication;
@@ -80,20 +82,33 @@ export class PublicationInfoComponent implements OnInit {
 
     this.getPublicationInfo();
 
-    this.readerService.getSubscription('me').subscribe(
-      (res) => {
-        this.readerIsSubscribed = res.status.status === 'active';
-      },
-      (err) => {
-        console.log(err);
-      },
-    );
+    // Comprobar info de usuario si esta logueado
+    if ( this.authService.isLoggedIn() ) {
 
-    this.identityService.getById('me').subscribe(
-      (res) => {
-        this.readerIsContentManager = res.role_id === 'admin' || res.role_id === 'content-manager';
-      },
-    );
+      this.isUserLogIn = true;
+
+      // Comprobar estado suscripción usuario
+      this.readerService.getSubscription('me').subscribe(
+        (res) => {
+          this.readerIsSubscribed = res.status.status === 'active';
+        },
+        (err) => {
+          console.error(err);
+        },
+      );
+
+      // Comprobar si el usuario no es un administrador
+      this.identityService.getById('me').subscribe(
+        (res) => {
+          this.readerIsContentManager = res.role_id === 'admin' || res.role_id === 'content-manager';
+        },
+        (err: Error) => {
+          console.error(err);
+
+        }
+      );
+
+    }
 
   }
 
@@ -105,17 +120,27 @@ export class PublicationInfoComponent implements OnInit {
         const loggedInUserId = this.authService.getIdUser();
         this.readerIsAuthor = resPub.publication.author.id === loggedInUserId;
 
-        this.publicationService.canRequestContract(this.data.idPublication).subscribe(
-          (res) => {
-            this.canRequestContract = res.can_request;
-          },
-        );
+        if ( this.isUserLogIn  ) {
 
-        this.publicationService.getContract(this.data.idPublication).subscribe(
-          (res) => {
-            this.contract = res;
-          },
-        )
+          this.publicationService.canRequestContract(this.data.idPublication).subscribe(
+            (res) => {
+              this.canRequestContract = res.can_request;
+            },
+            (err: Error) => {
+              console.error(err);
+            }
+          );
+
+          this.publicationService.getContract(this.data.idPublication).subscribe(
+            (res) => {
+              this.contract = res;
+            },
+            (err: Error) => {
+              console.error(err);
+            }
+          );
+
+        }
 
         // console.log('TEST > ', resPub);
 
@@ -273,7 +298,11 @@ export class PublicationInfoComponent implements OnInit {
       (res) => {
         this.getPublicationInfo();
       }
-    )
+    );
+  }
+
+  public onGoToLogIn(): void {
+    const dialogRef = this.dialog.open(LoginRegisterComponent);
   }
 
   public subscribe(): void {

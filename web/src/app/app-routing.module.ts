@@ -46,7 +46,7 @@ const routes: Routes = [
   { path: 'profile/:id/editUser', component: PerfilEditarComponent,  canActivate: [AuthLoginGuard, SameUserGuard]},
   { path: 'collection/:id', component: CollectionInfoComponent },
   { path: 'about', component: AboutComponent },
-  { path: 'read/:id', component: VisorComicComponent },
+  { path: 'read/:id', component: VisorComicComponent, canActivate: [AuthLoginGuard] },
   { path: 'dashboard-reportes', component: DashboardReportesComponent },
   { path: 'dashboard-publicaciones-contratos', component: DashboardGestionContratosPublicacionesComponent },
   { path: 'dashboard-reglas-negocio', component: DashboardReglasNegociosComponent },
