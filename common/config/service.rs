@@ -1,41 +1,31 @@
-use std::str::FromStr;
 use std::sync::Arc;
 
 use crate::cache::Cache;
 
+use crate::config::BusinessRules;
 use crate::error::Error;
 use crate::result::Result;
 
 pub struct ConfigService {
-    cache: Arc<dyn Cache<String, String>>,
+    cache: Arc<dyn Cache<String, BusinessRules>>,
 }
 
 impl ConfigService {
-    pub fn new(cache: Arc<dyn Cache<String, String>>) -> Self {
+    pub fn new(cache: Arc<dyn Cache<String, BusinessRules>>) -> Self {
         ConfigService { cache }
     }
 
-    pub async fn get<K, V>(&self, k: K) -> Result<V>
-    where
-        V: FromStr,
-        <V as FromStr>::Err: std::error::Error,
-        K: Into<String>,
-    {
-        let k: String = k.into();
-
-        if let Some(v) = self.cache.get(&k).await {
-            return v.parse().map_err(|err| Error::bad_format(k).wrap_raw(err));
+    pub async fn get_business_rules(&self) -> Result<BusinessRules> {
+        if let Some(business_rules) = self.cache.get(&"business_rules".to_owned()).await {
+            return Ok(business_rules);
         }
 
-        return Err(Error::not_found(k));
+        Err(Error::not_found("business_rules"))
     }
 
-    pub async fn set<K, V>(&self, k: K, v: V) -> Result<()>
-    where
-        K: Into<String>,
-        V: ToString,
-    {
-        self.cache.set(k.into(), v.to_string()).await?;
-        Ok(())
+    pub async fn save_business_rules(&self, business_rules: BusinessRules) -> Result<()> {
+        self.cache
+            .set("business_rules".to_owned(), business_rules)
+            .await
     }
 }

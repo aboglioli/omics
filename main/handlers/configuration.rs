@@ -1,13 +1,14 @@
 use actix_web::{get, put, web, HttpRequest, HttpResponse, Responder};
 
+use common::config::BusinessRules;
+
 use crate::application::configuration::{Get, Update};
-use crate::application::dtos::ConfigurationDto;
 use crate::authorization::auth;
 use crate::container::MainContainer;
 use crate::error::PublicError;
 
 #[get("")]
-async fn get_all(c: web::Data<MainContainer>) -> impl Responder {
+async fn get_business_rules(c: web::Data<MainContainer>) -> impl Responder {
     Get::new(c.config_serv())
         .exec()
         .await
@@ -16,9 +17,9 @@ async fn get_all(c: web::Data<MainContainer>) -> impl Responder {
 }
 
 #[put("")]
-async fn update(
+async fn update_business_rules(
     req: HttpRequest,
-    cmd: web::Json<ConfigurationDto>,
+    cmd: web::Json<BusinessRules>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
@@ -33,7 +34,7 @@ async fn update(
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/configuration")
-            .service(get_all)
-            .service(update),
+            .service(get_business_rules)
+            .service(update_business_rules),
     );
 }

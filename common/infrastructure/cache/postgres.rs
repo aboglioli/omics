@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use serde::de::DeserializeOwned;
-use serde::{Serialize};
+use serde::Serialize;
 
 use tokio_postgres::types::ToSql;
 use tokio_postgres::Client;
