@@ -2,9 +2,10 @@ use serde::Serialize;
 
 use common::model::StatusItem;
 use identity::application::dtos::UserDto;
-use publishing::application::dtos::{PublicationDto, StatisticsDto};
+use publishing::application::dtos::{AuthorDto, PublicationDto, ReaderDto, StatisticsDto};
 
 use crate::domain::contract::{Contract, Status as ContractStatus, Summary};
+use crate::domain::donation::{Donation, Status as DonationStatus};
 use crate::domain::payment::Payment;
 use crate::domain::plan::Plan;
 use crate::domain::subscription::{Status as SubscriptionStatus, Subscription, SubscriptionPlan};
@@ -193,6 +194,66 @@ impl ContractDto {
     pub fn publication(mut self, publication: PublicationDto) -> Self {
         self.publication_id = None;
         self.publication = Some(publication);
+        self
+    }
+}
+
+#[derive(Serialize)]
+pub struct DonationStatusDto {
+    pub status: String,
+    pub changed_at: String,
+}
+
+impl DonationStatusDto {
+    pub fn from(status_item: &StatusItem<DonationStatus>) -> Self {
+        let status = status_item.status();
+
+        DonationStatusDto {
+            status: status.to_string(),
+            changed_at: status_item.datetime().to_rfc3339(),
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct DonationDto {
+    pub id: String,
+    pub author_id: Option<String>,
+    pub author: Option<AuthorDto>,
+    pub reader_id: Option<String>,
+    pub reader: Option<ReaderDto>,
+    pub amount: f64,
+    pub comment: String,
+    pub reader_payment: Option<PaymentDto>,
+    pub author_charge: Option<PaymentDto>,
+    pub status: DonationStatusDto,
+}
+
+impl DonationDto {
+    pub fn from(donation: &Donation) -> Self {
+        DonationDto {
+            id: donation.base().id().to_string(),
+            author_id: Some(donation.author_id().to_string()),
+            author: None,
+            reader_id: Some(donation.reader_id().to_string()),
+            reader: None,
+            amount: donation.amount().value(),
+            comment: donation.comment().to_string(),
+            reader_payment: donation.reader_payment().map(PaymentDto::from),
+            author_charge: donation.author_charge().map(PaymentDto::from),
+            status: DonationStatusDto::from(donation.status_history().current_item()),
+        }
+    }
+
+    pub fn author(mut self, author: AuthorDto) -> Self {
+        self.author_id = None;
+        self.author = Some(author);
+        self
+    }
+
+    pub fn reader(mut self, reader: ReaderDto) -> Self {
+        self.reader_id = None;
+        self.reader = Some(reader);
         self
     }
 }

@@ -1,9 +1,10 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use common::event::EventPublisher;
+use common::result::Result;
 use identity::domain::user::UserRepository;
-use publishing::domain::reader::{ReaderId, ReaderRepository};
 use publishing::domain::author::{AuthorId, AuthorRepository};
+use publishing::domain::reader::{ReaderId, ReaderRepository};
 
 use crate::domain::donation::{Donation, DonationRepository};
 use crate::domain::payment::{Amount, PaymentService};
@@ -42,7 +43,7 @@ impl<'a> Donate<'a> {
     ) -> Self {
         Donate {
             event_pub,
-            author_Repo,
+            author_repo,
             donation_repo,
             reader_repo,
             user_repo,
@@ -50,7 +51,12 @@ impl<'a> Donate<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, author_id: String, cmd: DonateCommand) -> Result<DonateResponse> {
+    pub async fn exec(
+        &self,
+        auth_id: String,
+        author_id: String,
+        cmd: DonateCommand,
+    ) -> Result<DonateResponse> {
         let reader_id = ReaderId::new(auth_id)?;
         let reader = self.reader_repo.find_by_id(&reader_id).await?;
         let reader_user = self.user_repo.find_by_id(&reader_id).await?;
@@ -79,7 +85,9 @@ impl<'a> Donate<'a> {
 
         self.donation_repo.save(&mut donation).await?;
 
-        self.event_pub.publish_all(donation.events().to_vec()?).await?;
+        self.event_pub
+            .publish_all(donation.events().to_vec()?)
+            .await?;
 
         Ok(DonateResponse {
             id: donation.base().id().to_string(),

@@ -20,7 +20,6 @@ impl Donation {
         let id: Uuid = row.get("id");
         let author_id: Uuid = row.get("author_id");
         let reader_id: Uuid = row.get("reader_id");
-        let reader_username: String = row.get("reader_username");
 
         let amount: f64 = row.get("amount");
         let comment: String = row.get("comment");
@@ -44,7 +43,6 @@ impl Donation {
             ),
             UserId::new(author_id.to_string())?,
             UserId::new(reader_id.to_string())?,
-            reader_username,
             Amount::new(amount)?,
             comment,
             reader_payment,
@@ -187,19 +185,17 @@ impl DonationRepository for PostgresDonationRepository {
                         id,
                         author_id,
                         reader_id,
-                        reader_username,
                         amount,
                         comment,
                         reader_payment,
                         author_charge,
                         status_history,
                         created_at
-                    ) VALUES ($1, $2, $3, $4, $5, $6)",
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
                     &[
                         &donation.base().id().to_uuid()?,
                         &donation.author_id().to_uuid()?,
                         &donation.reader_id().to_uuid()?,
-                        &donation.reader_username(),
                         &donation.amount().value(),
                         &donation.comment(),
                         &reader_payment,

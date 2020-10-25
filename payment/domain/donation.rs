@@ -21,7 +21,6 @@ pub struct Donation {
     events: Events<DonationEvent>,
     author_id: UserId,
     reader_id: UserId,
-    reader_username: String,
     amount: Amount,
     comment: String,
     reader_payment: Option<Payment>,
@@ -42,7 +41,6 @@ impl Donation {
             events: Events::new(),
             author_id: author.base().id().clone(),
             reader_id: reader.base().id().clone(),
-            reader_username: reader.username().to_string(),
             amount,
             comment: comment.into(),
             reader_payment: None,
@@ -65,7 +63,6 @@ impl Donation {
         base: AggregateRoot<DonationId>,
         author_id: UserId,
         reader_id: UserId,
-        reader_username: String,
         amount: Amount,
         comment: String,
         reader_payment: Option<Payment>,
@@ -77,7 +74,6 @@ impl Donation {
             events: Events::new(),
             author_id,
             reader_id,
-            reader_username,
             amount,
             comment,
             reader_payment,
@@ -100,10 +96,6 @@ impl Donation {
 
     pub fn reader_id(&self) -> &UserId {
         &self.reader_id
-    }
-
-    pub fn reader_username(&self) -> &str {
-        &self.reader_username
     }
 
     pub fn amount(&self) -> &Amount {
