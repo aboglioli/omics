@@ -40,6 +40,7 @@ async fn main() -> std::io::Result<()> {
     //     }
     // }
 
+    println!("Environment: {}", config.env());
     println!("Listening on {} ({})", config.port(), config.env());
 
     HttpServer::new(move || {

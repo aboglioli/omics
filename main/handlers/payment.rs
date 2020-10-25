@@ -3,7 +3,7 @@ use serde::Deserialize;
 use serde_json::Value;
 
 use common::error::Error;
-use payment::application::subscription::Pay;
+use payment::application::payment::Validate;
 
 use crate::container::MainContainer;
 use crate::error::PublicError;
@@ -31,8 +31,9 @@ async fn mercado_pago(cmd: web::Json<Value>, c: web::Data<MainContainer>) -> imp
         .map_err(PublicError::from)?;
 
     if cmd.action.starts_with("payment") {
-        Pay::new(
+        Validate::new(
             c.payment.event_pub(),
+            c.payment.donation_repo(),
             c.payment.subscription_repo(),
             c.payment.payment_serv(),
         )
@@ -45,6 +46,29 @@ async fn mercado_pago(cmd: web::Json<Value>, c: web::Data<MainContainer>) -> imp
     }
 }
 
+#[derive(Deserialize)]
+pub struct DevQuery {
+    reference: String,
+}
+
+#[get("/development")]
+async fn development(query: web::Query<DevQuery>, c: web::Data<MainContainer>) -> impl Responder {
+    Validate::new(
+        c.payment.event_pub(),
+        c.payment.donation_repo(),
+        c.payment.subscription_repo(),
+        c.payment.payment_serv(),
+    )
+    .exec(query.into_inner().reference)
+    .await
+    .map(|_res| HttpResponse::Ok().body("Pagado"))
+    .map_err(PublicError::from)
+}
+
 pub fn routes(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("/webhook").service(mercado_pago));
+    cfg.service(
+        web::scope("/webhook")
+            .service(mercado_pago)
+            .service(development),
+    );
 }

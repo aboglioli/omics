@@ -75,7 +75,7 @@ impl<'a> Subscribe<'a> {
                 "Suscripción de Omics".to_owned(),
                 "Plan básico.".to_owned(),
                 subscription.plan().price(),
-                subscription.base().id().to_string(),
+                format!("subscription:{}", subscription.base().id().value()),
                 &user,
             )
             .await?;

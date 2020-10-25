@@ -72,7 +72,7 @@ impl<'a> Donate<'a> {
                 "Donación".to_owned(),
                 format!("Para {}", author.username().to_string()),
                 donation.amount().value(),
-                donation.base().id().to_string(),
+                format!("donation:{}", donation.base().id().value()),
                 &reader_user,
             )
             .await?;
@@ -80,5 +80,10 @@ impl<'a> Donate<'a> {
         self.donation_repo.save(&mut donation).await?;
 
         self.event_pub.publish_all(donation.events().to_vec()?).await?;
+
+        Ok(DonateResponse {
+            id: donation.base().id().to_string(),
+            payment_link,
+        })
     }
 }
