@@ -162,6 +162,10 @@ impl Donation {
             return Err(Error::new("donation", "not_paid"));
         }
 
+        if self.is_charged() {
+            return Err(Error::new("donation", "already_charged"));
+        }
+
         let payment = Payment::new(Kind::Outcome, self.amount().clone())?;
 
         let status = self.status_history.current().charge()?;
