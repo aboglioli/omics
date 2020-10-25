@@ -1,4 +1,6 @@
+mod repository;
 mod status;
+pub use repository::*;
 pub use status::*;
 
 use common::error::Error;
@@ -22,7 +24,8 @@ pub struct Donation {
     reader_username: String,
     amount: Amount,
     comment: String,
-    payment: Option<Payment>,
+    reader_payment: Option<Payment>,
+    author_charge: Option<Payment>,
     status_history: StatusHistory<Status>,
 }
 
@@ -42,7 +45,8 @@ impl Donation {
             reader_username: reader.username().to_string(),
             amount,
             comment: comment.into(),
-            payment: None,
+            reader_payment: None,
+            author_charge: None,
             status_history: StatusHistory::new(Status::init()),
         };
 
@@ -64,7 +68,8 @@ impl Donation {
         reader_username: String,
         amount: Amount,
         comment: String,
-        payment: Option<Payment>,
+        reader_payment: Option<Payment>,
+        author_charge: Option<Payment>,
         status_history: StatusHistory<Status>,
     ) -> Self {
         Donation {
@@ -75,7 +80,8 @@ impl Donation {
             reader_username,
             amount,
             comment,
-            payment,
+            reader_payment,
+            author_charge,
             status_history,
         }
     }
@@ -108,8 +114,12 @@ impl Donation {
         &self.comment
     }
 
-    pub fn payment(&self) -> Option<&Payment> {
-        self.payment.as_ref()
+    pub fn reader_payment(&self) -> Option<&Payment> {
+        self.reader_payment.as_ref()
+    }
+
+    pub fn author_charge(&self) -> Option<&Payment> {
+        self.author_charge.as_ref()
     }
 
     pub fn status_history(&self) -> &StatusHistory<Status> {
@@ -117,7 +127,11 @@ impl Donation {
     }
 
     pub fn is_paid(&self) -> bool {
-        matches!(self.status_history.current(), Status::Paid) && self.payment.is_some()
+        matches!(self.status_history.current(), Status::Paid) && self.reader_payment.is_some()
+    }
+
+    pub fn is_charged(&self) -> bool {
+        matches!(self.status_history.current(), Status::Charged) && self.author_charge.is_some()
     }
 
     pub fn pay(&mut self) -> Result<Payment> {
@@ -130,9 +144,32 @@ impl Donation {
         let status = self.status_history.current().pay()?;
         self.status_history.add_status(status);
 
-        self.payment = Some(payment.clone());
+        self.reader_payment = Some(payment.clone());
 
         self.events.record_event(DonationEvent::Paid {
+            id: self.base().id().to_string(),
+            author_id: self.author_id().to_string(),
+            reader_id: self.reader_id().to_string(),
+            amount: self.amount().value(),
+            comment: self.comment().to_string(),
+        });
+
+        Ok(payment)
+    }
+
+    pub fn charge(&mut self) -> Result<Payment> {
+        if !self.is_paid() {
+            return Err(Error::new("donation", "not_paid"));
+        }
+
+        let payment = Payment::new(Kind::Outcome, self.amount().clone())?;
+
+        let status = self.status_history.current().charge()?;
+        self.status_history.add_status(status);
+
+        self.author_charge = Some(payment.clone());
+
+        self.events.record_event(DonationEvent::Charged {
             id: self.base().id().to_string(),
             author_id: self.author_id().to_string(),
             reader_id: self.reader_id().to_string(),

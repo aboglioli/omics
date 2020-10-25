@@ -12,6 +12,8 @@ pub enum Status {
     WaitingForPayment,
     #[serde(rename = "paid")]
     Paid,
+    #[serde(rename = "charged")]
+    Charged,
     #[serde(rename = "cancelled")]
     Cancelled,
 }
@@ -21,6 +23,7 @@ impl ToString for Status {
         match self {
             Status::WaitingForPayment => "waiting-for-payment".to_owned(),
             Status::Paid => "paid".to_owned(),
+            Status::Charged => "charged".to_owned(),
             Status::Cancelled => "cancelled".to_owned(),
         }
     }
@@ -33,6 +36,7 @@ impl FromStr for Status {
         match s {
             "waiting-for-payment" => Ok(Status::WaitingForPayment),
             "paid" => Ok(Status::Paid),
+            "charged" => Ok(Status::Charged),
             "cancelled" => Ok(Status::Cancelled),
             _ => Err(Error::new("donation_status", "invalid")),
         }
@@ -48,6 +52,13 @@ impl Status {
         match self {
             Status::WaitingForPayment => Ok(Status::Paid),
             _ => Err(Error::new("donation_status", "not_waiting_payment")),
+        }
+    }
+
+    pub fn charge(&self) -> Result<Self> {
+        match self {
+            Status::Paid => Ok(Status::Charged),
+            _ => Err(Error::new("donation_status", "not_paid")),
         }
     }
 

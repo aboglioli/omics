@@ -19,6 +19,13 @@ pub enum DonationEvent {
         amount: f64,
         comment: String,
     },
+    Charged {
+        id: String,
+        author_id: String,
+        reader_id: String,
+        amount: f64,
+        comment: String,
+    },
     Cancelled {
         id: String,
         author_id: String,
@@ -33,6 +40,7 @@ impl ToString for DonationEvent {
         match self {
             DonationEvent::Created { .. } => "created".to_owned(),
             DonationEvent::Paid { .. } => "paid".to_owned(),
+            DonationEvent::Charged { .. } => "charged".to_owned(),
             DonationEvent::Cancelled { .. } => "cancelled".to_owned(),
         }
     }
