@@ -16,11 +16,11 @@ use crate::domain::donation::{DonationOrderBy, DonationRepository, Status};
 
 #[derive(Deserialize)]
 pub struct SearchCommand {
-    author_id: Option<String>,
-    reader_id: Option<String>,
-    status: Option<String>,
-    date_from: Option<String>,
-    date_to: Option<String>,
+    pub author_id: Option<String>,
+    pub reader_id: Option<String>,
+    pub status: Option<String>,
+    pub date_from: Option<String>,
+    pub date_to: Option<String>,
 }
 
 pub struct Search<'a> {

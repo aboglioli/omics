@@ -1,7 +1,9 @@
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 
 use common::request::{IncludeParams, PaginationParams};
-
+use payment::application::donation::{
+    Search as SearchDonation, SearchCommand as SearchDonationCommand,
+};
 use publishing::application::author::{Follow, GetById, Search, SearchCommand, Unfollow};
 use publishing::application::collection::{
     Search as SearchCollection, SearchCommand as SearchCollectionCommand,
@@ -165,6 +167,43 @@ async fn unfollow(
     .map_err(PublicError::from)
 }
 
+#[get("/{author_id}/donations")]
+async fn get_donations(
+    req: HttpRequest,
+    path: web::Path<String>,
+    cmd: web::Query<SearchDonationCommand>,
+    include: web::Query<IncludeParams>,
+    c: web::Data<MainContainer>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    let mut user_id = path.into_inner();
+    user_id = if user_id == "me" {
+        auth_id.clone()
+    } else {
+        user_id
+    };
+
+    let mut cmd = cmd.into_inner();
+    cmd.author_id = Some(user_id);
+
+    SearchDonation::new(
+        c.publishing.author_repo(),
+        c.payment.donation_repo(),
+        c.publishing.reader_repo(),
+        c.identity.user_repo(),
+    )
+    .exec(
+        auth_id,
+        cmd,
+        include.into_inner().into(),
+        PaginationParams::default(),
+    )
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
+}
+
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/authors")
@@ -172,6 +211,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .service(get_by_id)
             .service(get_publications)
             .service(get_collections)
+            .service(get_donations)
             .service(follow)
             .service(unfollow),
     );
