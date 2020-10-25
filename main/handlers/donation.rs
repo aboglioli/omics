@@ -35,11 +35,7 @@ async fn search(
 }
 
 #[post("/charge")]
-async fn charge(
-    req: HttpRequest,
-    _path: web::Path<String>,
-    c: web::Data<MainContainer>,
-) -> impl Responder {
+async fn charge(req: HttpRequest, c: web::Data<MainContainer>) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
     Charge::new(c.payment.event_pub(), c.payment.donation_repo())

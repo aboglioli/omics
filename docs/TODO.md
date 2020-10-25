@@ -72,6 +72,7 @@ Filtros:
 - [ ] 'Cancel' publication for content managers
 - [ ] Generated descriptions in scripts/populate.js are longer than limit in value object.
 - [ ] "READ" button should not be shown to not logged in users
+- [  ] Use BusinessRules in code.
 
 # Progress
 

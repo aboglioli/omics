@@ -9,6 +9,7 @@ import { CategoryService } from './services/category.service';
 import { CollectionService } from './services/collection.service';
 import { ConfigService } from './services/config.service';
 import { ContractService } from './services/contract.service';
+import { DonationService } from './services/donation.service';
 import { FileService } from './services/file.service';
 import { IdentityService } from './services/identity.service';
 import { NotificationService } from './services/notification.service';
@@ -31,6 +32,7 @@ import { SubscriptionService } from './services/subscription.service';
     CollectionService,
     ConfigService,
     ContractService,
+    DonationService,
     FileService,
     IdentityService,
     NotificationService,
