@@ -1,7 +1,7 @@
-use actix_web::{delete, get, post, web, HttpRequest, HttpResponse, Responder};
+use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 
 use common::request::{IncludeParams, PaginationParams};
-use payment::application::donation::{Search, SearchCommand};
+use payment::application::donation::{Charge, Search, SearchCommand};
 
 use crate::authorization::auth;
 use crate::container::MainContainer;
@@ -34,6 +34,21 @@ async fn search(
     .map_err(PublicError::from)
 }
 
+#[post("/charge")]
+async fn charge(
+    req: HttpRequest,
+    _path: web::Path<String>,
+    c: web::Data<MainContainer>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    Charge::new(c.payment.event_pub(), c.payment.donation_repo())
+        .exec(auth_id)
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
+}
+
 pub fn routes(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("/donations").service(search));
+    cfg.service(web::scope("/donations").service(search).service(charge));
 }
