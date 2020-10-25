@@ -13,3 +13,9 @@ export enum DashboardGeneralOptionMenu {
   categories,
   tags
 }
+
+export enum TypeAmount {
+  percent,
+  normal,
+  currency
+}

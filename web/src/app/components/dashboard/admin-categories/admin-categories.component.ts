@@ -19,7 +19,6 @@ export class AdminCategoriesComponent implements OnInit {
   public faEdit = faEdit;
   public faAdd = faPlusCircle;
   public faCancel = faTimesCircle;
-  public faSave = faSave;
 
   public categoryList: ICategory[];
   public isEditCategory: boolean;
@@ -103,6 +102,8 @@ export class AdminCategoriesComponent implements OnInit {
         this.categoryService.delete(category.id).subscribe(() => {});
         this.categoryList.splice(index, 1);
 
+        this.sweetAlertGenericService.showAlertSuccess(`La categoría ${ category.name } ha sido eliminado`, 'Eliminado');
+
       } else {
 
         this.sweetAlertGenericService.showAlertError(
@@ -158,6 +159,7 @@ export class AdminCategoriesComponent implements OnInit {
 
           console.log(this.editIndexCategory);
           this.categoryList[this.editIndexCategory].name = categoryObject.name;
+          this.sweetAlertGenericService.showAlertSuccess(`La categoría ${ categoryObject.name } ha sido modificada`, 'Modificado');
           this.resetForm();
 
         },
@@ -180,6 +182,8 @@ export class AdminCategoriesComponent implements OnInit {
           console.log(res);
           categoryObject.id = res.id;
           this.categoryList.push( categoryObject );
+
+          this.sweetAlertGenericService.showAlertSuccess(`La categoría ${ categoryObject.name } ha creada`, 'Creado');
 
         },
         (err: any) => {

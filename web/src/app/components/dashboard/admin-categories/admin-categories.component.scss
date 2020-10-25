@@ -29,7 +29,7 @@ div.parent {
         flex-direction: row;
       }
 
-      // Mobile size
+      // Pantalla chica
       @media screen and (max-width: $break-small) {
         flex-direction: column;
       }

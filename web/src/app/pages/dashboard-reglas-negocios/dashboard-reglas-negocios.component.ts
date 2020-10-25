@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { BusinessRulesService } from '../../domain/services/business-rules.service';
-import { IBusinessRules, IBusinessRuleSingle } from '../../domain/models/business-rules';
+import { IBusinessRules, IBusinessRuleSingle, IBusinessType } from '../../domain/models/business-rules';
+import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
+import { TypeAmount } from 'src/app/models/enums.model';
+
 
 @Component({
   selector: 'app-dashboard-reglas-negocios',
@@ -14,7 +17,8 @@ export class DashboardReglasNegociosComponent implements OnInit {
 
   constructor(
     private spinnerService: NgxSpinnerService,
-    private businessRulesService: BusinessRulesService
+    private businessRulesService: BusinessRulesService,
+    private sweetAlertGenericService: SweetAlertGenericMessageService,
   ) { }
 
   ngOnInit(): void {
@@ -30,12 +34,14 @@ export class DashboardReglasNegociosComponent implements OnInit {
 
           if ( res.hasOwnProperty( key ) ) {
 
+            const nameTypeAux = this.getNameByKey( key );
             this.businessRulesList.push({
 
               // Cambiar guión bajo por espacios y primera letra en mayúscula
               key,
-              name: key.replace(/_/g, ' ').replace(/^./, key[0].toUpperCase()),
-              value: res[key]
+              name: nameTypeAux.name,
+              value: res[key],
+              type: nameTypeAux.type
 
             });
 
@@ -55,6 +61,58 @@ export class DashboardReglasNegociosComponent implements OnInit {
       }
 
     );
+
+  }
+
+
+  private getNameByKey( key: string ): IBusinessType {
+
+    switch ( key ) {
+
+      case 'days_to_generate_summaries': {
+        return {
+          name: 'Días para generar resumen',
+          type: TypeAmount.normal
+        };
+      }
+
+      case 'donation_percentage_retention': {
+        return {
+          name: 'Retención porcentual de donaciones',
+          type: TypeAmount.percent
+        };
+      }
+
+      case 'minimum_charge_amount': {
+        return {
+          name: 'Monto mínomo para cobrar',
+          type: TypeAmount.currency
+        };
+      }
+
+      case 'minimum_donation_amount': {
+        return {
+          name: 'Monto mínimo donación',
+          type: TypeAmount.currency
+        };
+      }
+
+      case 'minimum_views_percentage_to_require_contract': {
+        return {
+          name: 'Cantidad mínima de vistas en porcentaje para solicitar contrato',
+          type: TypeAmount.normal
+        };
+      }
+
+      case 'subscription_percentage_retention': {
+        return {
+          name: 'Porcentaje de retención de suscripción',
+          type: TypeAmount.percent
+        };
+      }
+
+    }
+
 
   }
 
