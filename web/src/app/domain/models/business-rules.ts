@@ -6,3 +6,9 @@ export interface IBusinessRules {
   minimum_views_percentage_to_require_contract: number;
   subscription_percentage_retention: number;
 }
+
+export interface IBusinessRuleSingle {
+  key: string;
+  name: string;
+  value: number;
+}

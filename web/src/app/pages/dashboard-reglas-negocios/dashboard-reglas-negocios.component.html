@@ -1,1 +1,26 @@
-<app-under-construction></app-under-construction>
+<div class="parent">
+
+  <div class="side"></div>
+
+  <div class="center">
+
+    <div class="header">
+
+      <h1 style="margin: 0;">Gestionar Reglas de Negocios</h1>
+
+    </div>
+
+    <div class="body">
+
+      <app-admin-business-rule
+        *ngFor="let rule of businessRulesList"
+        [businessRule]="rule">
+      </app-admin-business-rule>
+
+    </div>
+
+  </div>
+
+  <div class="side"></div>
+
+</div>

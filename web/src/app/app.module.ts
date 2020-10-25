@@ -75,6 +75,7 @@ import { CollectionInfoComponent } from './pages/collection-info/collection-info
 import { CatalogueFilterComponent } from './components/catalogue-filter/catalogue-filter.component';
 import { AdminCategoriesComponent } from './components/dashboard/admin-categories/admin-categories.component';
 import { AdminTagsComponent } from './components/dashboard/admin-tags/admin-tags.component';
+import { AdminBusinessRuleComponent } from './components/dashboard/admin-business-rule/admin-business-rule.component';
 
 
 @NgModule({
@@ -128,6 +129,7 @@ import { AdminTagsComponent } from './components/dashboard/admin-tags/admin-tags
     CatalogueFilterComponent,
     AdminCategoriesComponent,
     AdminTagsComponent,
+    AdminBusinessRuleComponent,
   ],
   imports: [
     BrowserModule,
