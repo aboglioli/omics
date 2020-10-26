@@ -219,6 +219,7 @@ async fn donate(
         c.payment.donation_repo(),
         c.publishing.reader_repo(),
         c.identity.user_repo(),
+        c.config_serv(),
         c.payment.payment_serv(),
     )
     .exec(auth_id, path.into_inner(), cmd.into_inner())

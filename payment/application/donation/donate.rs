@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use common::config::ConfigService;
+use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
 use identity::domain::user::UserRepository;
@@ -29,6 +31,7 @@ pub struct Donate<'a> {
     reader_repo: &'a dyn ReaderRepository,
     user_repo: &'a dyn UserRepository,
 
+    config_serv: &'a ConfigService,
     payment_serv: &'a dyn PaymentService,
 }
 
@@ -39,6 +42,7 @@ impl<'a> Donate<'a> {
         donation_repo: &'a dyn DonationRepository,
         reader_repo: &'a dyn ReaderRepository,
         user_repo: &'a dyn UserRepository,
+        config_serv: &'a ConfigService,
         payment_serv: &'a dyn PaymentService,
     ) -> Self {
         Donate {
@@ -47,6 +51,7 @@ impl<'a> Donate<'a> {
             donation_repo,
             reader_repo,
             user_repo,
+            config_serv,
             payment_serv,
         }
     }
@@ -57,6 +62,11 @@ impl<'a> Donate<'a> {
         author_id: String,
         cmd: DonateCommand,
     ) -> Result<DonateResponse> {
+        let business_rules = self.config_serv.get_business_rules().await?;
+        if cmd.amount < business_rules.minimum_donation_amount {
+            return Err(Error::new("donation", "minimum_amount"));
+        }
+
         let reader_id = ReaderId::new(auth_id)?;
         let reader = self.reader_repo.find_by_id(&reader_id).await?;
         let reader_user = self.user_repo.find_by_id(&reader_id).await?;

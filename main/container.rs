@@ -134,6 +134,7 @@ impl MainContainer {
             pub_reader_repo.clone(),
             pay_subscription_repo,
             id_user_repo.clone(),
+            config_serv.clone(),
             pay_payment_serv,
             publishing.statistics_serv_clone(),
         );

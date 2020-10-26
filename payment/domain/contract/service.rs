@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use chrono::{DateTime, Duration, Utc};
 
+use common::config::ConfigService;
 use common::error::Error;
 use common::result::Result;
 use publishing::domain::publication::{
@@ -16,6 +17,7 @@ pub struct ContractService {
     publication_repo: Arc<dyn PublicationRepository>,
     subscription_repo: Arc<dyn SubscriptionRepository>,
 
+    config_serv: Arc<ConfigService>,
     statistics_serv: Arc<StatisticsService>,
 }
 
@@ -24,12 +26,14 @@ impl ContractService {
         contract_repo: Arc<dyn ContractRepository>,
         publication_repo: Arc<dyn PublicationRepository>,
         subscription_repo: Arc<dyn SubscriptionRepository>,
+        config_serv: Arc<ConfigService>,
         statistics_serv: Arc<StatisticsService>,
     ) -> Self {
         ContractService {
             contract_repo,
             publication_repo,
             subscription_repo,
+            config_serv,
             statistics_serv,
         }
     }
@@ -66,13 +70,16 @@ impl ContractService {
             .await?;
         let p = publication_statistics.views() as f64 / total_statistics.views() as f64;
 
-        if p >= 0.01 {
+        let business_rules = self.config_serv.get_business_rules().await?;
+
+        if p >= business_rules.minimum_views_percentage_to_require_contract {
             return Ok(());
         }
 
         Err(Error::new("statistics", "publication_has_low_views"))
     }
 
+    // TODO: not used, wrong logic
     pub async fn calculate_summaries(
         &self,
         from: DateTime<Utc>,
@@ -148,6 +155,8 @@ impl ContractService {
         &self,
         publication_id: &PublicationId,
     ) -> Result<Contract> {
+        let business_rules = self.config_serv.get_business_rules().await?;
+
         let mut contract = self
             .contract_repo
             .find_by_publication_id(publication_id)
@@ -164,7 +173,8 @@ impl ContractService {
         };
 
         // Only update contracts older than 10 days
-        if date_from + Duration::days(10) > Utc::now() {
+        if date_from + Duration::days(business_rules.days_to_generate_summaries as i64) > Utc::now()
+        {
             return Ok(contract);
         }
 
@@ -181,7 +191,9 @@ impl ContractService {
                 }
             }
         }
-        subscription_total = subscription_total * 0.3;
+
+        let subscription_percentage = 1.0 - business_rules.subscription_percentage_retention;
+        subscription_total = subscription_total * subscription_percentage;
 
         if subscription_total == 0.0 {
             return Err(Error::new("subscription_total", "zero"));
@@ -246,6 +258,9 @@ mod tests {
 
     use async_trait::async_trait;
 
+    use common::cache::Cache;
+    use common::config::{BusinessRules, ConfigService};
+    use common::infrastructure::cache::InMemCache;
     use common::model::{AggregateRoot, Pagination, StatusHistory, StatusItem};
     use identity::domain::user::UserId;
     use publishing::domain::author::AuthorId;
@@ -742,10 +757,27 @@ mod tests {
 
     #[tokio::test]
     async fn calculate_summaries() {
+        let business_rules = BusinessRules {
+            minimum_donation_amount: 50.0,
+            donation_percentage_retention: 0.3,
+
+            days_to_generate_summaries: 10,
+            minimum_views_percentage_to_require_contract: 0.01,
+            subscription_percentage_retention: 0.7,
+            minimum_charge_amount: 200.0,
+        };
+        let cache = InMemCache::new();
+        cache
+            .set("business_rules".to_owned(), business_rules)
+            .await
+            .unwrap();
+        let config_serv = ConfigService::new(Arc::new(cache));
+
         let contract_serv = ContractService::new(
             Arc::new(FakeContractRepository),
             Arc::new(InMemPublicationRepository::new()),
             Arc::new(FakeSubscriptionRepository),
+            Arc::new(config_serv),
             Arc::new(StatisticsService::new(Arc::new(FakeInteractionRepository))),
         );
 

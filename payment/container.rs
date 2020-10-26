@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 
+use common::config::ConfigService;
 use common::container::Container;
 use common::event::EventPublisher;
 use identity::domain::user::UserRepository;
@@ -42,6 +43,7 @@ where
         reader_repo: Arc<dyn ReaderRepository>,
         subscription_repo: Arc<dyn SubscriptionRepository>,
         user_repo: Arc<dyn UserRepository>,
+        config_serv: Arc<ConfigService>,
         payment_serv: Arc<dyn PaymentService>,
         statistics_serv: Arc<StatisticsService>,
     ) -> Self {
@@ -49,6 +51,7 @@ where
             contract_repo.clone(),
             publication_repo.clone(),
             subscription_repo.clone(),
+            config_serv.clone(),
             statistics_serv.clone(),
         ));
 

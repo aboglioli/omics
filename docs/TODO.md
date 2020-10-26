@@ -75,7 +75,7 @@ Filtros:
 - [ ] Use BusinessRules in code.
 - [ ] Tag filter in frontend and backend.
 - [ ] Agregar propiedad de email de pago para autor.
-- [ ] Reports
+- [x] Reports
 
 # Progress
 
