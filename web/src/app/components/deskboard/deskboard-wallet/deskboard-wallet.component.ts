@@ -9,6 +9,8 @@ import Swal from 'sweetalert2';
 import { DeskboardMedioCobroComponent } from '../deskboard/deskboard-medio-cobro.component';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../../domain/services/auth.service';
+import { IdentityService } from '../../../domain/services/identity.service';
+import { IUser } from 'src/app/domain/models';
 @Component({
   selector: 'app-deskboard-wallet',
   templateUrl: './deskboard-wallet.component.html',
@@ -18,12 +20,15 @@ export class DeskboardWalletComponent implements OnInit {
   public contracts: IContract[];
   public message: string;
 
+  private emailPaymentUser: string;
+
   constructor(
     private authorService: AuthorService,
     private publicationService: PublicationService,
     private contractService: ContractService,
     private spinnerService: NgxSpinnerService,
     private authService: AuthService,
+    private identifyService: IdentityService,
     private dialog: MatDialog,
   ) { }
 
@@ -33,6 +38,7 @@ export class DeskboardWalletComponent implements OnInit {
     const userId = this.authService.getIdUser(); // Obtener el mail de medio de pago para modificar
 
     this.getContracts();
+
   }
 
   private getContracts(): void {
@@ -56,10 +62,33 @@ export class DeskboardWalletComponent implements OnInit {
           );
         }
 
-        this.spinnerService.hide();
+        this.getPayMentEmail();
       },
     );
   }
+
+
+  private getPayMentEmail(): void {
+
+    this.identifyService.getById( 'me' ).subscribe(
+      (res: IUser) => {
+
+        this.emailPaymentUser = res.payment_email;
+        // console.log('test >', this.emailPaymentUser)
+        this.spinnerService.hide();
+
+      },
+      ( err: Error ) => {
+
+        console.error(err);
+        this.spinnerService.hide();
+
+
+      }
+    );
+
+  }
+
 
   public generateSummaries(contract: IContract): void {
     this.spinnerService.show();
@@ -108,7 +137,6 @@ export class DeskboardWalletComponent implements OnInit {
     );
   }
 
-
   public onRescindirContrato( contract: IContract ): void {
 
     Swal.fire({
@@ -146,21 +174,46 @@ export class DeskboardWalletComponent implements OnInit {
 
   public onMedioCobro(): void {
 
-    const mailCobro = '';
-
     const dialogRef = this.dialog.open(
       DeskboardMedioCobroComponent,
       {
         panelClass: 'margin-dialog',
         data: {
-          mailCobro
+          mailCobro: this.emailPaymentUser
         }
       }
     );
 
-    // dialogRef.afterClosed().subscribe( resHaveEmail => {
+    dialogRef.afterClosed().subscribe( resEmail => {
 
-    // });
+      console.log('TEST resmail > ', resEmail );
+
+      if ( resEmail ) {
+        this.emailPaymentUser = resEmail;
+        console.log('TEST emailPaymentUser > ', this.emailPaymentUser );
+
+        this.spinnerService.show();
+
+        this.identifyService.changePaymentEmail( this.authService.getIdUser(), { payment_email: this.emailPaymentUser } ).subscribe(
+          (res: any) => {
+
+            console.log('TEST > ', res);
+            this.spinnerService.hide();
+
+          },
+          (err: Error) => {
+
+            console.error(err);
+
+            this.spinnerService.hide();
+
+          }
+        );
+
+      }
+
+
+    });
 
   }
 

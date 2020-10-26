@@ -2,7 +2,10 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { faTimesCircle, faSave } from '@fortawesome/free-solid-svg-icons';
-import { DialogData } from '../../publication/publication-review-add/publication-review-add.component';
+
+interface DialogData {
+  mailCobro: string;
+}
 
 @Component({
   selector: 'app-configurar-medio-cobro',
@@ -29,6 +32,7 @@ export class DeskboardMedioCobroComponent implements OnInit {
   ngOnInit(): void {
 
     this.buildForms();
+    console.log(this.data)
 
   }
 
@@ -36,7 +40,7 @@ export class DeskboardMedioCobroComponent implements OnInit {
 
     this.formMedioCobro = this.fb.group({
 
-      correo     : ['', [ Validators.required, Validators.pattern( '^[a-zA-Z0-9]+[a-zA-Z0-9_.+-]*@[a-zA-Z0-9]+[a-zA-Z0-9-]*\.[a-zA-Z0-9-.]+$' )] ],
+      correo     : [ this.data.mailCobro, [ Validators.required, Validators.pattern( '^[a-zA-Z0-9]+[a-zA-Z0-9_.+-]*@[a-zA-Z0-9]+[a-zA-Z0-9-]*\.[a-zA-Z0-9-.]+$' )] ],
 
     });
 
@@ -51,7 +55,7 @@ export class DeskboardMedioCobroComponent implements OnInit {
 
   public onSave(): void {
 
-    this.dialogRef.close();
+    this.dialogRef.close( this.formMedioCobro.get('correo').value );
 
   }
 
