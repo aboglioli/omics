@@ -57,6 +57,10 @@ export interface IRecoverPasswordCommand {
   email: string;
 }
 
+export interface IChangePaymentEmailCommand {
+  payment_email: string;
+}
+
 @Injectable()
 export class IdentityService {
   private baseUrl: string;
@@ -131,5 +135,9 @@ export class IdentityService {
 
   public recoverPassword(cmd: IRecoverPasswordCommand): Observable<any> {
     return this.http.post(`${this.configServ.baseUrl()}/recover-password`, cmd);
+  }
+
+  public changePaymentEmail(id: string, cmd: IChangePaymentEmailCommand): Observable<any> {
+    return this.http.put(`${this.configServ.baseUrl()}/${id}/payment-email`, cmd);
   }
 }

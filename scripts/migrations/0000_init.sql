@@ -45,6 +45,8 @@ CREATE TABLE IF NOT EXISTS users (
 
   validation_code VARCHAR(255),
 
+  payment_email VARCHAR(64),
+
   followers INTEGER DEFAULT 0,
   publications INTEGER DEFAULT 0,
   subscribed BOOLEAN DEFAULT FALSE,

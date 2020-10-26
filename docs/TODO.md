@@ -66,15 +66,16 @@ Filtros:
 - [x] Improve enum serializatiion/deserialization.
 - [ ] Replace rename of each enum for serde by rename_all = "kebab-case".
 - [x] Serialize directly (without util) in shared::event.
-- [ ] Add Pagination<T> to each repository.
+- [x] Add Pagination<T> to each repository.
 - [x] Don't use a default limit in repository (it's a complexity to generate
   reports). Add the default limit in use cases. Or make reports from events.
-- [ ] 'Cancel' publication for content managers
+- [?] 'Cancel' publication for content managers
 - [ ] Generated descriptions in scripts/populate.js are longer than limit in value object.
-- [ ] "READ" button should not be shown to not logged in users
+- [x] "READ" button should not be shown to not logged in users
 - [ ] Use BusinessRules in code.
 - [ ] Tag filter in frontend and backend.
 - [ ] Agregar propiedad de email de pago para autor.
+- [ ] Reports
 
 # Progress
 

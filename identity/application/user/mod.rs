@@ -1,4 +1,5 @@
 mod change_password;
+mod change_payment_email;
 mod change_role;
 mod delete;
 mod get_by_id;
@@ -9,6 +10,7 @@ mod search;
 mod update;
 mod validate;
 pub use change_password::*;
+pub use change_payment_email::*;
 pub use change_role::*;
 pub use delete::*;
 pub use get_by_id::*;
