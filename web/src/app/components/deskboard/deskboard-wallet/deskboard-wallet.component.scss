@@ -11,39 +11,21 @@
       margin-bottom: 2rem;
     }
 
-    .buttons {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 2rem;
+    button {
 
-      button {
-        border-radius: 3px;
-        border: 1px solid #fff;
-        background: transparent;
-        color: #222;
-        padding: 0.2rem 0.5rem;
-        margin-right: 1rem;
+      &.button-white-borders {
 
-        &.generate-summaries {
-          background-color: #d9adad;
-
-          &:hover {
-            background-color: #7d5959;
-            color: #fff;
-          }
+        color: white;
+        &:hover {
+          box-shadow: inset 0px 0px 0px 2px white;
+          font-weight: bold;
         }
 
-        &.charge {
-          background-color: #84a9ac;
+        padding-top: 0.1em;
 
-          &:disabled {
-            background-color: #aaa;
-            color: #555;
-            border: none;
-          }
-        }
       }
     }
+
 
     table {
       width: 100%;
@@ -62,7 +44,7 @@
 
     .totals {
       display: flex;
-      // justify-content: space-between;
+
 
       .total {
         h4 {

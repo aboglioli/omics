@@ -12,6 +12,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import Swal from 'sweetalert2';
 import { IUser } from 'src/app/domain/models';
+import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 
 @Component({
   selector: 'app-login-register',
@@ -69,7 +70,9 @@ export class LoginRegisterComponent implements OnInit {
                 private identityService: IdentityService,
                 private authService: AuthService,
                 private dialog: MatDialog,
-                private spinnerService: NgxSpinnerService) {
+                private spinnerService: NgxSpinnerService,
+                private sweetAlertGenericService: SweetAlertGenericMessageService,
+                ) {
 
     dialogRef.disableClose = true;
 
@@ -196,88 +199,102 @@ export class LoginRegisterComponent implements OnInit {
 
   public signUpUser(): void {
 
-    // Marcar datos inválidos
-    if ( this.formSignUp.invalid ) {
+    // Quitar espacios principio y final de más
+    const userNameAux = ( this.formSignUp.get('usuario').value.trim() );
+    this.formSignUp.get('usuario').setValue( userNameAux );
 
-      return Object.values( this.formSignUp.controls ).forEach( control => {
+    const correoAux = ( this.formSignUp.get('correo').value.trim() );
+    this.formSignUp.get('correo').setValue( correoAux );
 
-        // Si es un objeto
-        if ( control instanceof FormGroup ) {
+    if ( userNameAux.indexOf(' ') > 0) {
 
-          Object.values( control.controls ).forEach( subControl => subControl.markAsTouched() );
-
-        } else {
-
-          control.markAsTouched(); // Marcar todos como tocadas
-
-        }
-
-      } );
+      this.sweetAlertGenericService.showAlertError('Los nombres de usuario no pueden tener espacios', 'Error nombre de usuario');
 
     } else {
 
+      // Marcar datos inválidos
+      if ( this.formSignUp.invalid ) {
 
-      this.spinnerService.show();
-      setTimeout(() => {
-        this.spinnerService.hide();
-      }, 10000);
+        return Object.values( this.formSignUp.controls ).forEach( control => {
 
+          // Si es un objeto
+          if ( control instanceof FormGroup ) {
 
-      const registerCommand: IRegisterCommand = {
+            Object.values( control.controls ).forEach( subControl => subControl.markAsTouched() );
 
-        username: this.formSignUp.get('usuario').value,
-        email: this.formSignUp.get('correo').value,
-        password: this.formSignUp.get('password1').value
-
-      };
-
-
-      this.identityService.register( registerCommand ).subscribe(
-
-        (result: IRegisterResponse) => {
-
-          // TODO: En vez de señalar que se esconda luego el popup, habria que hacer se que cambie a la pestaña de Login
-          console.log('TEST > Registro realizado con éxito', result);
-
-          this.router.navigate(['/home']);
-
-          this.swalFormSignUpValid.fire();
-          this.spinnerService.hide();
-
-        },
-        (error: any ) => {
-
-          console.error( 'ERROR !!!', error );
-
-          const errorContext = error.error.context;
-
-          /* Se comprueba que campos de contexto hay del error, se muestra el mas prioritario
-          (buena práctica no colocar todo lo que esta erroneo) */
-          let msgAux: string;
-
-          if ( errorContext.email ) {
-            msgAux = 'correo';
           } else {
 
-            if ( errorContext.username ) {
-              msgAux = 'usuario';
-            }
+            control.markAsTouched(); // Marcar todos como tocadas
 
           }
 
-          Swal.fire({
-            icon: 'error',
-            title: 'Error al registrarse',
-            text: `El ${ msgAux } no está disponible`
-          });
+        } );
 
+      } else {
+
+
+        this.spinnerService.show();
+        setTimeout(() => {
           this.spinnerService.hide();
+        }, 10000);
 
-        }
-      );
+
+        const registerCommand: IRegisterCommand = {
+
+          username: this.formSignUp.get('usuario').value,
+          email: this.formSignUp.get('correo').value,
+          password: this.formSignUp.get('password1').value
+
+        };
+
+
+        this.identityService.register( registerCommand ).subscribe(
+
+          (result: IRegisterResponse) => {
+
+            // TODO: En vez de señalar que se esconda luego el popup, habria que hacer se que cambie a la pestaña de Login
+            console.log('TEST > Registro realizado con éxito', result);
+
+            this.router.navigate(['/home']);
+
+            this.swalFormSignUpValid.fire();
+            this.spinnerService.hide();
+
+          },
+          (error: any ) => {
+
+            console.error( 'ERROR !!!', error );
+
+            const errorContext = error.error.context;
+
+            /* Se comprueba que campos de contexto hay del error, se muestra el mas prioritario
+            (buena práctica no colocar todo lo que esta erroneo) */
+            let msgAux: string;
+
+            if ( errorContext.email ) {
+              msgAux = 'correo';
+            } else {
+
+              if ( errorContext.username ) {
+                msgAux = 'usuario';
+              }
+
+            }
+
+            Swal.fire({
+              icon: 'error',
+              title: 'Error al registrarse',
+              text: `El ${ msgAux } no está disponible`
+            });
+
+            this.spinnerService.hide();
+
+          }
+        );
+
+      }
 
     }
-
 
   }
 

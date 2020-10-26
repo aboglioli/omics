@@ -5,7 +5,7 @@ import { IContract } from '../../../domain/models/contract';
 import { PublicationService } from '../../../domain/services/publication.service';
 import { AuthorService } from '../../../domain/services/author.service';
 import { ContractService } from '../../../domain/services/contract.service';
-
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-deskboard-wallet',
   templateUrl: './deskboard-wallet.component.html',
@@ -52,7 +52,7 @@ export class DeskboardWalletComponent implements OnInit {
     );
   }
 
-  generateSummaries(contract: IContract): void {
+  public generateSummaries(contract: IContract): void {
     this.spinnerService.show();
 
     this.publicationService.generateSummaries(contract.publication.id).subscribe(
@@ -64,30 +64,30 @@ export class DeskboardWalletComponent implements OnInit {
     );
   }
 
-  totalAmount(contract: IContract): number {
+  public totalAmount(contract: IContract): number {
     return contract
       .summaries
       .reduce((acc, s) => acc + s.amount, 0.0);
   }
 
-  paidAmount(contract: IContract): number {
+  public paidAmount(contract: IContract): number {
     return contract
       .payments
       .reduce((acc, p) => acc + p.amount, 0.0);
   }
 
-  chargeAmount(contract: IContract): number {
+  public chargeAmount(contract: IContract): number {
     return contract
       .summaries
       .filter((s) => !s.paid)
       .reduce((acc, s) => acc + s.amount, 0.0);
   }
 
-  canCharge(contract: IContract): boolean {
+  public canCharge(contract: IContract): boolean {
     return contract.summaries.some((s) => !s.paid);
   }
 
-  charge(contract: IContract): void {
+  public charge(contract: IContract): void {
     this.spinnerService.show();
 
     this.contractService.charge(contract.id).subscribe(
@@ -97,6 +97,48 @@ export class DeskboardWalletComponent implements OnInit {
         this.spinnerService.hide();
       }
     );
+  }
+
+
+  public onRescindirContrato( contract: IContract ): void {
+
+    Swal.fire({
+      icon: 'error',
+      title: `¿Estas seguró rescindir el contrato de ${contract.publication.name}?`,
+      showCancelButton: true,
+      showConfirmButton: true,
+      confirmButtonColor: 'red',
+      confirmButtonText: 'Rescindir Contrato',
+      cancelButtonText: 'Cancelar',
+      focusCancel: true,
+    }).then( result => {
+
+      if ( result.isConfirmed ) {
+
+        this.contractService.delete( contract.id ).subscribe(
+
+          (res) => {
+
+            this.getContracts();
+
+          },
+          (err: Error ) => {
+
+            console.error(err);
+
+          }
+
+        );
+
+      }
+
+    } );
+  }
+
+  public confirmarRescindirContrato( contract: IContract ): void {
+
+
+
   }
 
 }
