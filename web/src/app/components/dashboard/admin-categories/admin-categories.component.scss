@@ -107,40 +107,6 @@ div.block-field {
 
   }
 
-  .text-area {
-    margin-top: 0.5em;
-
-    ::ng-deep div.mat-form-field-flex {
-      background-color: white;
-      color: black;
-      border-radius: 6px;
-    }
-  }
-
-  mat-radio-group {
-
-    display: flex;
-    flex-direction: row;
-    background-color: white;
-    color: black;
-    border-radius: 6px;
-
-    mat-radio-button {
-      margin: 1em 1em;
-    }
-
-  }
-
-  mat-form-field.matDate {
-
-    max-width: 296px;
-
-    ::ng-deep div.mat-form-field-flex {
-      background-color: white;
-      color: black;
-    }
-  }
-
 
 }
 

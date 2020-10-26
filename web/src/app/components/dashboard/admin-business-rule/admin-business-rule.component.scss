@@ -19,25 +19,84 @@ div.parent {
 
   .body {
 
-    display: flex;
-
-    // Pantalla grande
-    @media screen and (min-width: $break-small) {
-      flex-direction: row;
-    }
-
-    // Pantalla chica
-    @media screen and (max-width: $break-small) {
-      flex-direction: column;
-    }
 
     .buttons-action {
 
       display: flex;
       flex-direction: row;
 
+
+      // Pantalla chica
+      @media screen and (max-width: $break-small) {
+        justify-content: center;
+      }
+
+      button {
+        flex: 1;
+      }
+
     }
 
   }
+
+}
+
+
+// General
+
+div.block-field {
+
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin: 1em 2em;
+  min-width: 200px;
+
+  div.input-field-row {
+
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    div.title-and-error {
+
+      display: flex;
+      justify-content: space-between;
+
+      p.text-danger {
+        text-align: end;
+        font-weight: 500;
+        font-size: medium;
+        margin: 0;
+      }
+
+      p.field-name {
+        display: flex;
+        align-items: center;
+        margin: 0px;
+        margin-right: 1em;
+
+        font-weight: bold;
+        font-size: initial;
+
+      }
+
+    }
+
+  }
+
+
+}
+
+
+button.button-white-borders {
+
+  color: white;
+  &:hover {
+    box-shadow: inset 0px 0px 0px 2px white;
+    font-weight: bold;
+  }
+
+  padding-top: 0.1em;
 
 }

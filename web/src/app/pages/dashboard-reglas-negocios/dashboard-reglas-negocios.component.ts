@@ -99,8 +99,8 @@ export class DashboardReglasNegociosComponent implements OnInit {
 
       case 'minimum_views_percentage_to_require_contract': {
         return {
-          name: 'Cantidad mínima de vistas en porcentaje para solicitar contrato',
-          type: TypeAmount.normal
+          name: 'Porcentaje mínimo de vistas para solicitar contrato',
+          type: TypeAmount.percent
         };
       }
 
@@ -113,6 +113,12 @@ export class DashboardReglasNegociosComponent implements OnInit {
 
     }
 
+
+  }
+
+  public saveRule( rule: IBusinessRuleSingle ): void {
+
+    console.log('TEST > ', rule);
 
   }
 
