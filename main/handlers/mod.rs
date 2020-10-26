@@ -3,6 +3,7 @@ pub mod category;
 pub mod collection;
 pub mod configuration;
 pub mod contract;
+pub mod donation;
 pub mod event;
 pub mod file;
 pub mod notification;

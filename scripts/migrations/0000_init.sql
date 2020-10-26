@@ -221,3 +221,22 @@ CREATE TABLE IF NOT EXISTS contracts (
   updated_at TIMESTAMP WITH TIME ZONE,
   deleted_at TIMESTAMP WITH TIME ZONE
 );
+
+CREATE TABLE IF NOT EXISTS donations (
+  id UUID PRIMARY KEY,
+
+  author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  reader_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+
+  amount DOUBLE PRECISION DEFAULT 0.0,
+  comment TEXT NOT NULL,
+
+  reader_payment JSONB NOT NULL,
+  author_charge JSONB NOT NULL,
+
+  status_history JSONB NOT NULL,
+
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE,
+  deleted_at TIMESTAMP WITH TIME ZONE
+);

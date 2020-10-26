@@ -93,6 +93,10 @@ impl Config {
         self.port
     }
 
+    pub fn api_url(&self) -> String {
+        format!("http://localhost:{}/api", self.port())
+    }
+
     pub fn env(&self) -> &str {
         &self.env
     }

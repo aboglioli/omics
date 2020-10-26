@@ -6,6 +6,7 @@ import { ConfigService } from './config.service';
 import {
   IAuthor,
   ICollection,
+  IDonation,
   IPagination,
   IPublication,
   IReaderAuthorInteraction,
@@ -85,6 +86,16 @@ export class AuthorService {
     }
 
     return this.http.get<IPagination<ICollection>>(`${this.baseUrl}/${id}/collections`, { params });
+  }
+
+  public getDonations(id: string, include: string = ''): Observable<IPagination<IDonation>> {
+    let params = new HttpParams();
+
+    if (include) {
+      params = params.append('include', include);
+    }
+
+    return this.http.get<IPagination<IDonation>>(`${this.baseUrl}/${id}/donations`, { params });
   }
 
   public follow(id: string): Observable<any> {

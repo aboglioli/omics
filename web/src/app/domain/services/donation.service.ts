@@ -3,31 +3,36 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ConfigService } from './config.service';
-import { IContract, IPagination } from '../models';
+import { IDonation, IPagination } from '../models';
 
 export interface ISearchCommand {
-  publication_id?: string;
+  author_id?: string;
+  reader_id?: string;
   status?: string;
   date_from?: string;
   date_to?: string;
   offset?: number;
   limit?: number;
-  order_by?: string; // 'newest' 'oldest'
+  order_by?: string; // 'newest' 'oldest', 'amount'
 }
 
 @Injectable()
-export class ContractService {
+export class DonationService {
   private baseUrl: string;
 
   constructor(private http: HttpClient, configServ: ConfigService) {
-    this.baseUrl = `${configServ.baseUrl()}/contracts`;
+    this.baseUrl = `${configServ.baseUrl()}/donations`;
   }
 
-  public search(cmd: ISearchCommand, include: string = ''): Observable<IPagination<IContract>> {
+  public search(cmd: ISearchCommand, include: string = ''): Observable<IPagination<IDonation>> {
     let params = new HttpParams();
 
-    if (cmd.publication_id) {
-      params = params.append('publication_id', cmd.publication_id);
+    if (cmd.author_id) {
+      params = params.append('author_id', cmd.author_id);
+    }
+
+    if (cmd.reader_id) {
+      params = params.append('reader_id', cmd.reader_id);
     }
 
     if (cmd.status) {
@@ -58,26 +63,10 @@ export class ContractService {
       params = params.append('include', include);
     }
 
-    return this.http.get<IPagination<IContract>>(this.baseUrl, { params });
+    return this.http.get<IPagination<IDonation>>(this.baseUrl, { params });
   }
 
-  public approve(id: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${id}/approve`, {});
-  }
-
-  public reject(id: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${id}/reject`, {});
-  }
-
-  public delete(id: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}`);
-  }
-
-  public generateSatistics(): Observable<any> {
-    return this.http.post(`${this.baseUrl}/statistics`, {});
-  }
-
-  public charge(id: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${id}/charge`, {});
+  public charge(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/charge`, {});
   }
 }

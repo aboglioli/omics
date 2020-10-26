@@ -19,10 +19,12 @@ use notification::container::NotificationContainer;
 use notification::infrastructure::persistence::postgres::PostgresNotificationRepository;
 use notification::infrastructure::service::GmailService;
 use payment::container::PaymentContainer;
+use payment::domain::payment::PaymentService;
 use payment::infrastructure::persistence::postgres::{
-    PostgresContractRepository, PostgresPlanRepository, PostgresSubscriptionRepository,
+    PostgresContractRepository, PostgresDonationRepository, PostgresPlanRepository,
+    PostgresSubscriptionRepository,
 };
-use payment::infrastructure::service::MercadoPagoService;
+use payment::infrastructure::service::{DevelopmentPaymentService, MercadoPagoService};
 use publishing::container::PublishingContainer;
 use publishing::infrastructure::persistence::postgres::{
     PostgresAuthorRepository, PostgresCategoryRepository, PostgresCollectionRepository,
@@ -89,9 +91,14 @@ impl MainContainer {
 
         // Payment
         let pay_contract_repo = Arc::new(PostgresContractRepository::new(client.clone()));
+        let pay_donation_repo = Arc::new(PostgresDonationRepository::new(client.clone()));
         let pay_plan_repo = Arc::new(PostgresPlanRepository::new(client.clone()));
         let pay_subscription_repo = Arc::new(PostgresSubscriptionRepository::new(client.clone()));
-        let pay_payment_serv = Arc::new(MercadoPagoService::new());
+        let pay_payment_serv = if config.env() == "production" {
+            Arc::new(MercadoPagoService::new()) as Arc<dyn PaymentService>
+        } else {
+            Arc::new(DevelopmentPaymentService::new()) as Arc<dyn PaymentService>
+        };
 
         // Notification
         let not_notificationot_repo = Arc::new(PostgresNotificationRepository::new(client));
@@ -121,6 +128,7 @@ impl MainContainer {
         let payment = PaymentContainer::new(
             event_bus.clone(),
             pay_contract_repo,
+            pay_donation_repo,
             pay_plan_repo,
             pub_publicationot_repo.clone(),
             pub_reader_repo.clone(),

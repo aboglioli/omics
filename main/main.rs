@@ -13,8 +13,8 @@ use common::config::Config;
 
 use container::MainContainer;
 use handlers::{
-    author, category, collection, configuration, contract, event, file, notification, payment,
-    plan, publication, reader, report, role, subscription, user,
+    author, category, collection, configuration, contract, donation, event, file, notification,
+    payment, plan, publication, reader, report, role, subscription, user,
 };
 
 async fn index() -> impl Responder {
@@ -40,6 +40,7 @@ async fn main() -> std::io::Result<()> {
     //     }
     // }
 
+    println!("Environment: {}", config.env());
     println!("Listening on {} ({})", config.port(), config.env());
 
     HttpServer::new(move || {
@@ -64,6 +65,7 @@ async fn main() -> std::io::Result<()> {
                     .configure(payment::routes)
                     .configure(notification::routes)
                     .configure(report::routes)
+                    .configure(donation::routes)
                     .configure(configuration::routes),
             )
     })
