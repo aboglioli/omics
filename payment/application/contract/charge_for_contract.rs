@@ -1,3 +1,4 @@
+use common::config::ConfigService;
 use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
@@ -12,6 +13,7 @@ pub struct ChargeForContract<'a> {
     contract_repo: &'a dyn ContractRepository,
     publication_repo: &'a dyn PublicationRepository,
 
+    config_serv: &'a ConfigService,
     payment_serv: &'a dyn PaymentService,
 }
 
@@ -20,12 +22,14 @@ impl<'a> ChargeForContract<'a> {
         event_pub: &'a dyn EventPublisher,
         contract_repo: &'a dyn ContractRepository,
         publication_repo: &'a dyn PublicationRepository,
+        config_serv: &'a ConfigService,
         payment_serv: &'a dyn PaymentService,
     ) -> Self {
         ChargeForContract {
             event_pub,
             contract_repo,
             publication_repo,
+            config_serv,
             payment_serv,
         }
     }
@@ -44,7 +48,12 @@ impl<'a> ChargeForContract<'a> {
             return Err(Error::not_owner("contract"));
         }
 
-        let _payment = contract.pay_summaries()?;
+        let payment = contract.pay_summaries()?;
+
+        let business_rules = self.config_serv.get_business_rules().await?;
+        if payment.amount().value() < business_rules.minimum_charge_amount {
+            return Err(Error::new("contract", "minimum_charge"));
+        }
 
         // TODO: pay to author
 
