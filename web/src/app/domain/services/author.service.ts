@@ -26,6 +26,16 @@ export interface ISearchCommand {
   order_by?: string; // followers, publications, newest
 }
 
+export interface IDonateCommand {
+  amount: number;
+  comment: string;
+}
+
+export interface IDonateResponse {
+  id: string;
+  payment_link: string;
+}
+
 @Injectable()
 export class AuthorService {
   private baseUrl: string;
@@ -104,5 +114,9 @@ export class AuthorService {
 
   public unfollow(id: string): Observable<any> {
     return this.http.post(`${this.baseUrl}/${id}/unfollow`, {});
+  }
+
+  public donate(id: string, cmd: IDonateCommand): Observable<IDonateResponse> {
+    return this.http.post<IDonateResponse>(`${this.baseUrl}/${id}/donate`, cmd);
   }
 }
