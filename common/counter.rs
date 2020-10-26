@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 #[derive(Default)]
 pub struct Counter {
-    counts: HashMap<String, u64>,
+    counts: HashMap<String, usize>,
 }
 
 impl Counter {
@@ -30,12 +30,16 @@ impl Counter {
         }
     }
 
-    pub fn count(&self, name: &str) -> u64 {
+    pub fn count(&self, name: &str) -> usize {
         if let Some(count) = self.counts.get(name) {
             *count
         } else {
             0
         }
+    }
+
+    pub fn into(self) -> HashMap<String, usize> {
+        self.counts
     }
 }
 
