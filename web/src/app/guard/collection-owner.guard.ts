@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 import { ICollection } from '../domain/models';
 import { AuthService } from '../domain/services/auth.service';
 import { CollectionService } from '../domain/services/collection.service';
+import { SweetAlertGenericMessageService } from '../services/sweet-alert-generic-message.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,7 @@ export class CollectionOwnerGuard implements CanActivate {
   constructor(  private authService: AuthService,
                 private spinnerService: NgxSpinnerService,
                 private collectionService: CollectionService,
+                private sweetAlertGenericService: SweetAlertGenericMessageService,
                 private router: Router ) {}
 
   canActivate( next: ActivatedRouteSnapshot): Observable<boolean> | boolean {
@@ -37,6 +39,7 @@ export class CollectionOwnerGuard implements CanActivate {
         const isOwner = ( collectionAuthorId === this.authService.getIdUser() );
 
         if ( !isOwner ) {
+          this.sweetAlertGenericService.showAlertError('No es dueño de la colección', 'Error');
           this.router.navigate(['/home']);
         }
 

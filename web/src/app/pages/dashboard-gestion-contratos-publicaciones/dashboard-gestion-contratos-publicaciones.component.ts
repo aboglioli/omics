@@ -60,7 +60,7 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
 
     this.spinnerService.show();
 
-    this.publicationService.search({ status: 'waiting-approval' }, 'author,category').subscribe(
+    this.publicationService.search({ status: 'waiting-approval', order_by: 'newest' }, 'author,category').subscribe(
       (res) => {
 
         this.publicationList = res.items;
