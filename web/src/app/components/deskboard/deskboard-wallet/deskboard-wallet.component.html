@@ -1,52 +1,63 @@
 <div class="wallet-container">
-  <h1>Contratos</h1>
 
-  <div class="contract" *ngFor="let contract of contracts">
-    <h2>{{contract.publication.name}}</h2>
+  <div style="display: flex; justify-content: center;">
+    <button mat-flat-button
+            color="primary"
+            class="button-white-borders"
+            (click)="onMedioCobro()">
+          Medio de Cobro
+    </button>
+  </div>
 
-    <h3>Resúmenes</h3>
-    <div class="summaries">
-      <table>
-        <tr>
-          <th>Visualizaciones</th>
-          <th>Lecturas</th>
-          <th>Likes</th>
-          <th>Calificaciones</th>
-          <th>Monto</th>
-          <th>Desde</th>
-          <th>Hasta</th>
-          <th>Pagado</th>
-        </tr>
-        <tr *ngFor="let summary of contract.summaries">
-          <td>{{summary.statistics.views}}</td>
-          <td>{{summary.statistics.readings}}</td>
-          <td>{{summary.statistics.likes}}</td>
-          <td>{{summary.statistics.stars.toFixed(2)}}</td>
-          <td>$ {{summary.amount.toFixed(2)}}</td>
-          <td>{{summary.from | date: 'shortDate' | date: 'dd/MM/yyyy'}}</td>
-          <td>{{summary.to | date: 'shortDate' | date: 'dd/MM/yyyy'}}</td>
-          <td>{{summary.paid ? 'Sí' : 'No'}}</td>
-        </tr>
-      </table>
-    </div>
+  <span *ngIf="contracts.length > 0">
 
-    <h3>Pagos</h3>
-    <div class="payments">
-      <table>
-        <tr>
-          <th>Monto</th>
-          <th>Fecha</th>
-        </tr>
-        <tr *ngFor="let payment of contract.payments">
-          <td>$ {{payment.amount.toFixed(2)}}</td>
-          <td>{{payment.datetime | date: 'shortDate' | date: 'dd/MM/yyyy'}}</td>
-        </tr>
-      </table>
-    </div>
+    <h1>Contratos</h1>
 
+    <div class="contract" *ngFor="let contract of contracts">
+      <h2>{{contract.publication.name}}</h2>
 
-    <div class="row">
-      <div class="col-md-7 col-sm-12">
+      <h3>Resúmenes</h3>
+      <div class="summaries">
+        <table>
+          <tr>
+            <th>Visualizaciones</th>
+            <th>Lecturas</th>
+            <th>Likes</th>
+            <th>Calificaciones</th>
+            <th>Monto</th>
+            <th>Desde</th>
+            <th>Hasta</th>
+            <th>Pagado</th>
+          </tr>
+          <tr *ngFor="let summary of contract.summaries">
+            <td>{{summary.statistics.views}}</td>
+            <td>{{summary.statistics.readings}}</td>
+            <td>{{summary.statistics.likes}}</td>
+            <td>{{summary.statistics.stars.toFixed(2)}}</td>
+            <td>$ {{summary.amount.toFixed(2)}}</td>
+            <td>{{summary.from | date: 'shortDate' | date: 'dd/MM/yyyy'}}</td>
+            <td>{{summary.to | date: 'shortDate' | date: 'dd/MM/yyyy'}}</td>
+            <td>{{summary.paid ? 'Sí' : 'No'}}</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>Pagos</h3>
+
+      <div class="payments">
+        <table>
+          <tr>
+            <th>Monto</th>
+            <th>Fecha</th>
+          </tr>
+          <tr *ngFor="let payment of contract.payments">
+            <td>$ {{payment.amount.toFixed(2)}}</td>
+            <td>{{payment.datetime | date: 'shortDate' | date: 'dd/MM/yyyy'}}</td>
+          </tr>
+        </table>
+      </div>
+
+      <div style="display: flex; justify-content: center; margin-bottom: 1em;">
         <div class="totals">
           <div class="total">
             <h4>Total</h4>
@@ -63,24 +74,51 @@
         </div>
       </div>
 
-      <div class="col-md-5 col-sm-12">
-        <div class="buttons">
-          <button
-            class="generate-summaries"
-            (click)="generateSummaries(contract)"
-            >
+
+      <div style="display: flex; justify-content: center;">
+          <button mat-flat-button
+                  color="warn"
+                  class="button-white-borders"
+                  style="margin: 1em"
+                  (click)="onRescindirContrato(contract)">
+            Rescindir contrato
+          </button>
+
+          <button mat-flat-button
+                  color="primary"
+                  class="button-white-borders"
+                  style="margin: 1em"
+                  (click)="generateSummaries(contract)">
             Actualizar resúmenes
           </button>
 
-            <button
-              class="charge"
-              [disabled]="!canCharge(contract)"
-              (click)="charge(contract)"
-              >
-              Cobrar
-            </button>
-        </div>
+          <button mat-flat-button
+                  color="accent"
+                  class="button-white-borders"
+                  style="margin: 1em"
+                  [disabled]="!canCharge(contract)"
+                  (click)="charge(contract)">
+            Cobrar
+          </button>
+
       </div>
+
     </div>
-  </div>
+
+  </span>
+
+  <span *ngIf="contracts.length === 0">
+
+    <h1>No hay contratos disponibles</h1>
+
+  </span>
+
 </div>
+
+
+<swal #confirmRescindirContrato
+  title="Datos incompletos o erroneos"
+  text="Complete correctamente los datos necesarios"
+  icon="error"
+  [focusConfirm]="true">
+</swal>

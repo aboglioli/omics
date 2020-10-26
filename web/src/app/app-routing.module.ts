@@ -1,3 +1,5 @@
+// tslint:disable: max-line-length
+
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
@@ -27,6 +29,7 @@ import { CollectionOwnerGuard } from './guard/collection-owner.guard';
 import { CollectionInfoComponent } from './pages/collection-info/collection-info.component';
 import { PlansComponent } from './pages/plans/plans.component';
 import { AdminGuard } from './guard/admin.guard';
+import { ContentManagerGuard } from './guard/content-manager.guard';
 
 
 const routes: Routes = [
@@ -48,9 +51,9 @@ const routes: Routes = [
   { path: 'collection/:id', component: CollectionInfoComponent },
   { path: 'about', component: AboutComponent },
   { path: 'read/:id', component: VisorComicComponent, canActivate: [AuthLoginGuard] },
-  { path: 'dashboard-reportes', component: DashboardReportesComponent },
-  { path: 'dashboard-publicaciones-contratos', component: DashboardGestionContratosPublicacionesComponent },
-  { path: 'dashboard-reglas-negocio', component: DashboardReglasNegociosComponent },
+  { path: 'dashboard-reportes', component: DashboardReportesComponent, canActivate: [AdminGuard] },
+  { path: 'dashboard-publicaciones-contratos', component: DashboardGestionContratosPublicacionesComponent, canActivate: [ContentManagerGuard] },
+  { path: 'dashboard-reglas-negocio', component: DashboardReglasNegociosComponent, canActivate: [AdminGuard]  },
   { path: 'dashboard-general', component: DashboardGestionAdminComponent, canActivate: [AuthLoginGuard, AdminGuard ] },
   { path: 'plans', component: PlansComponent, canActivate: [AuthLoginGuard] },
   { path: '**', pathMatch: 'full', redirectTo: 'home' },

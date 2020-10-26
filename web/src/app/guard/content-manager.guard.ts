@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router } from '@angular/router';
+import { CanActivate, ActivatedRouteSnapshot, UrlTree, Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -10,7 +10,7 @@ import { SweetAlertGenericMessageService } from '../services/sweet-alert-generic
 @Injectable({
   providedIn: 'root'
 })
-export class AdminGuard implements CanActivate {
+export class ContentManagerGuard implements CanActivate {
 
   constructor(  private router: Router,
                 private spinnerService: NgxSpinnerService,
@@ -24,7 +24,7 @@ export class AdminGuard implements CanActivate {
 
       map(( userRes: IUser ) => {
 
-        const isAdmin = (userRes.role_id === 'admin');
+        const isAdmin = (userRes.role_id === 'admin' || userRes.role_id === 'content-manager');
         this.spinnerService.hide();
 
         if ( !isAdmin ) {

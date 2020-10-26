@@ -1,0 +1,105 @@
+@import "src/scss/vars";
+
+div.parent {
+
+  display: flex;
+  flex-direction: column;
+
+
+  color: white;
+  background-color: $omics-background-flat;
+
+  .header {
+
+    padding: 0.5em;
+    background-color: $omics-background-menu;
+    text-align: center;
+    position: relative;
+
+
+    div.button-top-menu {
+
+      position: absolute;
+      right: 2px;
+
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+
+      button {
+        margin: 0px;
+        &:focus {
+          outline: none;
+        }
+      }
+
+    }
+
+  }
+
+  .body {
+
+    padding-top: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
+
+  }
+
+}
+
+// Generales
+button.button-white-borders {
+
+  color: white;
+  &:hover {
+    box-shadow: inset 0px 0px 0px 2px white;
+    font-weight: bold;
+  }
+
+  padding-top: 0.1em;
+
+}
+
+div.block-field {
+
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin: 1em 2em;
+  min-width: 200px;
+
+  div.input-field-row {
+
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    div.title-and-error {
+
+      display: flex;
+      justify-content: space-between;
+
+      p.text-danger {
+        text-align: end;
+        font-weight: 500;
+        font-size: medium;
+        margin: 0;
+      }
+
+      p.field-name {
+        display: flex;
+        align-items: center;
+        margin: 0px;
+        margin-right: 1em;
+
+        font-weight: bold;
+        font-size: initial;
+
+      }
+
+    }
+
+  }
+
+
+}

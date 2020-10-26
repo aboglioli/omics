@@ -5,6 +5,7 @@ import { AuthService } from '../domain/services/auth.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { PublicationService, IGetByIdResponse } from '../domain/services/publication.service';
 import { map } from 'rxjs/operators';
+import { SweetAlertGenericMessageService } from '../services/sweet-alert-generic-message.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,7 @@ export class PublicationOwnerGuard implements CanActivate {
   constructor(  private authService: AuthService,
                 private spinnerService: NgxSpinnerService,
                 private publicationService: PublicationService,
+                private sweetAlertGenericService: SweetAlertGenericMessageService,
                 private router: Router ) {}
 
   canActivate( next: ActivatedRouteSnapshot): Observable<boolean> | boolean {
@@ -38,6 +40,7 @@ export class PublicationOwnerGuard implements CanActivate {
         const isOwner = ( publicationAuthorId === this.authService.getIdUser() );
 
         if ( !isOwner ) {
+          this.sweetAlertGenericService.showAlertError('No es dueño de la publicación', 'Error');
           this.router.navigate(['/home']);
         }
 

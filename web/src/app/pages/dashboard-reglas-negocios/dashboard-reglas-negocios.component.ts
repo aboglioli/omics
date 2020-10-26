@@ -14,6 +14,7 @@ import { TypeAmount } from 'src/app/models/enums.model';
 export class DashboardReglasNegociosComponent implements OnInit {
 
   public businessRulesList: IBusinessRuleSingle[] = [];
+  private businnesRulesObjectAux: IBusinessRules;
 
   constructor(
     private spinnerService: NgxSpinnerService,
@@ -30,6 +31,9 @@ export class DashboardReglasNegociosComponent implements OnInit {
 
         this.spinnerService.hide();
 
+        this.businnesRulesObjectAux = res;
+
+        // Crear la lista para poder manejarlo mejor individualmente
         for ( const key in res ) {
 
           if ( res.hasOwnProperty( key ) ) {
@@ -118,7 +122,26 @@ export class DashboardReglasNegociosComponent implements OnInit {
 
   public saveRule( rule: IBusinessRuleSingle ): void {
 
-    console.log('TEST > ', rule);
+    // this.spinnerService.show();
+
+    this.businnesRulesObjectAux[ rule.key ] = rule.value;
+
+    this.businessRulesService.save(this.businnesRulesObjectAux).subscribe(
+
+      (res) => {
+
+        this.sweetAlertGenericService.showAlertSuccess( 'Se ha guardado el cambio con éxito', 'Éxito' );
+        this.spinnerService.hide();
+
+      },
+      (err: Error) => {
+
+        this.sweetAlertGenericService.showAlertError('Problemas de conexión con el servidor', 'Error');
+        this.spinnerService.hide();
+
+      }
+
+    );
 
   }
 
