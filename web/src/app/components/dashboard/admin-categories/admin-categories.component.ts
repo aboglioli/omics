@@ -107,7 +107,7 @@ export class AdminCategoriesComponent implements OnInit {
       } else {
 
         this.sweetAlertGenericService.showAlertError(
-          'Las categorías con publicaciones y/o colecciones asignadas, no pueden eliminarse. Contactarse con el encargadode la base de datos.',
+          'Las categorías con publicaciones y/o colecciones asignadas, no pueden eliminarse. Contactarse con el encargado de la base de datos.',
           `No puede eliminarse ${ category.name }`
         );
 

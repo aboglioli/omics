@@ -21,6 +21,7 @@ export class PerfilComponent implements OnInit {
   public memberSince: Date;
   public isSameAsUser = false;
   public followed = false;
+  public isAccessUserLogIn = false;
 
   // Font Awseome icons
   public faFollowers = faUsers;
@@ -38,6 +39,8 @@ export class PerfilComponent implements OnInit {
   ngOnInit(): void {
 
     this.getUserDataByParams();
+
+    this.isAccessUserLogIn = this.authService.isLoggedIn();
 
   }
 

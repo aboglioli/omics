@@ -46,7 +46,7 @@ const routes: Routes = [
   { path: 'deskboard/publication/edit/:id', component:  PublicationNewEditComponent, canActivate: [PublicationOwnerGuard]},
   { path: 'deskboard/collection/new', component:  CollectionNewEditComponent},
   { path: 'deskboard/collection/edit/:id', component:  CollectionNewEditComponent, canActivate: [CollectionOwnerGuard]},
-  { path: 'profile/:id', component: PerfilComponent,  canActivate: [AuthLoginGuard] },
+  { path: 'profile/:id', component: PerfilComponent },
   { path: 'profile/:id/editUser', component: PerfilEditarComponent,  canActivate: [AuthLoginGuard, SameUserGuard]},
   { path: 'collection/:id', component: CollectionInfoComponent },
   { path: 'about', component: AboutComponent },
