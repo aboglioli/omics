@@ -38,6 +38,8 @@ impl User {
 
         let validation_code: Option<String> = row.get("validation_code");
 
+        let payment_email: Option<String> = row.get("payment_email");
+
         let created_at: DateTime<Utc> = row.get("created_at");
         let updated_at: Option<DateTime<Utc>> = row.get("updated_at");
         let deleted_at: Option<DateTime<Utc>> = row.get("deleted_at");
@@ -71,7 +73,14 @@ impl User {
         let role_id = RoleId::new(role_id)?;
         let validation = validation_code.map(Validation::build);
 
-        Ok(User::build(agg_root, identity, person, role_id, validation))
+        Ok(User::build(
+            agg_root,
+            identity,
+            person,
+            role_id,
+            validation,
+            payment_email.map(Email::new).transpose()?,
+        ))
     }
 }
 

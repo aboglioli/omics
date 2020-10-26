@@ -69,6 +69,7 @@ mod tests {
 
     #[test]
     fn invalid() {
+        assert!(Username::new("user name").is_err());
         assert!(Username::new("úser").is_err());
         assert!(Username::new("us€r").is_err());
         assert!(Username::new("@user").is_err());

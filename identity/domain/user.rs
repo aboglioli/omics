@@ -51,6 +51,7 @@ pub struct User {
     person: Option<Person>,
     role_id: RoleId,
     validation: Option<Validation>,
+    payment_email: Option<Email>,
 }
 
 impl User {
@@ -62,6 +63,7 @@ impl User {
             person: None,
             role_id,
             validation: Some(Validation::new()),
+            payment_email: None,
         };
 
         user.events.record_event(UserEvent::Registered {
@@ -80,6 +82,7 @@ impl User {
         person: Option<Person>,
         role_id: RoleId,
         validation: Option<Validation>,
+        payment_email: Option<Email>,
     ) -> Self {
         User {
             base,
@@ -88,6 +91,7 @@ impl User {
             person,
             role_id,
             validation,
+            payment_email,
         }
     }
 
@@ -113,6 +117,10 @@ impl User {
 
     pub fn validation(&self) -> Option<&Validation> {
         self.validation.as_ref()
+    }
+
+    pub fn payment_email(&self) -> Option<&Email> {
+        self.payment_email.as_ref()
     }
 
     pub fn is_validated(&self) -> bool {
@@ -236,6 +244,18 @@ impl User {
                 temp_password,
                 email: self.identity().email().to_string(),
             });
+
+        Ok(())
+    }
+
+    pub fn set_payment_email(&mut self, payment_email: Email) -> Result<()> {
+        self.payment_email = Some(payment_email);
+        self.base.update();
+
+        self.events.record_event(UserEvent::PaymentEmailChanged {
+            id: self.base().id().to_string(),
+            payment_email: self.payment_email().unwrap().to_string(),
+        });
 
         Ok(())
     }

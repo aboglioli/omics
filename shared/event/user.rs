@@ -36,6 +36,10 @@ pub enum UserEvent {
         id: String,
         role_id: String,
     },
+    PaymentEmailChanged {
+        id: String,
+        payment_email: String,
+    },
     Deleted {
         id: String,
     },
@@ -50,6 +54,7 @@ impl ToString for UserEvent {
             UserEvent::Validated { .. } => "validated".to_owned(),
             UserEvent::PasswordRecoveryRequested { .. } => "password-recovery-requested".to_owned(),
             UserEvent::RoleChanged { .. } => "role-changed".to_owned(),
+            UserEvent::PaymentEmailChanged { .. } => "payment-email-changed".to_owned(),
             UserEvent::Deleted { .. } => "deleted".to_owned(),
         }
     }

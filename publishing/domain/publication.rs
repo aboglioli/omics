@@ -518,7 +518,7 @@ mod tests {
             "#publication01",
             "#user01",
             "Publication 01",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "domain.com/cover.jpg",
             3,
@@ -530,7 +530,7 @@ mod tests {
         assert_eq!(publication.base().id().value(), "#publication01");
         assert_eq!(publication.header().name().value(), "Publication 01");
         assert_eq!(publication.header().synopsis().value(), "Synopsis...");
-        assert_eq!(publication.header().category_id().value(), "#category01");
+        assert_eq!(publication.header().category_id().value(), "category-1");
         assert_eq!(publication.header().tags().len(), 2);
         assert!(!publication.events().to_vec().unwrap().is_empty());
         assert!(matches!(
@@ -545,7 +545,7 @@ mod tests {
             "#publication01",
             "#user01",
             "Publication 01",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "domain.com/cover.jpg",
             3,
@@ -604,7 +604,7 @@ mod tests {
             "#publication01",
             "#user01",
             "Publication 01",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "domain.com/cover.jpg",
             3,
@@ -617,7 +617,7 @@ mod tests {
             "#publication01",
             "#user01",
             "Publication 01",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "domain.com/cover.jpg",
             3,
@@ -643,7 +643,7 @@ mod tests {
             "#publication01",
             "#user01",
             "Publication 01",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "domain.com/cover.jpg",
             3,

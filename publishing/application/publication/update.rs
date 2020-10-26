@@ -121,7 +121,7 @@ mod tests {
             "#publication01",
             "#user01",
             "Publication 01",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "domain.com/cover.jpg",
             3,
@@ -130,7 +130,7 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
-        let mut category = mocks::category("#category02", "Category 2");
+        let mut category = mocks::category("Category 2");
         c.category_repo().save(&mut category).await.unwrap();
 
         uc.exec(
@@ -168,7 +168,7 @@ mod tests {
             .unwrap();
         assert_eq!(publication.header().name().value(), "New name");
         assert_eq!(publication.header().synopsis().value(), "New synopsis...");
-        assert_eq!(publication.header().category_id().value(), "#category02");
+        assert_eq!(publication.header().category_id().value(), "category-2");
         assert!(matches!(
             publication.status_history().current(),
             Status::Draft
@@ -187,7 +187,7 @@ mod tests {
             "#publication01",
             "#user01",
             "Publication 01",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "domain.com/cover.jpg",
             3,
@@ -196,7 +196,7 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
-        let mut category = mocks::category("#category02", "Category 2");
+        let mut category = mocks::category("Category 2");
         c.category_repo().save(&mut category).await.unwrap();
 
         uc.exec(
@@ -234,7 +234,7 @@ mod tests {
             "#publication01",
             "#user01",
             "Publication 01",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "domain.com/cover.jpg",
             3,
@@ -243,7 +243,7 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
-        let mut category = mocks::category("#category02", "Category 2");
+        let mut category = mocks::category("Category 2");
         c.category_repo().save(&mut category).await.unwrap();
 
         assert!(uc
@@ -272,7 +272,7 @@ mod tests {
             "#publication01",
             "#user01",
             "Publication 01",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "domain.com/cover.jpg",
             3,
@@ -289,7 +289,7 @@ mod tests {
                 UpdateCommand {
                     name: "New name".to_owned(),
                     synopsis: "New synopsis...".to_owned(),
-                    category_id: "#category02".to_owned(),
+                    category_id: "category-2".to_owned(),
                     tags: vec!["New tag".to_owned()],
                     cover: "domain.com/new-cover.jpg".to_owned(),
                     pages: None,

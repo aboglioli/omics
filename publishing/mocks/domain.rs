@@ -89,7 +89,7 @@ pub fn collection(
     collection
 }
 
-pub fn category(_id: &str, name: &str) -> Category {
+pub fn category(name: &str) -> Category {
     Category::new(CategoryName::new(name).unwrap()).unwrap()
 }
 

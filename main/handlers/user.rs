@@ -2,9 +2,10 @@ use actix_web::{delete, get, http, post, put, web, HttpRequest, HttpResponse, Re
 
 use common::request::{IncludeParams, PaginationParams};
 use identity::application::user::{
-    ChangePassword, ChangePasswordCommand, ChangeRole, ChangeRoleCommand, Delete, GetById, Login,
-    LoginCommand, RecoverPassword, RecoverPasswordCommand, Register, RegisterCommand, Search,
-    SearchCommand, Update, UpdateCommand, Validate,
+    ChangePassword, ChangePasswordCommand, ChangePaymentEmail, ChangePaymentEmailCommand,
+    ChangeRole, ChangeRoleCommand, Delete, GetById, Login, LoginCommand, RecoverPassword,
+    RecoverPasswordCommand, Register, RegisterCommand, Search, SearchCommand, Update,
+    UpdateCommand, Validate,
 };
 
 use crate::authorization::auth;
@@ -190,6 +191,29 @@ async fn validate(
         .map_err(PublicError::from)
 }
 
+#[put("/{user_id}/payment-email")]
+async fn change_payment_email(
+    req: HttpRequest,
+    path: web::Path<String>,
+    cmd: web::Json<ChangePaymentEmailCommand>,
+    c: web::Data<MainContainer>,
+) -> impl Responder {
+    let auth_id = auth(&req, &c).await?;
+
+    let mut user_id = path.into_inner();
+    user_id = if user_id == "me" {
+        auth_id.clone()
+    } else {
+        user_id
+    };
+
+    ChangePaymentEmail::new(c.identity.event_pub(), c.identity.user_repo())
+        .exec(auth_id, user_id, cmd.into_inner())
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
+}
+
 #[put("/{user_id}/role")]
 async fn change_role(
     req: HttpRequest,
@@ -229,6 +253,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
                 .service(delete)
                 .service(change_password)
                 .service(validate)
-                .service(change_role),
+                .service(change_role)
+                .service(change_payment_email),
         );
 }

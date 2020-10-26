@@ -16,6 +16,7 @@ export interface IUser {
   validated: boolean;
   role_id?: string;
   role?: IRole;
+  payment_email?: string;
   created_at: string;
   updated_at?: string;
 }

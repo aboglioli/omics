@@ -66,13 +66,16 @@ Filtros:
 - [x] Improve enum serializatiion/deserialization.
 - [ ] Replace rename of each enum for serde by rename_all = "kebab-case".
 - [x] Serialize directly (without util) in shared::event.
-- [ ] Add Pagination<T> to each repository.
+- [x] Add Pagination<T> to each repository.
 - [x] Don't use a default limit in repository (it's a complexity to generate
   reports). Add the default limit in use cases. Or make reports from events.
-- [ ] 'Cancel' publication for content managers
+- [?] 'Cancel' publication for content managers
 - [ ] Generated descriptions in scripts/populate.js are longer than limit in value object.
-- [ ] "READ" button should not be shown to not logged in users
-- [  ] Use BusinessRules in code.
+- [x] "READ" button should not be shown to not logged in users
+- [ ] Use BusinessRules in code.
+- [ ] Tag filter in frontend and backend.
+- [ ] Agregar propiedad de email de pago para autor.
+- [ ] Reports
 
 # Progress
 
@@ -100,7 +103,7 @@ Filtros:
 - [x] CU 15 - Dar Like a Publicación  
 
 ## Módulo de Suscripción y Donación 
-- [ ] CU 16 - Donar a Autor 
+- [x] CU 16 - Donar a Autor 
 - [x] CU 17 - Realizar Suscripción 
 - [x] CU 18 - Cancelar Suscripción 
 - [x] CU 19 - Pagar Suscripción  
@@ -127,6 +130,6 @@ Filtros:
 - [ ] CU 32 - Generar y Visualizar Reportes 
 
 ## Módulo de Configuración
-- [ ] CU 33 - Configurar Reglas de Negocio  
-- [ ] CU 34 - Gestionar Categorías y Etiquetas 
-- [ ] CU 35 - Gestionar Estados 
+- [x] CU 33 - Configurar Reglas de Negocio  
+- [x] CU 34 - Gestionar Categorías y Etiquetas 
+- [-] CU 35 - Gestionar Estados 

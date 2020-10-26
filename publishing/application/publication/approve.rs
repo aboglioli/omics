@@ -94,7 +94,7 @@ mod tests {
             "#publication01",
             "#user01",
             "Publication 01",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "domain.com/cover.jpg",
             3,
