@@ -1,0 +1,77 @@
+<div class="parent">
+
+  <div class="header">
+
+    <!-- Volver -->
+    <div class="button-top-menu">
+      <button mat-icon-button mat-dialog-close (click)="closeMatDialog()">
+        <fa-icon [icon]="faClose" size="2x"></fa-icon>
+      </button>
+    </div>
+
+    <h1 style="margin: 0;">Mail de medio de cobro</h1>
+
+  </div>
+
+  <div class="body">
+
+    <div class="alert alert-warning" role="alert">
+      Nota: El mail ingresado es con el que tienes vinculada tu cuenta de Mercado Pago.
+    </div>
+
+    <form [formGroup]="formMedioCobro">
+
+      <div class="block-field">
+
+        <div class="input-field-row">
+
+          <div class="title-and-error">
+            <p class="field-name">Correo: </p>
+
+            <!-- mensaje de error -->
+            <p  *ngIf="correoNoValido"
+                class="form-text text-danger">
+
+                Ingrese un correo válido
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Input text -->
+        <div style="display: flex">
+
+
+          <input  class="form-control"
+                  type="email"
+                  placeholder="Correo Mercado Pago"
+                  formControlName="correo"
+                  [class.is-invalid]="correoNoValido">
+
+        </div>
+
+
+      </div>
+
+    </form>
+
+    <div style="display: flex; justify-content: center">
+
+      <button mat-flat-button
+              color="accent"
+              class="button-white-borders"
+              style="margin: 1em"
+              [disabled]="formMedioCobro.invalid"
+              (click)="onSave()">
+
+        <fa-icon  [icon]="faSave" size="1x"></fa-icon>
+        Guardar Cambios
+
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

@@ -294,13 +294,6 @@ export class PerfilEditarComponent implements OnInit {
   }
 
 
-  public onMedioCobro(): void {
-
-    // TODO: Agregar pantalla de Medio de Cobro
-    this.sweetAlertGenericService.showUnderConstrucction();
-
-  }
-
   public onEliminarCuenta(): void {
 
     // TODO: Agregar pantalla de eliminar

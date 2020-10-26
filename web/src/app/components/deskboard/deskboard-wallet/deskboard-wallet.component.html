@@ -1,5 +1,14 @@
 <div class="wallet-container">
 
+  <div style="display: flex; justify-content: center;">
+    <button mat-flat-button
+            color="primary"
+            class="button-white-borders"
+            (click)="onMedioCobro()">
+          Medio de Cobro
+    </button>
+  </div>
+
   <span *ngIf="contracts.length > 0">
 
     <h1>Contratos</h1>

@@ -76,6 +76,7 @@ import { CatalogueFilterComponent } from './components/catalogue-filter/catalogu
 import { AdminCategoriesComponent } from './components/dashboard/admin-categories/admin-categories.component';
 import { AdminTagsComponent } from './components/dashboard/admin-tags/admin-tags.component';
 import { AdminBusinessRuleComponent } from './components/dashboard/admin-business-rule/admin-business-rule.component';
+import { DeskboardMedioCobroComponent } from './components/deskboard/deskboard/deskboard-medio-cobro.component';
 
 
 @NgModule({
@@ -130,6 +131,7 @@ import { AdminBusinessRuleComponent } from './components/dashboard/admin-busines
     AdminCategoriesComponent,
     AdminTagsComponent,
     AdminBusinessRuleComponent,
+    DeskboardMedioCobroComponent,
   ],
   imports: [
     BrowserModule,

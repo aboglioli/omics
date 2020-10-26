@@ -6,6 +6,9 @@ import { PublicationService } from '../../../domain/services/publication.service
 import { AuthorService } from '../../../domain/services/author.service';
 import { ContractService } from '../../../domain/services/contract.service';
 import Swal from 'sweetalert2';
+import { DeskboardMedioCobroComponent } from '../deskboard/deskboard-medio-cobro.component';
+import { MatDialog } from '@angular/material/dialog';
+import { AuthService } from '../../../domain/services/auth.service';
 @Component({
   selector: 'app-deskboard-wallet',
   templateUrl: './deskboard-wallet.component.html',
@@ -20,9 +23,15 @@ export class DeskboardWalletComponent implements OnInit {
     private publicationService: PublicationService,
     private contractService: ContractService,
     private spinnerService: NgxSpinnerService,
+    private authService: AuthService,
+    private dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
+
+
+    const userId = this.authService.getIdUser(); // Obtener el mail de medio de pago para modificar
+
     this.getContracts();
   }
 
@@ -135,9 +144,23 @@ export class DeskboardWalletComponent implements OnInit {
     } );
   }
 
-  public confirmarRescindirContrato( contract: IContract ): void {
+  public onMedioCobro(): void {
 
+    const mailCobro = '';
 
+    const dialogRef = this.dialog.open(
+      DeskboardMedioCobroComponent,
+      {
+        panelClass: 'margin-dialog',
+        data: {
+          mailCobro
+        }
+      }
+    );
+
+    // dialogRef.afterClosed().subscribe( resHaveEmail => {
+
+    // });
 
   }
 
