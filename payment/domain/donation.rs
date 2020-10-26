@@ -149,7 +149,7 @@ impl Donation {
         Ok(payment)
     }
 
-    pub fn charge(&mut self) -> Result<Payment> {
+    pub fn charge(&mut self, percentage: f64) -> Result<Payment> {
         if !self.is_paid() {
             return Err(Error::new("donation", "not_paid"));
         }
@@ -158,7 +158,8 @@ impl Donation {
             return Err(Error::new("donation", "already_charged"));
         }
 
-        let payment = Payment::new(Kind::Outcome, self.amount().clone())?;
+        let amount = Amount::new(self.amount.value() * percentage)?;
+        let payment = Payment::new(Kind::Outcome, amount)?;
 
         let status = self.status_history.current().charge()?;
         self.status_history.add_status(status);
@@ -169,7 +170,7 @@ impl Donation {
             id: self.base().id().to_string(),
             author_id: self.author_id().to_string(),
             reader_id: self.reader_id().to_string(),
-            amount: self.amount().value(),
+            amount: payment.amount().value(),
             comment: self.comment().to_string(),
         });
 
