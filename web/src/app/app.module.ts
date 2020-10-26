@@ -74,6 +74,8 @@ import { CollectionNewEditComponent } from './pages/deskboard/collection-new-edi
 import { CollectionInfoComponent } from './pages/collection-info/collection-info.component';
 import { CatalogueFilterComponent } from './components/catalogue-filter/catalogue-filter.component';
 import { AdminCategoriesComponent } from './components/dashboard/admin-categories/admin-categories.component';
+import { AdminTagsComponent } from './components/dashboard/admin-tags/admin-tags.component';
+import { AdminBusinessRuleComponent } from './components/dashboard/admin-business-rule/admin-business-rule.component';
 
 
 @NgModule({
@@ -126,6 +128,8 @@ import { AdminCategoriesComponent } from './components/dashboard/admin-categorie
     CollectionInfoComponent,
     CatalogueFilterComponent,
     AdminCategoriesComponent,
+    AdminTagsComponent,
+    AdminBusinessRuleComponent,
   ],
   imports: [
     BrowserModule,

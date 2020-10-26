@@ -1,0 +1,43 @@
+@import "src/scss/vars";
+
+div.parent {
+
+  display: flex;
+  flex-direction: column;
+
+  margin: 1em 0em;
+
+  color: white;
+  background-color: $omics-background-flat;
+
+  .header {
+
+    padding: 0.25em;
+    background-color: $omics-background-menu;
+
+  }
+
+  .body {
+
+    display: flex;
+
+    // Pantalla grande
+    @media screen and (min-width: $break-small) {
+      flex-direction: row;
+    }
+
+    // Pantalla chica
+    @media screen and (max-width: $break-small) {
+      flex-direction: column;
+    }
+
+    .buttons-action {
+
+      display: flex;
+      flex-direction: row;
+
+    }
+
+  }
+
+}

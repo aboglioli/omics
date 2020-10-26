@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, OnInit } from '@angular/core';
-import { faClone } from '@fortawesome/free-solid-svg-icons';
+import { faClone, faTag } from '@fortawesome/free-solid-svg-icons';
 import { DashboardGeneralOptionMenu } from 'src/app/models/enums.model';
 
 @Component({
@@ -12,6 +12,7 @@ export class DashboardGestionAdminComponent implements OnInit {
 
   // FontAwesome Icon
   public faCategory = faClone;
+  public faTag = faTag;
 
 
   public optionMenu = DashboardGeneralOptionMenu;
@@ -30,7 +31,7 @@ export class DashboardGestionAdminComponent implements OnInit {
   }
 
   public onChangeTopMenu( option: number ): void {
-
+    this.currentOption = option;
   }
 
   private checkWidthScreen(): void {
