@@ -214,14 +214,14 @@ mod tests {
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 
-        let mut category = mocks::category("#category01", "Category 1");
+        let mut category = mocks::category("Category 1");
         c.category_repo().save(&mut category).await.unwrap();
 
         let mut publication = mocks::publication(
             "#publication01",
             "#user01",
             "Publication 01",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "domain.com/cover.jpg",
             3,
@@ -281,14 +281,14 @@ mod tests {
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 
-        let mut category = mocks::category("#category01", "Category 1");
+        let mut category = mocks::category("Category 1");
         c.category_repo().save(&mut category).await.unwrap();
 
         let mut publication = mocks::publication(
             "#publication01",
             "#user01",
             "Publication 01",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "domain.com/cover.jpg",
             3,
@@ -332,14 +332,14 @@ mod tests {
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 
-        let mut category = mocks::category("#category01", "Category 1");
+        let mut category = mocks::category("Category 1");
         c.category_repo().save(&mut category).await.unwrap();
 
         let mut publication = mocks::publication(
             "#publication01",
             "#user01",
             "Publication 01",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "domain.com/cover.jpg",
             3,
@@ -393,14 +393,14 @@ mod tests {
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 
-        let mut category = mocks::category("#category01", "Category 1");
+        let mut category = mocks::category("Category 1");
         c.category_repo().save(&mut category).await.unwrap();
 
         let mut publication = mocks::publication(
             "#publication01",
             "#user01",
             "Publication 01",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "domain.com/cover.jpg",
             3,
@@ -444,14 +444,14 @@ mod tests {
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 
-        let mut category = mocks::category("#category01", "Category 1");
+        let mut category = mocks::category("Category 1");
         c.category_repo().save(&mut category).await.unwrap();
 
         let mut publication = mocks::publication(
             "#publication01",
             "#user01",
             "Publication 01",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "domain.com/cover.jpg",
             3,

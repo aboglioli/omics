@@ -72,7 +72,9 @@ Filtros:
 - [ ] 'Cancel' publication for content managers
 - [ ] Generated descriptions in scripts/populate.js are longer than limit in value object.
 - [ ] "READ" button should not be shown to not logged in users
-- [  ] Use BusinessRules in code.
+- [ ] Use BusinessRules in code.
+- [ ] Tag filter in frontend and backend.
+- [ ] Agregar propiedad de email de pago para autor.
 
 # Progress
 
@@ -100,7 +102,7 @@ Filtros:
 - [x] CU 15 - Dar Like a Publicación  
 
 ## Módulo de Suscripción y Donación 
-- [ ] CU 16 - Donar a Autor 
+- [x] CU 16 - Donar a Autor 
 - [x] CU 17 - Realizar Suscripción 
 - [x] CU 18 - Cancelar Suscripción 
 - [x] CU 19 - Pagar Suscripción  
@@ -127,6 +129,6 @@ Filtros:
 - [ ] CU 32 - Generar y Visualizar Reportes 
 
 ## Módulo de Configuración
-- [ ] CU 33 - Configurar Reglas de Negocio  
-- [ ] CU 34 - Gestionar Categorías y Etiquetas 
-- [ ] CU 35 - Gestionar Estados 
+- [x] CU 33 - Configurar Reglas de Negocio  
+- [x] CU 34 - Gestionar Categorías y Etiquetas 
+- [-] CU 35 - Gestionar Estados 

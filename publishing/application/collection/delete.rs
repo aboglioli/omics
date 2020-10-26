@@ -57,7 +57,7 @@ mod tests {
             "#collection01",
             "#user01",
             "User",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "cover.jpg",
         );
@@ -84,7 +84,7 @@ mod tests {
             "#collection01",
             "#user01",
             "User",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "cover.jpg",
         );

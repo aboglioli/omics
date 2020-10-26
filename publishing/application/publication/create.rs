@@ -126,7 +126,7 @@ mod tests {
 
         let mut author = mocks::author("#user01", "user-1");
         c.author_repo().save(&mut author).await.unwrap();
-        let mut category = mocks::category("#category01", "Category 1");
+        let mut category = mocks::category("Category 1");
         c.category_repo().save(&mut category).await.unwrap();
 
         let res = uc
@@ -182,7 +182,7 @@ mod tests {
 
         let mut author = mocks::author("#user01", "user-1");
         c.author_repo().save(&mut author).await.unwrap();
-        let mut category = mocks::category("#category01", "Category 1");
+        let mut category = mocks::category("Category 1");
         c.category_repo().save(&mut category).await.unwrap();
 
         assert!(uc
@@ -235,7 +235,7 @@ mod tests {
                 CreateCommand {
                     name: "Publication 1".to_owned(),
                     synopsis: "Synopsis...".to_owned(),
-                    category_id: "#category01".to_owned(),
+                    category_id: "category-1".to_owned(),
                     tags: vec!["Tag 1".to_owned()],
                     cover: "cover.com/cover.jpg".to_owned(),
                     pages: None,

@@ -93,12 +93,12 @@ mod tests {
             "#collection01",
             "#user01",
             "Name",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "cover.jpg",
         );
         c.collection_repo().save(&mut collection).await.unwrap();
-        let mut category = mocks::category("#category02", "Category 2");
+        let mut category = mocks::category("Category 2");
         c.category_repo().save(&mut category).await.unwrap();
 
         uc.exec(
@@ -122,7 +122,7 @@ mod tests {
             .unwrap();
         assert_eq!(collection.header().name().value(), "New name");
         assert_eq!(collection.header().synopsis().value(), "New synopsis...");
-        assert_eq!(collection.header().category_id().value(), "#category02");
+        assert_eq!(collection.header().category_id().value(), "category-2");
 
         assert_eq!(c.event_pub().events().await.len(), 1);
     }
@@ -136,12 +136,12 @@ mod tests {
             "#collection01",
             "#user01",
             "User",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "cover.jpg",
         );
         c.collection_repo().save(&mut collection).await.unwrap();
-        let mut category = mocks::category("#category02", "Category 2");
+        let mut category = mocks::category("Category 2");
         c.category_repo().save(&mut category).await.unwrap();
 
         assert!(uc
@@ -169,12 +169,12 @@ mod tests {
             "#collection01",
             "#user01",
             "User",
-            "#category01",
+            "category-1",
             vec!["Tag 1", "Tag 2"],
             "cover.jpg",
         );
         c.collection_repo().save(&mut collection).await.unwrap();
-        let category = mocks::category("#category02", "Category 2");
+        let category = mocks::category("Category 2");
 
         assert!(uc
             .exec(
