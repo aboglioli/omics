@@ -83,10 +83,14 @@ export class AdminBusinessRuleComponent implements OnInit {
     this.businessRule.value = this.formRule.get('value').value;
 
     if ( this.businessRule.type === TypeAmount.percent ) {
-      this.initialValue *= 0.01;
+      this.businessRule.value  = Number( (this.businessRule.value * 0.01).toFixed(2) );
+      this.initialValue = this.businessRule.value;
     }
 
     this.OnRuleChange.emit( this.businessRule );
+
+    this.initialValue =  (this.businessRule.type === TypeAmount.percent) ?
+      ( this.businessRule.value * 100 ) : this.businessRule.value;
 
   }
 
