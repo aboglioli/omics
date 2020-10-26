@@ -8,11 +8,91 @@
 
   <div class="body">
 
-    <div class="form">
+    <form [formGroup]="formRule">
 
-    </div>
+      <div class="block-field">
+
+        <div class="input-field-row">
+
+          <div class="title-and-error">
+            <p class="field-name">Valor: </p>
+
+            <!-- mensaje de error -->
+            <p  *ngIf="valorNoValido"
+                class="form-text text-danger">
+
+                <span *ngIf="businessRule.type !== 0"> El valor debe ser un número >= 0 </span>
+                <span *ngIf="businessRule.type === 0"> El valor debe ser un número entre 0 y 100 </span>
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Input text -->
+        <div style="display: flex">
+
+          <fa-icon  *ngIf="businessRule.type === 2" [icon]="faCurrency" size="2x" style="margin-right: 0.25em;"></fa-icon>
+
+          <input  class="form-control"
+                  type="number"
+                  placeholder="Ingresar un valor"
+                  [style.text-align]=" (businessRule.type === 2) ? 'left' : 'right'"
+                  formControlName="value"
+                  [class.is-invalid]="valorNoValido">
+
+
+          <fa-icon  *ngIf="businessRule.type === 0" [icon]="faPercent" size="2x" style="margin-left: 0.25em;"></fa-icon>
+
+          <h2 *ngIf="businessRule.type === 1" style="margin-left: 0.25em;"> DÍAS</h2>
+
+        </div>
+
+
+      </div>
+
+    </form>
+
 
     <div class="buttons-action">
+
+
+      <button mat-flat-button
+              color="warn"
+              class="button-white-borders"
+              style="margin: 1em"
+              (click)="onResetRule()">
+
+
+        <span *ngIf="isBigScreen">
+          <fa-icon  [icon]="faCancel" size="1x"></fa-icon>
+          Revertir Cambios
+        </span>
+
+        <span *ngIf="!isBigScreen">
+          <fa-icon  [icon]="faCancel" size="2x"></fa-icon>
+        </span>
+
+      </button>
+
+      <button mat-flat-button
+              color="accent"
+              class="button-white-borders"
+              style="margin: 1em"
+              [disabled]="formRule.invalid"
+              (click)="onSaveRule()">
+
+        <span *ngIf="isBigScreen">
+          <fa-icon  [icon]="faSave" size="1x"></fa-icon>
+          Guardar Cambios
+        </span>
+
+        <span *ngIf="!isBigScreen">
+          <fa-icon  [icon]="faSave" size="2x"></fa-icon>
+        </span>
+
+      </button>
+
+
 
     </div>
 

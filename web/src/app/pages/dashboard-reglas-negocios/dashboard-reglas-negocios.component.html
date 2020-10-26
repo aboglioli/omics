@@ -14,7 +14,8 @@
 
       <app-admin-business-rule
         *ngFor="let rule of businessRulesList"
-        [businessRule]="rule">
+        [businessRule]="rule"
+        (OnRuleChange)="saveRule($event)">
       </app-admin-business-rule>
 
     </div>
