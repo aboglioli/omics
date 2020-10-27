@@ -1,6 +1,6 @@
 <div class="wallet-container">
 
-  <div style="display: flex; justify-content: center;">
+  <div style="display: flex; justify-content: center; flex-direction: column; align-items: center;">
     <button mat-flat-button
             color="primary"
             class="button-white-borders"
@@ -8,6 +8,10 @@
             (click)="onMedioCobro()">
           Medio de Cobro
     </button>
+
+    <div *ngIf="!emailPaymentUser" style="margin-bottom: 2rem;">
+      * Debes vincular un email de MercadoPago para poder cobrar.
+    </div>
   </div>
 
   <span *ngIf="contracts.length > 0">

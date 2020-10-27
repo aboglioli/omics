@@ -343,8 +343,9 @@ impl UserRepository for PostgresUserRepository {
                         profile_image = $8,
                         role_id = $9,
                         validation_code = $10,
-                        updated_at = $11,
-                        deleted_at = $12
+                        payment_email = $11,
+                        updated_at = $12,
+                        deleted_at = $13
                     WHERE
                         id = $1",
                     &[
@@ -370,6 +371,8 @@ impl UserRepository for PostgresUserRepository {
                             .flatten(),
                         &user.role_id().value(),
                         &user.validation().map(|v| v.code()),
+                        &user.payment_email()
+                            .map(|e| e.to_string()),
                         &user.base().updated_at(),
                         &user.base().deleted_at(),
                     ],

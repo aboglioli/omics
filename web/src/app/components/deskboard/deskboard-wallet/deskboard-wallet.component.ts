@@ -27,7 +27,7 @@ export class DeskboardWalletComponent implements OnInit {
   public businessRules: IBusinessRules;
   public message: string;
 
-  private emailPaymentUser: string;
+  public emailPaymentUser: string;
 
   constructor(
     private authorService: AuthorService,
@@ -157,7 +157,9 @@ export class DeskboardWalletComponent implements OnInit {
       return false;
     }
 
-    return contract.summaries.some((s) => !s.paid) && this.chargeAmount(contract) >= this.businessRules.minimum_charge_amount;
+    return this.emailPaymentUser
+      && contract.summaries.some((s) => !s.paid)
+      && this.chargeAmount(contract) >= this.businessRules.minimum_charge_amount;
   }
 
   public charge(contract: IContract): void {
@@ -166,6 +168,11 @@ export class DeskboardWalletComponent implements OnInit {
     this.contractService.charge(contract.id).subscribe(
       (res) => {
         this.getContracts();
+
+        this.sweetAlertGenericService.showAlertSuccess(
+          `Te hemos enviado un pago a tu cuenta de MercadoPago.`,
+          'Pago',
+        );
 
         this.spinnerService.hide();
       }
@@ -283,7 +290,8 @@ export class DeskboardWalletComponent implements OnInit {
       return false;
     }
 
-    return this.donationsChargeAmount() >= this.businessRules.minimum_charge_amount;
+    return this.emailPaymentUser
+      && this.donationsChargeAmount() >= this.businessRules.minimum_charge_amount;
   }
 
   public chargeDonations(): void {
@@ -292,6 +300,11 @@ export class DeskboardWalletComponent implements OnInit {
     this.donationService.charge().subscribe(
       (res) => {
         this.getDonations();
+
+        this.sweetAlertGenericService.showAlertSuccess(
+          `Te hemos enviado un pago a tu cuenta de MercadoPago.`,
+          'Pago',
+        );
 
         this.spinnerService.hide();
       },
