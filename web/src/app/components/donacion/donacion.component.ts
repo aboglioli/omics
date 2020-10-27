@@ -7,6 +7,7 @@ import { BusinessRulesService } from 'src/app/domain/services/business-rules.ser
 import { NgxSpinnerService } from 'ngx-spinner';
 import { IBusinessRules } from '../../domain/models/business-rules';
 import { AuthorService, IDonateResponse } from 'src/app/domain/services/author.service';
+import { DonationService } from 'src/app/domain/services/donation.service';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 
 interface DialogData {
@@ -39,6 +40,7 @@ export class DonacionComponent implements OnInit, OnDestroy {
     private spinnerService: NgxSpinnerService,
     private businessRulesService: BusinessRulesService,
     private authorService: AuthorService,
+    private donationService: DonationService,
     private sweetAlertGenericService: SweetAlertGenericMessageService,
   ) {
     dialogRef.disableClose = true;
@@ -100,6 +102,7 @@ export class DonacionComponent implements OnInit, OnDestroy {
   }
 
   public onDonate(): void {
+    clearInterval(this.lastInterval);
 
     this.spinnerService.show();
 
@@ -111,10 +114,28 @@ export class DonacionComponent implements OnInit, OnDestroy {
 
         this.spinnerService.hide();
 
-        this.sweetAlertGenericService.showAlertSuccess(`Donación de $${monto} realizada a ${ this.userToDonate.username }.`, 'Gracias por tu aporte')
+        // this.sweetAlertGenericService.showAlertSuccess(`Donación de $${monto} realizada a ${ this.userToDonate.username }.`, 'Gracias por tu aporte')
         window.open( res.payment_link, '_blank' );
 
-        this.closeMatDialog();
+        this.lastInterval = setInterval(
+          () => {
+            this.donationService.getById(res.id).subscribe(
+              (res) => {
+                if (res.status.status === 'paid') {
+                  clearInterval(this.lastInterval);
+                  this.sweetAlertGenericService.showAlertSuccess(`Donación de $${monto} realizada a ${ this.userToDonate.username }.`, 'Gracias por tu aporte');
+                  this.closeMatDialog();
+                }
+              },
+              (err) => {
+                clearInterval(this.lastInterval);
+                console.log(err);
+                this.closeMatDialog();
+              }
+            )
+          },
+          2000,
+        );
 
       },
       (err: Error ) => {
