@@ -1,11 +1,188 @@
-<h1>Categorías</h1>
+<div class="parent">
 
-<div style="display: block">
-  <canvas baseChart
-    [data]="chartData"
-    [labels]="chartLabels"
-    [options]="chartOptions"
-    [legend]="true"
-    chartType="pie">
-  </canvas>
+  <div class="side"></div>
+
+  <div class="center">
+
+    <div class="header">
+
+      <h1>REPORTES</h1>
+
+      <!-- Rango fechas reporte -->
+
+      <form class="date-filter"  [formGroup]="formReport">
+        <h2 style="text-align: center; margin: 0">Rango fechas: </h2>
+
+        <div style="display: flex;">
+
+          <!-- Fecha desde -->
+          <mat-form-field appearance="fill" class="matDate">
+            <mat-label>Desde...</mat-label>
+            <input  matInput
+                    [max]="maxDateToSearch"
+                    [matDatepicker]="pickerFrom"
+                    formControlName="dateFrom"
+                    (dateChange)="convertDateToRFC3339($event.value, 'dateFrom')">
+            <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+            <mat-datepicker #pickerFrom></mat-datepicker>
+          </mat-form-field>
+
+          <!-- Fecha hasta -->
+          <mat-form-field appearance="fill" class="matDate">
+            <mat-label>...Hasta</mat-label>
+            <input  matInput
+                    [max]="maxDateToSearch"
+                    [matDatepicker]="pickerTo"
+                    formControlName="dateTo"
+                    (dateChange)="convertDateToRFC3339($event.value, 'dateTo')">
+            <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
+            <mat-datepicker #pickerTo></mat-datepicker>
+          </mat-form-field>
+
+        </div>
+
+      </form>
+
+
+      <!-- Generar -->
+      <button mat-flat-button class="button-white-borders"
+              color="primary"
+              style="padding-top: 0.25em;"
+              (click)="generateChartsData()">
+        <fa-icon [icon]="faChart" size="2x" style="margin-right: 0.5em"></fa-icon>
+        Generar reporte
+      </button>
+
+    </div>
+
+    <div class="body">
+
+      <div class="export-buttons">
+
+        <button mat-flat-button class="button-white-borders"
+                color="primary"
+                style="padding-top: 0.25em;"
+                (click)="onExportar('pdf')">
+
+          <fa-icon [icon]="faPDF" size="2x" style="margin-right: 0.5em"></fa-icon>
+          Exportar a PDF
+
+        </button>
+
+        <button mat-flat-button class="button-white-borders"
+                color="primary"
+                style="padding-top: 0.25em;"
+                (click)="onExportar('pdf')">
+
+          <fa-icon [icon]="faCSV" size="2x" style="margin-right: 0.5em"></fa-icon>
+          Exportar a CSV
+
+        </button>
+
+
+      </div>
+
+      <div class="charts-list" *ngIf="report">
+
+        <!-- Publicaciones -->
+        <div class="chart-set">
+          <div class="chart-header-group">
+            <h1 class="title">Publicaciones </h1>
+            <h1 class="number">(Total: {{ report.publications.total }})</h1>
+          </div>
+
+          <!-- Por categoria y estado -->
+          <div class="chart-group-row">
+            <div class="chart">
+              <h2>Por categoría:</h2>
+              <canvas baseChart
+                [data]="chartPiePublicationByCategory.values"
+                [labels]="chartPiePublicationByCategory.labels"
+                [chartType]="chartPiePublicationByCategory.type"
+                [options]="chartPiePublicationByCategory.options"
+                [plugins]="chartPiePublicationByCategory.plugins"
+                [legend]="chartPiePublicationByCategory.legend">
+              </canvas>
+            </div>
+
+            <div class="chart">
+              <h2>Por estado:</h2>
+              <canvas baseChart
+                [data]="chartPiePublicationByStatus.values"
+                [labels]="chartPiePublicationByStatus.labels"
+                [chartType]="chartPiePublicationByStatus.type"
+                [options]="chartPiePublicationByStatus.options"
+                [plugins]="chartPiePublicationByStatus.plugins"
+                [legend]="chartPiePublicationByStatus.legend">
+              </canvas>
+            </div>
+
+          </div>
+
+          <!-- Por contrato -->
+          <div class="chart-group-row">
+
+            <div class="chart hide-small" style="flex: 0.5"></div>
+
+            <div class="chart">
+              <h2>Por Contrato:</h2>
+              <canvas baseChart
+                [data]="chartPiePublicationByContract.values"
+                [labels]="chartPiePublicationByContract.labels"
+                [chartType]="chartPiePublicationByContract.type"
+                [options]="chartPiePublicationByContract.options"
+                [plugins]="chartPiePublicationByContract.plugins"
+                [legend]="chartPiePublicationByContract.legend">
+              </canvas>
+            </div>
+
+            <div class="chart hide-small" style="flex: 0.5"></div>
+
+          </div>
+
+        </div>
+
+        <hr>
+
+        <!-- Contratos -->
+        <div class="chart-set">
+          <div class="chart-header-group">
+            <h1 class="title">Contratos </h1>
+            <h1 class="number">(Total: {{ report.contracts.total }})</h1>
+          </div>
+
+          <!-- Por Total ingresos y rango ingresos -->
+          <div class="chart-group-row">
+            <div class="chart">
+              <mat-card >
+                <h2>Ingresos total contratos:</h2>
+                <h1>$ {{ report.contracts.amount }}</h1>
+              </mat-card>
+            </div>
+
+            <div class="chart">
+              <h2>Por rango ingresos:</h2>
+              <canvas baseChart
+                [datasets]="chartBarContractByAmount.data"
+                [labels]="chartBarContractByAmount.labels"
+                [chartType]="chartBarContractByAmount.type"
+                [options]="chartBarContractByAmount.options"
+                [plugins]="chartBarContractByAmount.plugins"
+                [legend]="chartBarContractByAmount.legend">
+              </canvas>
+            </div>
+
+          </div>
+
+        </div>
+
+        <hr>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="side"></div>
+
 </div>
