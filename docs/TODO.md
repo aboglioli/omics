@@ -1,22 +1,5 @@
 # All
 
-# Catalog
-Catálogo endpoint:
-- Más vistas
-- Nuevas (últimas)
-- Más likeadas
-- Mejor calificadas
-- Recomendadas
-
-Filtros:
-- Desde
-- Hast
-
-## Latest
-- [x] Add filters to publication Search.
-- [x] Returns ID after requesting contract.
-- [ ] Pagination
-
 ## Urgent
 - [x] Publication status should be an object in DTO to show comments.
 - [x] Get collections that a publication is in.
@@ -52,6 +35,9 @@ Filtros:
 - [x] Redirect after user validation.
 - [x] Recover password: send email.
 
+- [x] Add filters to publication Search.
+- [x] Returns ID after requesting contract.
+- [x] Pagination
 - [-] Create Author from UserService when a new publication is created.
 - [ ] Make /events accessible only in development env.
 - [x] If request is a GET and an error occurs, a 404 error should be returned.
@@ -72,9 +58,9 @@ Filtros:
 - [?] 'Cancel' publication for content managers
 - [ ] Generated descriptions in scripts/populate.js are longer than limit in value object.
 - [x] "READ" button should not be shown to not logged in users
-- [ ] Use BusinessRules in code.
+- [x] Use BusinessRules in code.
 - [ ] Tag filter in frontend and backend.
-- [ ] Agregar propiedad de email de pago para autor.
+- [x] Agregar propiedad de email de pago para autor.
 - [x] Reports
 
 # Progress
@@ -127,7 +113,7 @@ Filtros:
 - [x] CU 31 - Aceptar/Rechazar Contrato  
 
 ## Módulo de Reportes 
-- [ ] CU 32 - Generar y Visualizar Reportes 
+- [x] CU 32 - Generar y Visualizar Reportes 
 
 ## Módulo de Configuración
 - [x] CU 33 - Configurar Reglas de Negocio  
