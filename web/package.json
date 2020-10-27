@@ -36,6 +36,7 @@
     "ngx-bar-rating": "^1.1.0",
     "ngx-spinner": "^10.0.1",
     "ngx-toastr": "^13.0.0",
+    "pdfmake": "^0.1.68",
     "rxjs": "~6.5.5",
     "sweetalert2": "^9.17.1",
     "tslib": "^2.0.0",
