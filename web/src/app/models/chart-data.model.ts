@@ -7,7 +7,7 @@ export class ChartDataClassPie {
   values: number[];
   type: ChartType;
   legend: boolean;
-  plugins: any[]
+  plugins: any[];
   colors: object[];
   options: ChartOptions;
 

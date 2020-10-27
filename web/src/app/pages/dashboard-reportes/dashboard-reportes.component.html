@@ -156,7 +156,7 @@
             <div class="chart">
               <mat-card >
                 <h2>Ingresos total contratos:</h2>
-                <h1>$ {{ report.contracts.amount }}</h1>
+                <h1>{{ report.contracts.amount | currency }}</h1>
               </mat-card>
             </div>
 
@@ -178,14 +178,14 @@
 
         <hr>
 
-        <!-- Contratos -->
+        <!-- Usuarios -->
         <div class="chart-set">
           <div class="chart-header-group">
             <h1 class="title">Usuarios </h1>
             <h1 class="number">(Total: {{ report.users.total }})</h1>
           </div>
 
-          <!-- Por Total ingresos y rango ingresos -->
+          <!-- Usuarios activos y genero -->
           <div class="chart-group-row">
             <div class="chart">
               <mat-card >
@@ -208,6 +208,7 @@
 
           </div>
 
+          <!-- Por rango de edad -->
           <div class="chart-group-row">
 
             <div class="chart hide-small" style="flex: 0.5"></div>
@@ -227,6 +228,52 @@
             <div class="chart hide-small" style="flex: 0.5"></div>
 
           </div>
+        </div>
+
+        <hr>
+
+        <!-- Ingresos -->
+        <div class="chart-set">
+          <div class="chart-header-group">
+            <h1 class="title">Ingresos </h1>
+          </div>
+
+          <!-- Por Total ingreso y egresos -->
+          <div class="chart-group-row">
+            <div class="chart">
+              <mat-card >
+                <h2>Total ingresos ($):</h2>
+                <h1  style="color: green">{{ report.payments.income | currency}}</h1>
+              </mat-card>
+            </div>
+
+            <div class="chart">
+              <mat-card >
+                <h2>Total egresos:</h2>
+                <h1 style="color: red">{{ report.payments.outcome | currency}}</h1>
+              </mat-card>
+            </div>
+
+          </div>
+
+          <!-- Por Total suscripciones e ingresos por suscripción -->
+          <div class="chart-group-row">
+            <div class="chart">
+              <mat-card >
+                <h2>Total suscripciones:</h2>
+                <h1>{{ report.subscriptions.total }}</h1>
+              </mat-card>
+            </div>
+
+            <div class="chart">
+              <mat-card >
+                <h2>Total ingresos por suscripción:</h2>
+                <h1 style="color: green">{{ report.subscriptions.amount | currency}}</h1>
+              </mat-card>
+            </div>
+
+          </div>
+
         </div>
 
         <hr>

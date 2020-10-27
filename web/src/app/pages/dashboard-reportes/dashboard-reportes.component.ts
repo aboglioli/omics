@@ -195,7 +195,7 @@ export class DashboardReportesComponent implements OnInit {
 
     auxliarLabelValue = this.transformDataToChartValue( this.report.users.by_gender);
 
-    this.chartBarUsersByAgeRange.labels = auxliarLabelValue.labels;
+    this.chartPieUsersByGender.labels = auxliarLabelValue.labels;
     this.chartPieUsersByGender.values = auxliarLabelValue.values;
     this.chartPieUsersByGender.plugins = [ auxliarLabelValue.labels ];
 
