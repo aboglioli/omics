@@ -114,6 +114,63 @@
 
   </span>
 
+  <span *ngIf="donations.length > 0">
+    <h1>Donaciones</h1>
+
+    <div class="donations" >
+      <table>
+        <tr>
+          <th>Usuario</th>
+          <th>Comentario</th>
+          <th>Total</th>
+          <th>Subtotal</th>
+          <th>Pagado</th>
+        </tr>
+        <tr *ngFor="let donation of donations">
+          <td>{{donation.reader.username}}</td>
+          <td>{{donation.comment}}</td>
+          <td>$ {{donation.amount.toFixed(2)}}</td>
+          <td>$ {{calculateDonationSubtotal(donation).toFixed()}}</td>
+          <td>{{donation.author_charge ? 'Sí' : 'No'}}</td>
+        </tr>
+      </table>
+
+      <div style="display: flex; justify-content: center; margin-bottom: 1em; margin-top: 2rem;">
+        <div class="totals">
+          <div class="total">
+            <h4>Total</h4>
+            <p style="color: #00afef;">$ {{donationsTotalAmount().toFixed(2)}}</p>
+          </div>
+          <div class="total">
+            <h4>Pagado</h4>
+            <p style="color: #caba6f;">$ {{donationsPaidAmount().toFixed(2)}}</p>
+          </div>
+          <div class="total">
+            <h4>Por cobrar</h4>
+            <p style="color: #46b194;">$ {{donationsChargeAmount().toFixed(2)}}</p>
+          </div>
+        </div>
+      </div>
+
+
+      <div style="display: flex; justify-content: center;">
+          <button mat-flat-button
+                  color="accent"
+                  class="button-white-borders"
+                  style="margin: 1em"
+                  [disabled]="!canChargeDonations()"
+                  (click)="chargeDonations()">
+            Cobrar
+          </button>
+
+      </div>
+    </div>
+  </span>
+
+  <span *ngIf="donations.length === 0">
+    <h1>No tienes donaciones</h1>
+  </span>
+
 </div>
 
 

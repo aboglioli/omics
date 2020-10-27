@@ -2,9 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { NgxSpinnerService } from 'ngx-spinner';
 
 import { IContract } from '../../../domain/models/contract';
+import { IDonation } from '../../../domain/models/donation';
+import { IBusinessRules } from '../../../domain/models/business-rules';
 import { PublicationService } from '../../../domain/services/publication.service';
+import { BusinessRulesService } from '../../../domain/services/business-rules.service';
 import { AuthorService } from '../../../domain/services/author.service';
 import { ContractService } from '../../../domain/services/contract.service';
+import { DonationService } from '../../../domain/services/donation.service';
 import Swal from 'sweetalert2';
 import { DeskboardMedioCobroComponent } from '../deskboard/deskboard-medio-cobro.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -18,7 +22,9 @@ import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-ge
   styleUrls: ['./deskboard-wallet.component.scss']
 })
 export class DeskboardWalletComponent implements OnInit {
-  public contracts: IContract[];
+  public contracts: IContract[] = [];
+  public donations: IDonation[] = [];
+  public businessRules: IBusinessRules;
   public message: string;
 
   private emailPaymentUser: string;
@@ -27,6 +33,8 @@ export class DeskboardWalletComponent implements OnInit {
     private authorService: AuthorService,
     private publicationService: PublicationService,
     private contractService: ContractService,
+    private donationService: DonationService,
+    private businessRulesService: BusinessRulesService,
     private spinnerService: NgxSpinnerService,
     private authService: AuthService,
     private identifyService: IdentityService,
@@ -39,8 +47,18 @@ export class DeskboardWalletComponent implements OnInit {
 
     const userId = this.authService.getIdUser(); // Obtener el mail de medio de pago para modificar
 
+    this.getBusinessRules();
     this.getContracts();
+    this.getDonations();
 
+  }
+
+  private getBusinessRules(): void {
+    this.businessRulesService.get().subscribe(
+      (res) => {
+        this.businessRules = res;
+      },
+    )
   }
 
   private getContracts(): void {
@@ -69,6 +87,18 @@ export class DeskboardWalletComponent implements OnInit {
     );
   }
 
+  private getDonations(): void {
+    this.spinnerService.show();
+
+    this.donations = [];
+
+    this.authorService.getDonations('me', 'reader').subscribe(
+      (res) => {
+        this.donations = res.items;
+      },
+    );
+  }
+
 
   private getPayMentEmail(): void {
 
@@ -89,6 +119,15 @@ export class DeskboardWalletComponent implements OnInit {
       }
     );
 
+  }
+
+  public calculateDonationSubtotal(donation: IDonation): number {
+    if (!this.businessRules) {
+      return donation.amount;
+    }
+
+    const percentage = 1.0 - this.businessRules.donation_percentage_retention;
+    return donation.amount * percentage;
   }
 
 
@@ -124,7 +163,11 @@ export class DeskboardWalletComponent implements OnInit {
   }
 
   public canCharge(contract: IContract): boolean {
-    return contract.summaries.some((s) => !s.paid);
+    if (!this.businessRules) {
+      return false;
+    }
+
+    return contract.summaries.some((s) => !s.paid) && this.chargeAmount(contract) >= this.businessRules.minimum_charge_amount;
   }
 
   public charge(contract: IContract): void {
@@ -214,6 +257,55 @@ export class DeskboardWalletComponent implements OnInit {
 
     });
 
+  }
+
+  public donationsTotalAmount(): number {
+    return this.donations
+      .reduce((acc, d) => {
+        return acc + d.amount
+      }, 0);
+  }
+
+  public donationsPaidAmount(): number {
+    return this.donations
+      .reduce((acc, d) => {
+        if (!d.author_charge) {
+          return acc;
+        }
+
+        return acc + d.amount
+      }, 0);
+  }
+
+  public donationsChargeAmount(): number {
+    return this.donations
+      .reduce((acc, d) => {
+        if (d.author_charge) {
+          return acc;
+        }
+
+        return acc + d.amount
+      }, 0);
+  }
+
+  public canChargeDonations(): boolean {
+    if (!this.businessRules) {
+      return false;
+    }
+
+    return this.donationsChargeAmount() >= this.businessRules.minimum_charge_amount;
+  }
+
+  public chargeDonations(): void {
+    this.spinnerService.show();
+
+    this.donationService.charge().subscribe(
+      (res) => {
+        this.getDonations();
+
+        this.spinnerService.hide();
+      },
+    )
   }
 
 }
