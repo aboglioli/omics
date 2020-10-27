@@ -4,7 +4,7 @@ export interface ICount {
 
 export interface IUsers {
   total: number;
-  new: number;
+  by_status: ICount;
   by_gender: ICount;
   by_age: ICount;
 }
@@ -16,20 +16,33 @@ export interface IAuthors {
 
 export interface IPublications {
   total: number;
-  new: number;
   by_category: ICount;
-  by_preferences: ICount;
+  by_contract: ICount;
+  by_status: ICount;
+  by_pages: ICount;
 }
 
 export interface ISubscriptions {
   total: number;
-  new: number;
+  by_payment: ICount;
+  by_status: ICount;
+  by_amount: ICount;
   amount: number;
 }
 
 export interface IContracts {
   total: number;
-  new: number;
+  by_summary: ICount;
+  by_payment: ICount;
+  by_status: ICount;
+  by_amount: ICount;
+  amount: number;
+}
+
+export interface IDonations {
+  total: number;
+  by_status: ICount;
+  by_amount: ICount;
   amount: number;
 }
 
@@ -44,6 +57,7 @@ export interface IReport {
   publications?: IPublications;
   subscriptions?: ISubscriptions;
   contracts?: IContracts;
+  donations?: IDonations;
   payments?: IPayments;
 
   from: string;
