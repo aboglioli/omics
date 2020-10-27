@@ -13,12 +13,13 @@ import { Component, OnInit } from '@angular/core';
       <dev-upload-file *ngSwitchCase="'upload-file'"></dev-upload-file>
       <dev-new-publication *ngSwitchCase="'new-publication'"></dev-new-publication>
       <dev-payment *ngSwitchCase="'payment'"></dev-payment>
+      <dev-reports *ngSwitchCase="'reports'"></dev-reports>
     </div>
   `,
   styleUrls: ['./general.scss'],
 })
 export class DevelopmentComponent implements OnInit {
-  public selection = 'new-publication';
+  public selection = 'reports';
 
   constructor(
   ) { }

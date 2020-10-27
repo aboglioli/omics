@@ -52,6 +52,7 @@ import { DevelopmentComponent } from './pages/development/development.component'
 import { DevUploadFileComponent } from './pages/development/upload-file/upload-file';
 import { DevNewPublicationComponent } from './pages/development/new-publication/new-publication';
 import { DevPaymentComponent } from './pages/development/payment/payment';
+import { DevReportsComponent } from './pages/development/reports/reports';
 
 // Domain
 import { DomainModule } from './domain/module';
@@ -113,6 +114,7 @@ import { DeskboardMedioCobroComponent } from './components/deskboard/deskboard/d
     DevUploadFileComponent,
     DevNewPublicationComponent,
     DevPaymentComponent,
+    DevReportsComponent,
     SideNavMenuUserComponent,
     PerfilEditarComponent,
     PublicationApproveRejectMotiveComponent,
