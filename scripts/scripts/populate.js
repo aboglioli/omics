@@ -85,7 +85,7 @@ async function main() {
         }
 
         // Collections
-        for (let i = 0; i < rand(0, 5); i++) {
+        if (rand(0, 100) < 10) {
           populator.createCollection({
             userId: user.id,
             publicationIds: randArr(

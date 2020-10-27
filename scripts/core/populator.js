@@ -230,16 +230,18 @@ class Populator {
 
   createCollection({ userId, publicationIds }) {
     const id = uuid();
+    const sample = randArr(this.comicSamples);
     const collection = {
       id,
       author_id: userId,
-      name: faker.name.findName(),
-      synopsis: faker.lorem.paragraph(),
+      name: sample.title || faker.name.findName(),
+      synopsis: sample.description || faker.lorem.paragraph(),
       category_id: randArr(categories),
       tags: randArr(tags, true),
-      cover: image(250),
+      cover: `${sample.images[0].path}.${sample.images[0].extension}`,
+      // cover: image(250),
       items: publicationIds.map((id) => ({
-        pulication_id: id,
+        publication_id: { id },
         date: this.nextDate(),
       })),
       created_at: this.nextDate(),
@@ -261,10 +263,12 @@ class Populator {
       this.addEvent("collection", "publication-added", {
         PublicationAdded: {
           id: collection.id,
-          publication_id: item.publication_id,
+          publication_id: item.publication_id.id,
         },
       });
     });
+
+    this.collections[id] = collection;
 
     return collection;
   }
