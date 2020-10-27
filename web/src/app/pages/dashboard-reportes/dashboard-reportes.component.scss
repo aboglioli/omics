@@ -159,9 +159,20 @@ div.parent {
           .chart {
             flex: 1;
 
-            h2 {
+            h2, h1 {
               margin: 0.5em 0em;
               text-align: center;
+            }
+
+
+            mat-card {
+
+              margin: 15%;
+
+              h1 {
+                font-size: 35pt;
+              }
+
             }
 
 

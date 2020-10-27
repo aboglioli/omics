@@ -7,7 +7,7 @@ import { IReport } from '../../domain/models/report';
 import { ReportService } from '../../domain/services/report.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { ChartDataClass } from '../../models/chart-data.model';
+import { ChartDataClassPie, ChartDataClassBar } from '../../models/chart-data.model';
 
 
 @Component({
@@ -48,10 +48,11 @@ export class DashboardReportesComponent implements OnInit {
 
   };
 
-  public chartPiePublicationByCategory: ChartDataClass = new ChartDataClass();
-  public chartPiePublicationByStatus: ChartDataClass = new ChartDataClass();
-  public chartPiePublicationByContract: ChartDataClass = new ChartDataClass();
+  public chartPiePublicationByCategory: ChartDataClassPie = new ChartDataClassPie();
+  public chartPiePublicationByStatus: ChartDataClassPie = new ChartDataClassPie();
+  public chartPiePublicationByContract: ChartDataClassPie = new ChartDataClassPie();
 
+  public chartBarContractByAmount: ChartDataClassBar = new ChartDataClassBar();
 
   constructor(
     private reportService: ReportService,
@@ -139,8 +140,6 @@ export class DashboardReportesComponent implements OnInit {
 
     this.chartPiePublicationByCategory.options = this.defaultPlotOptions;
 
-    // console.log('TEST > ', this.chartPiePublicationByCategory);
-
     //#endregion
 
     // #region Chart Publicaciones estado
@@ -153,27 +152,9 @@ export class DashboardReportesComponent implements OnInit {
     this.chartPiePublicationByStatus.values = auxliarLabelValue.values;
     this.chartPiePublicationByStatus.plugins = [ auxliarLabelValue.labels ];
 
-    this.chartPiePublicationByStatus.options = {
-
-      responsive: true,
-      legend: {
-        position: 'top'
-      },
-      plugins: {
-        datalabels: {
-          formatter: (value, ctx) => {
-            const label = ctx.chart.data.labels[ctx.dataIndex];
-            return label;
-          },
-        },
-      }
-
-    };
-
-    // console.log('TEST > ', this.chartPiePublicationByStatus);
+    this.chartPiePublicationByStatus.options = this.defaultPlotOptions;
 
     //#endregion
-
 
     // #region Chart Publicaciones por Contrato o no contrato
     this.chartPiePublicationByContract.type = 'pie';
@@ -187,7 +168,20 @@ export class DashboardReportesComponent implements OnInit {
 
     this.chartPiePublicationByContract.options = this.defaultPlotOptions;
 
-    // console.log('TEST > ', this.chartPiePublicationByStatus);
+    //#endregion
+
+
+    // #region Chart Contratos por rango de cantidad recibido
+    this.chartBarContractByAmount.type = 'bar';
+    this.chartBarContractByAmount.legend = true;
+
+    auxliarLabelValue = this.transformDataToChartValue( this.report.contracts.by_amount);
+
+    this.chartBarContractByAmount.labels = auxliarLabelValue.labels;
+    this.chartBarContractByAmount.data = [ {data: auxliarLabelValue.values, label: 'Cantidad' }];
+    this.chartBarContractByAmount.plugins = [ auxliarLabelValue.labels ];
+
+    this.chartBarContractByAmount.options = this.defaultPlotOptions;
 
     //#endregion
 
