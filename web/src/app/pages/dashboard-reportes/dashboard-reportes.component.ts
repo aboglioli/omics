@@ -54,6 +54,8 @@ export class DashboardReportesComponent implements OnInit {
 
   public chartBarContractByAmount: ChartDataClassBar = new ChartDataClassBar();
 
+  public chartPieUsersByGender: ChartDataClassPie = new ChartDataClassPie();
+
   constructor(
     private reportService: ReportService,
     private fb: FormBuilder,
@@ -185,6 +187,20 @@ export class DashboardReportesComponent implements OnInit {
 
     //#endregion
 
+
+    // #region Chart Publicaciones por Contrato o no contrato
+    this.chartPieUsersByGender.type = 'pie';
+    this.chartPieUsersByGender.legend = true;
+
+    auxliarLabelValue = this.transformDataToChartValue( this.report.users.by_gender);
+
+    this.chartPieUsersByGender.labels = auxliarLabelValue.labels;
+    this.chartPieUsersByGender.values = auxliarLabelValue.values;
+    this.chartPieUsersByGender.plugins = [ auxliarLabelValue.labels ];
+
+    this.chartPieUsersByGender.options = this.defaultPlotOptions;
+
+    //#endregion
 
 
   }

@@ -177,6 +177,41 @@
         </div>
 
         <hr>
+
+        <!-- Contratos -->
+        <div class="chart-set">
+          <div class="chart-header-group">
+            <h1 class="title">Usuarios </h1>
+            <h1 class="number">(Total: {{ report.users.total }})</h1>
+          </div>
+
+          <!-- Por Total ingresos y rango ingresos -->
+          <div class="chart-group-row">
+            <div class="chart">
+              <mat-card >
+                <h2>Usuarios activos:</h2>
+                <h1>{{ report.users.by_status.active }}</h1>
+              </mat-card>
+            </div>
+
+            <div class="chart">
+              <h2>Por edad:</h2>
+              <canvas baseChart
+                [data]="chartPieUsersByGender.values"
+                [labels]="chartPieUsersByGender.labels"
+                [chartType]="chartPieUsersByGender.type"
+                [options]="chartPieUsersByGender.options"
+                [plugins]="chartPieUsersByGender.plugins"
+                [legend]="chartPieUsersByGender.legend">
+              </canvas>
+            </div>
+
+          </div>
+
+        </div>
+
+        <hr>
+
       </div>
 
     </div>
