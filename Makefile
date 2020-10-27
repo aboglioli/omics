@@ -14,6 +14,9 @@ fix:
 run:
 	PORT=3000 cargo run --bin omics
 
+production-run:
+	PORT=3000 ENV=production cargo run --bin omics
+
 dependencies:
 	cargo update
 

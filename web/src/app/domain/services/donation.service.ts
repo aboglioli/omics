@@ -66,6 +66,16 @@ export class DonationService {
     return this.http.get<IPagination<IDonation>>(this.baseUrl, { params });
   }
 
+  public getById(id: string, include: string = ''): Observable<IDonation> {
+    let params = new HttpParams();
+
+    if (include) {
+      params = params.append('include', include);
+    }
+
+    return this.http.get<IDonation>(`${this.baseUrl}/${id}`, { params });
+  }
+
   public charge(): Observable<any> {
     return this.http.post(`${this.baseUrl}/charge`, {});
   }
