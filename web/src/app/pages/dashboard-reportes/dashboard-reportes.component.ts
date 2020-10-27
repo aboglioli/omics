@@ -143,7 +143,7 @@ export class DashboardReportesComponent implements OnInit {
 
     //#endregion
 
-    // #region Chart Publicaciones por Contrato o no contrato
+    // #region Chart Publicaciones estado
     this.chartPiePublicationByStatus.type = 'pie';
     this.chartPiePublicationByStatus.legend = true;
 
@@ -179,7 +179,7 @@ export class DashboardReportesComponent implements OnInit {
     this.chartPiePublicationByContract.type = 'pie';
     this.chartPiePublicationByContract.legend = true;
 
-    auxliarLabelValue = this.transformDataToChartValue( this.report.publications.by_status);
+    auxliarLabelValue = this.transformDataToChartValue( this.report.publications.by_contract);
 
     this.chartPiePublicationByContract.labels = auxliarLabelValue.labels;
     this.chartPiePublicationByContract.values = auxliarLabelValue.values;
