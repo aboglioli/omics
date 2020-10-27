@@ -125,6 +125,7 @@ async fn charge(
         c.payment.event_pub(),
         c.payment.contract_repo(),
         c.payment.publication_repo(),
+        c.identity.user_repo(),
         c.config_serv(),
         c.payment.payment_serv(),
     )

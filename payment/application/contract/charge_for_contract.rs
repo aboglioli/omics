@@ -2,6 +2,7 @@ use common::config::ConfigService;
 use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
+use identity::domain::user::{UserId, UserRepository};
 use publishing::domain::publication::PublicationRepository;
 
 use crate::domain::contract::{ContractId, ContractRepository};
@@ -12,6 +13,7 @@ pub struct ChargeForContract<'a> {
 
     contract_repo: &'a dyn ContractRepository,
     publication_repo: &'a dyn PublicationRepository,
+    user_repo: &'a dyn UserRepository,
 
     config_serv: &'a ConfigService,
     payment_serv: &'a dyn PaymentService,
@@ -22,6 +24,7 @@ impl<'a> ChargeForContract<'a> {
         event_pub: &'a dyn EventPublisher,
         contract_repo: &'a dyn ContractRepository,
         publication_repo: &'a dyn PublicationRepository,
+        user_repo: &'a dyn UserRepository,
         config_serv: &'a ConfigService,
         payment_serv: &'a dyn PaymentService,
     ) -> Self {
@@ -29,6 +32,7 @@ impl<'a> ChargeForContract<'a> {
             event_pub,
             contract_repo,
             publication_repo,
+            user_repo,
             config_serv,
             payment_serv,
         }
@@ -48,6 +52,12 @@ impl<'a> ChargeForContract<'a> {
             return Err(Error::not_owner("contract"));
         }
 
+        let user_id = UserId::new(auth_id)?;
+        let user = self.user_repo.find_by_id(&user_id).await?;
+        if user.payment_email().is_none() {
+            return Err(Error::new("contract", "missing_payment_email"));
+        }
+
         let payment = contract.pay_summaries()?;
 
         let business_rules = self.config_serv.get_business_rules().await?;
@@ -55,7 +65,16 @@ impl<'a> ChargeForContract<'a> {
             return Err(Error::new("contract", "minimum_charge"));
         }
 
-        // TODO: pay to author
+        self.payment_serv
+            .send_payment(
+                user.payment_email().unwrap().to_string(),
+                format!(
+                    "Pago de Omics por contrato de {}",
+                    publication.header().name().to_string()
+                ),
+                payment.amount().value(),
+            )
+            .await?;
 
         self.contract_repo.save(&mut contract).await?;
 

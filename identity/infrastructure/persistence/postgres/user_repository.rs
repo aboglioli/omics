@@ -371,8 +371,7 @@ impl UserRepository for PostgresUserRepository {
                             .flatten(),
                         &user.role_id().value(),
                         &user.validation().map(|v| v.code()),
-                        &user.payment_email()
-                            .map(|e| e.to_string()),
+                        &user.payment_email().map(|e| e.to_string()),
                         &user.base().updated_at(),
                         &user.base().deleted_at(),
                     ],

@@ -1,32 +1,47 @@
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
-use identity::domain::user::UserId;
+use identity::domain::user::{UserId, UserRepository};
 
 use crate::domain::donation::{DonationRepository, Status};
+use crate::domain::payment::PaymentService;
 
 pub struct Charge<'a> {
     event_pub: &'a dyn EventPublisher,
 
     donation_repo: &'a dyn DonationRepository,
+    user_repo: &'a dyn UserRepository,
+
+    payment_serv: &'a dyn PaymentService,
 }
 
 impl<'a> Charge<'a> {
     pub fn new(
         event_pub: &'a dyn EventPublisher,
         donation_repo: &'a dyn DonationRepository,
+        user_repo: &'a dyn UserRepository,
+        payment_serv: &'a dyn PaymentService,
     ) -> Self {
         Charge {
             event_pub,
             donation_repo,
+            user_repo,
+            payment_serv,
         }
     }
 
     pub async fn exec(&self, auth_id: String) -> Result<CommandResponse> {
+        let user_id = UserId::new(auth_id)?;
+        let user = self.user_repo.find_by_id(&user_id).await?;
+        if user.payment_email().is_none() {
+            return Err(Error::new("donation", "missing_payment_email"));
+        }
+
         let pagination_donations = self
             .donation_repo
             .search(
-                Some(&UserId::new(auth_id)?),
+                Some(&user_id),
                 None,
                 Some(&Status::Paid),
                 None,
@@ -51,7 +66,13 @@ impl<'a> Charge<'a> {
                 .await?;
         }
 
-        // TODO: PaymentService
+        self.payment_serv
+            .send_payment(
+                user.payment_email().unwrap().to_string(),
+                "Pago de Omics en concepto de donaciones".to_owned(),
+                total,
+            )
+            .await?;
 
         Ok(CommandResponse::default())
     }

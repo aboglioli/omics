@@ -59,11 +59,16 @@ async fn get_by_id(
 async fn charge(req: HttpRequest, c: web::Data<MainContainer>) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
-    Charge::new(c.payment.event_pub(), c.payment.donation_repo())
-        .exec(auth_id)
-        .await
-        .map(|res| HttpResponse::Ok().json(res))
-        .map_err(PublicError::from)
+    Charge::new(
+        c.payment.event_pub(),
+        c.payment.donation_repo(),
+        c.identity.user_repo(),
+        c.payment.payment_serv(),
+    )
+    .exec(auth_id)
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
 }
 
 pub fn routes(cfg: &mut web::ServiceConfig) {

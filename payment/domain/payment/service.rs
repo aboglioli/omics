@@ -15,4 +15,17 @@ pub trait PaymentService: Sync + Send {
     ) -> Result<String>;
 
     async fn get_external_reference_from_payment(&self, payment_id: String) -> Result<String>;
+
+    async fn send_payment(
+        &self,
+        payment_email: String,
+        description: String,
+        amount: f64,
+    ) -> Result<()> {
+        println!(
+            "Payment sent to {}, description: {}, amount: {}",
+            payment_email, description, amount
+        );
+        Ok(())
+    }
 }
