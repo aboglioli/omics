@@ -208,6 +208,25 @@
 
           </div>
 
+          <div class="chart-group-row">
+
+            <div class="chart hide-small" style="flex: 0.5"></div>
+
+            <div class="chart">
+              <h2>Por rango edad:</h2>
+              <canvas baseChart
+                [datasets]="chartBarUsersByAgeRange.data"
+                [labels]="chartBarUsersByAgeRange.labels"
+                [chartType]="chartBarUsersByAgeRange.type"
+                [options]="chartBarUsersByAgeRange.options"
+                [plugins]="chartBarUsersByAgeRange.plugins"
+                [legend]="chartBarUsersByAgeRange.legend">
+              </canvas>
+            </div>
+
+            <div class="chart hide-small" style="flex: 0.5"></div>
+
+          </div>
         </div>
 
         <hr>
