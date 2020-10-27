@@ -132,12 +132,14 @@ export class CatalogoComponent implements OnInit {
       this.searchObjectPublication.date_from = objectToSearch.dateFrom;
       this.searchObjectPublication.date_to = objectToSearch.dateTo;
       this.searchObjectPublication.order_by = objectToSearch.orderBy;
+      this.searchObjectPublication.category_id  = objectToSearch.category_id;
       this.getPublicationData();
 
     } else {
 
       this.searchObjectCollection.date_from = objectToSearch.dateFrom;
       this.searchObjectCollection.date_to = objectToSearch.dateTo;
+      this.searchObjectCollection.category_id = objectToSearch.category_id;
       this.getCollectionData();
 
     }

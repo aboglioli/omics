@@ -13,7 +13,7 @@ import { MatDialog } from '@angular/material/dialog';
   styleUrls: ['./favoritos.component.scss']
 })
 export class FavoritosComponent implements OnInit {
-  public publications: IPublication[];
+  public publications: IPublication[] = [];
 
   constructor(
     private readerService: ReaderService,
