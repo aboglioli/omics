@@ -62,6 +62,7 @@
 - [ ] Tag filter in frontend and backend.
 - [x] Agregar propiedad de email de pago para autor.
 - [x] Reports
+- [ ] Check if user has 'payment_email' before charging in Wallet component.
 
 # Progress
 

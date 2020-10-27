@@ -74,12 +74,15 @@ impl<'a> Donate<'a> {
         let author_id = AuthorId::new(author_id)?;
         let author = self.author_repo.find_by_id(&author_id).await?;
 
+        let author_percentage = 1.0 - business_rules.donation_percentage_retention;
+
         let mut donation = Donation::new(
             self.donation_repo.next_id().await?,
             &author,
             &reader,
             Amount::new(cmd.amount)?,
             cmd.comment,
+            author_percentage,
         )?;
 
         let payment_link = self
@@ -87,7 +90,7 @@ impl<'a> Donate<'a> {
             .get_payment_link(
                 "Donación".to_owned(),
                 format!("Para {}", author.username().to_string()),
-                donation.amount().value(),
+                donation.total().value(),
                 format!("donation:{}", donation.base().id().value()),
                 &reader_user,
             )

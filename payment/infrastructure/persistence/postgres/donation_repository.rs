@@ -21,7 +21,9 @@ impl Donation {
         let author_id: Uuid = row.get("author_id");
         let reader_id: Uuid = row.get("reader_id");
 
-        let amount: f64 = row.get("amount");
+        let total: f64 = row.get("total");
+        let subtotal: f64 = row.get("subtotal");
+        let author_percentage: f64 = row.get("author_percentage");
         let comment: String = row.get("comment");
 
         let reader_payment: Option<Payment> = serde_json::from_value(row.get("reader_payment"))?;
@@ -43,7 +45,9 @@ impl Donation {
             ),
             UserId::new(author_id.to_string())?,
             UserId::new(reader_id.to_string())?,
-            Amount::new(amount)?,
+            Amount::new(total)?,
+            Amount::new(subtotal)?,
+            author_percentage,
             comment,
             reader_payment,
             author_charge,
@@ -133,7 +137,7 @@ impl DonationRepository for PostgresDonationRepository {
         let limit = limit.unwrap_or_else(|| total as usize);
         let order_by = match order_by {
             Some(DonationOrderBy::Newest) => "created_at DESC",
-            Some(DonationOrderBy::Amount) => "amount DESC",
+            Some(DonationOrderBy::Amount) => "total DESC",
             _ => "created_at ASC",
         };
 
@@ -185,18 +189,22 @@ impl DonationRepository for PostgresDonationRepository {
                         id,
                         author_id,
                         reader_id,
-                        amount,
+                        total,
+                        subtotal,
+                        author_percentage,
                         comment,
                         reader_payment,
                         author_charge,
                         status_history,
                         created_at
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
                     &[
                         &donation.base().id().to_uuid()?,
                         &donation.author_id().to_uuid()?,
                         &donation.reader_id().to_uuid()?,
-                        &donation.amount().value(),
+                        &donation.total().value(),
+                        &donation.subtotal().value(),
+                        &donation.author_percentage(),
                         &donation.comment(),
                         &reader_payment,
                         &author_charge,

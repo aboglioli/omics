@@ -262,7 +262,7 @@ export class DeskboardWalletComponent implements OnInit {
   public donationsTotalAmount(): number {
     return this.donations
       .reduce((acc, d) => {
-        return acc + d.amount
+        return acc + d.subtotal
       }, 0);
   }
 
@@ -273,7 +273,7 @@ export class DeskboardWalletComponent implements OnInit {
           return acc;
         }
 
-        return acc + d.amount
+        return acc + d.subtotal
       }, 0);
   }
 
@@ -284,7 +284,7 @@ export class DeskboardWalletComponent implements OnInit {
           return acc;
         }
 
-        return acc + d.amount
+        return acc + d.subtotal
       }, 0);
   }
 

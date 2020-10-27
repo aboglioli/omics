@@ -38,15 +38,11 @@ async fn search(
 async fn charge(req: HttpRequest, c: web::Data<MainContainer>) -> impl Responder {
     let auth_id = auth(&req, &c).await?;
 
-    Charge::new(
-        c.payment.event_pub(),
-        c.payment.donation_repo(),
-        c.config_serv(),
-    )
-    .exec(auth_id)
-    .await
-    .map(|res| HttpResponse::Ok().json(res))
-    .map_err(PublicError::from)
+    Charge::new(c.payment.event_pub(), c.payment.donation_repo())
+        .exec(auth_id)
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
 }
 
 pub fn routes(cfg: &mut web::ServiceConfig) {

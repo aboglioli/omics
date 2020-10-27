@@ -260,7 +260,7 @@ impl Report {
         for donation in donations.iter() {
             by_status.inc(donation.status_history().current().to_string());
 
-            let d_amount = donation.amount().value();
+            let d_amount = donation.total().value();
 
             if d_amount < 50.0 {
                 by_amount.inc("0-50");

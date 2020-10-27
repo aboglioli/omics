@@ -13,7 +13,9 @@ export interface IDonation {
   author?: string;
   reader_id?: string;
   reader?: IReader;
-  amount: number;
+  total: number;
+  subtotal: number;
+  author_percentage: number;
   comment: string;
   reader_payment?: IPayment;
   author_charge?: IPayment;
