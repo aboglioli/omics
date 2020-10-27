@@ -8,7 +8,9 @@ use identity::domain::user::{UserId, UserRepository};
 use publishing::domain::author::{AuthorId, AuthorRepository};
 use publishing::domain::interaction::InteractionRepository;
 use publishing::domain::publication::{PublicationId, PublicationRepository};
-use shared::event::{AuthorEvent, ContractEvent, PublicationEvent, SubscriptionEvent, UserEvent};
+use shared::event::{
+    AuthorEvent, ContractEvent, DonationEvent, PublicationEvent, SubscriptionEvent, UserEvent,
+};
 
 use crate::domain::notification::{Body, Notification, NotificationRepository};
 
@@ -304,6 +306,67 @@ impl EventHandler for NotificationHandler {
                             body,
                         )?;
 
+                        self.notification_repo.save(&mut notification).await?;
+                    }
+                    _ => return Ok(false),
+                }
+            }
+            "donation" => {
+                let event: DonationEvent = serde_json::from_value(event.payload())?;
+
+                match event {
+                    DonationEvent::Paid {
+                        author_id,
+                        reader_id,
+                        total,
+                        ..
+                    } => {
+                        // Reader
+                        let reader_id = UserId::new(reader_id)?;
+                        let reader = self.user_repo.find_by_id(&reader_id).await?;
+
+                        let author_id = UserId::new(author_id)?;
+                        let author = self.user_repo.find_by_id(&author_id).await?;
+
+                        let mut body = Body::new()
+                            .reader(
+                                reader.base().id().value(),
+                                reader.identity().username().value(),
+                            )
+                            .author(
+                                author.base().id().value(),
+                                author.identity().username().value(),
+                            )
+                            .amount(total);
+
+                        if let Some(person) = reader.person() {
+                            body = body.reader_name(
+                                person.fullname().name(),
+                                person.fullname().lastname(),
+                            );
+                        }
+
+                        if let Some(person) = author.person() {
+                            body = body.author_name(
+                                person.fullname().name(),
+                                person.fullname().lastname(),
+                            );
+                        }
+
+                        let mut notification = Notification::new(
+                            self.notification_repo.next_id().await?,
+                            reader_id,
+                            "donation-paid",
+                            body.clone(),
+                        )?;
+                        self.notification_repo.save(&mut notification).await?;
+
+                        let mut notification = Notification::new(
+                            self.notification_repo.next_id().await?,
+                            author_id,
+                            "donation-received",
+                            body,
+                        )?;
                         self.notification_repo.save(&mut notification).await?;
                     }
                     _ => return Ok(false),

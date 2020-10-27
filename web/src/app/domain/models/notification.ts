@@ -14,6 +14,8 @@ export interface INotificationBody {
   reader_username?: string;
   reader_name?: string;
   reader_lastname?: string;
+
+  amount?: number;
 }
 
 /**

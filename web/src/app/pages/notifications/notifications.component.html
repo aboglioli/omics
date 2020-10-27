@@ -93,6 +93,22 @@
             nuestro equipo.
           </div>
 
+          <div *ngSwitchCase="'donation-paid'">
+            Donación de ${{notification.body.amount.toFixed(2)}} al usuario
+            <a [href]="'/profile/' + notification.body.author_id">
+              {{notification.body.author_username}}
+            </a>
+            realizada.
+          </div>
+
+          <div *ngSwitchCase="'donation-received'">
+            El usuario
+            <a [href]="'/profile/' + notification.body.reader_id">
+              {{notification.body.reader_username}}
+            </a>
+            te realizó una donación de ${{notification.body.amount.toFixed(2)}}.
+          </div>
+
         </div>
       </div>
     </div>

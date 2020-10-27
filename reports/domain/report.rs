@@ -121,7 +121,21 @@ impl Report {
                     let d = Utc::now() - birthdate.date().clone();
                     let age = d.num_days() / 365;
 
-                    by_age.inc(age.to_string());
+                    if age < 14 {
+                        by_age.inc("0-14");
+                    } else if age < 22 {
+                        by_age.inc("14-22");
+                    } else if age < 30 {
+                        by_age.inc("22-30");
+                    } else if age < 40 {
+                        by_age.inc("30-40");
+                    } else if age < 50 {
+                        by_age.inc("40-50");
+                    } else if age < 60 {
+                        by_age.inc("50-60");
+                    } else {
+                        by_age.inc("+60");
+                    }
                 } else {
                     by_age.inc("unknown");
                 }

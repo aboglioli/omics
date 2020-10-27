@@ -102,9 +102,20 @@ export class NotificationsComponent implements OnInit {
       classes.push('unread');
     }
 
-    if (notification.code === 'publication-approved') {
+    const greenCodes = [
+      'publication-approved',
+      'subscription-activated',
+      'contract-approved',
+      'donation-received',
+    ];
+    const redCodes = [
+      'publication-rejected',
+      'contract-rejected',
+    ];
+
+    if (greenCodes.includes(notification.code)) {
       classes.push('green');
-    } else if (notification.code === 'publication-rejected') {
+    } else if (redCodes.includes(notification.code)) {
       classes.push('red');
     }
 

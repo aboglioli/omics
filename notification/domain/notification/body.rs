@@ -17,6 +17,8 @@ pub struct Body {
     reader_username: Option<String>,
     reader_name: Option<String>,
     reader_lastname: Option<String>,
+
+    amount: Option<f64>,
 }
 
 impl Body {
@@ -57,6 +59,11 @@ impl Body {
     pub fn reader_name<S: Into<String>>(mut self, reader_name: S, reader_lastname: S) -> Self {
         self.reader_name = Some(reader_name.into());
         self.reader_lastname = Some(reader_lastname.into());
+        self
+    }
+
+    pub fn amount(mut self, amount: f64) -> Self {
+        self.amount = Some(amount);
         self
     }
 }
