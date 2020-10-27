@@ -1,1 +1,77 @@
-<app-under-construction></app-under-construction>
+<div class="parent">
+
+  <div class="header">
+
+    <div class="overlay-header">
+      <h1>Sobre Omics</h1>
+
+      <button mat-stroked-button class="button-white-borders"
+              style="margin-top: 2em"
+              (click)="onGoFacebookPage()">
+
+        <fa-icon [icon]="faFacebook" size="3x" style="margin-right: 0em;"></fa-icon>
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="body">
+
+    <hr>
+    <!-- Equipo -->
+    <div class="group column center">
+
+      <h1>Equipo de Omics</h1>
+
+      <div class="team">
+
+        <div  class="dev" *ngFor="let dev of teamList"
+              (click)="onGoToTweeter(dev)">
+          <h2>{{ dev.name }}</h2>
+          <img  [src]="dev.photo"
+                alt="omics-dev-staff"
+                [ngClass]="{ 'avatar': dev.url }">
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <hr>
+
+    <!--  FAQ  -->
+    <div class="group column center">
+
+      <h1>PREGUNTA FREQUENTES / FAQ</h1>
+      <mat-accordion>
+
+        <mat-expansion-panel *ngFor="let faq of faqList">
+
+          <!--  Cabecera-->
+          <mat-expansion-panel-header>
+
+            <mat-panel-title>
+              {{ faq.question }}
+            </mat-panel-title>
+
+          </mat-expansion-panel-header>
+
+          <p *ngFor="let text of faq.paragraph" class="break word sangria" style="font-size: 12pt;">
+            {{ text }}
+          </p>
+
+        </mat-expansion-panel>
+
+
+      </mat-accordion>
+
+    </div>
+
+    <hr>
+
+  </div>
+
+</div>

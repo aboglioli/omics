@@ -88,10 +88,59 @@
       </span>
 
       <br>
+
       <!-- Categorias -->
-      <!-- <div class="title-row">
-        <h2>Categorías</h2>
-      </div> -->
+      <div *ngIf="categoryList.length > 0" style="padding: 0px; width: 70%;">
+
+        <div class="input-field-row">
+
+          <div class="title-and-error" >
+            <p class="field-name">Categoría: </p>
+          </div>
+
+          <div  class="d-inline-block"
+                ngbDropdown
+                #dropdownCategory="ngbDropdown">
+
+            <button class="btn button-white-borders hover-white mr-2"
+                    id="dropdown-category" ngbDropdownAnchor
+                    (focus)="dropdownCategory.open();">
+
+                      <span *ngIf="!categoryFormValueId">
+                        Lista de categorías disponibles
+                      </span>
+
+                      <span *ngIf="categoryFormValueId">
+                        {{ categoryValueName }}
+                      </span>
+            </button>
+
+            <div ngbDropdownMenu aria-labelledby="dropdown-category">
+
+              <!-- Opciones únicas -->
+              <mat-radio-group formControlName="category_id">
+                <ul>
+                  <li style="width: 100%; padding-left: 1em;"
+                      *ngFor="let category of categoryList">
+
+                    <mat-radio-button
+                                  color="primary"
+                                  [value]="category.valueId"
+                                  (change)="onSelectCategory(category); dropdownCategory.close()">
+                      {{ category.name }}
+                    </mat-radio-button>
+
+                  </li>
+                </ul>
+              </mat-radio-group>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
 
     </form>
 

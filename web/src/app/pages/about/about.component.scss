@@ -1,0 +1,155 @@
+@import "src/scss/vars";
+
+div.parent {
+  display: flex;
+  flex-direction: column;
+
+  color: white;
+
+  // Pantalla chica
+  @media screen and (min-width: $break-small) {
+    min-height: calc(100vh - 4.6em);
+  }
+
+  // Pantalla grande
+  @media screen and (max-width: $break-small) {
+    min-height: 100vh;
+  }
+
+}
+
+div.header {
+
+  position: relative;
+
+  height: 250px;
+  background-image: url('/assets/images/banners/topBanner.jpg');
+  width: 100%;
+
+  .overlay-header{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba($color: $omics-background-flat, $alpha: 0.6);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    h1 {
+
+      font-size: 42pt;
+      margin: 0;
+
+    }
+  }
+
+
+
+}
+
+
+div.body {
+
+  .group {
+
+    display: flex;
+
+    &.column {
+      flex-direction: column;
+
+      &.center {
+        align-items: center;
+      }
+    }
+
+  }
+
+
+  mat-accordion {
+    padding:  0em 15%;
+
+    mat-expansion-panel-header {
+      color: white;
+      background-color: $omics-background-button;
+      border-bottom: solid 2px white;
+
+      .mat-expansion-panel-header-title {
+        color: white;
+      }
+
+      ::ng-deep .mat-expansion-indicator::after  {
+        color: white;
+      }
+
+      &:hover {
+
+        background: white;
+        .mat-expansion-panel-header-title {
+          color: black !important;
+          font-weight: bolder;
+        }
+
+        ::ng-deep .mat-expansion-indicator::after  {
+          color: black;
+        }
+
+      }
+
+
+    }
+  }
+
+  .team {
+
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    margin: 0.25em 10%;
+
+    div.dev {
+      margin: 1em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    img {
+      width: 128px;
+      height: 128px;
+      border-radius: 64px;
+
+      &.avatar:hover {
+        cursor: pointer;
+        border: solid 2px $omics-neon-pink;
+      }
+    }
+
+
+  }
+}
+
+// Generales
+
+hr {
+  border: 0;
+  border-top: 2px solid white;
+  margin: 2em;
+  box-shadow: 0px 0px 4px 4px $omics-neon-pink;
+}
+
+
+button.button-white-borders {
+
+  color: white;
+  border: none;
+
+  &:focus {
+    outline: none;
+  }
+
+}
