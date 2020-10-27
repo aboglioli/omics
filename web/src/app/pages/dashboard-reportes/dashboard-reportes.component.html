@@ -69,7 +69,7 @@
 
         </button>
 
-        <button mat-flat-button class="button-white-borders"
+        <!-- <button mat-flat-button class="button-white-borders"
                 color="primary"
                 style="padding-top: 0.25em;"
                 (click)="onExportar('pdf')">
@@ -77,7 +77,7 @@
           <fa-icon [icon]="faCSV" size="2x" style="margin-right: 0.5em"></fa-icon>
           Exportar a CSV
 
-        </button>
+        </button> -->
 
 
       </div>
@@ -156,7 +156,7 @@
             <div class="chart">
               <mat-card >
                 <h2>Ingresos total contratos:</h2>
-                <h1>$ {{ report.contracts.amount }}</h1>
+                <h1>{{ report.contracts.amount | currency }}</h1>
               </mat-card>
             </div>
 
@@ -177,6 +177,107 @@
         </div>
 
         <hr>
+
+        <!-- Usuarios -->
+        <div class="chart-set">
+          <div class="chart-header-group">
+            <h1 class="title">Usuarios </h1>
+            <h1 class="number">(Total: {{ report.users.total }})</h1>
+          </div>
+
+          <!-- Usuarios activos y genero -->
+          <div class="chart-group-row">
+            <div class="chart">
+              <mat-card >
+                <h2>Usuarios activos:</h2>
+                <h1>{{ report.users.by_status.active }}</h1>
+              </mat-card>
+            </div>
+
+            <div class="chart">
+              <h2>Por edad:</h2>
+              <canvas baseChart
+                [data]="chartPieUsersByGender.values"
+                [labels]="chartPieUsersByGender.labels"
+                [chartType]="chartPieUsersByGender.type"
+                [options]="chartPieUsersByGender.options"
+                [plugins]="chartPieUsersByGender.plugins"
+                [legend]="chartPieUsersByGender.legend">
+              </canvas>
+            </div>
+
+          </div>
+
+          <!-- Por rango de edad -->
+          <div class="chart-group-row">
+
+            <div class="chart hide-small" style="flex: 0.5"></div>
+
+            <div class="chart">
+              <h2>Por rango edad:</h2>
+              <canvas baseChart
+                [datasets]="chartBarUsersByAgeRange.data"
+                [labels]="chartBarUsersByAgeRange.labels"
+                [chartType]="chartBarUsersByAgeRange.type"
+                [options]="chartBarUsersByAgeRange.options"
+                [plugins]="chartBarUsersByAgeRange.plugins"
+                [legend]="chartBarUsersByAgeRange.legend">
+              </canvas>
+            </div>
+
+            <div class="chart hide-small" style="flex: 0.5"></div>
+
+          </div>
+        </div>
+
+        <hr>
+
+        <!-- Ingresos -->
+        <div class="chart-set">
+          <div class="chart-header-group">
+            <h1 class="title">Ingresos </h1>
+          </div>
+
+          <!-- Por Total ingreso y egresos -->
+          <div class="chart-group-row">
+            <div class="chart">
+              <mat-card >
+                <h2>Total ingresos ($):</h2>
+                <h1  style="color: green">{{ report.payments.income | currency}}</h1>
+              </mat-card>
+            </div>
+
+            <div class="chart">
+              <mat-card >
+                <h2>Total egresos:</h2>
+                <h1 style="color: red">{{ report.payments.outcome | currency}}</h1>
+              </mat-card>
+            </div>
+
+          </div>
+
+          <!-- Por Total suscripciones e ingresos por suscripción -->
+          <div class="chart-group-row">
+            <div class="chart">
+              <mat-card >
+                <h2>Total suscripciones:</h2>
+                <h1>{{ report.subscriptions.total }}</h1>
+              </mat-card>
+            </div>
+
+            <div class="chart">
+              <mat-card >
+                <h2>Total ingresos por suscripción:</h2>
+                <h1 style="color: green">{{ report.subscriptions.amount | currency}}</h1>
+              </mat-card>
+            </div>
+
+          </div>
+
+        </div>
+
+        <hr>
+
       </div>
 
     </div>

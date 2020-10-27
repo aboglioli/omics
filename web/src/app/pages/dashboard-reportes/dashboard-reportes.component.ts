@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { faChartLine, faFileCsv, faFilePdf } from '@fortawesome/free-solid-svg-icons';
-import { ChartOptions, ChartType } from 'chart.js';
+import { ChartOptions } from 'chart.js';
 import { Label, ThemeService } from 'ng2-charts';
 
 import { IReport } from '../../domain/models/report';
@@ -53,6 +53,9 @@ export class DashboardReportesComponent implements OnInit {
   public chartPiePublicationByContract: ChartDataClassPie = new ChartDataClassPie();
 
   public chartBarContractByAmount: ChartDataClassBar = new ChartDataClassBar();
+
+  public chartPieUsersByGender: ChartDataClassPie = new ChartDataClassPie();
+  public chartBarUsersByAgeRange: ChartDataClassBar = new ChartDataClassBar();
 
   constructor(
     private reportService: ReportService,
@@ -112,7 +115,7 @@ export class DashboardReportesComponent implements OnInit {
         this.spinnerService.hide();
 
         this.report = res;
-        console.log('TEST > ', this.report);
+        // console.log('TEST > ', this.report);
         this.setCharts( );
 
       },
@@ -186,6 +189,34 @@ export class DashboardReportesComponent implements OnInit {
     //#endregion
 
 
+    // #region Chart usuarios por género
+    this.chartPieUsersByGender.type = 'pie';
+    this.chartPieUsersByGender.legend = true;
+
+    auxliarLabelValue = this.transformDataToChartValue( this.report.users.by_gender);
+
+    this.chartPieUsersByGender.labels = auxliarLabelValue.labels;
+    this.chartPieUsersByGender.values = auxliarLabelValue.values;
+    this.chartPieUsersByGender.plugins = [ auxliarLabelValue.labels ];
+
+    this.chartPieUsersByGender.options = this.defaultPlotOptions;
+
+    //#endregion
+
+
+    // #region Chart Usuarios por rango de edad
+    this.chartBarUsersByAgeRange.type = 'bar';
+    this.chartBarUsersByAgeRange.legend = true;
+
+    auxliarLabelValue = this.transformDataToChartValue( this.report.users.by_age);
+
+    this.chartBarUsersByAgeRange.labels = auxliarLabelValue.labels;
+    this.chartBarUsersByAgeRange.data = [ {data: auxliarLabelValue.values, label: 'Cantidad' }];
+    this.chartBarUsersByAgeRange.plugins = [ auxliarLabelValue.labels ];
+
+    this.chartBarUsersByAgeRange.options = this.defaultPlotOptions;
+
+    //#endregion
 
   }
 
