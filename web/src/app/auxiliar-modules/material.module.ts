@@ -14,6 +14,7 @@ import {MatChipsModule} from '@angular/material/chips';
 import {MatInputModule } from '@angular/material/input';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatCardModule} from '@angular/material/card';
+import {MatExpansionModule} from '@angular/material/expansion';
 
 @NgModule({
   declarations: [],
@@ -34,6 +35,7 @@ import {MatCardModule} from '@angular/material/card';
     MatDatepickerModule,
     MatNativeDateModule,
     MatCardModule,
+    MatExpansionModule
   ],
   exports: [
     MatToolbarModule,
@@ -51,7 +53,8 @@ import {MatCardModule} from '@angular/material/card';
     MatInputModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatCardModule
+    MatCardModule,
+    MatExpansionModule
   ],
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'es-ES' }]
 })

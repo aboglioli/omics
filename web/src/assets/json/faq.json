@@ -1,0 +1,201 @@
+{
+  "faq":[
+     {
+        "question":"¿Qué es OMICS?",
+        "paragraph": [
+          "Omics es una plataforma para distribuir contenido de alta calidad, acompañando a los autores que recién comienzan con sus primeros cómics y otros que ya poseen trayectoria, pero que no encuentran un lugar seguro para publicar sus obras.",
+          "Es el “Spotify” de los cómics donde pueden darse a conocer artistas que no tienen el alcance de grandes editoriales. Enfatiza su cercanía al usuario, el cual no tiene que invertir en papel, y puede seguir sus gustos según autor, categoría, estilo, etcétera."
+        ]
+     },
+     {
+      "question":"¿La plataforma de OMICS es gratuita? ",
+      "paragraph": [
+        "Sí, es gratuita. Lee gratis los cómics originales exclusivos de OMICS. La plataforma se actualiza constantemente para que puedas leer publicaciones nuevas de tus autores favoritos."
+      ]
+     },
+     {
+      "question":"¿En qué dispositivos funciona la plataforma de OMICS?",
+      "paragraph": [
+        "Puedes utilizarla en un servidor web tanto en notebook, PC, como en tu celular. Puedes acceder al sitio móvil desde cualquier navegador.",
+        "Es posible que el funcionamiento de la aplicación varíe según el dispositivo y la conexión que uses. Ten en cuenta que es posible que se apliquen cargos de datos según tu uso."
+      ]
+     },
+     {
+      "question":"Tengo problemas con la conexión a la plataforma.",
+      "paragraph": [
+        "Verifica tu conexión a internet: En ciertos casos es posible que las páginas de OMICS no se abran o inicien correctamente si tu conexión es inestable. En ese caso, te recomendamos ponerte en contacto directamente con tu ISP (proveedor de servicio de internet).",
+        "Intenta refrescar la página: Presiona la tecla F5 o actualizar en la pestaña superior a la izquierda del navegador por si se ha colgado o las imágenes no cargan.",
+        "Otro: Si a pesar de haber comprobado lo que se menciona anteriormente, el problema persiste, ponte en contacto con el servicio de OMICS para que podamos analizarlo."
+      ]
+     },
+     {
+      "question":"¿Cómo puedo reestablecer mi contraseña?",
+      "paragraph": [
+        "Si te registraste con una dirección de email debes hacer click en ¿No recuerdas la contraseña? En la pantalla de inicio de sesión. Ingresar la dirección de email, haz click en “Enviar” y seguir las instrucciones del correo recibido."
+      ]
+     },
+     {
+      "question":"Apareció un mensaje que me pedía que confirmara mi dirección de email y contraseña.",
+      "paragraph": [
+        "Verifica que hayas registrado tu cuenta en OMICS con tu dirección de email.  La información de tu cuenta de OMICS distingue entre mayúsculas y minúsculas. Los caracteres de tu nombre de usuario y contraseña deben coincidir exactamente con los de tu cuenta para poder iniciar sesión."
+      ]
+     },
+     {
+      "question":"Quiero eliminar mi cuenta.",
+      "paragraph": [
+        "Si quieres eliminar tu cuenta es necesario que lo hagas desde la página web de OMICS. Sigue estos pasos desde el navegador de tu PC o teléfono inteligente:","Es el “Spotify” de los cómics donde pueden darse a conocer artistas que no tienen el alcance de grandes editoriales. Enfatiza su cercanía al usuario, el cual no tiene que invertir en papel, y puede seguir sus gustos según autor, categoría, estilo, etcétera.",
+        "1) Iniciar sesión en OMICS y dirigirse a la imagen/foto de usuario. Allí se despliegan las funcionalidades.",
+        "2) Seleccionar la sección de “Ver Perfil”.",
+        "3) Seleccionar la opción “Editar Perfil”.",
+        "4) Luego, seleccionar la opción “Eliminar usuario”. Por seguridad te pide que ingreses la contraseña para confirmar la acción que deseas realizar."
+      ]
+     },
+     {
+      "question":"No recuerdo mi cuenta de OMICS.",
+      "paragraph": [
+        "Comunícate con el equipo de OMICS para que podamos revisar tu cuenta a omics.contacto@gmail.com."
+      ]
+     },
+     {
+      "question":"Aún no he recibido el correo de recuperación de contraseña.",
+      "paragraph": [
+        "Es posible que hayas recibido el correo de recuperación de contraseña en tu carpeta de spam. Si no está allí, accede a los ajustes de tu email y verifica que el contacto de omics.contacto@gmail.com no esté en la lista de remitentes bloqueados.",
+        "Si los problemas persisten, comunícate con el equipo de OMICS para que podamos resolver el problema a omics.contacto@gmail.com."
+      ]
+     },
+     {
+      "question":"¿Tengo que crear una cuenta con mi dirección de email?",
+      "paragraph": [
+        "SÍ, tienes que crear una cuenta con tu dirección de email para comenzar a utilizar todas las funcionalidades que te ofrece la plataforma de OMICS."
+      ]
+     },
+     {
+      "question":"Mis “Favoritos” desaparecieron.",
+      "paragraph": [
+        "Revisa que no hayas cerrado sesión en tu cuenta de OMICS. Puedes acceder al historial de lectura desde “Favoritos” una vez que inicies sesión en tu cuenta."
+      ]
+     },
+     {
+      "question":"La plataforma se cierra constantemente después de una actualización.",
+      "paragraph": [
+        "Comunícate con el equipo de OMICS para que podamos resolver el problema a omics.contacto@gmail.com."
+      ]
+     },
+     {
+      "question":"¿Cómo me suscribo para poder acceder a contenido premium?",
+      "paragraph": [
+        "La Suscripción a la plataforma es mensual, y se puede cancelar en cualquier momento que el usuario así lo desee. Cuando un usuario quiere suscribirse a la plataforma para poder acceder al contenido premium (Publicaciones marcadas con una Estrella), puede realizarlo de 3 formas diferentes:",
+        "1) Si el usuario selecciona una Publicación Premium (marcada con una Estrella) se despliega la pantalla con la opción para Suscribirse.",
+        "2) El usuario debe ir a la esquina superior derecha y seleccionar su perfil. Se despliega el menú del panel de usuario y se selecciona la opción “Suscribirse”. Ahí se observa el Plan Básico, el valor y el botón Suscribirse. Al seleccionar Suscribirse se visualiza la opción Pagar. Al seleccionarlo, el usuario es redirigido a la sección de pago check-out de Mercado Pago.",
+        "3) El usuario debe ir a la esquina superior derecha y seleccionar su perfil. Se despliega el menú del panel de usuario y se selecciona la opción “Editar Perfil”. Ahí se encuentra la opción de “Suscribirse”, se selecciona y se despliega la pantalla con el Plan Básico, el valor y el botón Suscribirse. Al confirmar, se visualiza la opción Pagar. Al seleccionarlo, el usuario es redirigido a la sección de pago check-out de Mercado Pago."
+      ]
+     },
+     {
+      "question":"No puedo conectarme a OMICS.",
+      "paragraph": [
+        "Si tienes problemas para conectarte a OMICS, intenta comprobar la configuración de red de tu dispositivo. Comprueba la opción que se adecúe a tu caso si utilizas teléfono móvil:",
+        "1) Usuarios de Android:",
+        "---> a) Ve a la sección de ajustes de tu dispositivo.",
+        "---> b) Pulsa Conexiones > Redes móviles > Nombres de punto de acceso",
+        "---> c) Abre el menú en la parte superior de la pantalla, y selecciona Restablecer valores (Los nombres y ubicaciones mostradas varían según el dispositivo.)",
+        "",
+        "2) Usuarios de iOS:",
+        "---> a) Ve a la sección de ajustes de tu dispositivo.",
+        "---> b) Pulsa General > Restablecer.",
+        "---> a) Pulsa Restablecer la configuración de red.",
+        "",
+        "Ahora, si a pesar de haber comprobado lo mencionado anteriormente, el problema persiste, ponte en contacto con el equipo de OMICS para que podamos resolver el problema a omics.contacto@gmail.com."
+      ]
+     },
+     {
+       "question": "La plataforma no carga los cómics que quiero leer.",
+       "paragraph": [
+        "Revisa tu conexión a internet. Si tu red es inestable, es posible que la plataforma no pueda cargar las imágenes correctamente. Si los problemas persisten, comunícate con el equipo de OMICS para que podamos resolver el problema a omics.contacto@gmail.com."
+       ]
+     },
+     {
+       "question": "La plataforma quedó trabada en una pantalla blanca apenas la abrí.",
+       "paragraph": [
+        "Revisa tu conexión a internet. Si tu conexión es inestable, es posible que la plataforma no cargue el contenido correctamente. Si el problema no se resuelve, comunícate con el equipo de OMICS para que podamos resolver el problema a omics.contacto@gmail.com."
+       ]
+     },
+     {
+       "question": "¿Cómo empiezo a publicar?",
+       "paragraph": [
+        "El botón “Publicar” se encuentra en el sitio de OMICS. Sigue las siguientes recomendaciones:",
+        "1) Ir a la esquina superior izquierda, al Menú de despliegue (tres líneas horizontales) y seleccionar “Deskboard”.",
+        "2) Luego se le muestra la ventana con los botones de:",
+        "---> a) Publicaciones",
+        "---> b) Colecciones",
+        "3) Debe seleccionar el botón Publicaciones y se le muestra el botón “Añadir Publicación”.",
+        "4) Al seleccionar dicho botón se le despliega la ventana para llenar los datos de la Publicación que desea subir a la plataforma.",
+        "5) Una vez cargados los datos debe seleccionar el botón Publicar (botón verde). Luego pasa a un control de contenido y una vez aprobado su cómic será publicado con éxito."
+       ]
+     },
+     {
+      "question": "¿Cómo guardo un borrador?",
+      "paragraph": [
+       "Cuando haces una carga de una obra, puedes guardar la misma como borrador con la opción “Borrador” o publicarlo para que luego de un control de contenido se apruebe y comience a compartirse en la plataforma. Guardarlo como borrador cargará el cómic en el servidor de OMICS, pero tus lectores no podrán verlo."
+      ]
+     },
+     {
+      "question": "¿Qué edad debo tener para ingresar a la plataforma?",
+      "paragraph": [
+       "Debes ser por lo menos de 14 años para ingresar a la plataforma de OMICS y usarlo."
+      ]
+     },
+     {
+      "question": "¿Qué edad debo tener para publicar?",
+      "paragraph": [
+       "Debes ser por lo menos de 14 años para publicar en la plataforma de OMICS."
+      ]
+     },
+     {
+      "question": "¿Qué proceso puedo seguir si me rechazaron la publicación?",
+      "paragraph": [
+       "Cuando el Gestor de Contenido rechaza tu publicación, te llega una notificación y un email con el/los motivos. Puedes tomar esas recomendaciones y hacer los cambios necesarios en tu obra para que luego pueda ser publicada en la plataforma. Una vez realizado los cambios, tu cómic pasa a revisión nuevamente y en caso de que esté todo bien, tu publicación es aprobada."
+      ]
+     },
+     {
+      "question": "Otra persona está publicando mis cómics en OMICS sin mi permiso.",
+      "paragraph": [
+       "Comunícate con el equipo de OMICS para recibir ayuda y que podamos resolver el problema a omics.contacto@gmail.com y bríndale la siguiente información:","Es el “Spotify” de los cómics donde pueden darse a conocer artistas que no tienen el alcance de grandes editoriales. Enfatiza su cercanía al usuario, el cual no tiene que invertir en papel, y puede seguir sus gustos según autor, categoría, estilo, etcétera.",
+       "--> Nombre del cómic infractor.",
+       "--> URL del cómic infractor. ",
+       "--> Prueba de propiedad de contenido (como un enlace a la publicación original o el archivo PSD).Revisaremos la denuncia y tomaremos las medidas pertinentes"
+      ]
+     },
+     {
+      "question": "Mis archivos no se están cargando.",
+      "paragraph": [
+       "Si tienes problemas para conectarte a OMICS, prueba restablecer los ajustes de red.",
+       "Si los problemas persisten después de restablecer tus ajustes de red, comunícate con el equipo de OMICS para que podamos resolver el problema a omics.contacto@gmail.com y bríndale la siguiente información:",
+       "--> Captura de pantalla de la página de error.",
+       "--> Cuenta con la que iniciaste sesión.",
+       "--> País.",
+       "--> Dispositivo (por ejemplo, Samsung Galaxy S8+, iPhone X, iPad 9.7, Kindle Fire HD8).",
+       "--> Sistema operativo y versión (por ejemplo, Android 8.0.0, iOS 11.3.1).",
+       "--> Versión de la plataforma de OMICS (Configuración> Información> Versión de la plataforma).",
+       "--> Conexión a internet."
+      ]
+     },
+     {
+      "question": "Quiero reportar un plagio.",
+      "paragraph": [
+       "Comunícate con el equipo de OMICS para recibir ayuda y que podamos resolver el problema a omics.contacto@gmail.com y bríndale la siguiente información:","Es el “Spotify” de los cómics donde pueden darse a conocer artistas que no tienen el alcance de grandes editoriales. Enfatiza su cercanía al usuario, el cual no tiene que invertir en papel, y puede seguir sus gustos según autor, categoría, estilo, etcétera.",
+       "En ese caso, por favor ponte en contacto con el equipo de OMICS para que podamos resolver el problema a omics.contacto@gmail.com e incluye la siguiente información:",
+       "--> Título del cómic infractor.",
+       "--> URL del cómic infractor.",
+       "--> Pruebas de propiedad de contenido. (URL de la publicación original o el archivo PSD original del contenido en cuestión)."
+      ]
+     },
+     {
+      "question": "¿Dónde puedo enviar comentarios/sugerencias relacionados con OMICS?",
+      "paragraph": [
+       "¡Tus sugerencias, comentarios e ideas siempre son bienvenidas! Comunícate con el equipo de OMICS omics.contacto@gmail.com para compartir tus comentarios o sugerencias."
+      ]
+     }
+
+  ]
+}
+
