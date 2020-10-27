@@ -59,8 +59,7 @@ export class DashboardReglasNegociosComponent implements OnInit {
       (err: Error) => {
 
         this.spinnerService.hide();
-        console.error(err);
-
+        console.error('Error', err);
 
       }
 
@@ -89,7 +88,7 @@ export class DashboardReglasNegociosComponent implements OnInit {
 
       case 'minimum_charge_amount': {
         return {
-          name: 'Monto mínomo para cobrar',
+          name: 'Monto mínimo para cobrar',
           type: TypeAmount.currency
         };
       }

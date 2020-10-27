@@ -138,6 +138,6 @@ export class IdentityService {
   }
 
   public changePaymentEmail(id: string, cmd: IChangePaymentEmailCommand): Observable<any> {
-    return this.http.put(`${this.configServ.baseUrl()}/${id}/payment-email`, cmd);
+    return this.http.put(`${this.baseUrl}/${id}/payment-email`, cmd);
   }
 }

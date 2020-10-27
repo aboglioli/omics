@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { faUsers } from '@fortawesome/free-solid-svg-icons';
-import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 import { AuthService } from '../../domain/services/auth.service';
 import Swal from 'sweetalert2';
 import { AuthorService, IGetByIdResponse } from '../../domain/services/author.service';
 import { IAuthor } from '../../domain/models/author';
+import { DonacionComponent } from '../../components/donacion/donacion.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-perfil',
@@ -33,7 +34,7 @@ export class PerfilComponent implements OnInit {
     private router: Router,
     private spinnerService: NgxSpinnerService,
     private authService: AuthService,
-    private sweetAlertGenericService: SweetAlertGenericMessageService,
+    private dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
@@ -111,7 +112,15 @@ export class PerfilComponent implements OnInit {
   public selectDonar(): void {
 
     // TODO: Agregar pantalla de donación
-    this.sweetAlertGenericService.showUnderConstrucction();
+    const dialogRef = this.dialog.open(
+      DonacionComponent,
+      {
+        panelClass: 'margin-dialog',
+        data: {
+          userToDonate: this.profileData
+        }
+      }
+    );
 
   }
 

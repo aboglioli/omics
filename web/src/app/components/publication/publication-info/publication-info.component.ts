@@ -16,6 +16,7 @@ import { AuthService } from '../../../domain/services/auth.service';
 import { IContract } from '../../../domain/models/contract';
 import { IdentityService } from '../../../domain/services/identity.service';
 import { LoginRegisterComponent } from '../../user/login-register/login-register.component';
+import { DonacionComponent } from '../../donacion/donacion.component';
 
 export interface DialogData {
   idPublication: string;
@@ -204,8 +205,19 @@ export class PublicationInfoComponent implements OnInit {
   }
 
   public onDonar(): void {
-    this.sweetAlertGenericService.showUnderConstrucction();
+
+    const dialogRef = this.dialog.open(
+      DonacionComponent,
+      {
+        panelClass: 'margin-dialog',
+        data: {
+          userToDonate: this.publication.author
+        }
+      }
+    );
+
   }
+
 
   public onFavorito(): void {
 

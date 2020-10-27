@@ -1,1 +1,102 @@
-<p>donacion works!</p>
+<div class="parent">
+
+  <div class="header">
+
+    <!-- Volver -->
+    <div class="button-top-menu">
+      <button mat-icon-button mat-dialog-close (click)="closeMatDialog()">
+        <fa-icon [icon]="faClose" size="2x"></fa-icon>
+      </button>
+    </div>
+
+    <h1>Donación</h1>
+    <h2 style="text-align: left;">Para: {{ userToDonate.username }}</h2>
+
+  </div>
+
+  <div class="body">
+
+    <div class="alert alert-warning" role="alert">
+      Nota: El monto mínimo de donación es $ {{ minValueDonate  }}. El comentario es optativo.
+    </div>
+
+    <form [formGroup]="formDonate">
+
+      <div class="block-field">
+
+        <div class="input-field-row">
+
+          <div class="title-and-error">
+            <p class="field-name">Monto: </p>
+
+            <!-- mensaje de error -->
+            <p  *ngIf="montoNoValido"
+                class="form-text text-danger">
+
+                Ingrese un monto mayor a ${{ minValueDonate }}
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Input text -->
+        <div style="display: flex">
+
+          <fa-icon [icon]="faCurrency" size="2x" style="margin-right: 0.25em;"></fa-icon>
+          <input  class="form-control"
+                  type="number"
+                  placeholder="Monto a donar"
+                  formControlName="monto"
+                  [class.is-invalid]="montoNoValido">
+
+        </div>
+
+
+      </div>
+
+      <div class="block-field">
+
+        <div class="input-field-row">
+
+          <div class="title-and-error">
+            <h3 style="font-weight: 500; margin: 0">Adjuntar comentario: </h3>
+
+            <!-- mensaje de error -->
+            <p  *ngIf="comentarioNoValido"
+                class="form-text text-danger">
+                Debe tener menos de 256 caracterés
+            </p>
+          </div>
+
+        </div>
+
+        <mat-form-field appearance="fill" class="text-area">
+          <mat-label>{{ commentLenght }} / 256</mat-label>
+          <textarea matInput
+                    formControlName="comentario"></textarea>
+        </mat-form-field>
+
+      </div>
+
+    </form>
+
+    <div style="display: flex; justify-content: center">
+
+      <button mat-flat-button
+              color="accent"
+              class="button-white-borders"
+              style="margin: 1em"
+              [disabled]="formDonate.invalid"
+              (click)="onDonate()">
+
+        <fa-icon  [icon]="faDonar" size="1x"></fa-icon>
+        Enviar Donación
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+</div>

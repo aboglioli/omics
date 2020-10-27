@@ -32,7 +32,6 @@ export class DeskboardMedioCobroComponent implements OnInit {
   ngOnInit(): void {
 
     this.buildForms();
-    console.log(this.data)
 
   }
 
@@ -43,7 +42,6 @@ export class DeskboardMedioCobroComponent implements OnInit {
       correo     : [ this.data.mailCobro, [ Validators.required, Validators.pattern( '^[a-zA-Z0-9]+[a-zA-Z0-9_.+-]*@[a-zA-Z0-9]+[a-zA-Z0-9-]*\.[a-zA-Z0-9-.]+$' )] ],
 
     });
-
 
   }
 

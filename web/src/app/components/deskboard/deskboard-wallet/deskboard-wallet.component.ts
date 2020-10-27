@@ -11,6 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../../domain/services/auth.service';
 import { IdentityService } from '../../../domain/services/identity.service';
 import { IUser } from 'src/app/domain/models';
+import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 @Component({
   selector: 'app-deskboard-wallet',
   templateUrl: './deskboard-wallet.component.html',
@@ -29,6 +30,7 @@ export class DeskboardWalletComponent implements OnInit {
     private spinnerService: NgxSpinnerService,
     private authService: AuthService,
     private identifyService: IdentityService,
+    private sweetAlertGenericService: SweetAlertGenericMessageService,
     private dialog: MatDialog,
   ) { }
 
@@ -186,18 +188,15 @@ export class DeskboardWalletComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe( resEmail => {
 
-      console.log('TEST resmail > ', resEmail );
-
       if ( resEmail ) {
         this.emailPaymentUser = resEmail;
-        console.log('TEST emailPaymentUser > ', this.emailPaymentUser );
 
         this.spinnerService.show();
 
         this.identifyService.changePaymentEmail( this.authService.getIdUser(), { payment_email: this.emailPaymentUser } ).subscribe(
           (res: any) => {
 
-            console.log('TEST > ', res);
+            this.sweetAlertGenericService.showAlertSuccess(`El correo actualmente vinculado al pago por Mercado Pago es: ${  this.emailPaymentUser }`, 'Email de cobro cambiado');
             this.spinnerService.hide();
 
           },
