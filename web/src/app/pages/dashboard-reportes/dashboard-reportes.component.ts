@@ -115,7 +115,7 @@ export class DashboardReportesComponent implements OnInit {
         this.spinnerService.hide();
 
         this.report = res;
-        console.log('TEST > ', this.report);
+        // console.log('TEST > ', this.report);
         this.setCharts( );
 
       },

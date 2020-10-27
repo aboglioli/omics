@@ -79,6 +79,13 @@
 
     </div>
 
+    <span *ngIf="publicationList.length === 0">
+
+      <h1>No hay publicaciones disponibles</h1>
+
+    </span>
+
+
   </div>
 
   <div *ngIf="selectedPanel === 'contract'" class="body">
@@ -113,6 +120,14 @@
       </div>
 
     </div>
+
+
+    <span *ngIf="contracts.length === 0">
+
+      <h1>No hay contratos disponibles</h1>
+
+    </span>
+
   </div>
 
 

@@ -25,8 +25,8 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
 
   public selectedPanel = 'publication';
 
-  public publicationList: IPublication[];
-  public contracts: IContract[];
+  public publicationList: IPublication[] = [];
+  public contracts: IContract[] = [];
   public isBigScreen = true;
 
   constructor(
