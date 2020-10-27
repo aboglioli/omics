@@ -60,6 +60,7 @@ export class PlansComponent implements OnInit, OnDestroy {
                 }
               },
               (err) => {
+                clearInterval(this.lastInterval);
                 console.log(err);
               }
             );

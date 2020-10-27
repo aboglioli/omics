@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { IAuthor } from 'src/app/domain/models';
 import { faTimesCircle, faMoneyBillAlt, faDollarSign } from '@fortawesome/free-solid-svg-icons';
@@ -18,7 +18,7 @@ interface DialogData {
   templateUrl: './donacion.component.html',
   styleUrls: ['./donacion.component.scss']
 })
-export class DonacionComponent implements OnInit {
+export class DonacionComponent implements OnInit, OnDestroy {
 
   // Font Awseome icons
   public faClose = faTimesCircle;
@@ -29,6 +29,8 @@ export class DonacionComponent implements OnInit {
   formDonate: FormGroup;
 
   minValueDonate = 0;
+
+  private lastInterval: number;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
@@ -49,6 +51,10 @@ export class DonacionComponent implements OnInit {
 
     this.getMinValueDonate();
 
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.lastInterval);
   }
 
   private getMinValueDonate(): void  {
