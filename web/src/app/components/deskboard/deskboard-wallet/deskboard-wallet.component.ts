@@ -121,16 +121,6 @@ export class DeskboardWalletComponent implements OnInit {
 
   }
 
-  public calculateDonationSubtotal(donation: IDonation): number {
-    if (!this.businessRules) {
-      return donation.amount;
-    }
-
-    const percentage = 1.0 - this.businessRules.donation_percentage_retention;
-    return donation.amount * percentage;
-  }
-
-
   public generateSummaries(contract: IContract): void {
     this.spinnerService.show();
 

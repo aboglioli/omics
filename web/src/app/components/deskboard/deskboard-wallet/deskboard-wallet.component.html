@@ -129,11 +129,15 @@
         <tr *ngFor="let donation of donations">
           <td>{{donation.reader.username}}</td>
           <td>{{donation.comment}}</td>
-          <td>$ {{donation.amount.toFixed(2)}}</td>
-          <td>$ {{calculateDonationSubtotal(donation).toFixed()}}</td>
+          <td>$ {{donation.total.toFixed(2)}}</td>
+          <td>$ {{donation.subtotal.toFixed(2)}}</td>
           <td>{{donation.author_charge ? 'Sí' : 'No'}}</td>
         </tr>
       </table>
+
+      <div class="donation-terms" *ngIf="businessRules" style="margin-top: 0.7rem; color: #e8e8e8;">
+        * Recibirás un porcentaje mayoritario por las donaciones realizadas. Omics se queda con el {{(businessRules.donation_percentage_retention * 100).toFixed(0)}}%
+      </div>
 
       <div style="display: flex; justify-content: center; margin-bottom: 1em; margin-top: 2rem;">
         <div class="totals">
