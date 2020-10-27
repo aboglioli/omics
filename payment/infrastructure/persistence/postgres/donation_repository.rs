@@ -68,7 +68,7 @@ impl DonationRepository for PostgresDonationRepository {
         let row = self
             .client
             .query_one(
-                "SELECT * FROM donatios
+                "SELECT * FROM donations
                 WHERE id = $1",
                 &[&id.to_uuid()?],
             )
