@@ -43,12 +43,6 @@
 
     <div class="option-menu" style="flex: 1">
 
-      <!-- Donar -->
-      <button *ngIf="readerInfo"
-              mat-icon-button (click)="onDonar()">
-        <fa-icon [icon]="faDonar" size="2x"></fa-icon>
-      </button>
-
       <!-- Favorito -->
       <button *ngIf="readerInfo"
               mat-icon-button (click)="onFavorito()">
@@ -61,12 +55,6 @@
               mat-icon-button (click)="onLike()">
         <fa-icon  [icon]="faLike" size="2x"
                   [ngClass]="{'selected': readerInfo.liked}"></fa-icon>
-      </button>
-
-      <!-- Comentarios -->
-      <button *ngIf="readerInfo"
-              mat-icon-button (click)="onComentarios()">
-        <fa-icon [icon]="faComentario" size="2x"></fa-icon>
       </button>
 
       <!-- Info -->

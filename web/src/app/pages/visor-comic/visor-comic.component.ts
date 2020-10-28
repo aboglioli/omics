@@ -20,11 +20,9 @@ export class VisorComicComponent implements OnInit {
   // Font Awseome icons
   public faLeft = faChevronLeft;
   public faRight = faChevronRight;
-  public faDonar = faMoneyBillAlt;
   public faLike = faHeart;
   public faFavorito = faBookmark;
   public faInfo = faInfoCircle;
-  public faComentario = faCommentDots;
 
   // Manejo de publicación
   public publicationToShow: IPublication;
@@ -106,10 +104,6 @@ export class VisorComicComponent implements OnInit {
 
   }
 
-  public onDonar(): void {
-    this.sweetAlertGenericService.showUnderConstrucction();
-  }
-
   public onFavorito(): void {
 
     if ( !this.readerInfo.in_favorites  ) {
@@ -157,9 +151,6 @@ export class VisorComicComponent implements OnInit {
 
   }
 
-  public onComentarios(): void {
-    this.sweetAlertGenericService.showUnderConstrucction();
-  }
 
   public onInfo(): void {
 

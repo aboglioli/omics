@@ -136,6 +136,7 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
     this.publicationService.approve( publication.id,  { comment: commentReason }).subscribe(
       (res: any) => {
         console.log(res);
+        this.sweetAlertGenericService.showAlertSuccess(`La publicación ${publication.name} ha sido aceptada`, 'Aceptada');
         this.getAllPublication();
       },
       (err: Error) => {
@@ -155,6 +156,7 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
       (res: any) => {
 
         console.log(res);
+        this.sweetAlertGenericService.showAlertSuccess(`La publicación ${publication.name} ha sido rechazada`, 'Rechazada');
         this.getAllPublication();
 
       },
@@ -171,6 +173,7 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
   public approveContract(contract: IContract): void {
     this.contractService.approve(contract.id).subscribe(
       (res) => {
+        this.sweetAlertGenericService.showAlertSuccess(`El contrato de la publicación ${contract.publication.name} ha sido aprobado`, 'Aprobada');
         this.getAllContracts();
       },
     );
@@ -179,6 +182,7 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
   public rejectContract(contract: IContract): void {
     this.contractService.reject(contract.id).subscribe(
       (res) => {
+        this.sweetAlertGenericService.showAlertSuccess(`El contrato de la publicación ${contract.publication.name} ha sido rechazado`, 'Rechazado');
         this.getAllContracts();
       },
     );
