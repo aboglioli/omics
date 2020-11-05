@@ -33,6 +33,7 @@ impl EventHandler for RegisteredHandler {
                 username,
                 email,
                 validation_code,
+                ..
             } => {
                 let email = Email::new(
                     email,

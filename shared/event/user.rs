@@ -9,6 +9,7 @@ pub enum UserEvent {
         id: String,
         username: String,
         email: String,
+        role_id: String,
         validation_code: String,
     },
     LoggedIn {

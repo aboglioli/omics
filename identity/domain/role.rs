@@ -1,6 +1,8 @@
 mod permission;
+mod permission_repository;
 mod repository;
 pub use permission::*;
+pub use permission_repository::*;
 pub use repository::*;
 
 use common::model::{AggregateRoot, StringId};
@@ -26,11 +28,11 @@ impl Role {
         })
     }
 
-    pub fn build(base: AggregateRoot<RoleId>, name: String) -> Self {
+    pub fn build(base: AggregateRoot<RoleId>, name: String, permissions: Vec<Permission>) -> Self {
         Role {
             base,
             name,
-            permissions: Vec::new(),
+            permissions,
         }
     }
 
@@ -38,65 +40,56 @@ impl Role {
         &self.base
     }
 
-    pub fn is(&self, role_id: &str) -> bool {
-        self.base().id().value() == role_id
-    }
-
     pub fn name(&self) -> &str {
         &self.name
     }
 
-    pub fn has_permissions(&self, module: &str, permissions: &str) -> bool {
+    pub fn permissions(&self) -> &[Permission] {
+        &self.permissions
+    }
+
+    pub fn can<S: Into<String>>(&self, permission_id: S) -> bool {
+        let permission_id = permission_id.into();
+
         for p in self.permissions.iter() {
-            if p.module() == module && p.contains(permissions) {
+            if p.id() == permission_id {
                 return true;
             }
         }
+
         false
     }
 
-    pub fn add_permissions(&mut self, permission: Permission) {
-        self.permissions.push(permission);
+    pub fn set_permissions(&mut self, permissions: Vec<Permission>) -> Result<()> {
+        self.permissions = permissions;
+        self.base.update();
+        Ok(())
     }
 }
 
 #[cfg(test)]
 mod tests {
 
-    use common::result::Result;
-
     use super::*;
 
     #[test]
-    fn create_role() -> Result<()> {
-        let r = Role::new(RoleId::new("admin").unwrap(), "Administrator")?;
+    fn create_role() {
+        let r = Role::new(RoleId::new("admin").unwrap(), "Administrator").unwrap();
         assert_eq!(r.base(), &AggregateRoot::new(RoleId::new("admin").unwrap()));
         assert_eq!(r.name(), "Administrator");
         assert_eq!(r.base(), &AggregateRoot::new(RoleId::new("admin").unwrap()));
-
-        Ok(())
     }
 
     #[test]
-    fn permissions() -> Result<()> {
-        let pmod1 = Permission::new("mod1", "CRUD")?;
-        let pmod2 = Permission::new("mod2", "CRD")?;
-        let pmod3 = Permission::new("mod3", "R")?;
-        let mut r = Role::new(RoleId::new("user").unwrap(), "User")?;
-        r.add_permissions(pmod1);
-        r.add_permissions(pmod2);
-        r.add_permissions(pmod3);
-        assert!(r.has_permissions("mod1", "cD"));
-        assert!(r.has_permissions("mod1", "crud"));
-        assert!(r.has_permissions("mod2", "Cd"));
-        assert!(!r.has_permissions("mod2", "CdU"));
-        assert!(!r.has_permissions("mod3", "C"));
-        assert!(r.has_permissions("mod3", "r"));
+    fn permissions() {
+        let permissions = vec![
+            Permission::new("edit_all_users", "Edit all users").unwrap(),
+            Permission::new("edit_own_user", "Edit own user").unwrap(),
+        ];
+        let mut r = Role::new(RoleId::new("admin").unwrap(), "Administrator").unwrap();
+        r.set_permissions(permissions).unwrap();
 
-        let pmod4 = Permission::new("mod3", "c")?;
-        r.add_permissions(pmod4);
-        assert!(r.has_permissions("mod3", "C"));
-
-        Ok(())
+        assert!(r.can("edit_all_users"));
+        assert!(!r.can("edit_all_publications"));
     }
 }

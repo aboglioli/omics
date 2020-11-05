@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-use crate::domain::role::Role;
+use crate::domain::role::{Permission, Role};
 use crate::domain::user::User;
 
 #[derive(Serialize)]
@@ -65,9 +65,25 @@ impl From<&User> for UserDto {
 }
 
 #[derive(Serialize)]
+pub struct PermissionDto {
+    pub id: String,
+    pub name: String,
+}
+
+impl PermissionDto {
+    pub fn from(permission: &Permission) -> PermissionDto {
+        PermissionDto {
+            id: permission.id().to_string(),
+            name: permission.name().to_string(),
+        }
+    }
+}
+
+#[derive(Serialize)]
 pub struct RoleDto {
     pub id: String,
     pub name: String,
+    pub permissions: Vec<PermissionDto>,
 }
 
 impl From<&Role> for RoleDto {
@@ -75,6 +91,7 @@ impl From<&Role> for RoleDto {
         RoleDto {
             id: role.base().id().to_string(),
             name: role.name().to_string(),
+            permissions: role.permissions().iter().map(PermissionDto::from).collect(),
         }
     }
 }

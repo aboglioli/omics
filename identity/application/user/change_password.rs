@@ -1,9 +1,11 @@
 use serde::Deserialize;
 
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 
+use crate::domain::role::RoleRepository;
 use crate::domain::user::{UserId, UserRepository, UserService};
 
 #[derive(Deserialize)]
@@ -39,6 +41,9 @@ impl<'a> ChangePassword<'a> {
         cmd: ChangePasswordCommand,
     ) -> Result<CommandResponse> {
         let mut user = self.user_repo.find_by_id(&UserId::new(user_id)?).await?;
+        if !user.can("change_password") {
+            return Err(Error::unauthorized());
+        }
 
         self.user_serv
             .change_password(&mut user, &cmd.old_password, &cmd.new_password)

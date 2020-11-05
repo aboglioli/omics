@@ -17,6 +17,10 @@ VALUES
   ('content-manager', 'Gestor de contenido', NOW()),
   ('user', 'Usuario', NOW());
 
+INSERT INTO permissions(id, name)
+VALUES
+  ('permission-1', 'Permiso 1');
+
 INSERT INTO users(
   id,
   provider,

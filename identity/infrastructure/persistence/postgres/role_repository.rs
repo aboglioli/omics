@@ -9,18 +9,21 @@ use common::error::Error;
 use common::model::AggregateRoot;
 use common::result::Result;
 
-use crate::domain::role::{Role, RoleId, RoleRepository};
+use crate::domain::role::{Permission, Role, RoleId, RoleRepository};
 
 impl Role {
     fn from_row(row: Row) -> Result<Self> {
         let id: String = row.get("id");
         let name: String = row.get("name");
 
+        let permissions: Vec<Permission> = serde_json::from_value(row.get("permissions"))?;
+
         let created_at: DateTime<Utc> = row.get("created_at");
 
         Ok(Role::build(
             AggregateRoot::build(RoleId::new(id)?, created_at, None, None),
             name,
+            permissions,
         ))
     }
 }
@@ -44,13 +47,13 @@ impl RoleRepository for PostgresRoleRepository {
             .await
             .map_err(|err| Error::not_found("role").wrap_raw(err))?;
 
-        let mut users = Vec::new();
+        let mut roles = Vec::new();
 
         for row in rows.into_iter() {
-            users.push(Role::from_row(row)?);
+            roles.push(Role::from_row(row)?);
         }
 
-        Ok(users)
+        Ok(roles)
     }
 
     async fn find_by_id(&self, id: &RoleId) -> Result<Role> {
@@ -62,6 +65,21 @@ impl RoleRepository for PostgresRoleRepository {
 
         Role::from_row(row)
     }
+
+    // async fn find_by_user_id(&self, user_id: &UserId) -> Result<Role> {
+    //     let row = self
+    //         .client
+    //         .query_one(
+    //             "SELECT r.id, r.name, r.permissions FROM roles AS r
+    //             LEFT JOIN user u ON u.role_id = r.id
+    //             WHERE u.id = $1",
+    //             &[&user_id.to_uuid()?],
+    //         )
+    //         .await
+    //         .map_err(|err| Error::not_found("role").wrap_raw(err))?;
+    //
+    //     Role::from_row(row)
+    // }
 
     async fn save(&self, role: &mut Role) -> Result<()> {
         let create = self

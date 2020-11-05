@@ -32,6 +32,8 @@ impl<'a> ChangePaymentEmail<'a> {
         user_id: String,
         cmd: ChangePaymentEmailCommand,
     ) -> Result<CommandResponse> {
+        let user_id = UserId::new(auth_id)?;
+        let user = self.user_repo.find_by_id(&user_id).await?;
         if auth_id != user_id {
             let auth_user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
             if !auth_user.is_admin() {
