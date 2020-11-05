@@ -401,7 +401,7 @@ class Populator {
     this.users[authorId].followers += 1;
   }
 
-  createSubscription({ userId }) {
+  createSubscription({ userId, planPrice }) {
     const id = uuid();
     const subscription = {
       id,
@@ -410,13 +410,13 @@ class Populator {
         plan_id: {
           id: "basic",
         },
-        price: 75.0,
+        price: planPrice,
         assigned_at: this.nextDate(),
       },
       payments: [
         {
           kind: "income",
-          amount: 75.0,
+          amount: planPrice,
           datetime: this.nextDate(),
         },
       ],
@@ -490,6 +490,8 @@ class Populator {
       },
     });
 
+    const total = this.subscriptions.reduce((acc, s) => acc + s.payments[0].amount, 0);
+
     const summaries = [];
     const date = new Date(this.nextDate());
     for (let i = 0; i < summaryCount; i++) {
@@ -497,15 +499,17 @@ class Populator {
       const to = new Date(date);
       to.setHours(date.getHours() + 24);
 
+      const statistics = {
+        views: rand(100, 1000),
+        unique_views: rand(100, 1000),
+        readings: rand(100, 1000),
+        likes: rand(100, 1000),
+        reviews: rand(100, 1000),
+        stars: rand(0, 6) * 1.0,
+      };
+
       const summary = {
-        statistics: {
-          views: rand(100, 1000),
-          unique_views: rand(100, 1000),
-          readings: rand(100, 1000),
-          likes: rand(100, 1000),
-          reviews: rand(100, 1000),
-          stars: rand(0, 6) * 1.0,
-        },
+        statistics,
         total: rand(1000, 10000) * 1.0,
         amount: rand(10, 1000) * 1.0,
         paid: i / summaryCount <= 0.75,
@@ -552,62 +556,69 @@ class Populator {
     return contract;
   }
 
+  generateSummariesForContracts() {
+
+  }
+
+  async saveItems(items, dbTable) {
+    try {
+      const columns = items.length > 0 ? Object.keys(items[0]).length : 0;
+      const max = Math.ceil(30000 / columns);
+
+      for (; items.length > 0; ) {
+        const slice = items.splice(0, max);
+        await this.db(dbTable).insert(slice);
+      }
+    } catch (err) {
+      console.log("Table:", dbTable);
+      console.log(err);
+    }
+  }
+
   async save() {
-    await this.db("users").insert(Object.values(this.users));
+    const users = Object.values(this.users);
+    await this.saveItems(users, "users");
 
-    await this.db("publications").insert(
-      Object.values(this.publications).map((p) => ({
-        ...p,
-        tags: JSON.stringify(p.tags),
-        pages: JSON.stringify(p.pages),
-        status_history: JSON.stringify(p.status_history),
-      }))
-    );
+    const publications = Object.values(this.publications).map((p) => ({
+      ...p,
+      tags: JSON.stringify(p.tags),
+      pages: JSON.stringify(p.pages),
+      status_history: JSON.stringify(p.status_history),
+    }));
+    await this.saveItems(publications, "publications");
 
-    await this.db("collections").insert(
-      Object.values(this.collections).map((c) => ({
-        ...c,
-        tags: JSON.stringify(c.tags),
-        items: JSON.stringify(c.items),
-      }))
-    );
+    const collections = Object.values(this.collections).map((c) => ({
+      ...c,
+      tags: JSON.stringify(c.tags),
+      items: JSON.stringify(c.items),
+    }));
+    await this.saveItems(collections, "collections");
 
-    await this.db("views").insert(this.views);
+    await this.saveItems(this.views, "views");
+    await this.saveItems(this.readings, "readings");
+    await this.saveItems(this.likes, "likes");
+    await this.saveItems(this.reviews, "reviews");
+    await this.saveItems(this.publicationFavorites, "publication_favorites");
+    await this.saveItems(this.collectionFavorites, "collection_favorites");
+    await this.saveItems(this.follows, "follows");
 
-    await this.db("readings").insert(this.readings);
+    const contracts = this.contracts.map((c) => ({
+      ...c,
+      summaries: JSON.stringify(c.summaries),
+      payments: JSON.stringify(c.payments),
+      status_history: JSON.stringify(c.status_history),
+    }));
+    await this.saveItems(contracts, "contracts");
 
-    await this.db("likes").insert(this.likes);
-
-    await this.db("reviews").insert(this.reviews);
-
-    await this.db("publication_favorites").insert(this.publicationFavorites);
-
-    await this.db("collection_favorites").insert(this.collectionFavorites);
-
-    await this.db("follows").insert(this.follows);
-
-    await this.db("contracts").insert(
-      this.contracts.map((c) => ({
-        ...c,
-        summaries: JSON.stringify(c.summaries),
-        payments: JSON.stringify(c.payments),
-        status_history: JSON.stringify(c.status_history),
-      }))
-    );
-
-    await this.db("subscriptions").insert(
-      this.subscriptions.map((s) => ({
-        ...s,
-        payments: JSON.stringify(s.payments),
-        status_history: JSON.stringify(s.status_history),
-      }))
-    );
+    const subscriptions = this.subscriptions.map((s) => ({
+      ...s,
+      payments: JSON.stringify(s.payments),
+      status_history: JSON.stringify(s.status_history),
+    }));
+    await this.saveItems(subscriptions, "subscriptions");
 
     // Events
-    for (; this.events.length > 0; ) {
-      const events = this.events.splice(0, 10000);
-      await this.db("events").insert(events);
-    }
+    await this.saveItems(this.events, "events");
   }
 }
 

@@ -48,7 +48,7 @@ async function main() {
 
   try {
     // User
-    for (let i = 0; i < 1200; i++) {
+    for (let i = 0; i < 20000; i++) {
       const user = populator.createUser({ username: `user-${i}` });
 
       if (rand(0, 100) < 5) {
@@ -102,9 +102,11 @@ async function main() {
       const newDate = new Date();
       newDate.setHours(newDate.getHours() - 24 * 10);
       populator.lastDate = newDate;
-      if (rand(0, 100) < 5) {
+      // if (rand(0, 100) < 5) {
+      if (i < 3000) {
         populator.createSubscription({
           userId: user.id,
+          planPrice: 150.0,
         });
       }
       populator.lastDate = oldLastDate;
