@@ -240,7 +240,7 @@
                 <mat-form-field appearance="fill" class="matDate">
                   <mat-label>Slecciona una fecha</mat-label>
                   <input  matInput
-                          [max]="maxDateBirthday"
+                          [max]="maxDatebirthdate"
                           [matDatepicker]="picker"
                           formControlName="birthdate"
                           (dateChange)="convertDateToRFC3339($event.value)">

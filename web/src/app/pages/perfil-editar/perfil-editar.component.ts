@@ -40,7 +40,7 @@ export class PerfilEditarComponent implements OnInit {
   public formProfile: FormGroup;
   public formDeleteAccount: FormGroup;
 
-  public maxDateBirthday: Date;
+  public maxDatebirthdate: Date;
 
   public generosList  = [
     {
@@ -83,7 +83,8 @@ export class PerfilEditarComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.maxDateBirthday = new Date();
+    this.maxDatebirthdate = new Date();
+    this.maxDatebirthdate.setFullYear(  this.maxDatebirthdate.getFullYear() - 14 );
 
     this.createForm();
     this.userId = this.authService.getIdUser();

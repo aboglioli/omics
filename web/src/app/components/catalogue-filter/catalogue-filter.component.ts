@@ -76,7 +76,7 @@ export class CatalogueFilterComponent implements OnInit {
           this.categoryList.push(category);
         });
 
-        console.log(this.categoryList);
+        // console.log(this.categoryList);
       },
       (err: Error ) => {
         console.error('ERROR: ', err);
