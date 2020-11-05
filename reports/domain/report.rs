@@ -301,7 +301,7 @@ impl Report {
         });
     }
 
-    pub fn map_payments(&mut self, subscriptions: &[Subscription], contracts: &[Contract]) {
+    pub fn map_payments(&mut self, subscriptions: &[Subscription], contracts: &[Contract], donations: &[Donation]) {
         let mut income = 0.0;
         let mut outcome = 0.0;
 
@@ -319,6 +319,11 @@ impl Report {
                     outcome += payment.amount().value();
                 }
             }
+        }
+
+        for donation in donations.iter() {
+            income += donation.total().value() - donation.subtotal().value();
+            outcome += donation.subtotal().value();
         }
 
         self.payments = Some(Payments { income, outcome });

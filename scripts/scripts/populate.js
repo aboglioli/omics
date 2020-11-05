@@ -183,6 +183,8 @@ async function main() {
       interactions.push([user.id, publication.id]);
     }
 
+    populator.generateSummariesForContracts();
+
     createCompleteUser(populator);
 
     await populator.save();

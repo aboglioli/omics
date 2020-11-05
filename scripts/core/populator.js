@@ -454,7 +454,7 @@ class Populator {
     return subscription;
   }
 
-  createContract({ publicationId, userId, summaryCount }) {
+  createContract({ publicationId, userId }) {
     const id = uuid();
     const contract = {
       id,
@@ -490,65 +490,6 @@ class Populator {
       },
     });
 
-    const total = this.subscriptions.reduce((acc, s) => acc + s.payments[0].amount, 0);
-
-    const summaries = [];
-    const date = new Date(this.nextDate());
-    for (let i = 0; i < summaryCount; i++) {
-      date.setHours(date.getHours() + 24);
-      const to = new Date(date);
-      to.setHours(date.getHours() + 24);
-
-      const statistics = {
-        views: rand(100, 1000),
-        unique_views: rand(100, 1000),
-        readings: rand(100, 1000),
-        likes: rand(100, 1000),
-        reviews: rand(100, 1000),
-        stars: rand(0, 6) * 1.0,
-      };
-
-      const summary = {
-        statistics,
-        total: rand(1000, 10000) * 1.0,
-        amount: rand(10, 1000) * 1.0,
-        paid: i / summaryCount <= 0.75,
-        from: new Date(date),
-        to,
-      };
-
-      summaries.push(summary);
-
-      this.addEvent("contract", "summary-added", {
-        SummaryAdded: {
-          id,
-          publication_id: publicationId,
-          total: summary.total,
-          amount: summary.amount,
-          from: summary.from,
-          to: summary.to,
-        },
-      });
-    }
-    contract.summaries = summaries;
-
-    contract.payments = [
-      {
-        kind: "outcome",
-        amount: summaries
-          .filter((s) => s.paid)
-          .reduce((acc, s) => acc + s.amount, 0.0),
-        datetime: new Date(),
-      },
-    ];
-    this.addEvent("contract", "payment-added", {
-      PaymentAdded: {
-        id,
-        publication_id: publicationId,
-        amount: contract.payments[0].amount,
-      },
-    });
-
     this.contracts.push(contract);
 
     this.publications[publicationId].contract = true;
@@ -557,7 +498,69 @@ class Populator {
   }
 
   generateSummariesForContracts() {
+    const total = this.subscriptions.reduce((acc, s) => acc + s.payments[0].amount, 0);
+    const amount = total * 0.3;
 
+    for (const contract of this.contracts) {
+      const summaries = [];
+      const summaryCount = 15;
+      const date = new Date(this.nextDate());
+
+      for (let i = 0; i < summaryCount; i++) {
+        date.setHours(date.getHours() + 24);
+        const to = new Date(date);
+        to.setHours(date.getHours() + 24);
+
+        const statistics = {
+          views: rand(100, 1000),
+          unique_views: rand(100, 1000),
+          readings: rand(100, 1000),
+          likes: rand(100, 1000),
+          reviews: rand(100, 1000),
+          stars: rand(0, 6) * 1.0,
+        };
+
+        const summary = {
+          statistics,
+          total: rand(1000, 10000) * 1.0,
+          amount: rand(1000, amount) * (1.0 / this.contracts.length),
+          paid: i / summaryCount <= 0.7,
+          from: new Date(date),
+          to,
+        };
+
+        summaries.push(summary);
+
+        this.addEvent("contract", "summary-added", {
+          SummaryAdded: {
+            id: contract.id,
+            publication_id: contract.publication_id,
+            total: summary.total,
+            amount: summary.amount,
+            from: summary.from,
+            to: summary.to,
+          },
+        });
+      }
+      contract.summaries = summaries;
+
+      contract.payments = [
+        {
+          kind: "outcome",
+          amount: summaries
+            .filter((s) => s.paid)
+            .reduce((acc, s) => acc + s.amount, 0.0),
+          datetime: new Date(),
+        },
+      ];
+      this.addEvent("contract", "payment-added", {
+        PaymentAdded: {
+          id: contract.id,
+          publication_id: contract.publication_id,
+          amount: contract.payments[0].amount,
+        },
+      });
+    }
   }
 
   async saveItems(items, dbTable) {
