@@ -23,9 +23,7 @@ impl<'a> GetById<'a> {
     pub async fn exec(&self, (auth_id, auth_role): UserIdAndRole, id: String) -> Result<RoleDto> {
         let user = self.user_repo.find_by_id(&auth_id).await?;
         if !auth_role.can("get_all_roles") {
-            if user.role_id().value() != id {
-                return Err(Error::unauthorized());
-            } else if !auth_role.can("get_own_role") {
+            if user.role_id().value() != id || !auth_role.can("get_own_role") {
                 return Err(Error::unauthorized());
             }
         }

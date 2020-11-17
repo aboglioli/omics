@@ -25,13 +25,11 @@ impl<'a> Delete<'a> {
         (auth_id, auth_role): UserIdAndRole,
         user_id: String,
     ) -> Result<CommandResponse> {
-        if !auth_role.can("delete_user") {
-            return Err(Error::unauthorized());
-        }
-
         let user_id = UserId::new(user_id)?;
-        if auth_id != user_id {
-            return Err(Error::unauthorized());
+        if !auth_role.can("delete_all_users") {
+            if auth_id != user_id || !auth_role.can("delete_own_user") {
+                return Err(Error::unauthorized());
+            }
         }
 
         let mut user = self.user_repo.find_by_id(&user_id).await?;
