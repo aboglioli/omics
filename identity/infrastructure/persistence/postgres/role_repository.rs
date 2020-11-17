@@ -9,7 +9,8 @@ use common::error::Error;
 use common::model::AggregateRoot;
 use common::result::Result;
 
-use crate::domain::role::{Permission, Role, RoleId, RoleRepository};
+use crate::domain::role::{Permission, Name, Role, RoleId, RoleRepository};
+use crate::domain::user::UserId;
 
 impl Role {
     fn from_row(row: Row) -> Result<Self> {
@@ -22,7 +23,7 @@ impl Role {
 
         Ok(Role::build(
             AggregateRoot::build(RoleId::new(id)?, created_at, None, None),
-            name,
+            Name::new(name)?,
             permissions,
         ))
     }
@@ -66,20 +67,20 @@ impl RoleRepository for PostgresRoleRepository {
         Role::from_row(row)
     }
 
-    // async fn find_by_user_id(&self, user_id: &UserId) -> Result<Role> {
-    //     let row = self
-    //         .client
-    //         .query_one(
-    //             "SELECT r.id, r.name, r.permissions FROM roles AS r
-    //             LEFT JOIN user u ON u.role_id = r.id
-    //             WHERE u.id = $1",
-    //             &[&user_id.to_uuid()?],
-    //         )
-    //         .await
-    //         .map_err(|err| Error::not_found("role").wrap_raw(err))?;
-    //
-    //     Role::from_row(row)
-    // }
+    async fn find_by_user_id(&self, user_id: &UserId) -> Result<Role> {
+        let row = self
+            .client
+            .query_one(
+                "SELECT r.* FROM users AS u
+                LEFT JOIN roles r ON r.id = u.role_id
+                WHERE u.id = $1",
+                &[&user_id.to_uuid()?],
+            )
+            .await
+            .map_err(|err| Error::not_found("role").wrap_raw(err))?;
+
+        Role::from_row(row)
+    }
 
     async fn save(&self, role: &mut Role) -> Result<()> {
         let create = self

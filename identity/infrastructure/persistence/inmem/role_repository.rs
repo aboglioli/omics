@@ -38,6 +38,10 @@ impl RoleRepository for InMemRoleRepository {
             .ok_or_else(|| Error::not_found("role"))
     }
 
+    async fn find_by_user_id(&self, user_id: &UserId) -> Result<Role> {
+        Err(Error::not_found("role"))
+    }
+
     async fn save(&self, role: &mut Role) -> Result<()> {
         if role.base().deleted_at().is_none() {
             self.cache.set(role.base().id().clone(), role.clone()).await

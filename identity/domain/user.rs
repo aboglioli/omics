@@ -35,9 +35,10 @@ pub use validation::*;
 
 use common::model::{AggregateRoot, Events, StringId};
 use common::result::Result;
+use common::error::Error;
 use shared::event::UserEvent;
 
-use crate::domain::role::Role;
+use crate::domain::role::RoleId;
 use crate::domain::token::Token;
 
 pub type UserId = StringId;
@@ -48,19 +49,19 @@ pub struct User {
     events: Events<UserEvent>,
     identity: Identity,
     person: Option<Person>,
-    role: Role,
+    role_id: RoleId,
     validation: Option<Validation>,
     payment_email: Option<Email>,
 }
 
 impl User {
-    pub fn new(id: UserId, identity: Identity, role: Role) -> Result<Self> {
+    pub fn new(id: UserId, identity: Identity, role_id: RoleId) -> Result<Self> {
         let mut user = User {
             base: AggregateRoot::new(id),
             events: Events::new(),
             identity,
             person: None,
-            role,
+            role_id,
             validation: Some(Validation::new()),
             payment_email: None,
         };
@@ -69,7 +70,7 @@ impl User {
             id: user.base().id().to_string(),
             username: user.identity().username().to_string(),
             email: user.identity().email().to_string(),
-            role_id: user.role().base().id().to_string(),
+            role_id: user.role_id().to_string(),
             validation_code: user.validation().unwrap().code().to_string(),
         });
 
@@ -80,7 +81,7 @@ impl User {
         base: AggregateRoot<UserId>,
         identity: Identity,
         person: Option<Person>,
-        role: Role,
+        role_id: RoleId,
         validation: Option<Validation>,
         payment_email: Option<Email>,
     ) -> Self {
@@ -89,7 +90,7 @@ impl User {
             events: Events::new(),
             identity,
             person,
-            role,
+            role_id,
             validation,
             payment_email,
         }
@@ -111,8 +112,8 @@ impl User {
         self.person.as_ref()
     }
 
-    pub fn role(&self) -> &Role {
-        &self.role
+    pub fn role_id(&self) -> &RoleId {
+        &self.role_id
     }
 
     pub fn validation(&self) -> Option<&Validation> {
@@ -129,10 +130,6 @@ impl User {
 
     pub fn is_active(&self) -> bool {
         self.base.deleted_at().is_none() && self.is_validated()
-    }
-
-    pub fn can<S: Into<String>>(&self, permission_id: S) -> bool {
-        self.role().can(permission_id)
     }
 
     pub fn set_password(&mut self, password: Password) -> Result<()> {
@@ -174,13 +171,13 @@ impl User {
         Ok(())
     }
 
-    pub fn change_role(&mut self, role: Role) -> Result<()> {
-        self.role = role;
+    pub fn change_role(&mut self, role_id: RoleId) -> Result<()> {
+        self.role_id = role_id;
         self.base.update();
 
         self.events.record_event(UserEvent::RoleChanged {
             id: self.base().id().to_string(),
-            role_id: self.role().base().id().to_string(),
+            role_id: self.role_id().to_string(),
         });
 
         Ok(())

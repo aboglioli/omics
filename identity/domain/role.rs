@@ -1,9 +1,13 @@
+mod name;
 mod permission;
 mod permission_repository;
 mod repository;
+pub use name::*;
 pub use permission::*;
 pub use permission_repository::*;
 pub use repository::*;
+
+use slug::slugify;
 
 use common::model::{AggregateRoot, StringId};
 use common::result::Result;
@@ -13,22 +17,23 @@ pub type RoleId = StringId;
 #[derive(Debug, Clone)]
 pub struct Role {
     base: AggregateRoot<RoleId>,
-    name: String,
+    name: Name,
     permissions: Vec<Permission>,
 }
 
 impl Role {
-    pub fn new<S: Into<String>>(code: RoleId, name: S) -> Result<Self> {
-        let name = name.into();
+    pub fn new(name: Name) -> Result<Self> {
+        let id = slugify(name.value());
+        let id = RoleId::new(id)?;
 
         Ok(Role {
-            base: AggregateRoot::new(code),
+            base: AggregateRoot::new(id),
             name,
             permissions: Vec::new(),
         })
     }
 
-    pub fn build(base: AggregateRoot<RoleId>, name: String, permissions: Vec<Permission>) -> Self {
+    pub fn build(base: AggregateRoot<RoleId>, name: Name, permissions: Vec<Permission>) -> Self {
         Role {
             base,
             name,
@@ -40,7 +45,7 @@ impl Role {
         &self.base
     }
 
-    pub fn name(&self) -> &str {
+    pub fn name(&self) -> &Name {
         &self.name
     }
 
@@ -74,9 +79,9 @@ mod tests {
 
     #[test]
     fn create_role() {
-        let r = Role::new(RoleId::new("admin").unwrap(), "Administrator").unwrap();
+        let r = Role::new(RoleId::new("admin").unwrap(), Name::new("Administrator").unwrap()).unwrap();
         assert_eq!(r.base(), &AggregateRoot::new(RoleId::new("admin").unwrap()));
-        assert_eq!(r.name(), "Administrator");
+        assert_eq!(r.name().value(), "Administrator");
         assert_eq!(r.base(), &AggregateRoot::new(RoleId::new("admin").unwrap()));
     }
 
@@ -86,7 +91,7 @@ mod tests {
             Permission::new("edit_all_users", "Edit all users").unwrap(),
             Permission::new("edit_own_user", "Edit own user").unwrap(),
         ];
-        let mut r = Role::new(RoleId::new("admin").unwrap(), "Administrator").unwrap();
+        let mut r = Role::new(RoleId::new("admin").unwrap(), Name::new("Administrator").unwrap()).unwrap();
         r.set_permissions(permissions).unwrap();
 
         assert!(r.can("edit_all_users"));
