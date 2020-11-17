@@ -9,7 +9,7 @@ use common::error::Error;
 use common::model::AggregateRoot;
 use common::result::Result;
 
-use crate::domain::role::{Permission, Name, Role, RoleId, RoleRepository};
+use crate::domain::role::{Name, Permission, Role, RoleId, RoleRepository};
 use crate::domain::user::UserId;
 
 impl Role {
@@ -99,7 +99,7 @@ impl RoleRepository for PostgresRoleRepository {
                     VALUES ($1, $2, $3)",
                     &[
                         &role.base().id().value(),
-                        &role.name(),
+                        &role.name().value(),
                         &role.base().created_at(),
                     ],
                 )
@@ -113,11 +113,24 @@ impl RoleRepository for PostgresRoleRepository {
                         name = $2
                     WHERE
                         id = $1",
-                    &[&role.base().id().value(), &role.name()],
+                    &[&role.base().id().value(), &role.name().value()],
                 )
                 .await
                 .map_err(|err| Error::new("role", "update").wrap_raw(err))?;
         }
+
+        Ok(())
+    }
+
+    async fn delete(&self, id: &RoleId) -> Result<()> {
+        self.client
+            .execute(
+                "DELETE FROM roles
+                WHERE id = $1",
+                &[&id.value()],
+            )
+            .await
+            .map_err(|err| Error::new("role", "delete").wrap_raw(err))?;
 
         Ok(())
     }

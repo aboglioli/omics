@@ -65,9 +65,20 @@ impl Role {
         false
     }
 
+    pub fn set_name(&mut self, name: Name) -> Result<()> {
+        self.name = name;
+        self.base.update();
+        Ok(())
+    }
+
     pub fn set_permissions(&mut self, permissions: Vec<Permission>) -> Result<()> {
         self.permissions = permissions;
         self.base.update();
+        Ok(())
+    }
+
+    pub fn delete(&mut self) -> Result<()> {
+        self.base.delete();
         Ok(())
     }
 }
@@ -79,9 +90,9 @@ mod tests {
 
     #[test]
     fn create_role() {
-        let r = Role::new(RoleId::new("admin").unwrap(), Name::new("Administrator").unwrap()).unwrap();
+        let r = Role::new(Name::new("Admin").unwrap()).unwrap();
         assert_eq!(r.base(), &AggregateRoot::new(RoleId::new("admin").unwrap()));
-        assert_eq!(r.name().value(), "Administrator");
+        assert_eq!(r.name().value(), "Admin");
         assert_eq!(r.base(), &AggregateRoot::new(RoleId::new("admin").unwrap()));
     }
 
@@ -91,7 +102,7 @@ mod tests {
             Permission::new("edit_all_users", "Edit all users").unwrap(),
             Permission::new("edit_own_user", "Edit own user").unwrap(),
         ];
-        let mut r = Role::new(RoleId::new("admin").unwrap(), Name::new("Administrator").unwrap()).unwrap();
+        let mut r = Role::new(Name::new("Admin").unwrap()).unwrap();
         r.set_permissions(permissions).unwrap();
 
         assert!(r.can("edit_all_users"));

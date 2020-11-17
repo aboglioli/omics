@@ -6,6 +6,7 @@ use common::infrastructure::cache::InMemCache;
 use common::result::Result;
 
 use crate::domain::role::{Role, RoleId, RoleRepository};
+use crate::domain::user::UserId;
 
 pub struct InMemRoleRepository {
     cache: InMemCache<RoleId, Role>,
@@ -48,5 +49,9 @@ impl RoleRepository for InMemRoleRepository {
         } else {
             self.cache.delete(role.base().id()).await
         }
+    }
+
+    async fn delete(&self, id: &RoleId) -> Result<()> {
+        self.cache.delete(id).await
     }
 }

@@ -12,4 +12,6 @@ pub trait RoleRepository: Sync + Send {
     async fn find_by_user_id(&self, user_id: &UserId) -> Result<Role>;
 
     async fn save(&self, role: &mut Role) -> Result<()>;
+
+    async fn delete(&self, id: &RoleId) -> Result<()>;
 }

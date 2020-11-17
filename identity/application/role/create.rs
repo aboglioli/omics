@@ -1,9 +1,10 @@
 use serde::Deserialize;
 
 use common::error::Error;
+use common::request::CommandResponse;
 use common::result::Result;
 
-use crate::domain::role::{Role, Name, RoleRepository, PermissionRepository};
+use crate::domain::role::{Name, PermissionRepository, Role, RoleRepository};
 use crate::domain::user::UserId;
 
 #[derive(Deserialize)]
@@ -18,7 +19,10 @@ pub struct Create<'a> {
 }
 
 impl<'a> Create<'a> {
-    pub fn new(permission_repo: &'a dyn PermissionRepository, role_repo: &'a dyn RoleRepository) -> Self {
+    pub fn new(
+        permission_repo: &'a dyn PermissionRepository,
+        role_repo: &'a dyn RoleRepository,
+    ) -> Self {
         Create {
             permission_repo,
             role_repo,
@@ -26,19 +30,23 @@ impl<'a> Create<'a> {
     }
 
     pub async fn exec(&self, auth_id: String, cmd: CreateCommand) -> Result<CommandResponse> {
-        let role = self.role_repo.find_by_user_id(&UserId::new(auth_id)?).await?;
+        let role = self
+            .role_repo
+            .find_by_user_id(&UserId::new(auth_id)?)
+            .await?;
         if !role.can("create_role") {
             return Err(Error::unauthorized());
         }
 
-        let mut role = Role::new(Name::new(cmd.name))?;
-        let available_permissions = self.permission_repository.find_all().await?;
+        let mut role = Role::new(Name::new(cmd.name)?)?;
+        let available_permissions = self.permission_repo.find_all().await?;
 
+        let permissions = &cmd.permissions;
         let permissions_to_set = available_permissions
             .into_iter()
             .filter(|permission| {
-                for permission_to_set in cmd.permissions.iter() {
-                    if permission.id() === permission_to_set {
+                for permission_to_set in permissions.iter() {
+                    if permission.id() == permission_to_set {
                         return true;
                     }
                 }

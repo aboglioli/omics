@@ -33,9 +33,9 @@ pub use service::*;
 pub use username::*;
 pub use validation::*;
 
+use common::error::Error;
 use common::model::{AggregateRoot, Events, StringId};
 use common::result::Result;
-use common::error::Error;
 use shared::event::UserEvent;
 
 use crate::domain::role::RoleId;
