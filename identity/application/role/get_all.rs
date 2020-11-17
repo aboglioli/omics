@@ -5,7 +5,8 @@ use common::result::Result;
 
 use crate::application::dtos::RoleDto;
 use crate::domain::role::RoleRepository;
-use crate::domain::user::{UserId, UserRepository};
+use crate::domain::user::{UserRepository};
+use crate::UserIdAndRole;
 
 #[derive(Serialize)]
 pub struct GetAllResponse {
@@ -25,12 +26,8 @@ impl<'a> GetAll<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String) -> Result<GetAllResponse> {
-        let role = self
-            .role_repo
-            .find_by_user_id(&UserId::new(auth_id)?)
-            .await?;
-        if !role.can("get_all_roles") {
+    pub async fn exec(&self, (_auth_id, auth_role): UserIdAndRole) -> Result<GetAllResponse> {
+        if !auth_role.can("get_all_roles") {
             return Err(Error::unauthorized());
         }
 

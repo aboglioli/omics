@@ -19,12 +19,17 @@ impl Role {
 
         let permissions: Vec<Permission> = serde_json::from_value(row.get("permissions"))?;
 
+        let default: bool = row.get("default");
+
         let created_at: DateTime<Utc> = row.get("created_at");
+        let updated_at: Option<DateTime<Utc>> = row.get("updated_at");
+        let deleted_at: Option<DateTime<Utc>> = row.get("deleted_at");
 
         Ok(Role::build(
-            AggregateRoot::build(RoleId::new(id)?, created_at, None, None),
+            AggregateRoot::build(RoleId::new(id)?, created_at, updated_at, deleted_at),
             Name::new(name)?,
             permissions,
+            default,
         ))
     }
 }
@@ -76,6 +81,16 @@ impl RoleRepository for PostgresRoleRepository {
                 WHERE u.id = $1",
                 &[&user_id.to_uuid()?],
             )
+            .await
+            .map_err(|err| Error::not_found("role").wrap_raw(err))?;
+
+        Role::from_row(row)
+    }
+
+    async fn find_default(&self) -> Result<Role> {
+        let row = self
+            .client
+            .query_one("SELECT * FROM roles WHERE default = true", &[])
             .await
             .map_err(|err| Error::not_found("role").wrap_raw(err))?;
 

@@ -19,6 +19,7 @@ pub struct Role {
     base: AggregateRoot<RoleId>,
     name: Name,
     permissions: Vec<Permission>,
+    default: bool,
 }
 
 impl Role {
@@ -30,14 +31,21 @@ impl Role {
             base: AggregateRoot::new(id),
             name,
             permissions: Vec::new(),
+            default: false,
         })
     }
 
-    pub fn build(base: AggregateRoot<RoleId>, name: Name, permissions: Vec<Permission>) -> Self {
+    pub fn build(
+        base: AggregateRoot<RoleId>,
+        name: Name,
+        permissions: Vec<Permission>,
+        default: bool,
+    ) -> Self {
         Role {
             base,
             name,
             permissions,
+            default,
         }
     }
 
@@ -57,12 +65,16 @@ impl Role {
         let permission_id = permission_id.into();
 
         for p in self.permissions.iter() {
-            if p.id() == permission_id {
+            if p.id() == permission_id || p.id() == "*" {
                 return true;
             }
         }
 
         false
+    }
+
+    pub fn is_default(&self) -> bool {
+        self.default
     }
 
     pub fn set_name(&mut self, name: Name) -> Result<()> {
@@ -74,6 +86,11 @@ impl Role {
     pub fn set_permissions(&mut self, permissions: Vec<Permission>) -> Result<()> {
         self.permissions = permissions;
         self.base.update();
+        Ok(())
+    }
+
+    pub fn set_default(&mut self, default: bool) -> Result<()> {
+        self.default = default;
         Ok(())
     }
 

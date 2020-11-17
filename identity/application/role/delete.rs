@@ -1,11 +1,12 @@
-use serde::Deserialize;
+
 
 use common::error::Error;
 use common::request::CommandResponse;
 use common::result::Result;
 
 use crate::domain::role::{RoleId, RoleRepository};
-use crate::domain::user::{UserId, UserRepository};
+use crate::domain::user::{UserRepository};
+use crate::UserIdAndRole;
 
 pub struct Delete<'a> {
     role_repo: &'a dyn RoleRepository,
@@ -20,12 +21,12 @@ impl<'a> Delete<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, role_id: String) -> Result<CommandResponse> {
-        let role = self
-            .role_repo
-            .find_by_user_id(&UserId::new(auth_id)?)
-            .await?;
-        if !role.can("delete_role") {
+    pub async fn exec(
+        &self,
+        (_auth_id, auth_role): UserIdAndRole,
+        role_id: String,
+    ) -> Result<CommandResponse> {
+        if !auth_role.can("delete_role") {
             return Err(Error::unauthorized());
         }
 

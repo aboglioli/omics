@@ -4,6 +4,7 @@ use common::request::CommandResponse;
 use common::result::Result;
 
 use crate::domain::user::{UserId, UserRepository};
+use crate::UserIdAndRole;
 
 pub struct Delete<'a> {
     event_pub: &'a dyn EventPublisher,
@@ -19,15 +20,21 @@ impl<'a> Delete<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, user_id: String) -> Result<CommandResponse> {
-        if auth_id != user_id {
-            let auth_user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-            if !auth_user.is_admin() {
-                return Err(Error::unauthorized());
-            }
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        user_id: String,
+    ) -> Result<CommandResponse> {
+        if !auth_role.can("delete_user") {
+            return Err(Error::unauthorized());
         }
 
-        let mut user = self.user_repo.find_by_id(&UserId::new(user_id)?).await?;
+        let user_id = UserId::new(user_id)?;
+        if auth_id != user_id {
+            return Err(Error::unauthorized());
+        }
+
+        let mut user = self.user_repo.find_by_id(&user_id).await?;
 
         user.delete()?;
 
@@ -61,10 +68,17 @@ mod tests {
             "user",
         );
         c.user_repo().save(&mut user).await.unwrap();
+        let role = mocks::role("User");
 
         let user_id = user.base().id().to_string();
-        assert!(uc.exec(user_id.clone(), user_id.clone()).await.is_ok());
-        assert!(uc.exec(user_id.clone(), user_id).await.is_err());
+        assert!(uc
+            .exec((user.base().id().clone(), role.clone()), user_id.clone())
+            .await
+            .is_ok());
+        assert!(uc
+            .exec((user.base().id().clone(), role.clone()), user_id)
+            .await
+            .is_err());
 
         assert_eq!(c.event_pub().events().await.len(), 1);
     }

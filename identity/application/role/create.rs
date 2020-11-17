@@ -5,7 +5,8 @@ use common::request::CommandResponse;
 use common::result::Result;
 
 use crate::domain::role::{Name, PermissionRepository, Role, RoleRepository};
-use crate::domain::user::UserId;
+
+use crate::UserIdAndRole;
 
 #[derive(Deserialize)]
 pub struct CreateCommand {
@@ -29,12 +30,12 @@ impl<'a> Create<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, cmd: CreateCommand) -> Result<CommandResponse> {
-        let role = self
-            .role_repo
-            .find_by_user_id(&UserId::new(auth_id)?)
-            .await?;
-        if !role.can("create_role") {
+    pub async fn exec(
+        &self,
+        (_auth_id, auth_role): UserIdAndRole,
+        cmd: CreateCommand,
+    ) -> Result<CommandResponse> {
+        if !auth_role.can("create_role") {
             return Err(Error::unauthorized());
         }
 

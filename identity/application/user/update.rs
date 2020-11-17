@@ -10,6 +10,7 @@ use common::result::Result;
 use crate::domain::user::{
     Biography, Birthdate, Fullname, Gender, Image, Person, UserId, UserRepository,
 };
+use crate::UserIdAndRole;
 
 #[derive(Deserialize)]
 pub struct UpdateCommand {
@@ -37,18 +38,18 @@ impl<'a> Update<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (auth_id, auth_role): UserIdAndRole,
         user_id: String,
         cmd: UpdateCommand,
     ) -> Result<CommandResponse> {
-        if auth_id != user_id {
-            let auth_user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-            if !auth_user.is_admin() {
+        let user_id = UserId::new(user_id)?;
+        if !auth_role.can("update_all_users") {
+            if auth_id != user_id || !auth_role.can("update_own_user") {
                 return Err(Error::unauthorized());
             }
         }
 
-        let mut user = self.user_repo.find_by_id(&UserId::new(user_id)?).await?;
+        let mut user = self.user_repo.find_by_id(&user_id).await?;
 
         let birthdate = cmd
             .birthdate
@@ -92,10 +93,11 @@ mod tests {
     async fn non_existing_user() {
         let c = mocks::container();
         let uc = Update::new(c.event_pub(), c.user_repo());
+        let role = mocks::role("User");
 
         assert!(uc
             .exec(
-                "user-1".to_owned(),
+                (UserId::new("user-1").unwrap(), role),
                 "user-1".to_owned(),
                 UpdateCommand {
                     name: "Name".to_owned(),
@@ -126,10 +128,11 @@ mod tests {
             "user",
         );
         c.user_repo().save(&mut user).await.unwrap();
+        let role = mocks::role("User");
 
         assert!(uc
             .exec(
-                user.base().id().to_string(),
+                (user.base().id().clone(), role),
                 user.base().id().to_string(),
                 UpdateCommand {
                     name: "N".to_owned(),
@@ -145,7 +148,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                user.base().id().to_string(),
+                (user.base().id().clone(), role),
                 user.base().id().to_string(),
                 UpdateCommand {
                     name: "Name".to_owned(),
@@ -161,7 +164,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                user.base().id().to_string(),
+                (user.base().id().clone(), role),
                 user.base().id().to_string(),
                 UpdateCommand {
                     name: "Name".to_owned(),
@@ -177,7 +180,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                user.base().id().to_string(),
+                (user.base().id().clone(), role),
                 user.base().id().to_string(),
                 UpdateCommand {
                     name: "Name".to_owned(),
@@ -193,7 +196,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                user.base().id().to_string(),
+                (user.base().id().clone(), role),
                 user.base().id().to_string(),
                 UpdateCommand {
                     name: "Name".to_owned(),
@@ -224,10 +227,11 @@ mod tests {
             "user",
         );
         c.user_repo().save(&mut user).await.unwrap();
+        let role = mocks::role();
 
         assert!(uc
             .exec(
-                user.base().id().to_string(),
+                (user.base().id().clone(), role),
                 user.base().id().to_string(),
                 UpdateCommand {
                     name: "Name".to_owned(),

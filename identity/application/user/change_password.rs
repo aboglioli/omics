@@ -17,6 +17,7 @@ pub struct ChangePasswordCommand {
 pub struct ChangePassword<'a> {
     event_pub: &'a dyn EventPublisher,
 
+    role_repo: &'a dyn RoleRepository,
     user_repo: &'a dyn UserRepository,
 
     user_serv: &'a UserService,
@@ -25,11 +26,13 @@ pub struct ChangePassword<'a> {
 impl<'a> ChangePassword<'a> {
     pub fn new(
         event_pub: &'a dyn EventPublisher,
+        role_repo: &'a dyn RoleRepository,
         user_repo: &'a dyn UserRepository,
         user_serv: &'a UserService,
     ) -> Self {
         ChangePassword {
             event_pub,
+            role_repo,
             user_repo,
             user_serv,
         }
@@ -40,10 +43,13 @@ impl<'a> ChangePassword<'a> {
         user_id: String,
         cmd: ChangePasswordCommand,
     ) -> Result<CommandResponse> {
-        let mut user = self.user_repo.find_by_id(&UserId::new(user_id)?).await?;
-        if !user.can("change_password") {
+        let user_id = UserId::new(user_id)?;
+        let role = self.role_repo.find_by_user_id(&user_id).await?;
+        if !role.can("change_user_password") {
             return Err(Error::unauthorized());
         }
+
+        let mut user = self.user_repo.find_by_id(&user_id).await?;
 
         self.user_serv
             .change_password(&mut user, &cmd.old_password, &cmd.new_password)
@@ -66,7 +72,7 @@ mod tests {
     #[tokio::test]
     async fn success() {
         let c = mocks::container();
-        let uc = ChangePassword::new(c.event_pub(), c.user_repo(), c.user_serv());
+        let uc = ChangePassword::new(c.event_pub(), c.role_repo(), c.user_repo(), c.user_serv());
 
         let mut user = mocks::user(
             "user-1",
@@ -99,7 +105,7 @@ mod tests {
     #[tokio::test]
     async fn invalid_password() {
         let c = mocks::container();
-        let uc = ChangePassword::new(c.event_pub(), c.user_repo(), c.user_serv());
+        let uc = ChangePassword::new(c.event_pub(), c.role_repo(), c.user_repo(), c.user_serv());
 
         let mut user = mocks::user(
             "user-1",
