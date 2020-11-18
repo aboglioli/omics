@@ -1,14 +1,15 @@
 use actix_web::HttpRequest;
 
 use common::error::Error;
-use identity::domain::role::Role;
 use identity::domain::token::Token;
+use identity::domain::role::Role;
 use identity::domain::user::UserId;
+use identity::UserIdAndRole;
 
 use crate::container::MainContainer;
 use crate::error::PublicError;
 
-pub async fn auth(req: &HttpRequest, c: &MainContainer) -> Result<(String, Role), PublicError> {
+pub async fn auth(req: &HttpRequest, c: &MainContainer) -> Result<UserIdAndRole, PublicError> {
     let auth_header = match req.headers().get("authorization") {
         Some(header) => {
             if let Ok(header) = header.to_str() {
@@ -23,15 +24,13 @@ pub async fn auth(req: &HttpRequest, c: &MainContainer) -> Result<(String, Role)
 
     let token = extract_token(auth_header).map_err(PublicError::from)?;
 
-    let user_id = c
-        .identity
+    let user_id = c.identity
         .authorization_serv()
         .authorize(&token)
         .await
         .map_err(PublicError::from)?;
 
-    let role = c
-        .identity
+    let role = c.identity
         .role_repo()
         .find_by_user_id(&UserId::new(user_id)?)
         .await

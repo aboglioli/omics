@@ -1,6 +1,8 @@
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
+use identity::UserIdAndRole;
+use common::error::Error;
 
 use crate::domain::interaction::InteractionRepository;
 use crate::domain::publication::{PublicationId, PublicationRepository};
@@ -29,16 +31,19 @@ impl<'a> DeleteReview<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<CommandResponse> {
+    pub async fn exec(&self, (auth_id, auth_role): UserIdAndRole, publication_id: String) -> Result<CommandResponse> {
+        if !auth_role.can("delete_review_from_publication") {
+            return Err(Error::unauthorized());
+        }
+
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        let reader_id = ReaderId::new(auth_id)?;
-        let reader = self.reader_repo.find_by_id(&reader_id).await?;
+        let reader = self.reader_repo.find_by_id(&auth_id).await?;
 
         let reviews = self
             .interaction_repo
-            .find_reviews(Some(&reader_id), Some(&publication_id), None, None)
+            .find_reviews(Some(&auth_id), Some(&publication_id), None, None)
             .await?;
 
         if let Some(review) = reviews.first() {
@@ -46,7 +51,7 @@ impl<'a> DeleteReview<'a> {
         }
 
         self.interaction_repo
-            .delete_review(&reader_id, &publication_id)
+            .delete_review(&auth_id, &publication_id)
             .await?;
         self.publication_repo.save(&mut publication).await?;
 

@@ -3,6 +3,8 @@ use serde::Serialize;
 use common::request::Include;
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
+use common::error::Error;
 
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};
 use crate::domain::author::AuthorRepository;
@@ -42,7 +44,7 @@ impl<'a> GetPublications<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: Option<String>,
+        user_id_and_role: Option<UserIdAndRole>,
         collection_id: String,
         include: Include,
     ) -> Result<GetPublicationsResponse> {
@@ -51,9 +53,12 @@ impl<'a> GetPublications<'a> {
             .find_by_id(&CollectionId::new(collection_id)?)
             .await?;
 
-        let can_view_unpublished_publications = if let Some(auth_id) = auth_id {
-            let user = self.user_repo.find_by_id(&UserId::new(&auth_id)?).await?;
-            collection.author_id().value() == auth_id || user.is_content_manager()
+        let can_view_unpublished_publications = if let Some((auth_id, auth_role)) = user_id_and_role {
+            if !auth_role.can("get_publications_from_collection") {
+                return Err(Error::unauthorized());
+            }
+
+            collection.author_id() == &auth_id || auth_role.can("get_unpublished_not_owned_publications")
         } else {
             false
         };

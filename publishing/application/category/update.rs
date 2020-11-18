@@ -5,6 +5,7 @@ use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
 
 use crate::domain::category::{CategoryId, CategoryRepository, Name};
 
@@ -16,30 +17,26 @@ pub struct UpdateCommand {
 pub struct Update<'a> {
     event_pub: &'a dyn EventPublisher,
     category_repo: &'a dyn CategoryRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Update<'a> {
     pub fn new(
         event_pub: &'a dyn EventPublisher,
         category_repo: &'a dyn CategoryRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         Update {
             event_pub,
             category_repo,
-            user_repo,
         }
     }
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (auth_id, auth_role): UserIdAndRole,
         category_id: String,
         cmd: UpdateCommand,
     ) -> Result<CommandResponse> {
-        let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-        if !user.is_admin() {
+        if !auth_role.can("update_category") {
             return Err(Error::unauthorized());
         }
 

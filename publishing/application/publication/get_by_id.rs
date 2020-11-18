@@ -5,6 +5,7 @@ use common::event::EventPublisher;
 use common::request::Include;
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
 
 use crate::application::dtos::{
     AuthorDto, CategoryDto, PublicationDto, ReaderPublicationInteractionDto, ReviewDto,
@@ -60,35 +61,39 @@ impl<'a> GetById<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: Option<String>,
+        user_id_and_role: Option<UserIdAndRole>,
         publication_id: String,
         include: Include,
     ) -> Result<GetByIdResponse> {
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        let is_content_manager = if let Some(auth_id) = &auth_id {
-            let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-            user.is_content_manager()
-        } else {
-            false
-        };
+        if let Some((auth_id, auth_role)) = &user_id_and_role {
+            if !auth_role.can("get_all_publications") {
+                if publication.author_id() != auth_id && !publication.is_published() {
+                    return Err(Error::unauthorized());
+                }
 
-        let (mut publication_dto, reader_interaction_dto) = if let Some(auth_id) = auth_id {
-            let is_reader_author = publication.author_id().value() == auth_id;
+                if publication.author_id() == auth_id && !auth_role.can("get_own_publication") {
+                    return Err(Error::unauthorized());
+                }
+            }
+        }
 
-            if is_reader_author {
+        let (mut publication_dto, reader_interaction_dto) = if let Some((auth_id, auth_role)) = user_id_and_role {
+            let is_reader_author = publication.author_id() == &auth_id;
+
+            if is_reader_author && auth_role.can("get_own_publication") {
                 (PublicationDto::from(&publication).pages(&publication), None)
-            } else if is_content_manager {
+            } else if auth_role.can("approve_publication") {
                 (PublicationDto::from(&publication), None)
             } else {
-                let reader_id = ReaderId::new(auth_id)?;
-                let reader = self.reader_repo.find_by_id(&reader_id).await?;
+                let reader = self.reader_repo.find_by_id(&auth_id).await?;
 
                 let mut view = publication.view(
                     &reader,
                     self.interaction_repo
-                        .find_views(Some(&reader_id), Some(&publication_id), None, None)
+                        .find_views(Some(&auth_id), Some(&publication_id), None, None)
                         .await?
                         .is_empty(),
                 )?;
@@ -102,17 +107,17 @@ impl<'a> GetById<'a> {
 
                 let reader_statistics = self
                     .statistics_serv
-                    .get_history(Some(&reader_id), Some(&publication_id), None, None)
+                    .get_history(Some(&auth_id), Some(&publication_id), None, None)
                     .await?;
 
                 let reviews = self
                     .interaction_repo
-                    .find_reviews(Some(&reader_id), Some(&publication_id), None, None)
+                    .find_reviews(Some(&auth_id), Some(&publication_id), None, None)
                     .await?;
 
                 let in_favorites = !self
                     .interaction_repo
-                    .find_publication_favorites(Some(&reader_id), Some(&publication_id), None, None)
+                    .find_publication_favorites(Some(&auth_id), Some(&publication_id), None, None)
                     .await?
                     .is_empty();
 

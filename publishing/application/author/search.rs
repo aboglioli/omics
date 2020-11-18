@@ -3,10 +3,10 @@ use std::str::FromStr;
 use chrono::DateTime;
 use serde::Deserialize;
 
-use common::config::Config;
 use common::error::Error;
 use common::request::{PaginationParams, PaginationResponse};
 use common::result::Result;
+use identity::UserIdAndRole;
 
 use crate::application::dtos::AuthorDto;
 use crate::domain::author::{AuthorOrderBy, AuthorRepository};
@@ -28,11 +28,15 @@ impl<'a> Search<'a> {
 
     pub async fn exec(
         &self,
-        _auth_id: Option<String>,
+        user_id_and_role: Option<UserIdAndRole>,
         cmd: SearchCommand,
         pagination: PaginationParams,
     ) -> Result<PaginationResponse<AuthorDto>> {
-        let _config = Config::get();
+        if let Some((auth_id, auth_role)) = &user_id_and_role {
+            if !auth_role.can("search_authors") {
+                return Err(Error::unauthorized());
+            }
+        }
 
         let pagination_authors = self
             .author_repo

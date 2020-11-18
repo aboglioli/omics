@@ -3,6 +3,8 @@ use serde::Deserialize;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
+use identity::UserIdAndRole;
+use common::error::Error;
 
 use crate::domain::interaction::{Comment, InteractionRepository, Stars};
 use crate::domain::publication::{PublicationId, PublicationRepository};
@@ -39,15 +41,18 @@ impl<'a> AddReview<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (auth_id, auth_role): UserIdAndRole,
         publication_id: String,
         cmd: AddReviewCommand,
     ) -> Result<CommandResponse> {
+        if !auth_role.can("add_review_to_publication") {
+            return Err(Error::unauthorized());
+        }
+
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        let reader_id = ReaderId::new(auth_id)?;
-        let reader = self.reader_repo.find_by_id(&reader_id).await?;
+        let reader = self.reader_repo.find_by_id(&auth_id).await?;
 
         let stars = Stars::new(cmd.stars)?;
         let comment = Comment::new(cmd.comment)?;

@@ -10,6 +10,10 @@ impl Name {
     pub fn new<S: Into<String>>(name: S) -> Result<Self> {
         let name = name.into();
 
+        if name.len() < 4 {
+            return Err(Error::new("username", "too_short"));
+        }
+
         if name.len() > 24 {
             return Err(Error::new("username", "too_long"));
         }

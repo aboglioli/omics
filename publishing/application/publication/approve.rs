@@ -5,6 +5,8 @@ use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
+use common::error::Error;
 
 use crate::domain::interaction::Comment;
 use crate::domain::publication::{PublicationId, PublicationRepository};
@@ -36,14 +38,11 @@ impl<'a> Approve<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (auth_id, auth_role): UserIdAndRole,
         publication_id: String,
         cmd: ApproveCommand,
     ) -> Result<CommandResponse> {
-        let user_id = UserId::new(auth_id)?;
-        let user = self.user_repo.find_by_id(&user_id).await?;
-
-        if !user.is_content_manager() {
+        if !auth_role.can("approve_publication") {
             return Err(Error::unauthorized());
         }
 
@@ -52,7 +51,7 @@ impl<'a> Approve<'a> {
 
         let comment = Comment::new(cmd.comment)?;
 
-        publication.approve(user_id, comment)?;
+        publication.approve(auth_id, comment)?;
 
         self.publication_repo.save(&mut publication).await?;
 

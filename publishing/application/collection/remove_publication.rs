@@ -2,6 +2,8 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
+use identity::UserIdAndRole;
+use common::error::Error;
 
 use crate::domain::collection::{CollectionId, CollectionRepository};
 use crate::domain::publication::PublicationId;
@@ -25,14 +27,18 @@ impl<'a> RemovePublication<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (auth_id, auth_role): UserIdAndRole,
         collection_id: String,
         publication_id: String,
     ) -> Result<CommandResponse> {
+        if !auth_role.can("remove_publication_from_collection") {
+            return Err(Error::unauthorized());
+        }
+
         let collection_id = CollectionId::new(collection_id)?;
         let mut collection = self.collection_repo.find_by_id(&collection_id).await?;
 
-        if collection.author_id().value() != auth_id {
+        if collection.author_id().value() != &auth_id {
             return Err(Error::not_owner("collection"));
         }
 

@@ -2,6 +2,8 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
+use identity::UserIdAndRole;
+use common::error::Error;
 
 use crate::domain::publication::{PublicationId, PublicationRepository};
 
@@ -22,11 +24,15 @@ impl<'a> Delete<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<CommandResponse> {
+    pub async fn exec(&self, (auth_id, auth_role): UserIdAndRole, publication_id: String) -> Result<CommandResponse> {
+        if !auth_role.can("delete_pubication") {
+            return Err(Error::unauthorized());
+        }
+
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        if publication.author_id().value() != auth_id {
+        if publication.author_id() != auth_id {
             return Err(Error::not_owner("publication"));
         }
 

@@ -1,6 +1,8 @@
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
+use identity::UserIdAndRole;
+use common::error::Error;
 
 use crate::domain::collection::{CollectionId, CollectionRepository};
 use crate::domain::interaction::InteractionRepository;
@@ -29,12 +31,15 @@ impl<'a> AddToFavorites<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, collection_id: String) -> Result<CommandResponse> {
+    pub async fn exec(&self, (auth_id, auth_role): UserIdAndRole, collection_id: String) -> Result<CommandResponse> {
+        if !auth_role.can("add_collection_to_favorites") {
+            return Err(Error::unauthorized());
+        }
+
         let collection_id = CollectionId::new(collection_id)?;
         let collection = self.collection_repo.find_by_id(&collection_id).await?;
 
-        let reader_id = ReaderId::new(auth_id)?;
-        let mut reader = self.reader_repo.find_by_id(&reader_id).await?;
+        let mut reader = self.reader_repo.find_by_id(&auth_id).await?;
 
         let mut favorite = reader.add_collection_to_favorites(&collection)?;
 
