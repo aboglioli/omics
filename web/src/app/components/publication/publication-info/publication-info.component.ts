@@ -67,7 +67,6 @@ export class PublicationInfoComponent implements OnInit {
     private authService: AuthService,
     private spinnerService: NgxSpinnerService,
     private breakpointObserver: BreakpointObserver,
-    private sweetAlertGenericService: SweetAlertGenericMessageService,
     private router: Router,
     private dialog: MatDialog,
   ) { }

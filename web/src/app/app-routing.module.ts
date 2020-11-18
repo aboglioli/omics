@@ -30,6 +30,7 @@ import { CollectionInfoComponent } from './pages/collection-info/collection-info
 import { PlansComponent } from './pages/plans/plans.component';
 import { AdminGuard } from './guard/admin.guard';
 import { ContentManagerGuard } from './guard/content-manager.guard';
+import { DashboardRolesComponent } from './pages/dashboard-roles/dashboard-roles.component';
 
 
 const routes: Routes = [
@@ -55,6 +56,7 @@ const routes: Routes = [
   { path: 'dashboard-publicaciones-contratos', component: DashboardGestionContratosPublicacionesComponent, canActivate: [ContentManagerGuard] },
   { path: 'dashboard-reglas-negocio', component: DashboardReglasNegociosComponent, canActivate: [AdminGuard]  },
   { path: 'dashboard-general', component: DashboardGestionAdminComponent, canActivate: [AuthLoginGuard, AdminGuard ] },
+  { path: 'dashboard-roles', component: DashboardRolesComponent, canActivate: [AuthLoginGuard, AdminGuard ] },
   { path: 'plans', component: PlansComponent, canActivate: [AuthLoginGuard] },
   { path: '**', pathMatch: 'full', redirectTo: 'home' },
 

@@ -6,7 +6,12 @@ export enum DeskboardOptionMenu {
 
 export enum typeSearchCatalogue {
   publication,
-  collection
+  collection,
+}
+
+export enum typeManagueRoles {
+  users,
+  roles,
 }
 
 export enum DashboardGeneralOptionMenu {
