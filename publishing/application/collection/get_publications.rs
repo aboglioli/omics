@@ -3,7 +3,7 @@ use serde::Serialize;
 use common::error::Error;
 use common::request::Include;
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};

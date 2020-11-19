@@ -7,7 +7,6 @@ use identity::UserIdAndRole;
 use crate::application::dtos::{AuthorDto, ReaderAuthorInteractionDto};
 use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::interaction::InteractionRepository;
-use crate::domain::reader::ReaderId;
 
 #[derive(Serialize)]
 pub struct GetByIdResponse {
@@ -40,7 +39,7 @@ impl<'a> GetById<'a> {
 
         if let Some((auth_id, auth_role)) = &user_id_and_role {
             if !auth_role.can("get_all_authors") {
-                if auth_id != author_id || !auth_role.can("get_own_author") {
+                if auth_id != &author_id || !auth_role.can("get_own_author") {
                     return Err(Error::unauthorized());
                 }
             }

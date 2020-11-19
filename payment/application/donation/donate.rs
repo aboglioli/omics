@@ -7,7 +7,7 @@ use common::result::Result;
 use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 use publishing::domain::author::{AuthorId, AuthorRepository};
-use publishing::domain::reader::{ReaderId, ReaderRepository};
+use publishing::domain::reader::ReaderRepository;
 
 use crate::domain::donation::{Donation, DonationRepository};
 use crate::domain::payment::{Amount, PaymentService};

@@ -6,7 +6,7 @@ use identity::UserIdAndRole;
 
 use crate::domain::interaction::InteractionRepository;
 use crate::domain::publication::{PublicationId, PublicationRepository};
-use crate::domain::reader::{ReaderId, ReaderRepository};
+use crate::domain::reader::ReaderRepository;
 
 pub struct Unlike<'a> {
     event_pub: &'a dyn EventPublisher,

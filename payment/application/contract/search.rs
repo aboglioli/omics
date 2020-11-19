@@ -6,7 +6,7 @@ use serde::Deserialize;
 use common::error::Error;
 use common::request::{Include, PaginationParams, PaginationResponse};
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 use publishing::application::dtos::PublicationDto;
 use publishing::domain::publication::{PublicationId, PublicationRepository};
@@ -43,7 +43,7 @@ impl<'a> Search<'a> {
 
     pub async fn exec(
         &self,
-        (auth_id, auth_role): UserIdAndRole,
+        (_auth_id, auth_role): UserIdAndRole,
         cmd: SearchCommand,
         include: Include,
         pagination: PaginationParams,

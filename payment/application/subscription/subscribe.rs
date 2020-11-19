@@ -3,7 +3,7 @@ use serde::Serialize;
 use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 use publishing::domain::reader::ReaderRepository;
 

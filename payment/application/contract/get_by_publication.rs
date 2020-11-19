@@ -1,6 +1,6 @@
 use common::error::Error;
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 use publishing::domain::publication::{PublicationId, PublicationRepository};
 

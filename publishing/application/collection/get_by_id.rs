@@ -46,7 +46,7 @@ impl<'a> GetById<'a> {
         collection_id: String,
         include: Include,
     ) -> Result<CollectionDto> {
-        if let Some((auth_id, auth_role)) = user_id_and_role {
+        if let Some((_auth_id, auth_role)) = user_id_and_role {
             if !auth_role.can("get_collection") {
                 return Err(Error::unauthorized());
             }

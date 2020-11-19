@@ -35,7 +35,7 @@ impl<'a> Delete<'a> {
         let collection_id = CollectionId::new(collection_id)?;
         let mut collection = self.collection_repo.find_by_id(&collection_id).await?;
 
-        if collection.author_id() != auth_id {
+        if collection.author_id() != &auth_id {
             return Err(Error::not_owner("collection"));
         }
 
@@ -55,6 +55,9 @@ impl<'a> Delete<'a> {
 mod tests {
     use super::*;
 
+    use identity::domain::user::UserId;
+    use identity::mocks as identity_mocks;
+
     use crate::mocks;
 
     #[tokio::test]
@@ -71,9 +74,13 @@ mod tests {
             "cover.jpg",
         );
         c.collection_repo().save(&mut collection).await.unwrap();
+        let role = identity_mocks::role("User");
 
         assert!(uc
-            .exec("#user01".to_owned(), collection.base().id().to_string())
+            .exec(
+                (UserId::new("#user01").unwrap(), role),
+                collection.base().id().to_string()
+            )
             .await
             .is_ok());
 
@@ -88,6 +95,7 @@ mod tests {
     async fn invalid() {
         let c = mocks::container();
         let uc = Delete::new(c.event_pub(), c.collection_repo());
+        let role = identity_mocks::role("User");
 
         let mut collection = mocks::collection(
             "#collection01",
@@ -100,12 +108,15 @@ mod tests {
         c.collection_repo().save(&mut collection).await.unwrap();
 
         assert!(uc
-            .exec("#user01".to_owned(), "#invalid-collection".to_owned())
+            .exec(
+                (UserId::new("#user01").unwrap(), role.clone()),
+                "#invalid-collection".to_owned()
+            )
             .await
             .is_err());
         assert!(uc
             .exec(
-                "#invald-author".to_owned(),
+                (UserId::new("#invald-author").unwrap(), role),
                 collection.base().id().to_string()
             )
             .await

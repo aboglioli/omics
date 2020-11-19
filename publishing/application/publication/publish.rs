@@ -4,7 +4,7 @@ use common::request::CommandResponse;
 use common::result::Result;
 use identity::UserIdAndRole;
 
-use crate::domain::author::{AuthorId, AuthorRepository};
+use crate::domain::author::AuthorRepository;
 use crate::domain::publication::{PublicationId, PublicationRepository};
 
 pub struct Publish<'a> {

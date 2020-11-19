@@ -40,14 +40,14 @@ impl<'a> AddPublication<'a> {
         let collection_id = CollectionId::new(collection_id)?;
         let mut collection = self.collection_repo.find_by_id(&collection_id).await?;
 
-        if collection.author_id() != auth_id {
+        if collection.author_id() != &auth_id {
             return Err(Error::not_owner("collection"));
         }
 
         let publication_id = PublicationId::new(publication_id)?;
         let publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        if publication.author_id() != auth_id {
+        if publication.author_id() != &auth_id {
             return Err(Error::not_owner("publication"));
         }
 

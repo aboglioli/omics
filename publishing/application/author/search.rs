@@ -32,7 +32,7 @@ impl<'a> Search<'a> {
         cmd: SearchCommand,
         pagination: PaginationParams,
     ) -> Result<PaginationResponse<AuthorDto>> {
-        if let Some((auth_id, auth_role)) = &user_id_and_role {
+        if let Some((_auth_id, auth_role)) = &user_id_and_role {
             if !auth_role.can("search_authors") {
                 return Err(Error::unauthorized());
             }

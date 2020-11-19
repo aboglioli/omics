@@ -1,11 +1,10 @@
 use serde::Deserialize;
 
 use common::error::Error;
-use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 
 use crate::domain::interaction::Comment;
@@ -102,9 +101,10 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         uc.exec(
-            user.base().id().to_string(),
+            (user.base().id().clone(), role),
             publication.base().id().to_string(),
             ApproveCommand {
                 comment: "All is OK".to_owned(),

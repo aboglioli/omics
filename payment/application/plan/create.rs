@@ -4,7 +4,7 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 
 use crate::domain::plan::{Plan, PlanId, PlanRepository, Price};
@@ -39,7 +39,7 @@ impl<'a> Create<'a> {
 
     pub async fn exec(
         &self,
-        (auth_id, auth_role): UserIdAndRole,
+        (_auth_id, auth_role): UserIdAndRole,
         cmd: CreateCommand,
     ) -> Result<CommandResponse> {
         if !auth_role.can("create_plan") {

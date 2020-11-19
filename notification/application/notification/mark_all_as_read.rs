@@ -1,7 +1,7 @@
 use common::error::Error;
 use common::request::CommandResponse;
 use common::result::Result;
-use identity::domain::user::UserId;
+
 use identity::UserIdAndRole;
 
 use crate::domain::notification::NotificationRepository;

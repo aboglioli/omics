@@ -6,7 +6,7 @@ use identity::UserIdAndRole;
 
 use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::interaction::InteractionRepository;
-use crate::domain::reader::{ReaderId, ReaderRepository};
+use crate::domain::reader::ReaderRepository;
 
 pub struct Follow<'a> {
     event_pub: &'a dyn EventPublisher,

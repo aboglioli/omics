@@ -9,7 +9,7 @@ use identity::UserIdAndRole;
 use crate::application::dtos::PageDto;
 use crate::domain::interaction::InteractionRepository;
 use crate::domain::publication::{PublicationId, PublicationRepository};
-use crate::domain::reader::{ReaderId, ReaderRepository};
+use crate::domain::reader::ReaderRepository;
 
 #[derive(Serialize)]
 pub struct ReadResponse {
@@ -79,6 +79,7 @@ impl<'a> Read<'a> {
 mod tests {
     use super::*;
 
+    use identity::domain::user::UserId;
     use identity::mocks as identity_mocks;
 
     use crate::mocks;
@@ -193,12 +194,15 @@ mod tests {
         let role = identity_mocks::role("User");
 
         assert!(uc
-            .exec((reader.base().id().clone(), role), "#invalid".to_owned())
+            .exec(
+                (reader.base().id().clone(), role.clone()),
+                "#invalid".to_owned()
+            )
             .await
             .is_err());
         assert!(uc
             .exec(
-                (ReaderId::new("#invalid").unwrap(), role),
+                (UserId::new("#invalid").unwrap(), role),
                 publication.base().id().to_string()
             )
             .await

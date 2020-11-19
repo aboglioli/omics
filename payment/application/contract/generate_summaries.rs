@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 
 use crate::domain::contract::{ContractRepository, ContractService};
@@ -48,7 +48,7 @@ impl<'a> GenerateSummaries<'a> {
 
     pub async fn exec(
         &self,
-        (auth_id, auth_role): UserIdAndRole,
+        (_auth_id, auth_role): UserIdAndRole,
         cmd: GenerateSummariesCommand,
     ) -> Result<GenerateSummariesResponse> {
         if !auth_role.can("generate_all_contract_summaries") {

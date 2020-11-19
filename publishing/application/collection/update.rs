@@ -87,6 +87,9 @@ impl<'a> Update<'a> {
 mod tests {
     use super::*;
 
+    use identity::domain::user::UserId;
+    use identity::mocks as identity_mocks;
+
     use crate::mocks;
 
     #[tokio::test]
@@ -105,9 +108,10 @@ mod tests {
         c.collection_repo().save(&mut collection).await.unwrap();
         let mut category = mocks::category("Category 2");
         c.category_repo().save(&mut category).await.unwrap();
+        let role = identity_mocks::role("User");
 
         uc.exec(
-            "#user01".to_owned(),
+            (UserId::new("#user01").unwrap(), role),
             collection.base().id().to_string(),
             UpdateCommand {
                 name: "New name".to_owned(),
@@ -148,10 +152,11 @@ mod tests {
         c.collection_repo().save(&mut collection).await.unwrap();
         let mut category = mocks::category("Category 2");
         c.category_repo().save(&mut category).await.unwrap();
+        let role = identity_mocks::role("User");
 
         assert!(uc
             .exec(
-                "#user02".to_owned(),
+                (UserId::new("#user02").unwrap(), role),
                 collection.base().id().to_string(),
                 UpdateCommand {
                     name: "New name".to_owned(),
@@ -180,10 +185,11 @@ mod tests {
         );
         c.collection_repo().save(&mut collection).await.unwrap();
         let category = mocks::category("Category 2");
+        let role = identity_mocks::role("User");
 
         assert!(uc
             .exec(
-                "#user01".to_owned(),
+                (UserId::new("#user01").unwrap(), role),
                 collection.base().id().to_string(),
                 UpdateCommand {
                     name: "New name".to_owned(),

@@ -132,7 +132,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                (user.base().id().clone(), role),
+                (user.base().id().clone(), role.clone()),
                 user.base().id().to_string(),
                 UpdateCommand {
                     name: "N".to_owned(),
@@ -148,7 +148,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                (user.base().id().clone(), role),
+                (user.base().id().clone(), role.clone()),
                 user.base().id().to_string(),
                 UpdateCommand {
                     name: "Name".to_owned(),
@@ -164,7 +164,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                (user.base().id().clone(), role),
+                (user.base().id().clone(), role.clone()),
                 user.base().id().to_string(),
                 UpdateCommand {
                     name: "Name".to_owned(),
@@ -180,7 +180,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                (user.base().id().clone(), role),
+                (user.base().id().clone(), role.clone()),
                 user.base().id().to_string(),
                 UpdateCommand {
                     name: "Name".to_owned(),
@@ -227,7 +227,7 @@ mod tests {
             "user",
         );
         c.user_repo().save(&mut user).await.unwrap();
-        let role = mocks::role();
+        let role = mocks::role("User");
 
         assert!(uc
             .exec(

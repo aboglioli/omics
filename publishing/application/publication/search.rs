@@ -6,7 +6,7 @@ use serde::Deserialize;
 use common::error::Error;
 use common::request::{Include, PaginationParams, PaginationResponse};
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};
@@ -133,8 +133,8 @@ impl<'a> Search<'a> {
                 publication_dto = publication_dto.category(CategoryDto::from(&category));
             }
 
-            if let Some(auth_id) = &auth_id {
-                if publication.author_id().value() == auth_id {
+            if let Some((auth_id, _)) = &user_id_and_role {
+                if publication.author_id() == auth_id {
                     publication_dto = publication_dto.pages(&publication)
                 }
             }

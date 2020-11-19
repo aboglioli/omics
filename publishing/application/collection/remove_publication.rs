@@ -1,5 +1,4 @@
 use common::error::Error;
-use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
@@ -38,7 +37,7 @@ impl<'a> RemovePublication<'a> {
         let collection_id = CollectionId::new(collection_id)?;
         let mut collection = self.collection_repo.find_by_id(&collection_id).await?;
 
-        if collection.author_id().value() != &auth_id {
+        if collection.author_id() != &auth_id {
             return Err(Error::not_owner("collection"));
         }
 

@@ -41,7 +41,7 @@ impl<'a> Search<'a> {
 
     pub async fn exec(
         &self,
-        (auth_id, auth_role): UserIdAndRole,
+        (_auth_id, auth_role): UserIdAndRole,
         cmd: SearchCommand,
         include: Include,
         pagination: PaginationParams,

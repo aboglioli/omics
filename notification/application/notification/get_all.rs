@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use common::error::Error;
 use common::result::Result;
-use identity::domain::user::UserId;
+
 use identity::UserIdAndRole;
 
 use crate::application::dtos::NotificationDto;

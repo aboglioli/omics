@@ -2,7 +2,7 @@ use common::config::ConfigService;
 use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 use publishing::domain::publication::PublicationRepository;
 
@@ -57,8 +57,7 @@ impl<'a> ChargeForContract<'a> {
             return Err(Error::not_owner("contract"));
         }
 
-        let user_id = UserId::new(auth_id)?;
-        let user = self.user_repo.find_by_id(&user_id).await?;
+        let user = self.user_repo.find_by_id(&auth_id).await?;
         if user.payment_email().is_none() {
             return Err(Error::new("contract", "missing_payment_email"));
         }

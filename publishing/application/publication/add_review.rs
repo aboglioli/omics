@@ -8,7 +8,7 @@ use identity::UserIdAndRole;
 
 use crate::domain::interaction::{Comment, InteractionRepository, Stars};
 use crate::domain::publication::{PublicationId, PublicationRepository};
-use crate::domain::reader::{ReaderId, ReaderRepository};
+use crate::domain::reader::ReaderRepository;
 
 #[derive(Deserialize)]
 pub struct AddReviewCommand {

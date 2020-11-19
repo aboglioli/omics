@@ -4,7 +4,7 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 
 use crate::domain::plan::{PlanId, PlanRepository, Price};
@@ -38,7 +38,7 @@ impl<'a> Update<'a> {
 
     pub async fn exec(
         &self,
-        (auth_id, auth_role): UserIdAndRole,
+        (_auth_id, auth_role): UserIdAndRole,
         plan_id: String,
         cmd: UpdateCommand,
     ) -> Result<CommandResponse> {

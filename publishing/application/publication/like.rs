@@ -6,7 +6,7 @@ use identity::UserIdAndRole;
 
 use crate::domain::interaction::InteractionRepository;
 use crate::domain::publication::{PublicationId, PublicationRepository};
-use crate::domain::reader::{ReaderId, ReaderRepository};
+use crate::domain::reader::ReaderRepository;
 
 pub struct Like<'a> {
     event_pub: &'a dyn EventPublisher,
@@ -62,6 +62,7 @@ impl<'a> Like<'a> {
 mod tests {
     use super::*;
 
+    use identity::domain::user::UserId;
     use identity::mocks as identity_mocks;
 
     use crate::mocks;
@@ -181,7 +182,7 @@ mod tests {
             .is_err());
         assert!(uc
             .exec(
-                (ReaderId::new("#invalid").unwrap(), role),
+                (UserId::new("#invalid").unwrap(), role),
                 publication.base().id().to_string()
             )
             .await

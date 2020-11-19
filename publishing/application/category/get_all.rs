@@ -22,7 +22,7 @@ impl<'a> GetAll<'a> {
     }
 
     pub async fn exec(&self, user_id_and_role: Option<UserIdAndRole>) -> Result<GetAllResponse> {
-        if let Some((auth_id, auth_role)) = user_id_and_role {
+        if let Some((_auth_id, auth_role)) = user_id_and_role {
             if !auth_role.can("get_all_categories") {
                 return Err(Error::unauthorized());
             }

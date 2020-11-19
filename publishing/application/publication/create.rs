@@ -5,7 +5,7 @@ use common::event::EventPublisher;
 use common::result::Result;
 use identity::UserIdAndRole;
 
-use crate::domain::author::{AuthorId, AuthorRepository};
+use crate::domain::author::AuthorRepository;
 use crate::domain::category::{CategoryId, CategoryRepository};
 use crate::domain::publication::{
     Header, Image, Name, Page, Publication, PublicationRepository, Synopsis, Tag,
@@ -117,6 +117,8 @@ impl<'a> Create<'a> {
 mod tests {
     use super::*;
 
+    use identity::mocks as identity_mocks;
+
     use crate::domain::publication::PublicationId;
     use crate::mocks;
 
@@ -134,10 +136,11 @@ mod tests {
         c.author_repo().save(&mut author).await.unwrap();
         let mut category = mocks::category("Category 1");
         c.category_repo().save(&mut category).await.unwrap();
+        let role = identity_mocks::role("User");
 
         let res = uc
             .exec(
-                author.base().id().to_string(),
+                (author.base().id().clone(), role),
                 CreateCommand {
                     name: "Publication 1".to_owned(),
                     synopsis: "Synopsis...".to_owned(),
@@ -190,10 +193,11 @@ mod tests {
         c.author_repo().save(&mut author).await.unwrap();
         let mut category = mocks::category("Category 1");
         c.category_repo().save(&mut category).await.unwrap();
+        let role = identity_mocks::role("User");
 
         assert!(uc
             .exec(
-                author.base().id().to_string(),
+                (author.base().id().clone(), role.clone()),
                 CreateCommand {
                     name: "".to_owned(),
                     synopsis: "Synopsis...".to_owned(),
@@ -208,7 +212,7 @@ mod tests {
 
         assert!(uc
             .exec(
-                author.base().id().to_string(),
+                (author.base().id().clone(), role),
                 CreateCommand {
                     name: "Publication 1".to_owned(),
                     synopsis: "".to_owned(),
@@ -234,10 +238,11 @@ mod tests {
 
         let mut author = mocks::author("#user01", "user-1");
         c.author_repo().save(&mut author).await.unwrap();
+        let role = identity_mocks::role("User");
 
         assert!(uc
             .exec(
-                author.base().id().to_string(),
+                (author.base().id().clone(), role),
                 CreateCommand {
                     name: "Publication 1".to_owned(),
                     synopsis: "Synopsis...".to_owned(),

@@ -47,7 +47,7 @@ impl<'a> GetStatistics<'a> {
             .publication_repo
             .find_by_id(&PublicationId::new(publication_id)?)
             .await?;
-        if publication.author_id().value() != auth_id {
+        if publication.author_id() != &auth_id {
             return Err(Error::not_owner("publication"));
         }
 

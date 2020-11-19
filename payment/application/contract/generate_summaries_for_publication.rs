@@ -38,7 +38,8 @@ impl<'a> GenerateSummariesForPublication<'a> {
     ) -> Result<ContractDto> {
         let publication_id = PublicationId::new(publication_id)?;
         let publication = self.publication_repo.find_by_id(&publication_id).await?;
-        if publication.author_id() != auth_id || !auth_role.can("generate_summaries_for_contract") {
+        if publication.author_id() != &auth_id || !auth_role.can("generate_summaries_for_contract")
+        {
             return Err(Error::not_owner("publication"));
         }
 

@@ -5,7 +5,7 @@ use common::event::EventPublisher;
 use common::result::Result;
 use identity::UserIdAndRole;
 
-use crate::domain::author::{AuthorId, AuthorRepository};
+use crate::domain::author::AuthorRepository;
 use crate::domain::category::{CategoryId, CategoryRepository};
 use crate::domain::collection::{Collection, CollectionRepository};
 use crate::domain::publication::{Header, Image, Name, Synopsis, Tag};

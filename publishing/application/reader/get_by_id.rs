@@ -3,7 +3,7 @@ use common::result::Result;
 use identity::UserIdAndRole;
 
 use crate::application::dtos::ReaderDto;
-use crate::domain::reader::{ReaderId, ReaderRepository};
+use crate::domain::reader::ReaderRepository;
 
 pub struct GetById<'a> {
     reader_repo: &'a dyn ReaderRepository,

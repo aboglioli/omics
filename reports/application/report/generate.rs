@@ -5,7 +5,8 @@ use serde::Deserialize;
 
 use common::error::Error;
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::domain::user::{UserRepository};
+use identity::UserIdAndRole;
 use payment::domain::contract::ContractRepository;
 use payment::domain::donation::DonationRepository;
 use payment::domain::subscription::SubscriptionRepository;
@@ -50,9 +51,12 @@ impl<'a> Generate<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, cmd: GenerateCommand) -> Result<Report> {
-        let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-        if !user.is_admin() {
+    pub async fn exec(
+        &self,
+        (_auth_id, auth_role): UserIdAndRole,
+        cmd: GenerateCommand,
+    ) -> Result<Report> {
+        if !auth_role.can("generate_report") {
             return Err(Error::unauthorized());
         }
 

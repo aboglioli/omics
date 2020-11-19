@@ -4,7 +4,6 @@ use chrono::DateTime;
 use serde::Deserialize;
 
 use common::error::Error;
-use common::error::Error;
 use common::request::{Include, PaginationParams, PaginationResponse};
 use common::result::Result;
 use identity::UserIdAndRole;
@@ -52,7 +51,7 @@ impl<'a> Search<'a> {
         include: Include,
         pagination: PaginationParams,
     ) -> Result<PaginationResponse<CollectionDto>> {
-        if let Some((auth_id, auth_role)) = user_id_and_role {
+        if let Some((_auth_id, auth_role)) = user_id_and_role {
             if !auth_role.can("search_collections") {
                 return Err(Error::unauthorized());
             }

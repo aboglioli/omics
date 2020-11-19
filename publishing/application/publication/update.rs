@@ -59,7 +59,7 @@ impl<'a> Update<'a> {
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        if publication.author_id() != auth_id {
+        if publication.author_id() != &auth_id {
             return Err(Error::not_owner("publication"));
         }
 
