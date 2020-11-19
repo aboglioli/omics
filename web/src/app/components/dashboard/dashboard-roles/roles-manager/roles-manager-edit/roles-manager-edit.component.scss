@@ -102,6 +102,11 @@ div.assign-permission-box {
             background-color: $omics-background-flat;
           }
 
+          &.selected {
+            color: white;
+            background-color: $omics-background-flat;
+          }
+
         }
 
       }
@@ -116,6 +121,7 @@ div.assign-permission-box {
     flex: 1;
 
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 

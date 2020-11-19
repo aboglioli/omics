@@ -23,7 +23,7 @@
         <div class="input-field-row">
 
         <div class="title-and-error">
-          <p class="field-name">Nombre: </p>
+          <p class="field-name">Nombre * </p>
 
           <!-- mensaje de error -->
           <p  *ngIf="nombreNovalido"
@@ -56,7 +56,8 @@
 
             <ul>
               <li *ngFor="let pToSelect of permissionArrayAssigned; let i = index"
-              (click)="onPermissionToRemove(i)">
+                  (click)="onPermissionToMove(i, true)"
+                  [ngClass]="{'selected': ( i === currentIndexElementSelected && currentItemSelected && isToRemoveArrow)}">
               {{ pToSelect.name }}
               </li>
             </ul>
@@ -75,11 +76,18 @@
           <button
             mat-icon-button
             class="arrow-button"
-            [disabled]="!currentItemSelected">
+            [disabled]="!currentItemSelected"
+            (click)="movePermission()">
 
-            <fa-icon [icon]="faLeft" size="3x"></fa-icon>
+            <fa-icon *ngIf="!isToRemoveArrow" [icon]="faLeft" size="3x"></fa-icon>
+            <fa-icon *ngIf="isToRemoveArrow" [icon]="faRight" size="3x"></fa-icon>
 
           </button>
+
+          <span style="margin-top: 0.5em;">
+            <p *ngIf="currentItemSelected" class="break-word" style="margin: 0;">{{ currentItemSelected.name  }}</p>
+            <small *ngIf="!currentItemSelected" class="break-word">No hay permiso seleccionado</small>
+          </span>
 
         </div>
 
@@ -91,10 +99,16 @@
 
             <ul>
               <li *ngFor="let pToSelect of permissionArrayToSelect; let i = index"
-                  (click)="onPermissionToAssign(i)">
+                  (click)="onPermissionToMove(i, false)"
+                  [ngClass]="{'selected': ( i === currentIndexElementSelected && currentItemSelected &&  !isToRemoveArrow)}">
                 {{ pToSelect.name }}
               </li>
             </ul>
+
+
+            <h4 *ngIf="permissionArrayToSelect.length === 0" style="margin-left: 0.5em;">
+              << No hay más permisos disponibles >>
+            </h4>
 
           </div>
 

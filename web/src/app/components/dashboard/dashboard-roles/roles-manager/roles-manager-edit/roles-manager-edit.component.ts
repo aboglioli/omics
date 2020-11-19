@@ -42,6 +42,8 @@ export class RolesManagerEditComponent implements OnInit {
   ];
 
   public currentItemSelected: any = null;
+  public currentIndexElementSelected = 0;
+  public isToRemoveArrow = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
@@ -50,6 +52,13 @@ export class RolesManagerEditComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+
+    // Quitar de los disponibles para asignar los que ya estan asignados
+    const availables = this.permissionArrayToSelect.filter(p => {
+      return this.permissionArrayAssigned.every(rp => rp.id !== p.id);
+    });
+
+    this.permissionArrayToSelect = availables;
 
     this.isNewRole =  (this.data.isNew) ? true : false;
     this.formBuild();
@@ -71,26 +80,54 @@ export class RolesManagerEditComponent implements OnInit {
 
     this.formRole = this.fb.group({
       name: [ '', [ Validators.required, Validators.minLength(4) ] ],
-      permission: [ null ],
+      permissionList: [ null ],
     });
 
   }
 
-  public onPermissionToAssign( indexItem: number ): void {
+  public onPermissionToMove( indexItem: number, isToRemove: boolean ): void {
 
-    const itemToAssign = this.permissionArrayToSelect[indexItem];
-
-    console.log('TEST Assign > ', itemToAssign);
-
+    this.isToRemoveArrow = isToRemove;
+    this.currentItemSelected = (isToRemove) ?
+                                  this.permissionArrayAssigned[indexItem] :
+                                  this.permissionArrayToSelect[indexItem];
+    this.currentIndexElementSelected = indexItem;
 
   }
 
-  public onPermissionToRemove( indexItem: number ): void {
+  public movePermission(): void {
 
-    const itemToRemove = this.permissionArrayToSelect[indexItem];
+    if ( this.isToRemoveArrow ) {
 
-    console.log('TEST Remove > ', itemToRemove);
+      this.removePermission();
+      this.permissionArrayToSelect.sort( (a, b) => a.name.localeCompare(b.name));
 
+    } else {
+
+      this.assignPermission();
+      this.permissionArrayAssigned.sort( (a, b) => a.name.localeCompare(b.name));
+
+    }
+
+  }
+
+  private assignPermission(): void {
+
+    this.permissionArrayAssigned.push( this.currentItemSelected );
+    this.permissionArrayToSelect.splice(this.currentIndexElementSelected, 1);
+
+    this.currentItemSelected = undefined;
+    this.currentIndexElementSelected = null;
+
+  }
+
+  private removePermission(): void {
+
+    this.permissionArrayToSelect.push( this.currentItemSelected );
+    this.permissionArrayAssigned.splice(this.currentIndexElementSelected, 1);
+
+    this.currentItemSelected = undefined;
+    this.currentIndexElementSelected = null;
 
   }
 
@@ -99,6 +136,18 @@ export class RolesManagerEditComponent implements OnInit {
   }
 
   public onSubmitForm(): void {
+
+    const arrayPermissionId: Array<string> = new Array();
+
+    this.permissionArrayAssigned.forEach( permission => {
+
+      arrayPermissionId.push(permission.id);
+
+    });
+
+    this.formRole.get('permissionList').setValue(arrayPermissionId);
+
+    console.log('TEST > ', this.formRole.value);
 
   }
 
