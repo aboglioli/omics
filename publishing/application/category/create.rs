@@ -35,7 +35,11 @@ impl<'a> Create<'a> {
         }
     }
 
-    pub async fn exec(&self, (auth_id, auth_role): UserIdAndRole, cmd: CreateCommand) -> Result<CreateResponse> {
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        cmd: CreateCommand,
+    ) -> Result<CreateResponse> {
         if !auth_role.can("create_category") {
             return Err(Error::unauthorized());
         }

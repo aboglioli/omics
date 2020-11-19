@@ -80,7 +80,9 @@ impl<'a> GetById<'a> {
             }
         }
 
-        let (mut publication_dto, reader_interaction_dto) = if let Some((auth_id, auth_role)) = user_id_and_role {
+        let (mut publication_dto, reader_interaction_dto) = if let Some((auth_id, auth_role)) =
+            user_id_and_role
+        {
             let is_reader_author = publication.author_id() == &auth_id;
 
             if is_reader_author && auth_role.can("get_own_publication") {
@@ -235,10 +237,11 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         let res = uc
             .exec(
-                Some(reader1.base().id().to_string()),
+                Some((reader1.base().id().clone(), role)),
                 publication.base().id().to_string(),
                 Include::default().add_field("author").add_field("category"),
             )
@@ -302,10 +305,11 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         assert!(uc
             .exec(
-                Some(reader2.base().id().to_string()),
+                Some((reader2.base().id().clone(), role)),
                 publication.base().id().to_string(),
                 Include::default(),
             )
@@ -353,10 +357,11 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         let res = uc
             .exec(
-                Some(reader2.base().id().to_string()),
+                Some((reader2.base().id().clone(), role)),
                 publication.base().id().to_string(),
                 Include::default().add_field("author").add_field("category"),
             )
@@ -414,10 +419,11 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         assert!(uc
             .exec(
-                Some(reader1.base().id().to_string()),
+                Some((reader1.base().id().clone(), role)),
                 "#invalid".to_owned(),
                 Include::default(),
             )
@@ -469,9 +475,11 @@ mod tests {
         let mut like = publication.like(&reader2).unwrap();
         c.interaction_repo().save_like(&mut like).await.unwrap();
 
+        let role = identity_mocks::role("User");
+
         let res = uc
             .exec(
-                Some(reader2.base().id().to_string()),
+                Some((reader2.base().id().clone(), role)),
                 publication.base().id().to_string(),
                 Include::default(),
             )

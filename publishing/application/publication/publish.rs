@@ -2,6 +2,7 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
+use identity::UserIdAndRole;
 
 use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::publication::{PublicationId, PublicationRepository};
@@ -26,14 +27,21 @@ impl<'a> Publish<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<CommandResponse> {
-        let author_id = AuthorId::new(auth_id)?;
-        self.author_repo.find_by_id(&author_id).await?;
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        publication_id: String,
+    ) -> Result<CommandResponse> {
+        if !auth_role.can("publish_publication") {
+            return Err(Error::unauthorized());
+        }
+
+        self.author_repo.find_by_id(&auth_id).await?;
 
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        if publication.author_id() != &author_id {
+        if publication.author_id() != &auth_id {
             return Err(Error::not_owner("publication"));
         }
 
@@ -52,6 +60,8 @@ impl<'a> Publish<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    use identity::mocks as identity_mocks;
 
     use crate::mocks;
 
@@ -75,9 +85,10 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         uc.exec(
-            author.base().id().to_string(),
+            (author.base().id().clone(), role),
             publication.base().id().to_string(),
         )
         .await

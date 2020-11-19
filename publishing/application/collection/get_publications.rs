@@ -1,10 +1,10 @@
 use serde::Serialize;
 
+use common::error::Error;
 use common::request::Include;
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
 use identity::UserIdAndRole;
-use common::error::Error;
 
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};
 use crate::domain::author::AuthorRepository;
@@ -53,12 +53,14 @@ impl<'a> GetPublications<'a> {
             .find_by_id(&CollectionId::new(collection_id)?)
             .await?;
 
-        let can_view_unpublished_publications = if let Some((auth_id, auth_role)) = user_id_and_role {
+        let can_view_unpublished_publications = if let Some((auth_id, auth_role)) = user_id_and_role
+        {
             if !auth_role.can("get_publications_from_collection") {
                 return Err(Error::unauthorized());
             }
 
-            collection.author_id() == &auth_id || auth_role.can("get_unpublished_not_owned_publications")
+            collection.author_id() == &auth_id
+                || auth_role.can("get_unpublished_not_owned_publications")
         } else {
             false
         };

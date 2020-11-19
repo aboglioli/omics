@@ -1,6 +1,7 @@
 use common::error::Error;
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
 use publishing::domain::publication::{PublicationId, PublicationRepository};
 
 use crate::application::dtos::ContractDto;
@@ -25,17 +26,17 @@ impl<'a> GetByPublication<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<ContractDto> {
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        publication_id: String,
+    ) -> Result<ContractDto> {
         let publication = self
             .publication_repo
             .find_by_id(&PublicationId::new(publication_id)?)
             .await?;
-        if publication.author_id().value() != auth_id {
-            let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-
-            if !user.is_content_manager() {
-                return Err(Error::unauthorized());
-            }
+        if publication.author_id() != &auth_id && !auth_role.can("get_contract_by_publication") {
+            return Err(Error::unauthorized());
         }
 
         let contract = self

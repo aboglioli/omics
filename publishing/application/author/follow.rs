@@ -1,7 +1,7 @@
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
-use common::error::Error;
 use identity::UserIdAndRole;
 
 use crate::domain::author::{AuthorId, AuthorRepository};
@@ -31,15 +31,16 @@ impl<'a> Follow<'a> {
         }
     }
 
-    pub async fn exec(&self, (auth_id, auth_role): UserIdAndRole, author_id: String) -> Result<CommandResponse> {
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        author_id: String,
+    ) -> Result<CommandResponse> {
         if !auth_role.can("follow_author") {
             return Err(Error::unauthorized());
         }
 
-        let reader = self
-            .reader_repo
-            .find_by_id(&auth_id)
-            .await?;
+        let reader = self.reader_repo.find_by_id(&auth_id).await?;
         let mut author = self
             .author_repo
             .find_by_id(&AuthorId::new(author_id)?)

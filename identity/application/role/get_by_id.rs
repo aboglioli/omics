@@ -4,7 +4,7 @@ use common::result::Result;
 
 use crate::application::dtos::RoleDto;
 use crate::domain::role::{RoleId, RoleRepository};
-use crate::domain::user::{UserRepository};
+use crate::domain::user::UserRepository;
 use crate::UserIdAndRole;
 
 pub struct GetById<'a> {

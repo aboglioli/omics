@@ -5,6 +5,7 @@ use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
 
 use crate::domain::plan::{PlanId, PlanRepository, Price};
 
@@ -37,12 +38,11 @@ impl<'a> Update<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (auth_id, auth_role): UserIdAndRole,
         plan_id: String,
         cmd: UpdateCommand,
     ) -> Result<CommandResponse> {
-        let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-        if !user.is_admin() {
+        if !auth_role.can("update_plan") {
             return Err(Error::unauthorized());
         }
 

@@ -3,6 +3,7 @@ use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
 
 use crate::domain::donation::{DonationRepository, Status};
 use crate::domain::payment::PaymentService;
@@ -31,9 +32,12 @@ impl<'a> Charge<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String) -> Result<CommandResponse> {
-        let user_id = UserId::new(auth_id)?;
-        let user = self.user_repo.find_by_id(&user_id).await?;
+    pub async fn exec(&self, (auth_id, auth_role): UserIdAndRole) -> Result<CommandResponse> {
+        if !auth_role.can("charge_donations") {
+            return Err(Error::unauthorized());
+        }
+
+        let user = self.user_repo.find_by_id(&auth_id).await?;
         if user.payment_email().is_none() {
             return Err(Error::new("donation", "missing_payment_email"));
         }
@@ -41,7 +45,7 @@ impl<'a> Charge<'a> {
         let pagination_donations = self
             .donation_repo
             .search(
-                Some(&user_id),
+                Some(&auth_id),
                 None,
                 Some(&Status::Paid),
                 None,

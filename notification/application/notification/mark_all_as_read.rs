@@ -1,6 +1,8 @@
+use common::error::Error;
 use common::request::CommandResponse;
 use common::result::Result;
 use identity::domain::user::UserId;
+use identity::UserIdAndRole;
 
 use crate::domain::notification::NotificationRepository;
 
@@ -13,10 +15,14 @@ impl<'a> MarkAllAsRead<'a> {
         MarkAllAsRead { notification_repo }
     }
 
-    pub async fn exec(&self, auth_id: String) -> Result<CommandResponse> {
+    pub async fn exec(&self, (auth_id, auth_role): UserIdAndRole) -> Result<CommandResponse> {
+        if !auth_role.can("mark_notifications_as_read") {
+            return Err(Error::unauthorized());
+        }
+
         let unread_notifications = self
             .notification_repo
-            .find_by_user_id(&UserId::new(auth_id)?, Some(false))
+            .find_by_user_id(&auth_id, Some(false))
             .await?;
 
         for mut notification in unread_notifications.into_iter() {

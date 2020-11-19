@@ -1,8 +1,8 @@
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 use identity::UserIdAndRole;
-use common::error::Error;
 
 use crate::domain::interaction::InteractionRepository;
 use crate::domain::publication::{PublicationId, PublicationRepository};
@@ -31,7 +31,11 @@ impl<'a> AddToFavorites<'a> {
         }
     }
 
-    pub async fn exec(&self, (auth_id, auth_role): UserIdAndRole, publication_id: String) -> Result<CommandResponse> {
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        publication_id: String,
+    ) -> Result<CommandResponse> {
         if !auth_role.can("add_publication_to_favorites") {
             return Err(Error::unauthorized());
         }

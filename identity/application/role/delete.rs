@@ -1,11 +1,9 @@
-
-
 use common::error::Error;
 use common::request::CommandResponse;
 use common::result::Result;
 
 use crate::domain::role::{RoleId, RoleRepository};
-use crate::domain::user::{UserRepository};
+use crate::domain::user::UserRepository;
 use crate::UserIdAndRole;
 
 pub struct Delete<'a> {

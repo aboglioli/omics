@@ -2,6 +2,7 @@ use serde::Serialize;
 
 use common::error::Error;
 use common::result::Result;
+use identity::UserIdAndRole;
 
 use crate::application::dtos::AuthorDto;
 use crate::domain::author::AuthorRepository;
@@ -29,8 +30,12 @@ impl<'a> GetFollowing<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, reader_id: String) -> Result<GetFollowingResponse> {
-        if auth_id != reader_id {
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        reader_id: String,
+    ) -> Result<GetFollowingResponse> {
+        if auth_id.value() != reader_id || !auth_role.can("get_reader_following") {
             return Err(Error::unauthorized());
         }
 

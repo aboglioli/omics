@@ -5,6 +5,7 @@ use serde::Deserialize;
 
 use common::error::Error;
 use common::result::Result;
+use identity::UserIdAndRole;
 
 use crate::application::dtos::StatisticsDto;
 use crate::domain::publication::{PublicationId, PublicationRepository, StatisticsService};
@@ -34,10 +35,14 @@ impl<'a> GetStatistics<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (auth_id, auth_role): UserIdAndRole,
         publication_id: String,
         cmd: GetStatisticsCommand,
     ) -> Result<StatisticsDto> {
+        if !auth_role.can("get_publication_statistics") {
+            return Err(Error::unauthorized());
+        }
+
         let publication = self
             .publication_repo
             .find_by_id(&PublicationId::new(publication_id)?)

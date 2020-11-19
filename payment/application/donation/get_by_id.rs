@@ -2,6 +2,7 @@ use common::error::Error;
 use common::request::Include;
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
 use publishing::application::dtos::{AuthorDto, ReaderDto};
 use publishing::domain::author::AuthorRepository;
 use publishing::domain::reader::ReaderRepository;
@@ -33,16 +34,16 @@ impl<'a> GetById<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (auth_id, auth_role): UserIdAndRole,
         donation_id: String,
         include: Include,
     ) -> Result<DonationDto> {
-        let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
+        let user = self.user_repo.find_by_id(&auth_id).await?;
         let donation = self
             .donation_repo
             .find_by_id(&DonationId::new(donation_id)?)
             .await?;
-        if !user.is_admin() {
+        if !auth_role.can("get_donation") {
             if user.base().id() != donation.author_id() && user.base().id() != donation.reader_id()
             {
                 return Err(Error::unauthorized());

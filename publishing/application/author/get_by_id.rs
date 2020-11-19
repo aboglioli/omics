@@ -1,7 +1,7 @@
 use serde::Serialize;
 
-use common::result::Result;
 use common::error::Error;
+use common::result::Result;
 use identity::UserIdAndRole;
 
 use crate::application::dtos::{AuthorDto, ReaderAuthorInteractionDto};

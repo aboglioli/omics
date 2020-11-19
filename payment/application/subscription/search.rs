@@ -8,6 +8,7 @@ use common::request::{Include, PaginationParams, PaginationResponse};
 use common::result::Result;
 use identity::application::dtos::UserDto;
 use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
 
 use crate::application::dtos::SubscriptionDto;
 use crate::domain::plan::PlanId;
@@ -40,13 +41,12 @@ impl<'a> Search<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (auth_id, auth_role): UserIdAndRole,
         cmd: SearchCommand,
         include: Include,
         pagination: PaginationParams,
     ) -> Result<PaginationResponse<SubscriptionDto>> {
-        let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-        if !user.is_admin() {
+        if !auth_role.can("search_subscriptions") {
             return Err(Error::unauthorized());
         }
 

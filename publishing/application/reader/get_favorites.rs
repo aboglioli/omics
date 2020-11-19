@@ -3,6 +3,7 @@ use serde::Serialize;
 use common::error::Error;
 use common::request::Include;
 use common::result::Result;
+use identity::UserIdAndRole;
 
 use crate::application::dtos::{AuthorDto, CategoryDto, CollectionDto, PublicationDto};
 use crate::domain::author::AuthorRepository;
@@ -45,11 +46,11 @@ impl<'a> GetFavorites<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (auth_id, auth_role): UserIdAndRole,
         reader_id: String,
         include: Include,
     ) -> Result<GetFavoritesResponse> {
-        if auth_id != reader_id {
+        if auth_id.value() != reader_id || !auth_role.can("get_reader_favorites") {
             return Err(Error::unauthorized());
         }
 

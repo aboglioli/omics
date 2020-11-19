@@ -5,7 +5,7 @@ use common::result::Result;
 
 use crate::application::dtos::RoleDto;
 use crate::domain::role::RoleRepository;
-use crate::domain::user::{UserRepository};
+use crate::domain::user::UserRepository;
 use crate::UserIdAndRole;
 
 #[derive(Serialize)]

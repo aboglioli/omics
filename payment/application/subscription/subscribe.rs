@@ -4,6 +4,7 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
 use publishing::domain::reader::ReaderRepository;
 
 use crate::domain::payment::PaymentService;
@@ -46,14 +47,21 @@ impl<'a> Subscribe<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, plan_id: String) -> Result<SubscriptionResponse> {
-        let user_id = UserId::new(auth_id)?;
-        let user = self.user_repo.find_by_id(&user_id).await?;
-        let reader = self.reader_repo.find_by_id(&user_id).await?;
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        plan_id: String,
+    ) -> Result<SubscriptionResponse> {
+        if !auth_role.can("subscribe") {
+            return Err(Error::unauthorized());
+        }
+
+        let user = self.user_repo.find_by_id(&auth_id).await?;
+        let reader = self.reader_repo.find_by_id(&auth_id).await?;
         let plan = self.plan_repo.find_by_id(&PlanId::new(plan_id)?).await?;
 
         // TODO: should be done by a domain service
-        if let Ok(subscription) = self.subscription_repo.find_by_user_id(&user_id).await {
+        if let Ok(subscription) = self.subscription_repo.find_by_user_id(&auth_id).await {
             match subscription.status_history().current() {
                 Status::Active => {
                     return Err(Error::new("subscription", "already_exists"));

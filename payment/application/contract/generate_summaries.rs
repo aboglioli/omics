@@ -7,6 +7,7 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
 
 use crate::domain::contract::{ContractRepository, ContractService};
 
@@ -47,11 +48,10 @@ impl<'a> GenerateSummaries<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (auth_id, auth_role): UserIdAndRole,
         cmd: GenerateSummariesCommand,
     ) -> Result<GenerateSummariesResponse> {
-        let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-        if !user.is_content_manager() {
+        if !auth_role.can("generate_all_contract_summaries") {
             return Err(Error::unauthorized());
         }
 

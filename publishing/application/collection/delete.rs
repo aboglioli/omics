@@ -1,8 +1,8 @@
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 use identity::UserIdAndRole;
-use common::error::Error;
 
 use crate::domain::collection::{CollectionId, CollectionRepository};
 
@@ -23,7 +23,11 @@ impl<'a> Delete<'a> {
         }
     }
 
-    pub async fn exec(&self, (auth_id, auth_role): UserIdAndRole, collection_id: String) -> Result<CommandResponse> {
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        collection_id: String,
+    ) -> Result<CommandResponse> {
         if !auth_role.can("delete_collection") {
             return Err(Error::unauthorized());
         }

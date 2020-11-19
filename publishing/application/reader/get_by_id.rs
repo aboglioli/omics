@@ -1,5 +1,6 @@
 use common::error::Error;
 use common::result::Result;
+use identity::UserIdAndRole;
 
 use crate::application::dtos::ReaderDto;
 use crate::domain::reader::{ReaderId, ReaderRepository};
@@ -13,13 +14,16 @@ impl<'a> GetById<'a> {
         GetById { reader_repo }
     }
 
-    pub async fn exec(&self, auth_id: String, reader_id: String) -> Result<ReaderDto> {
-        if auth_id != reader_id {
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        reader_id: String,
+    ) -> Result<ReaderDto> {
+        if auth_id.value() != reader_id || !auth_role.can("get_reader") {
             return Err(Error::unauthorized());
         }
 
-        let reader_id = ReaderId::new(auth_id)?;
-        let reader = self.reader_repo.find_by_id(&reader_id).await?;
+        let reader = self.reader_repo.find_by_id(&auth_id).await?;
 
         Ok(ReaderDto::from(&reader).preferences(&reader))
     }

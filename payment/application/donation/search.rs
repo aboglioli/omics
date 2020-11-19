@@ -7,6 +7,7 @@ use common::error::Error;
 use common::request::{Include, PaginationParams, PaginationResponse};
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
 use publishing::application::dtos::{AuthorDto, ReaderDto};
 use publishing::domain::author::AuthorRepository;
 use publishing::domain::reader::ReaderRepository;
@@ -47,21 +48,20 @@ impl<'a> Search<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (auth_id, auth_role): UserIdAndRole,
         cmd: SearchCommand,
         include: Include,
         pagination: PaginationParams,
     ) -> Result<PaginationResponse<DonationDto>> {
-        let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-        if !user.is_admin() {
+        if !auth_role.can("search_donations") {
             if let Some(author_id) = &cmd.author_id {
-                if author_id != user.base().id().value() {
+                if author_id != auth_id.value() {
                     return Err(Error::unauthorized());
                 }
             }
 
             if let Some(reader_id) = &cmd.reader_id {
-                if reader_id != user.base().id().value() {
+                if reader_id != auth_id.value() {
                     return Err(Error::unauthorized());
                 }
             }

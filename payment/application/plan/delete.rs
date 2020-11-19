@@ -3,6 +3,7 @@ use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
 
 use crate::domain::plan::{Plan, PlanId, PlanRepository, Price};
 
@@ -27,9 +28,12 @@ impl<'a> Delete<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, plan_id: String) -> Result<CommandResponse> {
-        let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-        if !user.is_admin() {
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        plan_id: String,
+    ) -> Result<CommandResponse> {
+        if !auth_role.can("delete_plan") {
             return Err(Error::unauthorized());
         }
 

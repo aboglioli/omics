@@ -23,7 +23,11 @@ impl<'a> Delete<'a> {
         }
     }
 
-    pub async fn exec(&self, (auth_id, auth_role): UserIdAndRole, category_id: String) -> Result<CommandResponse> {
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        category_id: String,
+    ) -> Result<CommandResponse> {
         if !auth_role.can("delete_category") {
             return Err(Error::unauthorized());
         }

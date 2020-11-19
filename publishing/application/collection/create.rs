@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
 
+use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
 use identity::UserIdAndRole;
-use common::error::Error;
 
 use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::category::{CategoryId, CategoryRepository};
@@ -47,7 +47,11 @@ impl<'a> Create<'a> {
         }
     }
 
-    pub async fn exec(&self, (auth_id, auth_role): UserIdAndRole, cmd: CreateCommand) -> Result<CreateResponse> {
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        cmd: CreateCommand,
+    ) -> Result<CreateResponse> {
         if !auth_role.can("create_collection") {
             return Err(Error::unauthorized());
         }

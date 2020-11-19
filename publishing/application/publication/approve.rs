@@ -1,12 +1,12 @@
 use serde::Deserialize;
 
 use common::error::Error;
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
 use identity::UserIdAndRole;
-use common::error::Error;
 
 use crate::domain::interaction::Comment;
 use crate::domain::publication::{PublicationId, PublicationRepository};

@@ -5,6 +5,7 @@ use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
 
 use crate::domain::interaction::Comment;
 use crate::domain::publication::{PublicationId, PublicationRepository};
@@ -36,14 +37,11 @@ impl<'a> Reject<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (auth_id, auth_role): UserIdAndRole,
         publication_id: String,
         cmd: RejectCommand,
     ) -> Result<CommandResponse> {
-        let user_id = UserId::new(auth_id)?;
-        let user = self.user_repo.find_by_id(&user_id).await?;
-
-        if !user.is_content_manager() {
+        if !auth_role.can("reject_publication") {
             return Err(Error::unauthorized());
         }
 
@@ -52,7 +50,7 @@ impl<'a> Reject<'a> {
 
         let comment = Comment::new(cmd.comment)?;
 
-        publication.reject(user_id, comment)?;
+        publication.reject(auth_id, comment)?;
 
         self.publication_repo.save(&mut publication).await?;
 
@@ -103,9 +101,10 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         uc.exec(
-            user.base().id().to_string(),
+            (user.base().id().clone(), role),
             publication.base().id().to_string(),
             RejectCommand {
                 comment: "All is OK".to_owned(),

@@ -1,8 +1,8 @@
 use actix_web::HttpRequest;
 
 use common::error::Error;
-use identity::domain::token::Token;
 use identity::domain::role::Role;
+use identity::domain::token::Token;
 use identity::domain::user::UserId;
 use identity::UserIdAndRole;
 
@@ -24,13 +24,15 @@ pub async fn auth(req: &HttpRequest, c: &MainContainer) -> Result<UserIdAndRole,
 
     let token = extract_token(auth_header).map_err(PublicError::from)?;
 
-    let user_id = c.identity
+    let user_id = c
+        .identity
         .authorization_serv()
         .authorize(&token)
         .await
         .map_err(PublicError::from)?;
 
-    let role = c.identity
+    let role = c
+        .identity
         .role_repo()
         .find_by_user_id(&UserId::new(user_id)?)
         .await
