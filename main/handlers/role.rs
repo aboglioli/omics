@@ -26,7 +26,6 @@ async fn get_all(req: HttpRequest, c: web::Data<MainContainer>) -> impl Responde
 async fn get_by_id(
     req: HttpRequest,
     path: web::Path<String>,
-    _include: web::Query<IncludeParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
     let user_id_and_role = auth(&req, &c).await?;
@@ -141,7 +140,11 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
         web::scope("/roles")
             .service(get_all)
             .service(get_by_id)
-            .service(get_users),
+            .service(get_users)
+            .service(create)
+            .service(update)
+            .service(delete)
+            .service(make_default),
     )
     .service(web::scope("/permissions").service(get_permissions));
 }

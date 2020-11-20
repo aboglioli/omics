@@ -41,6 +41,10 @@ impl<'a> Delete<'a> {
 
         let mut role = self.role_repo.find_by_id(&role_id).await?;
 
+        if role.is_default() {
+            return Err(Error::new("role", "is_default"));
+        }
+
         role.delete()?;
 
         self.role_repo.delete(&role_id).await?;

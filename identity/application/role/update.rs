@@ -10,8 +10,8 @@ use crate::UserIdAndRole;
 
 #[derive(Deserialize)]
 pub struct UpdateCommand {
-    name: Option<String>,
-    permissions: Option<Vec<String>>,
+    pub name: Option<String>,
+    pub permissions: Option<Vec<String>>,
 }
 
 pub struct Update<'a> {

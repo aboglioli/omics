@@ -1,7 +1,6 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use common::error::Error;
-use common::request::CommandResponse;
 use common::result::Result;
 
 use crate::domain::role::{Name, PermissionRepository, Role, RoleRepository};
@@ -10,8 +9,13 @@ use crate::UserIdAndRole;
 
 #[derive(Deserialize)]
 pub struct CreateCommand {
-    name: String,
-    permissions: Vec<String>,
+    pub name: String,
+    pub permissions: Vec<String>,
+}
+
+#[derive(Serialize)]
+pub struct CreateResponse {
+    pub id: String,
 }
 
 pub struct Create<'a> {
@@ -34,7 +38,7 @@ impl<'a> Create<'a> {
         &self,
         (_auth_id, auth_role): UserIdAndRole,
         cmd: CreateCommand,
-    ) -> Result<CommandResponse> {
+    ) -> Result<CreateResponse> {
         if !auth_role.can("create_role") {
             return Err(Error::unauthorized());
         }
@@ -60,6 +64,8 @@ impl<'a> Create<'a> {
 
         self.role_repo.save(&mut role).await?;
 
-        Ok(CommandResponse::default())
+        Ok(CreateResponse {
+            id: role.base().id().to_string(),
+        })
     }
 }
