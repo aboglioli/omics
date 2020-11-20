@@ -1,7 +1,7 @@
-use actix_web::{get, web, HttpRequest, HttpResponse, Responder};
+use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 
 use common::request::{IncludeParams, PaginationParams};
-use identity::application::role::{GetAll, GetById};
+use identity::application::role::{Create, CreateCommand, GetAll, GetById};
 use identity::application::user::{Search as SearchUser, SearchCommand as SearchUserCommand};
 
 use crate::authorization::auth;
@@ -56,6 +56,21 @@ async fn get_users(
             include.into_inner().into(),
             pagination.into_inner(),
         )
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
+}
+
+#[post("/")]
+async fn create(
+    req: HttpRequest,
+    cmd: web::Json<CreateCommand>,
+    c: web::Data<MainContainer>,
+) -> impl Responder {
+    let user_id_and_role = auth(&req, &c).await?;
+
+    Create::new(c.identity.permission_repo(), c.identity.role_repo())
+        .exec(user_id_and_role, cmd.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
