@@ -59,6 +59,13 @@
               Gestionar Categorías
       </button>
 
+      <button *ngIf="userData.role_id === 'admin'"
+              mat-stroked-button class="button-white-borders admin-button"
+              [ngClass]="{'active': ( activePathSelected === 'dashboard-roles' ) }"
+              (click)="goToPage('dashboard-roles')">
+              Gestionar usuarios y roles
+      </button>
+
     </div>
 
     <!-- User Options -->

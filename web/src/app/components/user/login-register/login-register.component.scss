@@ -138,3 +138,13 @@ button {
 .no-padding-dialog .mat-dialog-container {
   padding: 0;
 }
+
+mat-form-field.matDate {
+
+  width: 100%;
+
+  ::ng-deep div.mat-form-field-flex {
+    background-color: white;
+    color: black;
+  }
+}

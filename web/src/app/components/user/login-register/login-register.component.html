@@ -156,6 +156,37 @@
           </div>
         </div>
 
+        <!-- Feecha Nacimiento -->
+        <div class="form-group row">
+          <div class="col">
+
+            <div class="top-field">
+
+              <small class="form-text text-top">
+                Fecha de nacimiento
+              </small>
+
+              <!-- mensaje de error -->
+              <small  *ngIf="fechaUsuarioSignUpNovalido"
+                      class="form-text text-danger">
+                  Debes tener al menos 14 años
+              </small>
+            </div>
+
+            <mat-form-field appearance="fill" class="matDate">
+              <mat-label>Selecciona una fecha</mat-label>
+              <input  matInput
+                      [max]="maxDatebirthdate"
+                      [matDatepicker]="picker"
+                      formControlName="birthday"
+                      (dateChange)="convertDateToRFC3339($event.value)">
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+          </div>
+        </div>
+
         <!-- Contraseña -->
         <div class="form-group row">
           <div class="col">
@@ -228,6 +259,8 @@
             </div>
           </div>
         </div>
+
+        <br>
 
       </form>
     </mat-tab>

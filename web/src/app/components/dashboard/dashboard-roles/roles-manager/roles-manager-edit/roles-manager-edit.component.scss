@@ -1,0 +1,230 @@
+@import "src/scss/vars";
+
+
+div.parent{
+
+  color: white;
+  display: flex;
+  flex-direction: column;
+
+  div.header {
+
+    display: flex;
+    justify-content: center;
+    background-color: $omics-background-flat;
+    width: 100%;
+    padding: 10px;
+
+    position: relative;
+
+    h1 {
+      margin: 0.5em;
+    }
+
+    .button-top-menu {
+
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      padding: 5px;
+      position: absolute;
+
+      button {
+        margin: 0px;
+        outline: none;
+      }
+
+    }
+
+  }
+
+  div.body {
+
+
+    display: flex;
+    flex-direction: column;
+
+  }
+
+
+  div.action-buttons {
+
+    display: flex;
+    justify-content: center;
+
+  }
+
+
+}
+
+
+
+div.assign-permission-box {
+
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  padding: 0em 2em;
+
+  .permission-box {
+
+    display: flex;
+    flex-direction: column;
+    flex: 2;
+
+    h3 {
+      font-weight: 500;
+    }
+
+    .body-permission {
+
+      color: black;
+      height: 200px;
+      width: 100%;
+
+      background-color: white;
+
+      overflow-y: auto;
+      overflow-x: hidden;
+
+      ul {
+        list-style-type: none;
+        padding: 0px;
+
+        li {
+          padding: 0.5em 0em;
+          padding-left: 10px;
+          font-size: 12pt;
+
+          &:hover {
+            cursor: pointer;
+            color: white;
+            background-color: $omics-background-flat;
+          }
+
+          &.selected {
+            color: white;
+            background-color: $omics-background-flat;
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+
+  .permission-action {
+
+    margin: 1em;
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+  }
+
+
+}
+
+
+
+// Genereales
+
+div.block-field {
+
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin: 1em 2em;
+  min-width: 200px;
+
+  div.input-field-row {
+
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    div.title-and-error {
+
+      display: flex;
+      justify-content: space-between;
+
+      p.text-danger {
+        text-align: end;
+        font-weight: 500;
+        font-size: medium;
+        margin: 0;
+      }
+
+      p.field-name {
+        display: flex;
+        align-items: center;
+        margin: 0px;
+        margin-right: 1em;
+
+        font-weight: bold;
+        font-size: initial;
+
+      }
+
+    }
+
+  }
+
+
+}
+
+button.button-white-borders {
+
+  color: white;
+  &:hover {
+    &:not(:disabled) {
+      box-shadow: inset 0px 0px 0px 2px white;
+      font-weight: bold;
+    }
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  padding-top: 0.1em;
+
+}
+
+button.mat-icon-button {
+
+  &.arrow-button {
+    color: $omics-background-flat;
+    background-color: white;
+    margin: 0em 0.5em;
+
+    height: 50px;
+    width: 50px;
+
+    &:focus {
+      outline: none;
+    }
+
+    &:hover {
+      &:not(:disabled) {
+        color: white;
+        background-color: $omics-background-flat;
+        border: 2px solid white;
+      }
+    }
+
+    fa-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+    }
+
+  }
+
+}

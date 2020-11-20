@@ -1,0 +1,49 @@
+<div class="parent">
+
+  <div class="side"></div>
+
+  <div class="center">
+
+    <div class="header">
+
+      <h1>Gestionar: </h1>
+
+
+      <!-- #region Elegir que gestionar -->
+      <div  class="box-type">
+
+        <div  [ngClass]="{'selected': ( currentOption === optionMenu.roles )}"
+              (click)="onSelectManageTypeMenu( optionMenu.roles )">
+          Roles
+        </div>
+
+        <div  [ngClass]="{'selected': ( currentOption === optionMenu.users )}"
+              (click)="onSelectManageTypeMenu( optionMenu.users )">
+          Usuarios
+        </div>
+
+      </div>
+      <!-- #endregion -->
+
+
+    </div>
+
+    <div class="body">
+
+      <span *ngIf="(currentOption === optionMenu.roles); then rolesList else usersList"></span>
+
+      <ng-template #rolesList>
+        <app-roles-manager-list></app-roles-manager-list>
+      </ng-template>
+
+      <ng-template #usersList>
+        <app-user-roles-list></app-user-roles-list>
+      </ng-template>
+
+    </div>
+
+  </div>
+
+  <div class="side"></div>
+
+</div>

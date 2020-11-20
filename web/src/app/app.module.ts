@@ -78,6 +78,11 @@ import { AdminCategoriesComponent } from './components/dashboard/admin-categorie
 import { AdminTagsComponent } from './components/dashboard/admin-tags/admin-tags.component';
 import { AdminBusinessRuleComponent } from './components/dashboard/admin-business-rule/admin-business-rule.component';
 import { DeskboardMedioCobroComponent } from './components/deskboard/deskboard/deskboard-medio-cobro.component';
+import { DashboardRolesComponent } from './pages/dashboard-roles/dashboard-roles.component';
+import { UserRolesListComponent } from './components/dashboard/dashboard-roles/user-roles/user-roles-list/user-roles-list.component';
+import { UserRolesEditComponent } from './components/dashboard/dashboard-roles/user-roles/user-roles-edit/user-roles-edit.component';
+import { RolesManagerListComponent } from './components/dashboard/dashboard-roles/roles-manager/roles-manager-list/roles-manager-list.component';
+import { RolesManagerEditComponent } from './components/dashboard/dashboard-roles/roles-manager/roles-manager-edit/roles-manager-edit.component';
 
 
 @NgModule({
@@ -134,6 +139,11 @@ import { DeskboardMedioCobroComponent } from './components/deskboard/deskboard/d
     AdminTagsComponent,
     AdminBusinessRuleComponent,
     DeskboardMedioCobroComponent,
+    DashboardRolesComponent,
+    UserRolesListComponent,
+    UserRolesEditComponent,
+    RolesManagerListComponent,
+    RolesManagerEditComponent,
   ],
   imports: [
     BrowserModule,
