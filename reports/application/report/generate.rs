@@ -5,7 +5,7 @@ use serde::Deserialize;
 
 use common::error::Error;
 use common::result::Result;
-use identity::domain::user::{UserRepository};
+use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 use payment::domain::contract::ContractRepository;
 use payment::domain::donation::DonationRepository;

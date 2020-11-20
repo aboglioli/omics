@@ -18,7 +18,7 @@ async fn search(
     pagination: web::Query<PaginationParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     Search::new(
         c.payment.contract_repo(),
@@ -26,7 +26,7 @@ async fn search(
         c.payment.user_repo(),
     )
     .exec(
-        auth_id,
+        user_id_and_role,
         cmd.into_inner(),
         include.into_inner().into(),
         pagination.into_inner(),
@@ -42,14 +42,14 @@ async fn approve(
     path: web::Path<String>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     Approve::new(
         c.payment.event_pub(),
         c.payment.contract_repo(),
         c.payment.user_repo(),
     )
-    .exec(auth_id, path.into_inner())
+    .exec(user_id_and_role, path.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -61,14 +61,14 @@ async fn reject(
     path: web::Path<String>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     Reject::new(
         c.payment.event_pub(),
         c.payment.contract_repo(),
         c.payment.user_repo(),
     )
-    .exec(auth_id, path.into_inner())
+    .exec(user_id_and_role, path.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -80,14 +80,14 @@ async fn cancel(
     path: web::Path<String>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     Cancel::new(
         c.payment.event_pub(),
         c.payment.contract_repo(),
         c.payment.publication_repo(),
     )
-    .exec(auth_id, path.into_inner())
+    .exec(user_id_and_role, path.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -99,7 +99,7 @@ async fn generate_statistics(
     cmd: web::Json<GenerateSummariesCommand>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     GenerateSummaries::new(
         c.payment.event_pub(),
@@ -107,7 +107,7 @@ async fn generate_statistics(
         c.payment.user_repo(),
         c.payment.contract_serv(),
     )
-    .exec(auth_id, cmd.into_inner())
+    .exec(user_id_and_role, cmd.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -119,7 +119,7 @@ async fn charge(
     path: web::Path<String>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     ChargeForContract::new(
         c.payment.event_pub(),
@@ -129,7 +129,7 @@ async fn charge(
         c.config_serv(),
         c.payment.payment_serv(),
     )
-    .exec(auth_id, path.into_inner())
+    .exec(user_id_and_role, path.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)

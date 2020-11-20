@@ -16,6 +16,7 @@ use crate::error::PublicError;
 async fn register(cmd: web::Json<RegisterCommand>, c: web::Data<MainContainer>) -> impl Responder {
     Register::new(
         c.identity.event_pub(),
+        c.identity.role_repo(),
         c.identity.user_repo(),
         c.identity.user_serv(),
     )
@@ -27,11 +28,15 @@ async fn register(cmd: web::Json<RegisterCommand>, c: web::Data<MainContainer>) 
 
 #[post("/login")]
 async fn login(cmd: web::Json<LoginCommand>, c: web::Data<MainContainer>) -> impl Responder {
-    Login::new(c.identity.event_pub(), c.identity.authentication_serv())
-        .exec(cmd.into_inner())
-        .await
-        .map(|res| HttpResponse::Ok().json(res))
-        .map_err(PublicError::from)
+    Login::new(
+        c.identity.event_pub(),
+        c.identity.role_repo(),
+        c.identity.authentication_serv(),
+    )
+    .exec(cmd.into_inner())
+    .await
+    .map(|res| HttpResponse::Ok().json(res))
+    .map_err(PublicError::from)
 }
 
 #[post("/recover-password")]
@@ -41,6 +46,7 @@ async fn recover_password(
 ) -> impl Responder {
     RecoverPassword::new(
         c.identity.event_pub(),
+        c.identity.role_repo(),
         c.identity.user_repo(),
         c.identity.user_serv(),
     )
@@ -58,11 +64,11 @@ async fn search(
     pagination: web::Query<PaginationParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     Search::new(c.identity.role_repo(), c.identity.user_repo())
         .exec(
-            auth_id,
+            user_id_and_role,
             cmd.into_inner(),
             include.into_inner().into(),
             pagination.into_inner(),
@@ -79,17 +85,17 @@ async fn get_by_id(
     include: web::Query<IncludeParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     let mut user_id = path.into_inner();
-    user_id = if user_id == "me" {
-        auth_id.clone()
-    } else {
-        user_id
-    };
+    if user_id == "me" {
+        if let (auth_id, _) = &user_id_and_role {
+            user_id = auth_id.to_string();
+        }
+    }
 
     GetById::new(c.identity.role_repo(), c.identity.user_repo())
-        .exec(auth_id, user_id, include.into_inner().into())
+        .exec(user_id_and_role, user_id, include.into_inner().into())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -102,17 +108,17 @@ async fn update(
     cmd: web::Json<UpdateCommand>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     let mut user_id = path.into_inner();
-    user_id = if user_id == "me" {
-        auth_id.clone()
-    } else {
-        user_id
-    };
+    if user_id == "me" {
+        if let (auth_id, _) = &user_id_and_role {
+            user_id = auth_id.to_string();
+        }
+    }
 
     Update::new(c.identity.event_pub(), c.identity.user_repo())
-        .exec(auth_id, user_id, cmd.into_inner())
+        .exec(user_id_and_role, user_id, cmd.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -124,17 +130,17 @@ async fn delete(
     path: web::Path<String>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     let mut user_id = path.into_inner();
-    user_id = if user_id == "me" {
-        auth_id.clone()
-    } else {
-        user_id
-    };
+    if user_id == "me" {
+        if let (auth_id, _) = &user_id_and_role {
+            user_id = auth_id.to_string();
+        }
+    }
 
     Delete::new(c.identity.event_pub(), c.identity.user_repo())
-        .exec(auth_id, user_id)
+        .exec(user_id_and_role, user_id)
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -147,17 +153,18 @@ async fn change_password(
     cmd: web::Json<ChangePasswordCommand>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await.ok();
+    let user_id_and_role = auth(&req, &c).await.ok();
 
     let mut user_id = path.into_inner();
-    user_id = if user_id == "me" && auth_id.is_some() {
-        auth_id.clone().unwrap()
-    } else {
-        user_id
-    };
+    if user_id == "me" {
+        if let Some((auth_id, _)) = &user_id_and_role {
+            user_id = auth_id.to_string();
+        }
+    }
 
     ChangePassword::new(
         c.identity.event_pub(),
+        c.identity.role_repo(),
         c.identity.user_repo(),
         c.identity.user_serv(),
     )
@@ -174,21 +181,25 @@ async fn validate(
 ) -> impl Responder {
     let path = path.into_inner();
 
-    Validate::new(c.identity.event_pub(), c.identity.user_repo())
-        .exec(path.0, path.1)
-        .await
-        .map(|_res| {
-            HttpResponse::Ok()
-                .header(http::header::LOCATION, "http://localhost:4200")
-                .content_type("text/html")
-                .body(
-                    r#"
+    Validate::new(
+        c.identity.event_pub(),
+        c.identity.role_repo(),
+        c.identity.user_repo(),
+    )
+    .exec(path.0, path.1)
+    .await
+    .map(|_res| {
+        HttpResponse::Ok()
+            .header(http::header::LOCATION, "http://localhost:4200")
+            .content_type("text/html")
+            .body(
+                r#"
                 Bienvenido. Tu cuenta ha sido verificada.
                 <a href="http://localhost:4200/">Continua</a>.
             "#,
-                )
-        })
-        .map_err(PublicError::from)
+            )
+    })
+    .map_err(PublicError::from)
 }
 
 #[put("/{user_id}/payment-email")]
@@ -198,17 +209,17 @@ async fn change_payment_email(
     cmd: web::Json<ChangePaymentEmailCommand>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     let mut user_id = path.into_inner();
-    user_id = if user_id == "me" {
-        auth_id.clone()
-    } else {
-        user_id
-    };
+    if user_id == "me" {
+        if let (auth_id, _) = &user_id_and_role {
+            user_id = auth_id.to_string();
+        }
+    }
 
     ChangePaymentEmail::new(c.identity.event_pub(), c.identity.user_repo())
-        .exec(auth_id, user_id, cmd.into_inner())
+        .exec(user_id_and_role, user_id, cmd.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -221,21 +232,21 @@ async fn change_role(
     cmd: web::Json<ChangeRoleCommand>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     let mut user_id = path.into_inner();
-    user_id = if user_id == "me" {
-        auth_id.clone()
-    } else {
-        user_id
-    };
+    if user_id == "me" {
+        if let (auth_id, _) = &user_id_and_role {
+            user_id = auth_id.to_string();
+        }
+    }
 
     ChangeRole::new(
         c.identity.event_pub(),
         c.identity.role_repo(),
         c.identity.user_repo(),
     )
-    .exec(auth_id, user_id, cmd.into_inner())
+    .exec(user_id_and_role, user_id, cmd.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)

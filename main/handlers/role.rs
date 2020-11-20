@@ -10,10 +10,10 @@ use crate::error::PublicError;
 
 #[get("")]
 async fn get_all(req: HttpRequest, c: web::Data<MainContainer>) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     GetAll::new(c.identity.role_repo(), c.identity.user_repo())
-        .exec(auth_id)
+        .exec(user_id_and_role)
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -26,10 +26,10 @@ async fn get_by_id(
     _include: web::Query<IncludeParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     GetById::new(c.identity.role_repo(), c.identity.user_repo())
-        .exec(auth_id, path.into_inner())
+        .exec(user_id_and_role, path.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -44,14 +44,14 @@ async fn get_users(
     pagination: web::Query<PaginationParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     let mut cmd = cmd.into_inner();
     cmd.role_id = Some(path.into_inner());
 
     SearchUser::new(c.identity.role_repo(), c.identity.user_repo())
         .exec(
-            auth_id,
+            user_id_and_role,
             cmd,
             include.into_inner().into(),
             pagination.into_inner(),

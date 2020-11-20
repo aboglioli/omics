@@ -15,11 +15,11 @@ async fn search(
     pagination: web::Query<PaginationParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     Search::new(c.payment.subscription_repo(), c.payment.user_repo())
         .exec(
-            auth_id,
+            user_id_and_role,
             cmd.into_inner(),
             include.into_inner().into(),
             pagination.into_inner(),
@@ -31,10 +31,10 @@ async fn search(
 
 #[delete("")]
 async fn unsubscribe(req: HttpRequest, c: web::Data<MainContainer>) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     Unsubscribe::new(c.payment.event_pub(), c.payment.subscription_repo())
-        .exec(auth_id)
+        .exec(user_id_and_role)
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)

@@ -14,17 +14,17 @@ async fn get_by_id(
     path: web::Path<String>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     let mut user_id = path.into_inner();
-    user_id = if user_id == "me" {
-        auth_id.clone()
-    } else {
-        user_id
-    };
+    if user_id == "me" {
+        if let (auth_id, _) = &user_id_and_role {
+            user_id = auth_id.to_string();
+        }
+    }
 
     GetById::new(c.publishing.reader_repo())
-        .exec(auth_id, user_id)
+        .exec(user_id_and_role, user_id)
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -36,17 +36,17 @@ async fn get_following(
     path: web::Path<String>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     let mut user_id = path.into_inner();
-    user_id = if user_id == "me" {
-        auth_id.clone()
-    } else {
-        user_id
-    };
+    if user_id == "me" {
+        if let (auth_id, _) = &user_id_and_role {
+            user_id = auth_id.to_string();
+        }
+    }
 
     GetFollowing::new(c.publishing.author_repo(), c.publishing.interaction_repo())
-        .exec(auth_id, user_id)
+        .exec(user_id_and_role, user_id)
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -59,14 +59,14 @@ async fn get_favorites(
     include: web::Query<IncludeParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     let mut user_id = path.into_inner();
-    user_id = if user_id == "me" {
-        auth_id.clone()
-    } else {
-        user_id
-    };
+    if user_id == "me" {
+        if let (auth_id, _) = &user_id_and_role {
+            user_id = auth_id.to_string();
+        }
+    }
 
     GetFavorites::new(
         c.publishing.author_repo(),
@@ -75,7 +75,7 @@ async fn get_favorites(
         c.publishing.interaction_repo(),
         c.publishing.publication_repo(),
     )
-    .exec(auth_id, user_id, include.into_inner().into())
+    .exec(user_id_and_role, user_id, include.into_inner().into())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -87,17 +87,17 @@ async fn get_subscription(
     path: web::Path<String>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     let mut user_id = path.into_inner();
-    user_id = if user_id == "me" {
-        auth_id.clone()
-    } else {
-        user_id
-    };
+    if user_id == "me" {
+        if let (auth_id, _) = &user_id_and_role {
+            user_id = auth_id.to_string();
+        }
+    }
 
     GetSubscriptionByReader::new(c.payment.subscription_repo())
-        .exec(auth_id, user_id)
+        .exec(user_id_and_role, user_id)
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)

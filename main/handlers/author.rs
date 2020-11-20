@@ -23,10 +23,10 @@ async fn search(
     pagination: web::Query<PaginationParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await.ok();
+    let user_id_and_role = auth(&req, &c).await.ok();
 
     Search::new(c.publishing.author_repo())
-        .exec(auth_id, cmd.into_inner(), pagination.into_inner())
+        .exec(user_id_and_role, cmd.into_inner(), pagination.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -38,17 +38,17 @@ async fn get_by_id(
     path: web::Path<String>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await.ok();
+    let user_id_and_role = auth(&req, &c).await.ok();
 
     let mut user_id = path.into_inner();
-    user_id = if user_id == "me" && auth_id.is_some() {
-        auth_id.clone().unwrap()
-    } else {
-        user_id
-    };
+    if user_id == "me" {
+        if let Some((auth_id, _)) = &user_id_and_role {
+            user_id = auth_id.to_string();
+        }
+    }
 
     GetById::new(c.publishing.author_repo(), c.publishing.interaction_repo())
-        .exec(auth_id, user_id)
+        .exec(user_id_and_role, user_id)
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -62,14 +62,14 @@ async fn get_publications(
     include: web::Query<IncludeParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await.ok();
+    let user_id_and_role = auth(&req, &c).await.ok();
 
     let mut user_id = path.into_inner();
-    user_id = if user_id == "me" && auth_id.is_some() {
-        auth_id.clone().unwrap()
-    } else {
-        user_id
-    };
+    if user_id == "me" {
+        if let Some((auth_id, _)) = &user_id_and_role {
+            user_id = auth_id.to_string();
+        }
+    }
 
     let mut cmd = cmd.into_inner();
     cmd.author_id = Some(user_id);
@@ -81,7 +81,7 @@ async fn get_publications(
         c.publishing.user_repo(),
     )
     .exec(
-        auth_id,
+        user_id_and_role,
         cmd,
         include.into_inner().into(),
         PaginationParams::default(),
@@ -99,14 +99,14 @@ async fn get_collections(
     include: web::Query<IncludeParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await.ok();
+    let user_id_and_role = auth(&req, &c).await.ok();
 
     let mut user_id = path.into_inner();
-    user_id = if user_id == "me" && auth_id.is_some() {
-        auth_id.clone().unwrap()
-    } else {
-        user_id
-    };
+    if user_id == "me" {
+        if let Some((auth_id, _)) = &user_id_and_role {
+            user_id = auth_id.to_string();
+        }
+    }
 
     let mut cmd = cmd.into_inner();
     cmd.author_id = Some(user_id);
@@ -117,7 +117,7 @@ async fn get_collections(
         c.publishing.collection_repo(),
     )
     .exec(
-        auth_id,
+        user_id_and_role,
         cmd,
         include.into_inner().into(),
         PaginationParams::default(),
@@ -133,7 +133,7 @@ async fn follow(
     path: web::Path<String>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     Follow::new(
         c.publishing.event_pub(),
@@ -141,7 +141,7 @@ async fn follow(
         c.publishing.interaction_repo(),
         c.publishing.reader_repo(),
     )
-    .exec(auth_id, path.into_inner())
+    .exec(user_id_and_role, path.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -153,7 +153,7 @@ async fn unfollow(
     path: web::Path<String>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     Unfollow::new(
         c.publishing.event_pub(),
@@ -161,7 +161,7 @@ async fn unfollow(
         c.publishing.interaction_repo(),
         c.publishing.reader_repo(),
     )
-    .exec(auth_id, path.into_inner())
+    .exec(user_id_and_role, path.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -175,14 +175,14 @@ async fn get_donations(
     include: web::Query<IncludeParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     let mut user_id = path.into_inner();
-    user_id = if user_id == "me" {
-        auth_id.clone()
-    } else {
-        user_id
-    };
+    if user_id == "me" {
+        if let (auth_id, _) = &user_id_and_role {
+            user_id = auth_id.to_string();
+        }
+    }
 
     let mut cmd = cmd.into_inner();
     cmd.author_id = Some(user_id);
@@ -194,7 +194,7 @@ async fn get_donations(
         c.identity.user_repo(),
     )
     .exec(
-        auth_id,
+        user_id_and_role,
         cmd,
         include.into_inner().into(),
         PaginationParams::default(),
@@ -211,7 +211,7 @@ async fn donate(
     cmd: web::Json<DonateCommand>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     Donate::new(
         c.payment.event_pub(),
@@ -222,7 +222,7 @@ async fn donate(
         c.config_serv(),
         c.payment.payment_serv(),
     )
-    .exec(auth_id, path.into_inner(), cmd.into_inner())
+    .exec(user_id_and_role, path.into_inner(), cmd.into_inner())
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)

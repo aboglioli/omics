@@ -2,7 +2,8 @@ use common::config::ConfigService;
 use common::error::Error;
 use common::request::CommandResponse;
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::domain::user::{UserRepository};
+use identity::UserIdAndRole;
 
 use common::config::BusinessRules;
 
@@ -20,9 +21,12 @@ impl<'a> Update<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, cmd: BusinessRules) -> Result<CommandResponse> {
-        let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-        if !user.is_admin() {
+    pub async fn exec(
+        &self,
+        (_auth_id, auth_role): UserIdAndRole,
+        cmd: BusinessRules,
+    ) -> Result<CommandResponse> {
+        if !auth_role.can("change_business_rules") {
             return Err(Error::unauthorized());
         }
 
