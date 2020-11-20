@@ -4,7 +4,6 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::Include;
 use common::result::Result;
-use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 
 use crate::application::dtos::{
@@ -30,7 +29,6 @@ pub struct GetById<'a> {
     interaction_repo: &'a dyn InteractionRepository,
     publication_repo: &'a dyn PublicationRepository,
     reader_repo: &'a dyn ReaderRepository,
-    user_repo: &'a dyn UserRepository,
 
     statistics_serv: &'a StatisticsService,
 }
@@ -44,7 +42,6 @@ impl<'a> GetById<'a> {
         interaction_repo: &'a dyn InteractionRepository,
         publication_repo: &'a dyn PublicationRepository,
         reader_repo: &'a dyn ReaderRepository,
-        user_repo: &'a dyn UserRepository,
         statistics_serv: &'a StatisticsService,
     ) -> Self {
         GetById {
@@ -54,7 +51,6 @@ impl<'a> GetById<'a> {
             interaction_repo,
             publication_repo,
             reader_repo,
-            user_repo,
             statistics_serv,
         }
     }
@@ -207,17 +203,14 @@ mod tests {
             c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
-            c.user_repo(),
             c.statistics_serv(),
         );
 
-        let (mut user1, mut author1, mut reader1) = user(1);
-        c.user_repo().save(&mut user1).await.unwrap();
+        let (_user1, mut author1, mut reader1) = user(1);
         c.author_repo().save(&mut author1).await.unwrap();
         c.reader_repo().save(&mut reader1).await.unwrap();
 
-        let (mut user2, mut author2, mut reader2) = user(2);
-        c.user_repo().save(&mut user2).await.unwrap();
+        let (_user2, mut author2, mut reader2) = user(2);
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 
@@ -275,17 +268,14 @@ mod tests {
             c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
-            c.user_repo(),
             c.statistics_serv(),
         );
 
-        let (mut user1, mut author1, mut reader1) = user(1);
-        c.user_repo().save(&mut user1).await.unwrap();
+        let (_user1, mut author1, mut reader1) = user(1);
         c.author_repo().save(&mut author1).await.unwrap();
         c.reader_repo().save(&mut reader1).await.unwrap();
 
-        let (mut user2, mut author2, mut reader2) = user(2);
-        c.user_repo().save(&mut user2).await.unwrap();
+        let (_user2, mut author2, mut reader2) = user(2);
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 
@@ -327,17 +317,14 @@ mod tests {
             c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
-            c.user_repo(),
             c.statistics_serv(),
         );
 
-        let (mut user1, mut author1, mut reader1) = user(1);
-        c.user_repo().save(&mut user1).await.unwrap();
+        let (_user1, mut author1, mut reader1) = user(1);
         c.author_repo().save(&mut author1).await.unwrap();
         c.reader_repo().save(&mut reader1).await.unwrap();
 
-        let (mut user2, mut author2, mut reader2) = user(2);
-        c.user_repo().save(&mut user2).await.unwrap();
+        let (_user2, mut author2, mut reader2) = user(2);
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 
@@ -389,17 +376,14 @@ mod tests {
             c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
-            c.user_repo(),
             c.statistics_serv(),
         );
 
-        let (mut user1, mut author1, mut reader1) = user(1);
-        c.user_repo().save(&mut user1).await.unwrap();
+        let (_user1, mut author1, mut reader1) = user(1);
         c.author_repo().save(&mut author1).await.unwrap();
         c.reader_repo().save(&mut reader1).await.unwrap();
 
-        let (mut user2, mut author2, mut reader2) = user(2);
-        c.user_repo().save(&mut user2).await.unwrap();
+        let (_user2, mut author2, mut reader2) = user(2);
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 
@@ -441,17 +425,14 @@ mod tests {
             c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
-            c.user_repo(),
             c.statistics_serv(),
         );
 
-        let (mut user1, mut author1, mut reader1) = user(1);
-        c.user_repo().save(&mut user1).await.unwrap();
+        let (_user1, mut author1, mut reader1) = user(1);
         c.author_repo().save(&mut author1).await.unwrap();
         c.reader_repo().save(&mut reader1).await.unwrap();
 
-        let (mut user2, mut author2, mut reader2) = user(2);
-        c.user_repo().save(&mut user2).await.unwrap();
+        let (_user2, mut author2, mut reader2) = user(2);
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 

@@ -18,9 +18,7 @@ async fn get_by_id(
 
     let mut user_id = path.into_inner();
     if user_id == "me" {
-        if let (auth_id, _) = &user_id_and_role {
-            user_id = auth_id.to_string();
-        }
+        user_id = user_id_and_role.0.to_string();
     }
 
     GetById::new(c.publishing.reader_repo())
@@ -40,9 +38,7 @@ async fn get_following(
 
     let mut user_id = path.into_inner();
     if user_id == "me" {
-        if let (auth_id, _) = &user_id_and_role {
-            user_id = auth_id.to_string();
-        }
+        user_id = user_id_and_role.0.to_string();
     }
 
     GetFollowing::new(c.publishing.author_repo(), c.publishing.interaction_repo())
@@ -63,9 +59,7 @@ async fn get_favorites(
 
     let mut user_id = path.into_inner();
     if user_id == "me" {
-        if let (auth_id, _) = &user_id_and_role {
-            user_id = auth_id.to_string();
-        }
+        user_id = user_id_and_role.0.to_string();
     }
 
     GetFavorites::new(
@@ -91,9 +85,7 @@ async fn get_subscription(
 
     let mut user_id = path.into_inner();
     if user_id == "me" {
-        if let (auth_id, _) = &user_id_and_role {
-            user_id = auth_id.to_string();
-        }
+        user_id = user_id_and_role.0.to_string();
     }
 
     GetSubscriptionByReader::new(c.payment.subscription_repo())

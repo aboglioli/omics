@@ -4,7 +4,6 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
-use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 
 use crate::domain::category::{CategoryId, CategoryRepository, Name};

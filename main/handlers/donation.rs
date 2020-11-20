@@ -21,7 +21,6 @@ async fn search(
         c.publishing.author_repo(),
         c.payment.donation_repo(),
         c.publishing.reader_repo(),
-        c.identity.user_repo(),
     )
     .exec(
         user_id_and_role,
@@ -47,7 +46,6 @@ async fn get_by_id(
         c.publishing.author_repo(),
         c.payment.donation_repo(),
         c.publishing.reader_repo(),
-        c.identity.user_repo(),
     )
     .exec(
         user_id_and_role,

@@ -6,7 +6,7 @@ use serde::Deserialize;
 use common::error::Error;
 use common::request::{Include, PaginationParams, PaginationResponse};
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::domain::user::UserId;
 use identity::UserIdAndRole;
 use publishing::application::dtos::{AuthorDto, ReaderDto};
 use publishing::domain::author::AuthorRepository;
@@ -28,7 +28,6 @@ pub struct Search<'a> {
     author_repo: &'a dyn AuthorRepository,
     donation_repo: &'a dyn DonationRepository,
     reader_repo: &'a dyn ReaderRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Search<'a> {
@@ -36,13 +35,11 @@ impl<'a> Search<'a> {
         author_repo: &'a dyn AuthorRepository,
         donation_repo: &'a dyn DonationRepository,
         reader_repo: &'a dyn ReaderRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         Search {
             author_repo,
             donation_repo,
             reader_repo,
-            user_repo,
         }
     }
 

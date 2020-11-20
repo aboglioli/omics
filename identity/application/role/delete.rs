@@ -41,7 +41,7 @@ impl<'a> Delete<'a> {
 
         let mut role = self.role_repo.find_by_id(&role_id).await?;
 
-        role.delete();
+        role.delete()?;
 
         self.role_repo.delete(&role_id).await?;
 

@@ -1,6 +1,5 @@
 use common::error::Error;
 use common::result::Result;
-use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 use publishing::domain::publication::{PublicationId, PublicationRepository};
 
@@ -10,19 +9,16 @@ use crate::domain::contract::ContractRepository;
 pub struct GetByPublication<'a> {
     contract_repo: &'a dyn ContractRepository,
     publication_repo: &'a dyn PublicationRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> GetByPublication<'a> {
     pub fn new(
         contract_repo: &'a dyn ContractRepository,
         publication_repo: &'a dyn PublicationRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         GetByPublication {
             contract_repo,
             publication_repo,
-            user_repo,
         }
     }
 

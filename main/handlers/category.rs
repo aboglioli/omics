@@ -58,7 +58,6 @@ async fn get_publications(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
         c.publishing.publication_repo(),
-        c.publishing.user_repo(),
     )
     .exec(
         user_id_and_role,

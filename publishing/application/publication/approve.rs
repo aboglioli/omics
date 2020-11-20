@@ -4,7 +4,6 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
-use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 
 use crate::domain::interaction::Comment;
@@ -19,19 +18,16 @@ pub struct Approve<'a> {
     event_pub: &'a dyn EventPublisher,
 
     publication_repo: &'a dyn PublicationRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Approve<'a> {
     pub fn new(
         event_pub: &'a dyn EventPublisher,
         publication_repo: &'a dyn PublicationRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         Approve {
             event_pub,
             publication_repo,
-            user_repo,
         }
     }
 
@@ -74,7 +70,7 @@ mod tests {
     #[tokio::test]
     async fn approve() {
         let c = mocks::container();
-        let uc = Approve::new(c.event_pub(), c.publication_repo(), c.user_repo());
+        let uc = Approve::new(c.event_pub(), c.publication_repo());
 
         let mut user = identity_mocks::user(
             "#content-manager01",

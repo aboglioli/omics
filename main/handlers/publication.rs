@@ -53,7 +53,6 @@ async fn search(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
         c.publishing.publication_repo(),
-        c.publishing.user_repo(),
     )
     .exec(
         user_id_and_role,
@@ -82,7 +81,6 @@ async fn get_by_id(
         c.publishing.interaction_repo(),
         c.publishing.publication_repo(),
         c.publishing.reader_repo(),
-        c.publishing.user_repo(),
         c.publishing.statistics_serv(),
     )
     .exec(
@@ -174,15 +172,11 @@ async fn approve(
 ) -> impl Responder {
     let user_id_and_role = auth(&req, &c).await?;
 
-    Approve::new(
-        c.publishing.event_pub(),
-        c.publishing.publication_repo(),
-        c.publishing.user_repo(),
-    )
-    .exec(user_id_and_role, path.into_inner(), cmd.into_inner())
-    .await
-    .map(|res| HttpResponse::Ok().json(res))
-    .map_err(PublicError::from)
+    Approve::new(c.publishing.event_pub(), c.publishing.publication_repo())
+        .exec(user_id_and_role, path.into_inner(), cmd.into_inner())
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
 }
 
 #[post("/{publication_id}/reject")]
@@ -194,15 +188,11 @@ async fn reject(
 ) -> impl Responder {
     let user_id_and_role = auth(&req, &c).await?;
 
-    Reject::new(
-        c.publishing.event_pub(),
-        c.publishing.publication_repo(),
-        c.publishing.user_repo(),
-    )
-    .exec(user_id_and_role, path.into_inner(), cmd.into_inner())
-    .await
-    .map(|res| HttpResponse::Ok().json(res))
-    .map_err(PublicError::from)
+    Reject::new(c.publishing.event_pub(), c.publishing.publication_repo())
+        .exec(user_id_and_role, path.into_inner(), cmd.into_inner())
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
 }
 
 #[get("/{publication_id}/read")]
@@ -218,7 +208,6 @@ async fn read(
         c.publishing.interaction_repo(),
         c.publishing.publication_repo(),
         c.publishing.reader_repo(),
-        c.publishing.user_repo(),
     )
     .exec(user_id_and_role, path.into_inner())
     .await
@@ -418,15 +407,11 @@ async fn get_contract(
 ) -> impl Responder {
     let user_id_and_role = auth(&req, &c).await?;
 
-    GetContractByPublication::new(
-        c.payment.contract_repo(),
-        c.payment.publication_repo(),
-        c.payment.user_repo(),
-    )
-    .exec(user_id_and_role, path.into_inner())
-    .await
-    .map(|res| HttpResponse::Ok().json(res))
-    .map_err(PublicError::from)
+    GetContractByPublication::new(c.payment.contract_repo(), c.payment.publication_repo())
+        .exec(user_id_and_role, path.into_inner())
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
 }
 
 #[get("/{publication_id}/contract/summaries")]
@@ -457,15 +442,11 @@ async fn can_request_contract(
 ) -> impl Responder {
     let user_id_and_role = auth(&req, &c).await?;
 
-    CanRequestContract::new(
-        c.payment.contract_repo(),
-        c.payment.publication_repo(),
-        c.payment.contract_serv(),
-    )
-    .exec(user_id_and_role, path.into_inner())
-    .await
-    .map(|res| HttpResponse::Ok().json(res))
-    .map_err(PublicError::from)
+    CanRequestContract::new(c.payment.publication_repo(), c.payment.contract_serv())
+        .exec(user_id_and_role, path.into_inner())
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
 }
 
 #[post("/{publication_id}/contract")]

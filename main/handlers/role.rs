@@ -12,7 +12,7 @@ use crate::error::PublicError;
 async fn get_all(req: HttpRequest, c: web::Data<MainContainer>) -> impl Responder {
     let user_id_and_role = auth(&req, &c).await?;
 
-    GetAll::new(c.identity.role_repo(), c.identity.user_repo())
+    GetAll::new(c.identity.role_repo())
         .exec(user_id_and_role)
         .await
         .map(|res| HttpResponse::Ok().json(res))
@@ -28,7 +28,7 @@ async fn get_by_id(
 ) -> impl Responder {
     let user_id_and_role = auth(&req, &c).await?;
 
-    GetById::new(c.identity.role_repo(), c.identity.user_repo())
+    GetById::new(c.identity.role_repo())
         .exec(user_id_and_role, path.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))

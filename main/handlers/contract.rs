@@ -20,20 +20,16 @@ async fn search(
 ) -> impl Responder {
     let user_id_and_role = auth(&req, &c).await?;
 
-    Search::new(
-        c.payment.contract_repo(),
-        c.payment.publication_repo(),
-        c.payment.user_repo(),
-    )
-    .exec(
-        user_id_and_role,
-        cmd.into_inner(),
-        include.into_inner().into(),
-        pagination.into_inner(),
-    )
-    .await
-    .map(|res| HttpResponse::Ok().json(res))
-    .map_err(PublicError::from)
+    Search::new(c.payment.contract_repo(), c.payment.publication_repo())
+        .exec(
+            user_id_and_role,
+            cmd.into_inner(),
+            include.into_inner().into(),
+            pagination.into_inner(),
+        )
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
 }
 
 #[post("/{contract_id}/approve")]
@@ -104,7 +100,6 @@ async fn generate_statistics(
     GenerateSummaries::new(
         c.payment.event_pub(),
         c.payment.contract_repo(),
-        c.payment.user_repo(),
         c.payment.contract_serv(),
     )
     .exec(user_id_and_role, cmd.into_inner())

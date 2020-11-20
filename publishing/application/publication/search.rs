@@ -6,7 +6,6 @@ use serde::Deserialize;
 use common::error::Error;
 use common::request::{Include, PaginationParams, PaginationResponse};
 use common::result::Result;
-use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};
@@ -29,7 +28,6 @@ pub struct Search<'a> {
     author_repo: &'a dyn AuthorRepository,
     category_repo: &'a dyn CategoryRepository,
     publication_repo: &'a dyn PublicationRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Search<'a> {
@@ -37,13 +35,11 @@ impl<'a> Search<'a> {
         author_repo: &'a dyn AuthorRepository,
         category_repo: &'a dyn CategoryRepository,
         publication_repo: &'a dyn PublicationRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         Search {
             author_repo,
             category_repo,
             publication_repo,
-            user_repo,
         }
     }
 

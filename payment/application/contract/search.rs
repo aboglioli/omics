@@ -6,7 +6,6 @@ use serde::Deserialize;
 use common::error::Error;
 use common::request::{Include, PaginationParams, PaginationResponse};
 use common::result::Result;
-use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 use publishing::application::dtos::PublicationDto;
 use publishing::domain::publication::{PublicationId, PublicationRepository};
@@ -25,19 +24,16 @@ pub struct SearchCommand {
 pub struct Search<'a> {
     contract_repo: &'a dyn ContractRepository,
     publication_repo: &'a dyn PublicationRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Search<'a> {
     pub fn new(
         contract_repo: &'a dyn ContractRepository,
         publication_repo: &'a dyn PublicationRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         Search {
             contract_repo,
             publication_repo,
-            user_repo,
         }
     }
 

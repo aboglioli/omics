@@ -24,7 +24,7 @@ async fn update_business_rules(
 ) -> impl Responder {
     let user_id_and_role = auth(&req, &c).await?;
 
-    Update::new(c.identity.user_repo(), c.config_serv())
+    Update::new(c.config_serv())
         .exec(user_id_and_role, cmd.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))

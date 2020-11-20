@@ -89,9 +89,7 @@ async fn get_by_id(
 
     let mut user_id = path.into_inner();
     if user_id == "me" {
-        if let (auth_id, _) = &user_id_and_role {
-            user_id = auth_id.to_string();
-        }
+        user_id = user_id_and_role.0.to_string();
     }
 
     GetById::new(c.identity.role_repo(), c.identity.user_repo())
@@ -112,9 +110,7 @@ async fn update(
 
     let mut user_id = path.into_inner();
     if user_id == "me" {
-        if let (auth_id, _) = &user_id_and_role {
-            user_id = auth_id.to_string();
-        }
+        user_id = user_id_and_role.0.to_string();
     }
 
     Update::new(c.identity.event_pub(), c.identity.user_repo())
@@ -134,9 +130,7 @@ async fn delete(
 
     let mut user_id = path.into_inner();
     if user_id == "me" {
-        if let (auth_id, _) = &user_id_and_role {
-            user_id = auth_id.to_string();
-        }
+        user_id = user_id_and_role.0.to_string();
     }
 
     Delete::new(c.identity.event_pub(), c.identity.user_repo())
@@ -213,9 +207,7 @@ async fn change_payment_email(
 
     let mut user_id = path.into_inner();
     if user_id == "me" {
-        if let (auth_id, _) = &user_id_and_role {
-            user_id = auth_id.to_string();
-        }
+        user_id = user_id_and_role.0.to_string();
     }
 
     ChangePaymentEmail::new(c.identity.event_pub(), c.identity.user_repo())
@@ -236,9 +228,7 @@ async fn change_role(
 
     let mut user_id = path.into_inner();
     if user_id == "me" {
-        if let (auth_id, _) = &user_id_and_role {
-            user_id = auth_id.to_string();
-        }
+        user_id = user_id_and_role.0.to_string();
     }
 
     ChangeRole::new(

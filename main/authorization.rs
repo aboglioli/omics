@@ -1,7 +1,6 @@
 use actix_web::HttpRequest;
 
 use common::error::Error;
-
 use identity::domain::token::Token;
 use identity::domain::user::UserId;
 use identity::UserIdAndRole;

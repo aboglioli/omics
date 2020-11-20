@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
-use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 
 use crate::domain::category::{Category, CategoryRepository, Name};

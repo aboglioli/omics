@@ -2,29 +2,22 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
-use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 
-use crate::domain::plan::{Plan, PlanId, PlanRepository, Price};
+use crate::domain::plan::{PlanId, PlanRepository};
 
 pub struct Delete<'a> {
     event_pub: &'a dyn EventPublisher,
 
     plan_repo: &'a dyn PlanRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 // TODO: update subscriptions before deleting
 impl<'a> Delete<'a> {
-    pub fn new(
-        event_pub: &'a dyn EventPublisher,
-        plan_repo: &'a dyn PlanRepository,
-        user_repo: &'a dyn UserRepository,
-    ) -> Self {
+    pub fn new(event_pub: &'a dyn EventPublisher, plan_repo: &'a dyn PlanRepository) -> Self {
         Delete {
             event_pub,
             plan_repo,
-            user_repo,
         }
     }
 

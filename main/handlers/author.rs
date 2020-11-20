@@ -78,7 +78,6 @@ async fn get_publications(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
         c.publishing.publication_repo(),
-        c.publishing.user_repo(),
     )
     .exec(
         user_id_and_role,
@@ -179,9 +178,7 @@ async fn get_donations(
 
     let mut user_id = path.into_inner();
     if user_id == "me" {
-        if let (auth_id, _) = &user_id_and_role {
-            user_id = auth_id.to_string();
-        }
+        user_id = user_id_and_role.0.to_string();
     }
 
     let mut cmd = cmd.into_inner();
@@ -191,7 +188,6 @@ async fn get_donations(
         c.publishing.author_repo(),
         c.payment.donation_repo(),
         c.publishing.reader_repo(),
-        c.identity.user_repo(),
     )
     .exec(
         user_id_and_role,

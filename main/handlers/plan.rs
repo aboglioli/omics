@@ -24,15 +24,11 @@ async fn create(
 ) -> impl Responder {
     let user_id_and_role = auth(&req, &c).await?;
 
-    Create::new(
-        c.payment.event_pub(),
-        c.payment.plan_repo(),
-        c.payment.user_repo(),
-    )
-    .exec(user_id_and_role, cmd.into_inner())
-    .await
-    .map(|res| HttpResponse::Ok().json(res))
-    .map_err(PublicError::from)
+    Create::new(c.payment.event_pub(), c.payment.plan_repo())
+        .exec(user_id_and_role, cmd.into_inner())
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
 }
 
 #[put("/{plan_id}")]
@@ -44,15 +40,11 @@ async fn update(
 ) -> impl Responder {
     let user_id_and_role = auth(&req, &c).await?;
 
-    Update::new(
-        c.payment.event_pub(),
-        c.payment.plan_repo(),
-        c.payment.user_repo(),
-    )
-    .exec(user_id_and_role, path.into_inner(), cmd.into_inner())
-    .await
-    .map(|res| HttpResponse::Ok().json(res))
-    .map_err(PublicError::from)
+    Update::new(c.payment.event_pub(), c.payment.plan_repo())
+        .exec(user_id_and_role, path.into_inner(), cmd.into_inner())
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
 }
 
 #[delete("/{plan_id}")]
@@ -63,15 +55,11 @@ async fn delete(
 ) -> impl Responder {
     let user_id_and_role = auth(&req, &c).await?;
 
-    Delete::new(
-        c.payment.event_pub(),
-        c.payment.plan_repo(),
-        c.payment.user_repo(),
-    )
-    .exec(user_id_and_role, path.into_inner())
-    .await
-    .map(|res| HttpResponse::Ok().json(res))
-    .map_err(PublicError::from)
+    Delete::new(c.payment.event_pub(), c.payment.plan_repo())
+        .exec(user_id_and_role, path.into_inner())
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
 }
 
 #[post("/{plan_id}/subscribe")]

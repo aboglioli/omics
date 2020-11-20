@@ -1,20 +1,18 @@
 use common::error::Error;
 use common::request::Include;
 use common::result::Result;
-use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 use publishing::application::dtos::{AuthorDto, ReaderDto};
 use publishing::domain::author::AuthorRepository;
 use publishing::domain::reader::ReaderRepository;
 
 use crate::application::dtos::DonationDto;
-use crate::domain::donation::{DonationId, DonationOrderBy, DonationRepository, Status};
+use crate::domain::donation::{DonationId, DonationRepository};
 
 pub struct GetById<'a> {
     author_repo: &'a dyn AuthorRepository,
     donation_repo: &'a dyn DonationRepository,
     reader_repo: &'a dyn ReaderRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> GetById<'a> {
@@ -22,13 +20,11 @@ impl<'a> GetById<'a> {
         author_repo: &'a dyn AuthorRepository,
         donation_repo: &'a dyn DonationRepository,
         reader_repo: &'a dyn ReaderRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         GetById {
             author_repo,
             donation_repo,
             reader_repo,
-            user_repo,
         }
     }
 
@@ -38,14 +34,12 @@ impl<'a> GetById<'a> {
         donation_id: String,
         include: Include,
     ) -> Result<DonationDto> {
-        let user = self.user_repo.find_by_id(&auth_id).await?;
         let donation = self
             .donation_repo
             .find_by_id(&DonationId::new(donation_id)?)
             .await?;
         if !auth_role.can("get_donation") {
-            if user.base().id() != donation.author_id() && user.base().id() != donation.reader_id()
-            {
+            if &auth_id != donation.author_id() && &auth_id != donation.reader_id() {
                 return Err(Error::unauthorized());
             }
         }

@@ -13,9 +13,7 @@ use payment::domain::subscription::SubscriptionRepository;
 use publishing::domain::author::AuthorRepository;
 use publishing::domain::publication::PublicationRepository;
 
-use crate::domain::report::{
-    Authors, Contracts, Payments, Publications, Report, Subscriptions, Users,
-};
+use crate::domain::report::Report;
 
 #[derive(Deserialize)]
 pub struct GenerateCommand {

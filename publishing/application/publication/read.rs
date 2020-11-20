@@ -3,7 +3,6 @@ use serde::Serialize;
 use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
-use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 
 use crate::application::dtos::PageDto;
@@ -23,7 +22,6 @@ pub struct Read<'a> {
     interaction_repo: &'a dyn InteractionRepository,
     publication_repo: &'a dyn PublicationRepository,
     reader_repo: &'a dyn ReaderRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Read<'a> {
@@ -32,14 +30,12 @@ impl<'a> Read<'a> {
         interaction_repo: &'a dyn InteractionRepository,
         publication_repo: &'a dyn PublicationRepository,
         reader_repo: &'a dyn ReaderRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         Read {
             event_pub,
             interaction_repo,
             publication_repo,
             reader_repo,
-            user_repo,
         }
     }
 
@@ -92,7 +88,6 @@ mod tests {
             c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
-            c.user_repo(),
         );
 
         let mut reader = mocks::reader("#user02", "user-2");
@@ -136,7 +131,6 @@ mod tests {
             c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
-            c.user_repo(),
         );
 
         let mut reader = mocks::reader("#user02", "user-2");
@@ -173,7 +167,6 @@ mod tests {
             c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
-            c.user_repo(),
         );
 
         let mut reader = mocks::reader("#user01", "user-1");

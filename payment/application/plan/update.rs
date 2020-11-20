@@ -4,7 +4,6 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
-use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 
 use crate::domain::plan::{PlanId, PlanRepository, Price};
@@ -20,19 +19,13 @@ pub struct Update<'a> {
     event_pub: &'a dyn EventPublisher,
 
     plan_repo: &'a dyn PlanRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Update<'a> {
-    pub fn new(
-        event_pub: &'a dyn EventPublisher,
-        plan_repo: &'a dyn PlanRepository,
-        user_repo: &'a dyn UserRepository,
-    ) -> Self {
+    pub fn new(event_pub: &'a dyn EventPublisher, plan_repo: &'a dyn PlanRepository) -> Self {
         Update {
             event_pub,
             plan_repo,
-            user_repo,
         }
     }
 

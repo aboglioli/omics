@@ -5,7 +5,7 @@ use common::result::Result;
 use identity::UserIdAndRole;
 use publishing::domain::publication::{PublicationId, PublicationRepository};
 
-use crate::domain::contract::{ContractRepository, ContractService};
+use crate::domain::contract::ContractService;
 
 #[derive(Serialize)]
 pub struct CanRequestResponse {
@@ -13,7 +13,6 @@ pub struct CanRequestResponse {
 }
 
 pub struct CanRequest<'a> {
-    contract_repo: &'a dyn ContractRepository,
     publication_repo: &'a dyn PublicationRepository,
 
     contract_serv: &'a ContractService,
@@ -21,12 +20,10 @@ pub struct CanRequest<'a> {
 
 impl<'a> CanRequest<'a> {
     pub fn new(
-        contract_repo: &'a dyn ContractRepository,
         publication_repo: &'a dyn PublicationRepository,
         contract_serv: &'a ContractService,
     ) -> Self {
         CanRequest {
-            contract_repo,
             publication_repo,
             contract_serv,
         }

@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
-use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 
 use crate::domain::contract::{ContractRepository, ContractService};
@@ -26,7 +25,6 @@ pub struct GenerateSummaries<'a> {
     event_pub: &'a dyn EventPublisher,
 
     contract_repo: &'a dyn ContractRepository,
-    user_repo: &'a dyn UserRepository,
 
     contract_serv: &'a ContractService,
 }
@@ -35,13 +33,11 @@ impl<'a> GenerateSummaries<'a> {
     pub fn new(
         event_pub: &'a dyn EventPublisher,
         contract_repo: &'a dyn ContractRepository,
-        user_repo: &'a dyn UserRepository,
         contract_serv: &'a ContractService,
     ) -> Self {
         GenerateSummaries {
             event_pub,
             contract_repo,
-            user_repo,
             contract_serv,
         }
     }

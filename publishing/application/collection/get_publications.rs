@@ -3,7 +3,6 @@ use serde::Serialize;
 use common::error::Error;
 use common::request::Include;
 use common::result::Result;
-use identity::domain::user::UserRepository;
 use identity::UserIdAndRole;
 
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};
@@ -22,7 +21,6 @@ pub struct GetPublications<'a> {
     category_repo: &'a dyn CategoryRepository,
     collection_repo: &'a dyn CollectionRepository,
     publication_repo: &'a dyn PublicationRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> GetPublications<'a> {
@@ -31,14 +29,12 @@ impl<'a> GetPublications<'a> {
         category_repo: &'a dyn CategoryRepository,
         collection_repo: &'a dyn CollectionRepository,
         publication_repo: &'a dyn PublicationRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         GetPublications {
             author_repo,
             category_repo,
             collection_repo,
             publication_repo,
-            user_repo,
         }
     }
 

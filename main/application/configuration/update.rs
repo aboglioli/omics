@@ -2,23 +2,18 @@ use common::config::ConfigService;
 use common::error::Error;
 use common::request::CommandResponse;
 use common::result::Result;
-use identity::domain::user::{UserRepository};
+
 use identity::UserIdAndRole;
 
 use common::config::BusinessRules;
 
 pub struct Update<'a> {
-    user_repo: &'a dyn UserRepository,
-
     config_serv: &'a ConfigService,
 }
 
 impl<'a> Update<'a> {
-    pub fn new(user_repo: &'a dyn UserRepository, config_serv: &'a ConfigService) -> Self {
-        Update {
-            user_repo,
-            config_serv,
-        }
+    pub fn new(config_serv: &'a ConfigService) -> Self {
+        Update { config_serv }
     }
 
     pub async fn exec(
