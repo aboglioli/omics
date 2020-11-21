@@ -185,7 +185,7 @@ impl UserRepository for PostgresUserRepository {
         let role_id = role_id.map(|id| id.value());
 
         let (sql, params) = WhereBuilder::new()
-            .add_param_opt("role_id $$", &role_id, role_id.is_some())
+            .add_param_opt("role_id = $$", &role_id, role_id.is_some())
             .add_param_opt("created_at >= $$", &from, from.is_some())
             .add_param_opt("created_at <= $$", &to, to.is_some())
             .build();
