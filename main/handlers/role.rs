@@ -145,6 +145,6 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
             .service(create)
             .service(update)
             .service(delete)
-            .service(make_default)
+            .service(make_default),
     );
 }

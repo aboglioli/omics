@@ -91,6 +91,7 @@ impl Role {
 
     pub fn set_default(&mut self, default: bool) -> Result<()> {
         self.default = default;
+        self.base.update();
         Ok(())
     }
 

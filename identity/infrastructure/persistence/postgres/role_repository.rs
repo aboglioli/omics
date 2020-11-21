@@ -107,14 +107,18 @@ impl RoleRepository for PostgresRoleRepository {
             .await
             .is_err();
 
+        let permissions = serde_json::to_value(role.permissions())?;
+
         if create {
             self.client
                 .execute(
-                    "INSERT INTO roles(id, name, created_at)
-                    VALUES ($1, $2, $3)",
+                    r#"INSERT INTO roles(id, name, permissions, "default", created_at)
+                    VALUES ($1, $2, $3, $4, $5)"#,
                     &[
                         &role.base().id().value(),
                         &role.name().value(),
+                        &permissions,
+                        &role.is_default(),
                         &role.base().created_at(),
                     ],
                 )
@@ -123,12 +127,21 @@ impl RoleRepository for PostgresRoleRepository {
         } else {
             self.client
                 .execute(
-                    "UPDATE roles
+                    r#"UPDATE roles
                     SET
-                        name = $2
+                        name = $2,
+                        permissions = $3,
+                        "default" = $4,
+                        updated_at = $5
                     WHERE
-                        id = $1",
-                    &[&role.base().id().value(), &role.name().value()],
+                        id = $1"#,
+                    &[
+                        &role.base().id().value(),
+                        &role.name().value(),
+                        &permissions,
+                        &role.is_default(),
+                        &role.base().updated_at(),
+                    ],
                 )
                 .await
                 .map_err(|err| Error::new("role", "update").wrap_raw(err))?;
