@@ -1,10 +1,13 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { faTrashAlt, faSave, faTimesCircle, faChevronRight, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { IPermission, IRole } from '../../../../../domain/models/user';
 
 export interface DialogData {
   isNew: boolean;
+  role: IRole;
+  permissionArrayToSelect: IPermission[];
 }
 
 @Component({
@@ -13,6 +16,8 @@ export interface DialogData {
   styleUrls: ['./roles-manager-edit.component.scss']
 })
 export class RolesManagerEditComponent implements OnInit {
+
+  @Input() permissionArrayToSelect: Array<IPermission>;
 
   // FontAwesome Icon
   public faDelete = faTrashAlt;
@@ -29,19 +34,6 @@ export class RolesManagerEditComponent implements OnInit {
 
   public permissionArrayAssigned: Array<any> = [];
 
-  public permissionArrayToSelect: Array<any> = [
-    { id: '0', name: 'permiso 0' },
-    { id: '1', name: 'permiso 1' },
-    { id: '2', name: 'permiso 2' },
-    { id: '3', name: 'permiso 3' },
-    { id: '4', name: 'permiso 4' },
-    { id: '5', name: 'permiso 5' },
-    { id: '6', name: 'permiso 6' },
-    { id: '7', name: 'permiso 7' },
-    { id: '8', name: 'permiso 8' },
-    { id: '9', name: 'permiso 9' },
-  ];
-
   public currentItemSelected: any = null;
   public currentIndexElementSelected = 0;
   public isToRemoveArrow = false;
@@ -50,16 +42,12 @@ export class RolesManagerEditComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     public dialogRef: MatDialogRef<RolesManagerEditComponent>,
     private fb: FormBuilder,
-  ) { }
+  ) {
+    this.permissionArrayToSelect = this.data.permissionArrayToSelect;
+  }
 
   ngOnInit(): void {
 
-    // Quitar de los disponibles para asignar los que ya estan asignados
-    const availables = this.permissionArrayToSelect.filter(p => {
-      return this.permissionArrayAssigned.every(rp => rp.id !== p.id);
-    });
-
-    this.permissionArrayToSelect = availables;
 
     this.isNewRole =  (this.data.isNew) ? true : false;
     this.formBuild();
@@ -71,9 +59,22 @@ export class RolesManagerEditComponent implements OnInit {
     } else {
 
       this.title = 'Editar rol';
-      // TODO: Asignar los datos a editar
+      console.log('TEst > ', this.data.role)
+      this.isDefault = this.data.role.default;
+      this.setFormByData( this.data.role );
 
     }
+
+    this.permissionArrayAssigned = this.data.role.permissions;
+    this.permissionArrayAssigned.sort( (a, b) => a.name.localeCompare(b.name));
+
+    // Quitar de los disponibles para asignar los que ya estan asignados
+    const availables = this.permissionArrayToSelect.filter(p => {
+      return this.permissionArrayAssigned.every(rp => rp.id !== p.id);
+    });
+
+    this.permissionArrayToSelect = availables;
+
 
   }
 
@@ -84,6 +85,15 @@ export class RolesManagerEditComponent implements OnInit {
       permissionList: [ null ],
     });
 
+  }
+
+  private setFormByData( role: IRole ): void {
+    this.formRole.reset({
+
+      name: role.name,
+      permissionList: role.permissions
+
+    });
   }
 
   public onPermissionToMove( indexItem: number, isToRemove: boolean ): void {
