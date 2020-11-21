@@ -35,7 +35,7 @@ impl<'a> Delete<'a> {
             .search(Some(&role_id), None, None, None, Some(5), None)
             .await?;
 
-        if p_users.total() > 0 {
+        if p_users.count() > 0 {
             return Err(Error::new("role", "existing_users_assigned_to_role"));
         }
 
