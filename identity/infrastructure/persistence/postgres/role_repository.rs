@@ -90,7 +90,7 @@ impl RoleRepository for PostgresRoleRepository {
     async fn find_default(&self) -> Result<Role> {
         let row = self
             .client
-            .query_one("SELECT * FROM roles WHERE default = true", &[])
+            .query_one(r#"SELECT * FROM roles WHERE "default" = true"#, &[])
             .await
             .map_err(|err| Error::not_found("role").wrap_raw(err))?;
 
