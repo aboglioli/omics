@@ -7,7 +7,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class UserRolesListComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    
+  ) { }
 
   ngOnInit(): void {
   }

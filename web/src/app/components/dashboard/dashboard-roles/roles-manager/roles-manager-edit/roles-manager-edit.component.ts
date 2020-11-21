@@ -3,8 +3,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { faTrashAlt, faSave, faTimesCircle, faChevronRight, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { NgxSpinnerService } from 'ngx-spinner';
+import Swal from 'sweetalert2';
 import { IPermission, IRole } from '../../../../../domain/models/user';
-import { RoleService, ICreateCommand } from '../../../../../domain/services/role.service';
+import { RoleService, ICreateCommand, IUpdateCommand } from '../../../../../domain/services/role.service';
+import { SweetAlertGenericMessageService } from '../../../../../services/sweet-alert-generic-message.service';
 
 export interface DialogData {
   isNew: boolean;
@@ -46,6 +48,7 @@ export class RolesManagerEditComponent implements OnInit {
     private fb: FormBuilder,
     private roleService: RoleService,
     private spinnerService: NgxSpinnerService,
+    private sweetAlertGenericService: SweetAlertGenericMessageService
   ) {
     this.permissionArrayToSelect = this.data.permissionArrayToSelect;
   }
@@ -148,6 +151,54 @@ export class RolesManagerEditComponent implements OnInit {
 
   public deleteRol(): void {
 
+    Swal.fire({
+      title: `Eliminar Rol: ${this.data.role.name}`,
+      text: '¿Estas seguro ',
+      icon: 'warning',
+      showCancelButton: true,
+      focusCancel: true,
+      confirmButtonColor: '#FC4850',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'No'
+    }).then((result) => {
+      if (result.isConfirmed) {
+
+        this.deleteRoleConfirm();
+
+      }
+    });
+
+
+  }
+
+  private deleteRoleConfirm(): void {
+
+    this.spinnerService.show();
+    this.roleService.delete(this.data.role.id).subscribe(
+      (res) => {
+        this.spinnerService.hide();
+        this.dialogRef.close(true);
+        
+        this.sweetAlertGenericService.showAlertSuccess(`El rol ${ this.data.role.name } ha sido eliminado correctamente.`, 'Eliminación exitosa');
+
+      },
+      (err ) => {
+        this.spinnerService.hide();
+
+        if ( err.error.code === 'existing_users_assigned_to_role' ) {
+
+          this.sweetAlertGenericService.showAlertError(
+            // tslint:disable-next-line: max-line-length
+            'El rol no puede eliminarse debido a que hay usuarios asignados con el mismo. Contactarse con el encargado de la base de datos.',
+            `No puede eliminarse ${ this.data.role.name }`);
+
+        } else {
+          console.error(err);
+        }
+      }
+    );
+
   }
 
   public onSubmitForm(): void {
@@ -162,6 +213,16 @@ export class RolesManagerEditComponent implements OnInit {
 
     this.formRole.get('permissionList').setValue(arrayPermissionId);
 
+    if ( this.isNewRole ) {
+      this.createRole();
+    } else {
+      this.editRole();
+    }
+
+  }
+
+  private createRole(): void {
+
     const createdRole: ICreateCommand =  {
       name: this.formRole.get('name').value,
       permissions: this.formRole.get('permissionList').value
@@ -175,14 +236,60 @@ export class RolesManagerEditComponent implements OnInit {
 
         if ( this.isDefault ) {
 
-          this.roleService.makeDefault( resCreate.id ).subscribe();
+          this.roleService.makeDefault( resCreate.id ).subscribe(
+            (res) => {
+              this.sweetAlertGenericService.showAlertSuccess(`El rol predeterminado ${ createdRole.name } ha sido creado correctamente`, 'Creación exitosa');
+              this.dialogRef.close( true );
+            }
+          );
+
+        } else {
+
+          this.sweetAlertGenericService.showAlertSuccess(`El rol ${ createdRole.name } ha sido creado correctamente.`, 'Creación exitosa');
+          this.dialogRef.close( true );
 
         }
 
-        this.dialogRef.close( true );
 
       },
       ( err: Error ) => {
+        this.spinnerService.hide();
+        console.error(err);
+      }
+    );
+
+  }
+
+  private editRole(): void {
+
+    const editedRole: IUpdateCommand = {
+      name: this.formRole.get('name').value,
+      permissions: this.formRole.get('permissionList').value
+    };
+
+    this.spinnerService.show();
+    this.roleService.update( this.data.role.id, editedRole ).subscribe(
+      (resEdited) => {
+        this.spinnerService.hide();
+
+        if ( this.isDefault ) {
+
+          this.roleService.makeDefault( this.data.role.id ).subscribe(
+            (res) => {
+              this.sweetAlertGenericService.showAlertSuccess(`El rol predeterminado ${ editedRole.name } ha sido editado correctamente.`, 'Edición exitosa');
+              this.dialogRef.close( true );
+            }
+          );
+
+        } else {
+
+          this.sweetAlertGenericService.showAlertSuccess(`El rol ${ editedRole.name } ha sido editado correctamente.`, 'Edición exitosa');
+          this.dialogRef.close( true );
+
+        }
+
+      },
+      (err: Error) => {
         this.spinnerService.hide();
         console.error(err);
       }
