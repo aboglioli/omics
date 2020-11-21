@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { RolesManagerEditComponent } from '../roles-manager-edit/roles-manager-edit.component';
-import { RoleService, IGetAllResponse } from '../../../../../domain/services/role.service';
+import { RoleService } from '../../../../../domain/services/role.service';
 import { IRole, IPermission } from '../../../../../domain/models/user';
 import { forkJoin } from 'rxjs';
 
@@ -15,7 +15,6 @@ import { forkJoin } from 'rxjs';
   styleUrls: ['./roles-manager-list.component.scss']
 })
 export class RolesManagerListComponent implements OnInit {
-
 
   // Font Awseome icons
   public faAdd = faPlusCircle;
@@ -34,24 +33,45 @@ export class RolesManagerListComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.getRoleData();
+    this.getRoleData(true);
 
   }
 
-  public getRoleData(): void {
+  public getRoleData( isPermissionNeeded: boolean ): void {
 
     this.spinnerService.show();
-    forkJoin( [ this.roleService.getAll(), this.roleService.getPermissions() ]).subscribe(
 
-      ([resAllRoles, resAllPermissions]) => {
+    if ( isPermissionNeeded ) {
 
-        this.tableRoleData = resAllRoles.roles;
-        this.permissionsData = resAllPermissions.permissions;
+      forkJoin( [ this.roleService.getAll(), this.roleService.getPermissions() ]).subscribe(
 
-        this.spinnerService.hide();
+        ([resAllRoles, resAllPermissions]) => {
 
-      },
-    );
+          this.tableRoleData = resAllRoles.roles;
+          this.permissionsData = resAllPermissions.permissions;
+
+          this.spinnerService.hide();
+
+        },
+      );
+
+    } else {
+
+
+      this.roleService.getAll().subscribe(
+
+        (resAllRoles ) => {
+          this.tableRoleData = resAllRoles.roles;
+          this.spinnerService.hide();
+        },
+        (err: Error) => {
+          console.error(err);
+          this.spinnerService.hide();
+        }
+
+      );
+
+    }
 
   }
 
@@ -65,9 +85,18 @@ export class RolesManagerListComponent implements OnInit {
         disableClose: true,
         data: {
           isNew: true,
+          permissionArrayToSelect: this.permissionsData
         }
       }
-    );
+    ).afterClosed().subscribe(result => {
+
+      if ( result ) {
+
+        this.tableRoleData = [];
+        this.getRoleData( true );
+      }
+
+    });
 
   }
 
@@ -84,6 +113,15 @@ export class RolesManagerListComponent implements OnInit {
           role: roleElement,
           permissionArrayToSelect: this.permissionsData
         }
+      }
+    ).afterClosed().subscribe(result => {
+
+        if ( result ) {
+
+          this.tableRoleData = [];
+          this.getRoleData( true );
+        }
+
       }
     );
 

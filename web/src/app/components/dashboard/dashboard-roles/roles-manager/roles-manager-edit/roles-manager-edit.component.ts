@@ -1,8 +1,10 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit, ɵConsole } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { faTrashAlt, faSave, faTimesCircle, faChevronRight, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { IPermission, IRole } from '../../../../../domain/models/user';
+import { RoleService, ICreateCommand } from '../../../../../domain/services/role.service';
 
 export interface DialogData {
   isNew: boolean;
@@ -42,6 +44,8 @@ export class RolesManagerEditComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     public dialogRef: MatDialogRef<RolesManagerEditComponent>,
     private fb: FormBuilder,
+    private roleService: RoleService,
+    private spinnerService: NgxSpinnerService,
   ) {
     this.permissionArrayToSelect = this.data.permissionArrayToSelect;
   }
@@ -59,13 +63,13 @@ export class RolesManagerEditComponent implements OnInit {
     } else {
 
       this.title = 'Editar rol';
-      console.log('TEst > ', this.data.role)
+      console.log('TEst > ', this.data.role);
       this.isDefault = this.data.role.default;
       this.setFormByData( this.data.role );
 
     }
 
-    this.permissionArrayAssigned = this.data.role.permissions;
+    this.permissionArrayAssigned = (this.data.role) ? this.data.role.permissions : [];
     this.permissionArrayAssigned.sort( (a, b) => a.name.localeCompare(b.name));
 
     // Quitar de los disponibles para asignar los que ya estan asignados
@@ -82,7 +86,7 @@ export class RolesManagerEditComponent implements OnInit {
 
     this.formRole = this.fb.group({
       name: [ '', [ Validators.required, Validators.minLength(4) ] ],
-      permissionList: [ null ],
+      permissionList: [],
     });
 
   }
@@ -158,17 +162,36 @@ export class RolesManagerEditComponent implements OnInit {
 
     this.formRole.get('permissionList').setValue(arrayPermissionId);
 
-    if ( this.isDefault ) {
-      // TODO: setear rol como predeterminado
-    }
+    const createdRole: ICreateCommand =  {
+      name: this.formRole.get('name').value,
+      permissions: this.formRole.get('permissionList').value
+    };
 
-    console.log('TEST > ', this.formRole.value);
-    console.log('TEST > ', this.isDefault);
+    this.spinnerService.show();
+    this.roleService.create( createdRole ).subscribe(
+      ( resCreate ) => {
+
+        this.spinnerService.hide();
+
+        if ( this.isDefault ) {
+
+          this.roleService.makeDefault( resCreate.id ).subscribe();
+
+        }
+
+        this.dialogRef.close( true );
+
+      },
+      ( err: Error ) => {
+        this.spinnerService.hide();
+        console.error(err);
+      }
+    );
 
   }
 
   public onClose(): void {
-    this.dialogRef.close();
+    this.dialogRef.close( false);
   }
 
   // Getters
