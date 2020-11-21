@@ -5,16 +5,15 @@ import { RolesManagerEditComponent } from '../roles-manager-edit/roles-manager-e
 
 // TODO: Borrar luego de aplicar servicio
 const MOCKUP_DATA: any[] = [
-  {position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H'},
-  {position: 2, name: 'Helium', weight: 4.0026, symbol: 'He'},
-  {position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li'},
-  {position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be'},
-  {position: 5, name: 'Boron', weight: 10.811, symbol: 'B'},
-  {position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C'},
-  {position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N'},
-  {position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O'},
-  {position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F'},
-  {position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne'},
+  {id: '1', name: 'permiso 1', permisos: ['permiso 1']},
+  {id: '2', name: 'permiso 2', permisos: ['permiso 2']},
+  {id: '3', name: 'permiso 3', permisos: ['permiso 3']},
+  {id: '4', name: 'permiso 4', permisos: ['permiso 4']},
+  {id: '5', name: 'permiso 5', permisos: ['permiso 5']},
+  {id: '6', name: 'permiso 6', permisos: ['permiso 6']},
+  {id: '7', name: 'permiso 7', permisos: ['permiso 7']},
+  {id: '8', name: 'permiso 8', permisos: ['permiso 8']},
+  {id: '9', name: 'permiso 9', permisos: ['permiso 9']},
 ];
 
 @Component({
@@ -30,6 +29,7 @@ export class RolesManagerListComponent implements OnInit {
 
   // Información tablas
   tableRoleData: any[] = MOCKUP_DATA;
+  displayedColumns: string[] = ['id', 'name', 'permisos'];
 
   constructor(
     private dialog: MatDialog,
