@@ -159,7 +159,7 @@ VALUES
       { "id": "subscribe", "name": "Subscribirse" },
       { "id": "get_notifications", "name": "Obtener notificaciones" },
       { "id": "generate_report", "name": "Generar reports" },
-      { "id": "change_business_rules", "name": "Editar reglas de negocio" },
+      { "id": "change_business_rules", "name": "Editar reglas de negocio" }
     ]',
     FALSE,
     NOW()
@@ -189,7 +189,7 @@ VALUES
       { "id": "get_any_donation", "name": "Obtener cualquier donación" },
       { "id": "get_any_subscription", "name": "Obtener cualquier suscripción" },
       { "id": "get_notifications", "name": "Obtener notificaciones" },
-      { "id": "generate_report", "name": "Generar reports" },
+      { "id": "generate_report", "name": "Generar reports" }
     ]',
     FALSE,
     NOW()
@@ -237,7 +237,7 @@ VALUES
       { "id": "get_own_donation", "name": "Obtener donación propia" },
       { "id": "get_own_subscription", "name": "Obtener suscripción propia" },
       { "id": "subscribe", "name": "Subscribirse" },
-      { "id": "get_notifications", "name": "Obtener notificaciones" },
+      { "id": "get_notifications", "name": "Obtener notificaciones" }
     ]',
     TRUE,
     NOW()
