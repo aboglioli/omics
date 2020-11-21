@@ -36,7 +36,7 @@ export interface IUpdateCommand {
 export class RoleService {
   private baseUrl: string;
 
-  constructor(private http: HttpClient, private configServ: ConfigService) {
+  constructor(private http: HttpClient, configServ: ConfigService) {
     this.baseUrl = `${configServ.baseUrl()}/roles`;
   }
 
@@ -45,7 +45,7 @@ export class RoleService {
   }
 
   public getPermissions(): Observable<IGetPermissionsResponse> {
-    return this.http.get<IGetPermissionsResponse>(`${this.configServ.baseUrl()}/permissions`);
+    return this.http.get<IGetPermissionsResponse>(`${this.baseUrl}/permissions`);
   }
 
   public getById(id: string): Observable<IRole> {

@@ -124,7 +124,7 @@ async fn make_default(
         .map_err(PublicError::from)
 }
 
-#[get("/")]
+#[get("/permissions")]
 async fn get_permissions(req: HttpRequest, c: web::Data<MainContainer>) -> impl Responder {
     let user_id_and_role = auth(&req, &c).await?;
 
@@ -138,13 +138,13 @@ async fn get_permissions(req: HttpRequest, c: web::Data<MainContainer>) -> impl 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/roles")
+            .service(get_permissions)
             .service(get_all)
             .service(get_by_id)
             .service(get_users)
             .service(create)
             .service(update)
             .service(delete)
-            .service(make_default),
-    )
-    .service(web::scope("/permissions").service(get_permissions));
+            .service(make_default)
+    );
 }
