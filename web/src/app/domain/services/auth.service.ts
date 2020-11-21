@@ -2,6 +2,7 @@ import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/c
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { Router } from '@angular/router';
+import { IUser } from '../models/user';
 
 @Injectable()
 export class AuthService {
@@ -10,6 +11,9 @@ export class AuthService {
 
   public accessUser = new Subject<boolean>();
   public accessUser$ = this.accessUser.asObservable();
+
+  public user = new Subject<IUser>();
+  public user$ = this.user.asObservable();
 
   constructor(
     private router: Router,
@@ -28,6 +32,12 @@ export class AuthService {
 
   }
 
+  public updateUserData( newValue: IUser ): void {
+
+    this.user.next( newValue );
+
+  }
+
   public setToken(authToken: string, idUser: string): void {
 
     this.authToken = authToken;
@@ -43,6 +53,8 @@ export class AuthService {
     return localStorage.getItem('id_user');
 
   }
+
+
 
   public logout(): void {
 
