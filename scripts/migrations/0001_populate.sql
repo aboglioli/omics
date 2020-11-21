@@ -98,7 +98,7 @@ VALUES
   -- Configuration
   ('change_business_rules', 'Editar reglas de negocio');
 
-INSERT INTO roles(id, name, permissions, created_at)
+INSERT INTO roles(id, name, permissions, "default", created_at)
 VALUES
   (
     'admin',
@@ -175,6 +175,7 @@ VALUES
       { "id": "generate_report", "name": "Generar reports" },
       { "id": "change_business_rules", "name": "Editar reglas de negocio" }
     ]',
+    FALSE,
     NOW()
   ),
   (
@@ -252,6 +253,7 @@ VALUES
       { "id": "generate_report", "name": "Generar reports" },
       { "id": "change_business_rules", "name": "Editar reglas de negocio" }
     ]',
+    FALSE,
     NOW()
   ),
   (
@@ -329,6 +331,7 @@ VALUES
       { "id": "generate_report", "name": "Generar reports" },
       { "id": "change_business_rules", "name": "Editar reglas de negocio" }
     ]',
+    TRUE,
     NOW()
   );
 

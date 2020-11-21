@@ -50,12 +50,6 @@ impl<'a> Search<'a> {
         include: Include,
         pagination: PaginationParams,
     ) -> Result<PaginationResponse<PublicationDto>> {
-        if let Some((_, auth_role)) = &user_id_and_role {
-            if !auth_role.can("get_any_publication") {
-                return Err(Error::unauthorized());
-            }
-        }
-
         let is_reader_author =
             if let (Some((auth_id, _)), Some(author_id)) = (&user_id_and_role, &cmd.author_id) {
                 auth_id.value() == author_id

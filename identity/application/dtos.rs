@@ -84,6 +84,9 @@ pub struct RoleDto {
     pub id: String,
     pub name: String,
     pub permissions: Vec<PermissionDto>,
+    pub default: bool,
+    pub created_at: String,
+    pub updated_at: Option<String>,
 }
 
 impl From<&Role> for RoleDto {
@@ -92,6 +95,9 @@ impl From<&Role> for RoleDto {
             id: role.base().id().to_string(),
             name: role.name().to_string(),
             permissions: role.permissions().iter().map(PermissionDto::from).collect(),
+            default: role.is_default(),
+            created_at: role.base().created_at().to_rfc3339(),
+            updated_at: role.base().updated_at().map(|d| d.to_rfc3339()),
         }
     }
 }
