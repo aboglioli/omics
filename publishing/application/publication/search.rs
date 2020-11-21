@@ -64,7 +64,7 @@ impl<'a> Search<'a> {
             };
 
         let is_content_manager = if let Some((_, auth_role)) = &user_id_and_role {
-            auth_role.can("approve_reject_publication")
+            auth_role.can("get_any_publication") || auth_role.can("approve_reject_publication")
         } else {
             false
         };

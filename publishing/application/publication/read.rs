@@ -53,7 +53,7 @@ impl<'a> Read<'a> {
 
         let reader = self.reader_repo.find_by_id(&auth_id).await?;
 
-        if publication.author_id() != &auth_id && !auth_role.can("approve_publication") {
+        if publication.author_id() != &auth_id && !auth_role.can("approve_reject_publication") {
             let mut reading = publication.read(&reader)?;
 
             self.interaction_repo.save_reading(&mut reading).await?;

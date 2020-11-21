@@ -33,6 +33,13 @@ pub struct GetById<'a> {
     statistics_serv: &'a StatisticsService,
 }
 
+enum Viewer {
+    ContentManager,
+    Owner,
+    Reader,
+    Public,
+}
+
 impl<'a> GetById<'a> {
     #[allow(clippy::too_many_arguments)]
     pub fn new(
@@ -64,31 +71,28 @@ impl<'a> GetById<'a> {
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        if let Some((auth_id, auth_role)) = &user_id_and_role {
-            if !auth_role.can("get_any_publication") {
-                if publication.author_id() != auth_id
-                    && !publication.is_published()
-                    && !auth_role.can("get_unpublished_publications")
-                {
-                    return Err(Error::unauthorized());
-                }
-
-                if publication.author_id() == auth_id && !auth_role.can("get_own_publication") {
-                    return Err(Error::unauthorized());
-                }
-            }
-        }
-
-        let (mut publication_dto, reader_interaction_dto) = if let Some((auth_id, auth_role)) =
-            user_id_and_role
-        {
-            let is_reader_author = publication.author_id() == &auth_id;
-
-            if is_reader_author && auth_role.can("get_own_publication") {
-                (PublicationDto::from(&publication).pages(&publication), None)
-            } else if auth_role.can("approve_publication") {
-                (PublicationDto::from(&publication), None)
+        let viewer = if let Some((auth_id, auth_role)) = &user_id_and_role {
+            if publication.author_id() == auth_id && auth_role.can("get_own_publication") {
+                Viewer::Owner
+            } else if auth_role.can("get_any_publication")
+                || auth_role.can("approve_reject_publication")
+            {
+                Viewer::ContentManager
+            } else if publication.is_published() {
+                Viewer::Reader
             } else {
+                return Err(Error::new("publication", "not_published"));
+            }
+        } else {
+            Viewer::Public
+        };
+
+        let (mut publication_dto, reader_interaction_dto) = match viewer {
+            Viewer::ContentManager | Viewer::Owner => {
+                (PublicationDto::from(&publication).pages(&publication), None)
+            }
+            Viewer::Reader => {
+                let (auth_id, _auth_role) = user_id_and_role.unwrap();
                 let reader = self.reader_repo.find_by_id(&auth_id).await?;
 
                 let mut view = publication.view(
@@ -140,12 +144,7 @@ impl<'a> GetById<'a> {
                     Some(reader_interaction_dto),
                 )
             }
-        } else {
-            if !publication.is_published() {
-                return Err(Error::new("publication", "not_published"));
-            }
-
-            (PublicationDto::from(&publication), None)
+            Viewer::Public => (PublicationDto::from(&publication), None),
         };
 
         if include.has("author") {
