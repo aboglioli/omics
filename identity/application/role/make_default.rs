@@ -27,7 +27,7 @@ impl<'a> MakeDefault<'a> {
         let mut default_role = self.role_repo.find_default().await?;
 
         if role.base().id() == default_role.base().id() {
-            return Err(Error::new("role", "already_default"));
+            return Ok(CommandResponse::default());
         }
 
         role.set_default(true)?;
