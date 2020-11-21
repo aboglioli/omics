@@ -63,7 +63,7 @@ async fn get_users(
         .map_err(PublicError::from)
 }
 
-#[post("/")]
+#[post("")]
 async fn create(
     req: HttpRequest,
     cmd: web::Json<CreateCommand>,
