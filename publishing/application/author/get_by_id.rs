@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-use common::error::Error;
+
 use common::result::Result;
 use identity::UserIdAndRole;
 
@@ -36,15 +36,6 @@ impl<'a> GetById<'a> {
         author_id: String,
     ) -> Result<GetByIdResponse> {
         let author_id = AuthorId::new(author_id)?;
-
-        if let Some((auth_id, auth_role)) = &user_id_and_role {
-            if !auth_role.can("get_any_author") {
-                if auth_id != &author_id || !auth_role.can("get_own_author") {
-                    return Err(Error::unauthorized());
-                }
-            }
-        }
-
         let author = self.author_repo.find_by_id(&author_id).await?;
 
         let reader_interaction_dto = if let Some((auth_id, _)) = user_id_and_role {

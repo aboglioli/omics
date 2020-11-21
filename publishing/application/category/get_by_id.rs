@@ -1,4 +1,4 @@
-use common::error::Error;
+
 use common::result::Result;
 use identity::UserIdAndRole;
 
@@ -16,15 +16,9 @@ impl<'a> GetById<'a> {
 
     pub async fn exec(
         &self,
-        user_id_and_role: Option<UserIdAndRole>,
+        _user_id_and_role: Option<UserIdAndRole>,
         category_id: String,
     ) -> Result<CategoryDto> {
-        if let Some((_auth_id, auth_role)) = user_id_and_role {
-            if !auth_role.can("get_categories") {
-                return Err(Error::unauthorized());
-            }
-        }
-
         let category_id = CategoryId::new(category_id)?;
         let category = self.category_repo.find_by_id(&category_id).await?;
 

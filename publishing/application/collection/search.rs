@@ -46,17 +46,11 @@ impl<'a> Search<'a> {
 
     pub async fn exec(
         &self,
-        user_id_and_role: Option<UserIdAndRole>,
+        _user_id_and_role: Option<UserIdAndRole>,
         cmd: SearchCommand,
         include: Include,
         pagination: PaginationParams,
     ) -> Result<PaginationResponse<CollectionDto>> {
-        if let Some((_auth_id, auth_role)) = user_id_and_role {
-            if !auth_role.can("get_any_collection") {
-                return Err(Error::unauthorized());
-            }
-        }
-
         let pagination_collections = self
             .collection_repo
             .search(

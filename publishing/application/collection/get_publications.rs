@@ -55,7 +55,7 @@ impl<'a> GetPublications<'a> {
                 return Err(Error::unauthorized());
             }
 
-            collection.author_id() == &auth_id || auth_role.can("get_unpublished_publications")
+            collection.author_id() == &auth_id || auth_role.can("get_any_publication")
         } else {
             false
         };

@@ -72,7 +72,7 @@ impl<'a> GetById<'a> {
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
         let viewer = if let Some((auth_id, auth_role)) = &user_id_and_role {
-            if publication.author_id() == auth_id && auth_role.can("get_own_publication") {
+            if publication.author_id() == auth_id {
                 Viewer::Owner
             } else if auth_role.can("get_any_publication")
                 || auth_role.can("approve_reject_publication")

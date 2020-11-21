@@ -36,20 +36,15 @@ VALUES
   ('validate_user_account', 'Validar cuenta de usuario'),
   -- Authors
   ('follow_unfollow_author', 'Seguir/Dejar de seguir autor'),
-  ('get_any_author', 'Obtener cualquier autor'),
-  ('get_own_author', 'Obtener autor propio'),
   -- Categories
   ('create_category', 'Crear categoría'),
   ('delete_category', 'Eliminar categoría'),
-  ('get_categories', 'Obtener categorías'),
   ('update_category', 'Editar categoría'),
   -- Collections
   ('add_remove_collection_from_favorites', 'Agregar/Quitar colección de favoritos'),
   ('add_remove_publication_from_collection', 'Agregar/Quitar publicación de colección'),
   ('create_collection', 'Crear colección'),
   ('delete_collection', 'Eliminar colección'),
-  ('get_any_collection', 'Obtener cualquier colección'),
-  ('get_own_collection', 'Obtener colección propia'),
   ('get_publications_from_collection', 'Obtener publicaciones de una colección'),
   ('update_collection', 'Editar colección'),
   -- Publications
@@ -58,9 +53,7 @@ VALUES
   ('create_publication', 'Crear publicación'),
   ('delete_publication', 'Eliminar publicación'),
   ('get_any_publication', 'Obtener cualquier publicación'),
-  ('get_own_publication', 'Obtener publicación propia'),
   ('get_publication_reviews', 'Obtener calificaciones de publicación'),
-  ('get_unpublished_publications', 'Obtener publicaciones no publicadas'),
   ('like_unlike_publication', 'Like/Dislike publicación'),
   ('publish_publication', 'Publicar publicación'),
   ('read_publication', 'Leer publicación'),

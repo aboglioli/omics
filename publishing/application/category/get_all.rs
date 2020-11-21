@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-use common::error::Error;
+
 use common::result::Result;
 use identity::UserIdAndRole;
 
@@ -21,13 +21,7 @@ impl<'a> GetAll<'a> {
         GetAll { category_repo }
     }
 
-    pub async fn exec(&self, user_id_and_role: Option<UserIdAndRole>) -> Result<GetAllResponse> {
-        if let Some((_auth_id, auth_role)) = user_id_and_role {
-            if !auth_role.can("get_categories") {
-                return Err(Error::unauthorized());
-            }
-        }
-
+    pub async fn exec(&self, _user_id_and_role: Option<UserIdAndRole>) -> Result<GetAllResponse> {
         let categories = self.category_repo.find_all().await?;
         Ok(GetAllResponse {
             categories: categories.iter().map(CategoryDto::from).collect(),

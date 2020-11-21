@@ -19,6 +19,7 @@ export interface IGetByIdResponse {
 
 export interface ISearchCommand {
   name?: string;
+  publications_gt?: number;
   date_from?: string;
   date_to?: string;
   offset?: number;
@@ -53,6 +54,10 @@ export class AuthorService {
 
     if (cmd.name) {
       params = params.append('name', cmd.name);
+    }
+
+    if (cmd.publications_gt) {
+      params = params.append('publications_gt', cmd.publications_gt.toString());
     }
 
     if (cmd.date_from) {

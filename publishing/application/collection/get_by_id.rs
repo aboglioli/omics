@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-use common::error::Error;
+
 use common::request::Include;
 use common::result::Result;
 use identity::UserIdAndRole;
@@ -42,7 +42,7 @@ impl<'a> GetById<'a> {
 
     pub async fn exec(
         &self,
-        user_id_and_role: Option<UserIdAndRole>,
+        _user_id_and_role: Option<UserIdAndRole>,
         collection_id: String,
         include: Include,
     ) -> Result<CollectionDto> {
@@ -50,14 +50,6 @@ impl<'a> GetById<'a> {
             .collection_repo
             .find_by_id(&CollectionId::new(collection_id)?)
             .await?;
-
-        if let Some((auth_id, auth_role)) = user_id_and_role {
-            if !auth_role.can("get_any_collection") {
-                if collection.author_id() != &auth_id || !auth_role.can("get_own_collection") {
-                    return Err(Error::unauthorized());
-                }
-            }
-        }
 
         let mut collection_dto = CollectionDto::from(&collection);
 

@@ -14,6 +14,7 @@ use crate::domain::author::{AuthorOrderBy, AuthorRepository};
 #[derive(Deserialize)]
 pub struct SearchCommand {
     pub name: Option<String>,
+    pub publications_gt: Option<u32>,
     pub date_from: Option<String>,
     pub date_to: Option<String>,
 }
@@ -28,16 +29,10 @@ impl<'a> Search<'a> {
 
     pub async fn exec(
         &self,
-        user_id_and_role: Option<UserIdAndRole>,
+        _user_id_and_role: Option<UserIdAndRole>,
         cmd: SearchCommand,
         pagination: PaginationParams,
     ) -> Result<PaginationResponse<AuthorDto>> {
-        if let Some((_auth_id, auth_role)) = &user_id_and_role {
-            if !auth_role.can("get_any_author") {
-                return Err(Error::unauthorized());
-            }
-        }
-
         let pagination_authors = self
             .author_repo
             .search(
@@ -70,10 +65,17 @@ impl<'a> Search<'a> {
         );
 
         for author in pagination_authors.into_items().into_iter() {
+            // TODO: change this
             if author.username().starts_with("admin")
                 || author.username().starts_with("content-manager")
             {
                 continue;
+            }
+
+            if let Some(publications_gt) = cmd.publications_gt {
+                if author.publications() < publications_gt {
+                    continue;
+                }
             }
 
             res.add_item(AuthorDto::from(&author));

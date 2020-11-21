@@ -35,7 +35,7 @@ impl<'a> GetStatistics<'a> {
 
     pub async fn exec(
         &self,
-        (auth_id, auth_role): UserIdAndRole,
+        (_auth_id, auth_role): UserIdAndRole,
         publication_id: String,
         cmd: GetStatisticsCommand,
     ) -> Result<StatisticsDto> {
@@ -44,10 +44,8 @@ impl<'a> GetStatistics<'a> {
             .find_by_id(&PublicationId::new(publication_id)?)
             .await?;
 
-        if !auth_role.can("get_any_publication") {
-            if publication.author_id() != &auth_id || !auth_role.can("get_own_publication") {
-                return Err(Error::unauthorized());
-            }
+        if !publication.is_published() && !auth_role.can("get_any_publication") {
+            return Err(Error::unauthorized());
         }
 
         let statistics = self
