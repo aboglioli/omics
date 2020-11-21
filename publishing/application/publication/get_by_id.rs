@@ -66,7 +66,10 @@ impl<'a> GetById<'a> {
 
         if let Some((auth_id, auth_role)) = &user_id_and_role {
             if !auth_role.can("get_any_publication") {
-                if publication.author_id() != auth_id && !publication.is_published() && !auth_role.can("get_unpublished_publications") {
+                if publication.author_id() != auth_id
+                    && !publication.is_published()
+                    && !auth_role.can("get_unpublished_publications")
+                {
                     return Err(Error::unauthorized());
                 }
 

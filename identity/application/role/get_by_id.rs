@@ -16,7 +16,7 @@ impl<'a> GetById<'a> {
     }
 
     pub async fn exec(&self, (_auth_id, auth_role): UserIdAndRole, id: String) -> Result<RoleDto> {
-        if !auth_role.can("get_all_roles") {
+        if !auth_role.can("get_any_role") {
             if auth_role.base().id().value() != id || !auth_role.can("get_own_role") {
                 return Err(Error::unauthorized());
             }

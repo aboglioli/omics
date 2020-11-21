@@ -22,7 +22,7 @@ impl<'a> GetAll<'a> {
     }
 
     pub async fn exec(&self, (_auth_id, auth_role): UserIdAndRole) -> Result<GetAllResponse> {
-        if !auth_role.can("get_all_roles") {
+        if !auth_role.can("get_any_role") {
             return Err(Error::unauthorized());
         }
 

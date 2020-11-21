@@ -39,7 +39,9 @@ impl<'a> GetById<'a> {
             .find_by_id(&DonationId::new(donation_id)?)
             .await?;
         if !auth_role.can("get_any_donation") {
-            if (&auth_id != donation.author_id() && &auth_id != donation.reader_id()) || !auth_role.can("get_own_donation"){
+            if (&auth_id != donation.author_id() && &auth_id != donation.reader_id())
+                || !auth_role.can("get_own_donation")
+            {
                 return Err(Error::unauthorized());
             }
         }
