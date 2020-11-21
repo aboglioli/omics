@@ -4,7 +4,7 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
 
 use crate::domain::interaction::Comment;
 use crate::domain::publication::{PublicationId, PublicationRepository};
@@ -18,32 +18,26 @@ pub struct Reject<'a> {
     event_pub: &'a dyn EventPublisher,
 
     publication_repo: &'a dyn PublicationRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Reject<'a> {
     pub fn new(
         event_pub: &'a dyn EventPublisher,
         publication_repo: &'a dyn PublicationRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         Reject {
             event_pub,
             publication_repo,
-            user_repo,
         }
     }
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (auth_id, auth_role): UserIdAndRole,
         publication_id: String,
         cmd: RejectCommand,
     ) -> Result<CommandResponse> {
-        let user_id = UserId::new(auth_id)?;
-        let user = self.user_repo.find_by_id(&user_id).await?;
-
-        if !user.is_content_manager() {
+        if !auth_role.can("reject_publication") {
             return Err(Error::unauthorized());
         }
 
@@ -52,7 +46,7 @@ impl<'a> Reject<'a> {
 
         let comment = Comment::new(cmd.comment)?;
 
-        publication.reject(user_id, comment)?;
+        publication.reject(auth_id, comment)?;
 
         self.publication_repo.save(&mut publication).await?;
 
@@ -76,9 +70,9 @@ mod tests {
     #[tokio::test]
     async fn reject() {
         let c = mocks::container();
-        let uc = Reject::new(c.event_pub(), c.publication_repo(), c.user_repo());
+        let uc = Reject::new(c.event_pub(), c.publication_repo());
 
-        let mut user = identity_mocks::user(
+        let user = identity_mocks::user(
             "#content-manager01",
             "content-manager-1",
             "content-manager@omics.com",
@@ -88,7 +82,6 @@ mod tests {
             None,
             "content-manager",
         );
-        c.user_repo().save(&mut user).await.unwrap();
 
         let mut publication = mocks::publication(
             "#publication01",
@@ -103,9 +96,10 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         uc.exec(
-            user.base().id().to_string(),
+            (user.base().id().clone(), role),
             publication.base().id().to_string(),
             RejectCommand {
                 comment: "All is OK".to_owned(),

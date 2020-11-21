@@ -1,5 +1,8 @@
 # All
 
+## New
+- [ ] Add 'birthdate' in user register.
+
 ## Urgent
 - [x] Publication status should be an object in DTO to show comments.
 - [x] Get collections that a publication is in.

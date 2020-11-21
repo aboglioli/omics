@@ -70,6 +70,7 @@ impl User {
             id: user.base().id().to_string(),
             username: user.identity().username().to_string(),
             email: user.identity().email().to_string(),
+            role_id: user.role_id().to_string(),
             validation_code: user.validation().unwrap().code().to_string(),
         });
 
@@ -129,14 +130,6 @@ impl User {
 
     pub fn is_active(&self) -> bool {
         self.base.deleted_at().is_none() && self.is_validated()
-    }
-
-    pub fn is_admin(&self) -> bool {
-        self.role_id.value() == "admin"
-    }
-
-    pub fn is_content_manager(&self) -> bool {
-        self.role_id.value() == "admin" || self.role_id.value() == "content-manager"
     }
 
     pub fn set_password(&mut self, password: Password) -> Result<()> {

@@ -5,8 +5,9 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
 use identity::domain::user::UserRepository;
+use identity::UserIdAndRole;
 use publishing::domain::author::{AuthorId, AuthorRepository};
-use publishing::domain::reader::{ReaderId, ReaderRepository};
+use publishing::domain::reader::ReaderRepository;
 
 use crate::domain::donation::{Donation, DonationRepository};
 use crate::domain::payment::{Amount, PaymentService};
@@ -58,18 +59,21 @@ impl<'a> Donate<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (auth_id, auth_role): UserIdAndRole,
         author_id: String,
         cmd: DonateCommand,
     ) -> Result<DonateResponse> {
+        if !auth_role.can("donate") {
+            return Err(Error::unauthorized());
+        }
+
         let business_rules = self.config_serv.get_business_rules().await?;
         if cmd.amount < business_rules.minimum_donation_amount {
             return Err(Error::new("donation", "minimum_amount"));
         }
 
-        let reader_id = ReaderId::new(auth_id)?;
-        let reader = self.reader_repo.find_by_id(&reader_id).await?;
-        let reader_user = self.user_repo.find_by_id(&reader_id).await?;
+        let reader = self.reader_repo.find_by_id(&auth_id).await?;
+        let reader_user = self.user_repo.find_by_id(&auth_id).await?;
 
         let author_id = AuthorId::new(author_id)?;
         let author = self.author_repo.find_by_id(&author_id).await?;

@@ -6,6 +6,8 @@ use common::infrastructure::cache::InMemCache;
 use common::result::Result;
 
 use crate::domain::role::{Role, RoleId, RoleRepository};
+use crate::domain::user::UserId;
+use crate::mocks;
 
 pub struct InMemRoleRepository {
     cache: InMemCache<RoleId, Role>,
@@ -38,11 +40,23 @@ impl RoleRepository for InMemRoleRepository {
             .ok_or_else(|| Error::not_found("role"))
     }
 
+    async fn find_by_user_id(&self, _user_id: &UserId) -> Result<Role> {
+        Ok(mocks::role("User"))
+    }
+
+    async fn find_default(&self) -> Result<Role> {
+        Ok(mocks::role("User"))
+    }
+
     async fn save(&self, role: &mut Role) -> Result<()> {
         if role.base().deleted_at().is_none() {
             self.cache.set(role.base().id().clone(), role.clone()).await
         } else {
             self.cache.delete(role.base().id()).await
         }
+    }
+
+    async fn delete(&self, id: &RoleId) -> Result<()> {
+        self.cache.delete(id).await
     }
 }

@@ -2,7 +2,8 @@ use common::config::ConfigService;
 use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::domain::user::UserRepository;
+use identity::UserIdAndRole;
 use publishing::domain::publication::PublicationRepository;
 
 use crate::domain::contract::{ContractId, ContractRepository};
@@ -38,7 +39,11 @@ impl<'a> ChargeForContract<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, contract_id: String) -> Result<()> {
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        contract_id: String,
+    ) -> Result<()> {
         let mut contract = self
             .contract_repo
             .find_by_id(&ContractId::new(contract_id)?)
@@ -48,12 +53,11 @@ impl<'a> ChargeForContract<'a> {
             .find_by_id(contract.publication_id())
             .await?;
 
-        if publication.author_id().value() != auth_id {
+        if publication.author_id() != &auth_id || !auth_role.can("charge_for_contract") {
             return Err(Error::not_owner("contract"));
         }
 
-        let user_id = UserId::new(auth_id)?;
-        let user = self.user_repo.find_by_id(&user_id).await?;
+        let user = self.user_repo.find_by_id(&auth_id).await?;
         if user.payment_email().is_none() {
             return Err(Error::new("contract", "missing_payment_email"));
         }

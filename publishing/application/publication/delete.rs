@@ -2,6 +2,7 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
+use identity::UserIdAndRole;
 
 use crate::domain::publication::{PublicationId, PublicationRepository};
 
@@ -22,11 +23,19 @@ impl<'a> Delete<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<CommandResponse> {
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        publication_id: String,
+    ) -> Result<CommandResponse> {
+        if !auth_role.can("delete_pubication") {
+            return Err(Error::unauthorized());
+        }
+
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        if publication.author_id().value() != auth_id {
+        if publication.author_id() != &auth_id {
             return Err(Error::not_owner("publication"));
         }
 
@@ -48,6 +57,9 @@ impl<'a> Delete<'a> {
 mod tests {
     use super::*;
 
+    use identity::domain::user::UserId;
+    use identity::mocks as identity_mocks;
+
     use crate::mocks;
 
     #[tokio::test]
@@ -68,9 +80,13 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         assert!(uc
-            .exec("#user01".to_owned(), publication.base().id().to_string())
+            .exec(
+                (UserId::new("#user01").unwrap(), role),
+                publication.base().id().to_string()
+            )
             .await
             .is_ok());
 
@@ -99,14 +115,18 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         assert!(uc
-            .exec("#user01".to_owned(), "#invalid-publication".to_owned())
+            .exec(
+                (UserId::new("#user01").unwrap(), role.clone()),
+                "#invalid-publication".to_owned()
+            )
             .await
             .is_err());
         assert!(uc
             .exec(
-                "#invald-author".to_owned(),
+                (UserId::new("#invald-author").unwrap(), role),
                 publication.base().id().to_string()
             )
             .await

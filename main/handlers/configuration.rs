@@ -22,10 +22,10 @@ async fn update_business_rules(
     cmd: web::Json<BusinessRules>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
-    Update::new(c.identity.user_repo(), c.config_serv())
-        .exec(auth_id, cmd.into_inner())
+    Update::new(c.config_serv())
+        .exec(user_id_and_role, cmd.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)

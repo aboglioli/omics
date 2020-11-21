@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use common::container::Container;
 use common::event::EventPublisher;
 
-use crate::domain::role::RoleRepository;
+use crate::domain::role::{PermissionRepository, RoleRepository};
 use crate::domain::token::{TokenEncoder, TokenRepository, TokenService};
 use crate::domain::user::{
     AuthenticationService, AuthorizationService, PasswordHasher, UserRepository, UserService,
@@ -14,6 +14,7 @@ use crate::domain::user::{
 pub struct IdentityContainer<EPub> {
     event_pub: Arc<EPub>,
 
+    permission_repo: Arc<dyn PermissionRepository>,
     role_repo: Arc<dyn RoleRepository>,
     token_repo: Arc<dyn TokenRepository>,
     user_repo: Arc<dyn UserRepository>,
@@ -34,6 +35,7 @@ where
     pub fn new(
         event_pub: Arc<EPub>,
 
+        permission_repo: Arc<dyn PermissionRepository>,
         role_repo: Arc<dyn RoleRepository>,
         token_repo: Arc<dyn TokenRepository>,
         user_repo: Arc<dyn UserRepository>,
@@ -53,6 +55,7 @@ where
         IdentityContainer {
             event_pub,
 
+            permission_repo,
             role_repo,
             token_repo,
             user_repo,
@@ -69,6 +72,10 @@ where
 
     pub fn event_pub(&self) -> &EPub {
         &self.event_pub
+    }
+
+    pub fn permission_repo(&self) -> &dyn PermissionRepository {
+        self.permission_repo.as_ref()
     }
 
     pub fn role_repo(&self) -> &dyn RoleRepository {

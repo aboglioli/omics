@@ -1,6 +1,7 @@
 use common::error::Error;
 use common::result::Result;
 use identity::domain::user::UserId;
+use identity::UserIdAndRole;
 
 use crate::application::dtos::SubscriptionDto;
 use crate::domain::subscription::SubscriptionRepository;
@@ -14,8 +15,12 @@ impl<'a> GetByReader<'a> {
         GetByReader { subscription_repo }
     }
 
-    pub async fn exec(&self, auth_id: String, reader_id: String) -> Result<SubscriptionDto> {
-        if auth_id != reader_id {
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        reader_id: String,
+    ) -> Result<SubscriptionDto> {
+        if auth_id.value() != reader_id || !auth_role.can("get_own_subscription") {
             return Err(Error::unauthorized());
         }
 

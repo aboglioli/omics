@@ -1,11 +1,12 @@
 use serde::Serialize;
 
+use common::error::Error;
 use common::result::Result;
+use identity::UserIdAndRole;
 
 use crate::application::dtos::{AuthorDto, ReaderAuthorInteractionDto};
 use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::interaction::InteractionRepository;
-use crate::domain::reader::ReaderId;
 
 #[derive(Serialize)]
 pub struct GetByIdResponse {
@@ -31,18 +32,27 @@ impl<'a> GetById<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: Option<String>,
+        user_id_and_role: Option<UserIdAndRole>,
         author_id: String,
     ) -> Result<GetByIdResponse> {
         let author_id = AuthorId::new(author_id)?;
+
+        if let Some((auth_id, auth_role)) = &user_id_and_role {
+            if !auth_role.can("get_all_authors") {
+                if auth_id != &author_id || !auth_role.can("get_own_author") {
+                    return Err(Error::unauthorized());
+                }
+            }
+        }
+
         let author = self.author_repo.find_by_id(&author_id).await?;
 
-        let reader_interaction_dto = if let Some(auth_id) = auth_id {
-            if auth_id != author_id.value() {
+        let reader_interaction_dto = if let Some((auth_id, _)) = user_id_and_role {
+            if auth_id != author_id {
                 Some(ReaderAuthorInteractionDto::new(
                     !self
                         .interaction_repo
-                        .find_follows(Some(&ReaderId::new(auth_id)?), Some(&author_id), None, None)
+                        .find_follows(Some(&auth_id), Some(&author_id), None, None)
                         .await?
                         .is_empty(),
                 ))

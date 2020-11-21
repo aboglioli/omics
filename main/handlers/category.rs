@@ -17,10 +17,10 @@ use crate::error::PublicError;
 
 #[get("")]
 async fn get_all(req: HttpRequest, c: web::Data<MainContainer>) -> impl Responder {
-    let auth_id = auth(&req, &c).await.ok();
+    let user_id_and_role = auth(&req, &c).await.ok();
 
     GetAll::new(c.publishing.category_repo())
-        .exec(auth_id)
+        .exec(user_id_and_role)
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -32,10 +32,10 @@ async fn get_by_id(
     path: web::Path<String>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await.ok();
+    let user_id_and_role = auth(&req, &c).await.ok();
 
     GetById::new(c.publishing.category_repo())
-        .exec(auth_id, path.into_inner())
+        .exec(user_id_and_role, path.into_inner())
         .await
         .map(|res| HttpResponse::Ok().json(res))
         .map_err(PublicError::from)
@@ -49,7 +49,7 @@ async fn get_publications(
     include: web::Query<IncludeParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await.ok();
+    let user_id_and_role = auth(&req, &c).await.ok();
 
     let mut cmd = cmd.into_inner();
     cmd.category_id = Some(path.into_inner());
@@ -58,10 +58,9 @@ async fn get_publications(
         c.publishing.author_repo(),
         c.publishing.category_repo(),
         c.publishing.publication_repo(),
-        c.publishing.user_repo(),
     )
     .exec(
-        auth_id,
+        user_id_and_role,
         cmd,
         include.into_inner().into(),
         PaginationParams::default(),
@@ -79,7 +78,7 @@ async fn get_collections(
     include: web::Query<IncludeParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await.ok();
+    let user_id_and_role = auth(&req, &c).await.ok();
 
     let mut cmd = cmd.into_inner();
     cmd.category_id = Some(path.into_inner());
@@ -90,7 +89,7 @@ async fn get_collections(
         c.publishing.collection_repo(),
     )
     .exec(
-        auth_id,
+        user_id_and_role,
         cmd,
         include.into_inner().into(),
         PaginationParams::default(),
@@ -106,17 +105,13 @@ async fn create(
     cmd: web::Json<CreateCommand>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
-    Create::new(
-        c.publishing.event_pub(),
-        c.publishing.category_repo(),
-        c.publishing.user_repo(),
-    )
-    .exec(auth_id, cmd.into_inner())
-    .await
-    .map(|res| HttpResponse::Ok().json(res))
-    .map_err(PublicError::from)
+    Create::new(c.publishing.event_pub(), c.publishing.category_repo())
+        .exec(user_id_and_role, cmd.into_inner())
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
 }
 
 #[put("/{category_id}")]
@@ -126,17 +121,13 @@ async fn update(
     cmd: web::Json<UpdateCommand>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
-    Update::new(
-        c.publishing.event_pub(),
-        c.publishing.category_repo(),
-        c.publishing.user_repo(),
-    )
-    .exec(auth_id, path.into_inner(), cmd.into_inner())
-    .await
-    .map(|res| HttpResponse::Ok().json(res))
-    .map_err(PublicError::from)
+    Update::new(c.publishing.event_pub(), c.publishing.category_repo())
+        .exec(user_id_and_role, path.into_inner(), cmd.into_inner())
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
 }
 
 #[delete("/{category_id}")]
@@ -145,17 +136,13 @@ async fn delete(
     path: web::Path<String>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
-    Delete::new(
-        c.publishing.event_pub(),
-        c.publishing.category_repo(),
-        c.publishing.user_repo(),
-    )
-    .exec(auth_id, path.into_inner())
-    .await
-    .map(|res| HttpResponse::Ok().json(res))
-    .map_err(PublicError::from)
+    Delete::new(c.publishing.event_pub(), c.publishing.category_repo())
+        .exec(user_id_and_role, path.into_inner())
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
 }
 
 pub fn routes(cfg: &mut web::ServiceConfig) {

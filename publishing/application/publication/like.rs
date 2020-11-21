@@ -1,10 +1,12 @@
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
+use identity::UserIdAndRole;
 
 use crate::domain::interaction::InteractionRepository;
 use crate::domain::publication::{PublicationId, PublicationRepository};
-use crate::domain::reader::{ReaderId, ReaderRepository};
+use crate::domain::reader::ReaderRepository;
 
 pub struct Like<'a> {
     event_pub: &'a dyn EventPublisher,
@@ -29,12 +31,19 @@ impl<'a> Like<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<CommandResponse> {
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        publication_id: String,
+    ) -> Result<CommandResponse> {
+        if !auth_role.can("like_publication") {
+            return Err(Error::unauthorized());
+        }
+
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        let reader_id = ReaderId::new(auth_id)?;
-        let reader = self.reader_repo.find_by_id(&reader_id).await?;
+        let reader = self.reader_repo.find_by_id(&auth_id).await?;
 
         let mut like = publication.like(&reader)?;
 
@@ -52,6 +61,9 @@ impl<'a> Like<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    use identity::domain::user::UserId;
+    use identity::mocks as identity_mocks;
 
     use crate::mocks;
 
@@ -80,9 +92,10 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         uc.exec(
-            reader.base().id().to_string(),
+            (reader.base().id().clone(), role),
             publication.base().id().to_string(),
         )
         .await
@@ -122,10 +135,11 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         assert!(uc
             .exec(
-                reader.base().id().to_string(),
+                (reader.base().id().clone(), role),
                 publication.base().id().to_string()
             )
             .await
@@ -157,13 +171,20 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         assert!(uc
-            .exec(reader.base().id().to_string(), "#invalid".to_owned())
+            .exec(
+                (reader.base().id().clone(), role.clone()),
+                "#invalid".to_owned()
+            )
             .await
             .is_err());
         assert!(uc
-            .exec("#invalid".to_owned(), publication.base().id().to_string())
+            .exec(
+                (UserId::new("#invalid").unwrap(), role),
+                publication.base().id().to_string()
+            )
             .await
             .is_err());
     }

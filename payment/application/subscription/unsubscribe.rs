@@ -2,7 +2,8 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
-use identity::domain::user::UserId;
+
+use identity::UserIdAndRole;
 
 use crate::domain::subscription::{Status, SubscriptionRepository};
 
@@ -23,19 +24,14 @@ impl<'a> Unsubscribe<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String) -> Result<CommandResponse> {
+    pub async fn exec(&self, (auth_id, auth_role): UserIdAndRole) -> Result<CommandResponse> {
+        if !auth_role.can("unsubscribe") {
+            return Err(Error::unauthorized());
+        }
+
         let mut subscriptions = self
             .subscription_repo
-            .search(
-                Some(&UserId::new(auth_id)?),
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            )
+            .search(Some(&auth_id), None, None, None, None, None, None, None)
             .await?
             .into_items();
 

@@ -1,6 +1,8 @@
 use serde::Serialize;
 
+use common::error::Error;
 use common::result::Result;
+use identity::UserIdAndRole;
 
 use crate::application::dtos::{ReaderDto, ReviewDto};
 use crate::domain::interaction::InteractionRepository;
@@ -30,9 +32,15 @@ impl<'a> GetReviews<'a> {
 
     pub async fn exec(
         &self,
-        _auth_id: Option<String>,
+        user_id_and_role: Option<UserIdAndRole>,
         publication_id: String,
     ) -> Result<GetReviewsResponse> {
+        if let Some((_, auth_role)) = user_id_and_role {
+            if !auth_role.can("get_product_reviews") {
+                return Err(Error::unauthorized());
+            }
+        }
+
         let reviews = self
             .interaction_repo
             .find_reviews(None, Some(&PublicationId::new(publication_id)?), None, None)

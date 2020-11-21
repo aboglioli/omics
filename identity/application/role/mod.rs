@@ -1,4 +1,14 @@
+mod create;
+mod delete;
 mod get_all;
 mod get_by_id;
+mod get_permissions;
+mod make_default;
+mod update;
+pub use create::*;
+pub use delete::*;
 pub use get_all::*;
 pub use get_by_id::*;
+pub use get_permissions::*;
+pub use make_default::*;
+pub use update::*;

@@ -2,7 +2,8 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::domain::user::UserRepository;
+use identity::UserIdAndRole;
 
 use crate::domain::contract::{ContractId, ContractRepository};
 
@@ -26,12 +27,16 @@ impl<'a> Reject<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, contract_id: String) -> Result<CommandResponse> {
-        let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-
-        if !user.is_content_manager() {
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        contract_id: String,
+    ) -> Result<CommandResponse> {
+        if !auth_role.can("reject_contract") {
             return Err(Error::unauthorized());
         }
+
+        let user = self.user_repo.find_by_id(&auth_id).await?;
 
         let mut contract = self
             .contract_repo

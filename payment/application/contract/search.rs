@@ -6,7 +6,7 @@ use serde::Deserialize;
 use common::error::Error;
 use common::request::{Include, PaginationParams, PaginationResponse};
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
 use publishing::application::dtos::PublicationDto;
 use publishing::domain::publication::{PublicationId, PublicationRepository};
 
@@ -24,31 +24,27 @@ pub struct SearchCommand {
 pub struct Search<'a> {
     contract_repo: &'a dyn ContractRepository,
     publication_repo: &'a dyn PublicationRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Search<'a> {
     pub fn new(
         contract_repo: &'a dyn ContractRepository,
         publication_repo: &'a dyn PublicationRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         Search {
             contract_repo,
             publication_repo,
-            user_repo,
         }
     }
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (_auth_id, auth_role): UserIdAndRole,
         cmd: SearchCommand,
         include: Include,
         pagination: PaginationParams,
     ) -> Result<PaginationResponse<ContractDto>> {
-        let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-        if !user.is_content_manager() {
+        if !auth_role.can("search_contracts") {
             return Err(Error::unauthorized());
         }
 

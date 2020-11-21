@@ -1,10 +1,12 @@
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
+use identity::UserIdAndRole;
 
 use crate::domain::collection::{CollectionId, CollectionRepository};
 use crate::domain::interaction::InteractionRepository;
-use crate::domain::reader::{ReaderId, ReaderRepository};
+use crate::domain::reader::ReaderRepository;
 
 pub struct RemoveFromFavorites<'a> {
     event_pub: &'a dyn EventPublisher,
@@ -29,15 +31,22 @@ impl<'a> RemoveFromFavorites<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, collection_id: String) -> Result<CommandResponse> {
-        let reader_id = ReaderId::new(auth_id)?;
-        let mut reader = self.reader_repo.find_by_id(&reader_id).await?;
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        collection_id: String,
+    ) -> Result<CommandResponse> {
+        if !auth_role.can("remove_collection_from_favorites") {
+            return Err(Error::unauthorized());
+        }
+
+        let mut reader = self.reader_repo.find_by_id(&auth_id).await?;
 
         let collection_id = CollectionId::new(collection_id)?;
         let collection = self.collection_repo.find_by_id(&collection_id).await?;
 
         self.interaction_repo
-            .delete_collection_favorite(&reader_id, &collection_id)
+            .delete_collection_favorite(&auth_id, &collection_id)
             .await?;
 
         reader.remove_collection_from_favorites(&collection)?;

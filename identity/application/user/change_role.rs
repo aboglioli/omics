@@ -7,6 +7,7 @@ use common::result::Result;
 
 use crate::domain::role::{RoleId, RoleRepository};
 use crate::domain::user::{UserId, UserRepository};
+use crate::UserIdAndRole;
 
 #[derive(Deserialize)]
 pub struct ChangeRoleCommand {
@@ -35,13 +36,11 @@ impl<'a> ChangeRole<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (_auth_id, auth_role): UserIdAndRole,
         user_id: String,
         cmd: ChangeRoleCommand,
     ) -> Result<CommandResponse> {
-        let admin = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-
-        if !admin.is_admin() {
+        if !auth_role.can("change_user_role") {
             return Err(Error::unauthorized());
         }
 

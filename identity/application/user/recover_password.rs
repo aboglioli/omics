@@ -1,10 +1,12 @@
 use serde::Deserialize;
 use uuid::Uuid;
 
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 
+use crate::domain::role::RoleRepository;
 use crate::domain::user::{Email, Password, UserRepository, UserService};
 
 #[derive(Deserialize)]
@@ -15,6 +17,7 @@ pub struct RecoverPasswordCommand {
 pub struct RecoverPassword<'a> {
     event_pub: &'a dyn EventPublisher,
 
+    role_repo: &'a dyn RoleRepository,
     user_repo: &'a dyn UserRepository,
 
     user_serv: &'a UserService,
@@ -23,19 +26,26 @@ pub struct RecoverPassword<'a> {
 impl<'a> RecoverPassword<'a> {
     pub fn new(
         event_pub: &'a dyn EventPublisher,
+        role_repo: &'a dyn RoleRepository,
         user_repo: &'a dyn UserRepository,
         user_serv: &'a UserService,
     ) -> Self {
         RecoverPassword {
+            event_pub,
+            role_repo,
             user_repo,
             user_serv,
-            event_pub,
         }
     }
 
     pub async fn exec(&self, cmd: RecoverPasswordCommand) -> Result<CommandResponse> {
         let email = Email::new(cmd.email)?;
         let mut user = self.user_repo.find_by_email(&email).await?;
+
+        let role = self.role_repo.find_by_user_id(user.base().id()).await?;
+        if !role.can("recover_user_password") {
+            return Err(Error::unauthorized());
+        }
 
         let tmp_password = Uuid::new_v4().to_string();
         let hashed_password = self.user_serv.generate_password(&tmp_password)?;
@@ -60,7 +70,7 @@ mod tests {
     #[tokio::test]
     async fn non_existing_user() {
         let c = mocks::container();
-        let uc = RecoverPassword::new(c.event_pub(), c.user_repo(), c.user_serv());
+        let uc = RecoverPassword::new(c.event_pub(), c.role_repo(), c.user_repo(), c.user_serv());
 
         assert!(uc
             .exec(RecoverPasswordCommand {
@@ -73,7 +83,7 @@ mod tests {
     #[tokio::test]
     async fn password_recovery_code_generated() {
         let c = mocks::container();
-        let uc = RecoverPassword::new(c.event_pub(), c.user_repo(), c.user_serv());
+        let uc = RecoverPassword::new(c.event_pub(), c.role_repo(), c.user_repo(), c.user_serv());
 
         let mut user = mocks::user(
             "user-1",

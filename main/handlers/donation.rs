@@ -15,16 +15,15 @@ async fn search(
     pagination: web::Query<PaginationParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     Search::new(
         c.publishing.author_repo(),
         c.payment.donation_repo(),
         c.publishing.reader_repo(),
-        c.identity.user_repo(),
     )
     .exec(
-        auth_id,
+        user_id_and_role,
         cmd.into_inner(),
         include.into_inner().into(),
         pagination.into_inner(),
@@ -41,15 +40,18 @@ async fn get_by_id(
     include: web::Query<IncludeParams>,
     c: web::Data<MainContainer>,
 ) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     GetById::new(
         c.publishing.author_repo(),
         c.payment.donation_repo(),
         c.publishing.reader_repo(),
-        c.identity.user_repo(),
     )
-    .exec(auth_id, path.into_inner(), include.into_inner().into())
+    .exec(
+        user_id_and_role,
+        path.into_inner(),
+        include.into_inner().into(),
+    )
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)
@@ -57,7 +59,7 @@ async fn get_by_id(
 
 #[post("/charge")]
 async fn charge(req: HttpRequest, c: web::Data<MainContainer>) -> impl Responder {
-    let auth_id = auth(&req, &c).await?;
+    let user_id_and_role = auth(&req, &c).await?;
 
     Charge::new(
         c.payment.event_pub(),
@@ -65,7 +67,7 @@ async fn charge(req: HttpRequest, c: web::Data<MainContainer>) -> impl Responder
         c.identity.user_repo(),
         c.payment.payment_serv(),
     )
-    .exec(auth_id)
+    .exec(user_id_and_role)
     .await
     .map(|res| HttpResponse::Ok().json(res))
     .map_err(PublicError::from)

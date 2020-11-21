@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
 
 use crate::domain::contract::{ContractRepository, ContractService};
 
@@ -25,7 +25,6 @@ pub struct GenerateSummaries<'a> {
     event_pub: &'a dyn EventPublisher,
 
     contract_repo: &'a dyn ContractRepository,
-    user_repo: &'a dyn UserRepository,
 
     contract_serv: &'a ContractService,
 }
@@ -34,24 +33,21 @@ impl<'a> GenerateSummaries<'a> {
     pub fn new(
         event_pub: &'a dyn EventPublisher,
         contract_repo: &'a dyn ContractRepository,
-        user_repo: &'a dyn UserRepository,
         contract_serv: &'a ContractService,
     ) -> Self {
         GenerateSummaries {
             event_pub,
             contract_repo,
-            user_repo,
             contract_serv,
         }
     }
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (_auth_id, auth_role): UserIdAndRole,
         cmd: GenerateSummariesCommand,
     ) -> Result<GenerateSummariesResponse> {
-        let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-        if !user.is_content_manager() {
+        if !auth_role.can("generate_all_contract_summaries") {
             return Err(Error::unauthorized());
         }
 

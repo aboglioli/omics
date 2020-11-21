@@ -4,7 +4,7 @@ use common::mocks::FakeEventPublisher;
 
 use crate::container::IdentityContainer;
 use crate::infrastructure::persistence::inmem::{
-    InMemRoleRepository, InMemTokenRepository, InMemUserRepository,
+    InMemPermissionRepository, InMemRoleRepository, InMemTokenRepository, InMemUserRepository,
 };
 
 use crate::mocks::{FakePasswordHasher, FakeTokenEncoder};
@@ -12,6 +12,7 @@ use crate::mocks::{FakePasswordHasher, FakeTokenEncoder};
 pub fn container() -> IdentityContainer<FakeEventPublisher> {
     IdentityContainer::new(
         Arc::new(FakeEventPublisher::new()),
+        Arc::new(InMemPermissionRepository::new()),
         Arc::new(InMemRoleRepository::new()),
         Arc::new(InMemTokenRepository::new()),
         Arc::new(InMemUserRepository::new()),

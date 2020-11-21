@@ -1129,6 +1129,7 @@ dependencies = [
  "serde",
  "serde_json",
  "shared",
+ "slug",
  "tokio",
  "tokio-postgres",
  "uuid",

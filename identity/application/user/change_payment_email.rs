@@ -6,6 +6,7 @@ use common::request::CommandResponse;
 use common::result::Result;
 
 use crate::domain::user::{Email, UserId, UserRepository};
+use crate::UserIdAndRole;
 
 #[derive(Deserialize)]
 pub struct ChangePaymentEmailCommand {
@@ -28,18 +29,20 @@ impl<'a> ChangePaymentEmail<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (auth_id, auth_role): UserIdAndRole,
         user_id: String,
         cmd: ChangePaymentEmailCommand,
     ) -> Result<CommandResponse> {
-        if auth_id != user_id {
-            let auth_user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-            if !auth_user.is_admin() {
-                return Err(Error::unauthorized());
-            }
+        if !auth_role.can("change_user_payment_email") {
+            return Err(Error::unauthorized());
         }
 
-        let mut user = self.user_repo.find_by_id(&UserId::new(user_id)?).await?;
+        let user_id = UserId::new(user_id)?;
+        if auth_id != user_id {
+            return Err(Error::unauthorized());
+        }
+
+        let mut user = self.user_repo.find_by_id(&user_id).await?;
 
         user.set_payment_email(Email::new(cmd.payment_email)?)?;
 

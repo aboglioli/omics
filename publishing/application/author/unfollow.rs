@@ -1,10 +1,12 @@
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
+use identity::UserIdAndRole;
 
 use crate::domain::author::{AuthorId, AuthorRepository};
 use crate::domain::interaction::InteractionRepository;
-use crate::domain::reader::{ReaderId, ReaderRepository};
+use crate::domain::reader::ReaderRepository;
 
 pub struct Unfollow<'a> {
     event_pub: &'a dyn EventPublisher,
@@ -29,11 +31,16 @@ impl<'a> Unfollow<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, author_id: String) -> Result<CommandResponse> {
-        let reader = self
-            .reader_repo
-            .find_by_id(&ReaderId::new(auth_id)?)
-            .await?;
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        author_id: String,
+    ) -> Result<CommandResponse> {
+        if !auth_role.can("unfollow_author") {
+            return Err(Error::unauthorized());
+        }
+
+        let reader = self.reader_repo.find_by_id(&auth_id).await?;
         let mut author = self
             .author_repo
             .find_by_id(&AuthorId::new(author_id)?)

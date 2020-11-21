@@ -1,13 +1,14 @@
 use serde::Serialize;
 
+use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
-use identity::domain::user::UserRepository;
+use identity::UserIdAndRole;
 
 use crate::application::dtos::PageDto;
 use crate::domain::interaction::InteractionRepository;
 use crate::domain::publication::{PublicationId, PublicationRepository};
-use crate::domain::reader::{ReaderId, ReaderRepository};
+use crate::domain::reader::ReaderRepository;
 
 #[derive(Serialize)]
 pub struct ReadResponse {
@@ -21,7 +22,6 @@ pub struct Read<'a> {
     interaction_repo: &'a dyn InteractionRepository,
     publication_repo: &'a dyn PublicationRepository,
     reader_repo: &'a dyn ReaderRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Read<'a> {
@@ -30,31 +30,30 @@ impl<'a> Read<'a> {
         interaction_repo: &'a dyn InteractionRepository,
         publication_repo: &'a dyn PublicationRepository,
         reader_repo: &'a dyn ReaderRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         Read {
             event_pub,
             interaction_repo,
             publication_repo,
             reader_repo,
-            user_repo,
         }
     }
 
-    pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<ReadResponse> {
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        publication_id: String,
+    ) -> Result<ReadResponse> {
+        if !auth_role.can("read_publication") {
+            return Err(Error::unauthorized());
+        }
+
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        let reader_id = ReaderId::new(auth_id)?;
-        let reader = self.reader_repo.find_by_id(&reader_id).await?;
+        let reader = self.reader_repo.find_by_id(&auth_id).await?;
 
-        let is_content_manager = if let Ok(user) = self.user_repo.find_by_id(&reader_id).await {
-            user.is_content_manager()
-        } else {
-            false
-        };
-
-        if publication.author_id() != &reader_id && !is_content_manager {
+        if publication.author_id() != &auth_id && !auth_role.can("approve_publication") {
             let mut reading = publication.read(&reader)?;
 
             self.interaction_repo.save_reading(&mut reading).await?;
@@ -76,6 +75,9 @@ impl<'a> Read<'a> {
 mod tests {
     use super::*;
 
+    use identity::domain::user::UserId;
+    use identity::mocks as identity_mocks;
+
     use crate::mocks;
 
     #[tokio::test]
@@ -86,7 +88,6 @@ mod tests {
             c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
-            c.user_repo(),
         );
 
         let mut reader = mocks::reader("#user02", "user-2");
@@ -104,9 +105,10 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         uc.exec(
-            reader.base().id().to_string(),
+            (reader.base().id().clone(), role),
             publication.base().id().to_string(),
         )
         .await
@@ -129,7 +131,6 @@ mod tests {
             c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
-            c.user_repo(),
         );
 
         let mut reader = mocks::reader("#user02", "user-2");
@@ -147,10 +148,11 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         assert!(uc
             .exec(
-                reader.base().id().to_string(),
+                (reader.base().id().clone(), role),
                 publication.base().id().to_string()
             )
             .await
@@ -165,7 +167,6 @@ mod tests {
             c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
-            c.user_repo(),
         );
 
         let mut reader = mocks::reader("#user01", "user-1");
@@ -183,13 +184,20 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         assert!(uc
-            .exec(reader.base().id().to_string(), "#invalid".to_owned())
+            .exec(
+                (reader.base().id().clone(), role.clone()),
+                "#invalid".to_owned()
+            )
             .await
             .is_err());
         assert!(uc
-            .exec("#invalid".to_owned(), publication.base().id().to_string())
+            .exec(
+                (UserId::new("#invalid").unwrap(), role),
+                publication.base().id().to_string()
+            )
             .await
             .is_err());
     }

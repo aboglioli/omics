@@ -4,8 +4,8 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
+use identity::UserIdAndRole;
 
-use crate::domain::author::AuthorId;
 use crate::domain::category::{CategoryId, CategoryRepository};
 use crate::domain::publication::{
     Header, Image, Name, Page, PublicationId, PublicationRepository, Synopsis, Tag,
@@ -48,14 +48,18 @@ impl<'a> Update<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (auth_id, auth_role): UserIdAndRole,
         publication_id: String,
         cmd: UpdateCommand,
     ) -> Result<CommandResponse> {
+        if !auth_role.can("update_publication") {
+            return Err(Error::unauthorized());
+        }
+
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        if publication.author_id().value() != auth_id {
+        if publication.author_id() != &auth_id {
             return Err(Error::not_owner("publication"));
         }
 
@@ -73,7 +77,6 @@ impl<'a> Update<'a> {
         self.category_repo.find_by_id(&category_id).await?;
 
         let header = Header::new(name, synopsis, category_id, tags, cover)?;
-        let _author_id = AuthorId::new(auth_id)?;
 
         publication.set_header(header)?;
 
@@ -109,6 +112,9 @@ impl<'a> Update<'a> {
 mod tests {
     use super::*;
 
+    use identity::domain::user::UserId;
+    use identity::mocks as identity_mocks;
+
     use crate::domain::publication::Status;
     use crate::mocks;
 
@@ -132,9 +138,10 @@ mod tests {
         c.publication_repo().save(&mut publication).await.unwrap();
         let mut category = mocks::category("Category 2");
         c.category_repo().save(&mut category).await.unwrap();
+        let role = identity_mocks::role("User");
 
         uc.exec(
-            "#user01".to_owned(),
+            (UserId::new("#user01").unwrap(), role),
             publication.base().id().to_string(),
             UpdateCommand {
                 name: "New name".to_owned(),
@@ -198,9 +205,10 @@ mod tests {
         c.publication_repo().save(&mut publication).await.unwrap();
         let mut category = mocks::category("Category 2");
         c.category_repo().save(&mut category).await.unwrap();
+        let role = identity_mocks::role("User");
 
         uc.exec(
-            "#user01".to_owned(),
+            (UserId::new("#user01").unwrap(), role),
             publication.base().id().to_string(),
             UpdateCommand {
                 name: "New name".to_owned(),
@@ -245,10 +253,11 @@ mod tests {
         c.publication_repo().save(&mut publication).await.unwrap();
         let mut category = mocks::category("Category 2");
         c.category_repo().save(&mut category).await.unwrap();
+        let role = identity_mocks::role("User");
 
         assert!(uc
             .exec(
-                "#user02".to_owned(),
+                (UserId::new("#user02").unwrap(), role),
                 publication.base().id().to_string(),
                 UpdateCommand {
                     name: "New name".to_owned(),
@@ -281,10 +290,11 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         assert!(uc
             .exec(
-                "#user01".to_owned(),
+                (UserId::new("#user01").unwrap(), role),
                 publication.base().id().to_string(),
                 UpdateCommand {
                     name: "New name".to_owned(),

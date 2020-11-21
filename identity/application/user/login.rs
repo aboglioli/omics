@@ -1,8 +1,10 @@
 use serde::{Deserialize, Serialize};
 
+use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
 
+use crate::domain::role::RoleRepository;
 use crate::domain::user::AuthenticationService;
 
 #[derive(Deserialize)]
@@ -20,16 +22,20 @@ pub struct LoginResponse {
 pub struct Login<'a> {
     event_pub: &'a dyn EventPublisher,
 
+    role_repo: &'a dyn RoleRepository,
+
     authentication_serv: &'a AuthenticationService,
 }
 
 impl<'a> Login<'a> {
     pub fn new(
         event_pub: &'a dyn EventPublisher,
+        role_repo: &'a dyn RoleRepository,
         authentication_serv: &'a AuthenticationService,
     ) -> Self {
         Login {
             event_pub,
+            role_repo,
             authentication_serv,
         }
     }
@@ -42,6 +48,11 @@ impl<'a> Login<'a> {
         {
             Ok((user, token)) => {
                 self.event_pub.publish_all(user.events().to_vec()?).await?;
+
+                let role = self.role_repo.find_by_user_id(user.base().id()).await?;
+                if !role.can("login") {
+                    return Err(Error::unauthorized());
+                }
 
                 Ok(LoginResponse {
                     user_id: user.base().id().to_string(),
@@ -62,7 +73,7 @@ mod tests {
     #[tokio::test]
     async fn not_validated_user() {
         let c = mocks::container();
-        let uc = Login::new(c.event_pub(), c.authentication_serv());
+        let uc = Login::new(c.event_pub(), c.role_repo(), c.authentication_serv());
 
         let mut user = mocks::user(
             "user-1",
@@ -88,7 +99,7 @@ mod tests {
     #[tokio::test]
     async fn validated_user() {
         let c = mocks::container();
-        let uc = Login::new(c.event_pub(), c.authentication_serv());
+        let uc = Login::new(c.event_pub(), c.role_repo(), c.authentication_serv());
 
         let mut user = mocks::user(
             "user-1",

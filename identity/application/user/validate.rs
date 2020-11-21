@@ -1,19 +1,27 @@
+use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
 
+use crate::domain::role::RoleRepository;
 use crate::domain::user::{UserId, UserRepository, Validation};
 
 pub struct Validate<'a> {
     event_pub: &'a dyn EventPublisher,
 
+    role_repo: &'a dyn RoleRepository,
     user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Validate<'a> {
-    pub fn new(event_pub: &'a dyn EventPublisher, user_repo: &'a dyn UserRepository) -> Self {
+    pub fn new(
+        event_pub: &'a dyn EventPublisher,
+        role_repo: &'a dyn RoleRepository,
+        user_repo: &'a dyn UserRepository,
+    ) -> Self {
         Validate {
             event_pub,
+            role_repo,
             user_repo,
         }
     }
@@ -21,6 +29,11 @@ impl<'a> Validate<'a> {
     pub async fn exec(&self, user_id: String, validation_code: String) -> Result<CommandResponse> {
         let user_id = UserId::new(user_id)?;
         let mut user = self.user_repo.find_by_id(&user_id).await?;
+
+        let role = self.role_repo.find_by_id(user.role_id()).await?;
+        if !role.can("validate_user_account") {
+            return Err(Error::unauthorized());
+        }
 
         let validation = Validation::from(validation_code);
         user.validate(&validation)?;
@@ -42,7 +55,7 @@ mod tests {
     #[tokio::test]
     async fn invalid_code() {
         let c = mocks::container();
-        let uc = Validate::new(c.event_pub(), c.user_repo());
+        let uc = Validate::new(c.event_pub(), c.role_repo(), c.user_repo());
 
         let mut user = mocks::user(
             "user-1",
@@ -65,7 +78,7 @@ mod tests {
     #[tokio::test]
     async fn valid_code() {
         let c = mocks::container();
-        let uc = Validate::new(c.event_pub(), c.user_repo());
+        let uc = Validate::new(c.event_pub(), c.role_repo(), c.user_repo());
 
         let mut user = mocks::user(
             "user-1",

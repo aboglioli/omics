@@ -1,6 +1,7 @@
 use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
+use identity::UserIdAndRole;
 use publishing::domain::publication::{PublicationId, PublicationRepository};
 
 use crate::application::dtos::ContractDto;
@@ -30,10 +31,15 @@ impl<'a> GenerateSummariesForPublication<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, publication_id: String) -> Result<ContractDto> {
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        publication_id: String,
+    ) -> Result<ContractDto> {
         let publication_id = PublicationId::new(publication_id)?;
         let publication = self.publication_repo.find_by_id(&publication_id).await?;
-        if publication.author_id().value() != auth_id {
+        if publication.author_id() != &auth_id || !auth_role.can("generate_summaries_for_contract")
+        {
             return Err(Error::not_owner("publication"));
         }
 

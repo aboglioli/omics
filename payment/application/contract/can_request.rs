@@ -2,9 +2,10 @@ use serde::Serialize;
 
 use common::error::Error;
 use common::result::Result;
+use identity::UserIdAndRole;
 use publishing::domain::publication::{PublicationId, PublicationRepository};
 
-use crate::domain::contract::{ContractRepository, ContractService};
+use crate::domain::contract::ContractService;
 
 #[derive(Serialize)]
 pub struct CanRequestResponse {
@@ -12,7 +13,6 @@ pub struct CanRequestResponse {
 }
 
 pub struct CanRequest<'a> {
-    contract_repo: &'a dyn ContractRepository,
     publication_repo: &'a dyn PublicationRepository,
 
     contract_serv: &'a ContractService,
@@ -20,12 +20,10 @@ pub struct CanRequest<'a> {
 
 impl<'a> CanRequest<'a> {
     pub fn new(
-        contract_repo: &'a dyn ContractRepository,
         publication_repo: &'a dyn PublicationRepository,
         contract_serv: &'a ContractService,
     ) -> Self {
         CanRequest {
-            contract_repo,
             publication_repo,
             contract_serv,
         }
@@ -33,12 +31,13 @@ impl<'a> CanRequest<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (auth_id, auth_role): UserIdAndRole,
         publication_id: String,
     ) -> Result<CanRequestResponse> {
         let publication_id = PublicationId::new(publication_id)?;
         let publication = self.publication_repo.find_by_id(&publication_id).await?;
-        if publication.author_id().value() != auth_id {
+
+        if publication.author_id() != &auth_id || !auth_role.can("request_contract") {
             return Err(Error::unauthorized());
         }
 

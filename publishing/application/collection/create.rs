@@ -1,9 +1,11 @@
 use serde::{Deserialize, Serialize};
 
+use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
+use identity::UserIdAndRole;
 
-use crate::domain::author::{AuthorId, AuthorRepository};
+use crate::domain::author::AuthorRepository;
 use crate::domain::category::{CategoryId, CategoryRepository};
 use crate::domain::collection::{Collection, CollectionRepository};
 use crate::domain::publication::{Header, Image, Name, Synopsis, Tag};
@@ -45,7 +47,15 @@ impl<'a> Create<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, cmd: CreateCommand) -> Result<CreateResponse> {
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        cmd: CreateCommand,
+    ) -> Result<CreateResponse> {
+        if !auth_role.can("create_collection") {
+            return Err(Error::unauthorized());
+        }
+
         let name = Name::new(cmd.name)?;
         let synopsis = Synopsis::new(cmd.synopsis)?;
 
@@ -61,11 +71,10 @@ impl<'a> Create<'a> {
 
         let header = Header::new(name, synopsis, category_id, tags, cover)?;
 
-        let author_id = AuthorId::new(auth_id)?;
-        self.author_repo.find_by_id(&author_id).await?;
+        self.author_repo.find_by_id(&auth_id).await?;
 
         let mut collection =
-            Collection::new(self.collection_repo.next_id().await?, author_id, header)?;
+            Collection::new(self.collection_repo.next_id().await?, auth_id, header)?;
 
         self.collection_repo.save(&mut collection).await?;
 

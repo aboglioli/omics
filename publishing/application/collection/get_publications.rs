@@ -1,8 +1,9 @@
 use serde::Serialize;
 
+use common::error::Error;
 use common::request::Include;
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
 
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};
 use crate::domain::author::AuthorRepository;
@@ -20,7 +21,6 @@ pub struct GetPublications<'a> {
     category_repo: &'a dyn CategoryRepository,
     collection_repo: &'a dyn CollectionRepository,
     publication_repo: &'a dyn PublicationRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> GetPublications<'a> {
@@ -29,20 +29,18 @@ impl<'a> GetPublications<'a> {
         category_repo: &'a dyn CategoryRepository,
         collection_repo: &'a dyn CollectionRepository,
         publication_repo: &'a dyn PublicationRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         GetPublications {
             author_repo,
             category_repo,
             collection_repo,
             publication_repo,
-            user_repo,
         }
     }
 
     pub async fn exec(
         &self,
-        auth_id: Option<String>,
+        user_id_and_role: Option<UserIdAndRole>,
         collection_id: String,
         include: Include,
     ) -> Result<GetPublicationsResponse> {
@@ -51,9 +49,14 @@ impl<'a> GetPublications<'a> {
             .find_by_id(&CollectionId::new(collection_id)?)
             .await?;
 
-        let can_view_unpublished_publications = if let Some(auth_id) = auth_id {
-            let user = self.user_repo.find_by_id(&UserId::new(&auth_id)?).await?;
-            collection.author_id().value() == auth_id || user.is_content_manager()
+        let can_view_unpublished_publications = if let Some((auth_id, auth_role)) = user_id_and_role
+        {
+            if !auth_role.can("get_publications_from_collection") {
+                return Err(Error::unauthorized());
+            }
+
+            collection.author_id() == &auth_id
+                || auth_role.can("get_unpublished_not_owned_publications")
         } else {
             false
         };

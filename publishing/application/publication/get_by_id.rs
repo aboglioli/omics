@@ -4,7 +4,7 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::Include;
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
 
 use crate::application::dtos::{
     AuthorDto, CategoryDto, PublicationDto, ReaderPublicationInteractionDto, ReviewDto,
@@ -13,7 +13,7 @@ use crate::domain::author::AuthorRepository;
 use crate::domain::category::CategoryRepository;
 use crate::domain::interaction::InteractionRepository;
 use crate::domain::publication::{PublicationId, PublicationRepository, StatisticsService};
-use crate::domain::reader::{ReaderId, ReaderRepository};
+use crate::domain::reader::ReaderRepository;
 
 #[derive(Serialize)]
 pub struct GetByIdResponse {
@@ -29,7 +29,6 @@ pub struct GetById<'a> {
     interaction_repo: &'a dyn InteractionRepository,
     publication_repo: &'a dyn PublicationRepository,
     reader_repo: &'a dyn ReaderRepository,
-    user_repo: &'a dyn UserRepository,
 
     statistics_serv: &'a StatisticsService,
 }
@@ -43,7 +42,6 @@ impl<'a> GetById<'a> {
         interaction_repo: &'a dyn InteractionRepository,
         publication_repo: &'a dyn PublicationRepository,
         reader_repo: &'a dyn ReaderRepository,
-        user_repo: &'a dyn UserRepository,
         statistics_serv: &'a StatisticsService,
     ) -> Self {
         GetById {
@@ -53,42 +51,47 @@ impl<'a> GetById<'a> {
             interaction_repo,
             publication_repo,
             reader_repo,
-            user_repo,
             statistics_serv,
         }
     }
 
     pub async fn exec(
         &self,
-        auth_id: Option<String>,
+        user_id_and_role: Option<UserIdAndRole>,
         publication_id: String,
         include: Include,
     ) -> Result<GetByIdResponse> {
         let publication_id = PublicationId::new(publication_id)?;
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
-        let is_content_manager = if let Some(auth_id) = &auth_id {
-            let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-            user.is_content_manager()
-        } else {
-            false
-        };
+        if let Some((auth_id, auth_role)) = &user_id_and_role {
+            if !auth_role.can("get_all_publications") {
+                if publication.author_id() != auth_id && !publication.is_published() {
+                    return Err(Error::unauthorized());
+                }
 
-        let (mut publication_dto, reader_interaction_dto) = if let Some(auth_id) = auth_id {
-            let is_reader_author = publication.author_id().value() == auth_id;
+                if publication.author_id() == auth_id && !auth_role.can("get_own_publication") {
+                    return Err(Error::unauthorized());
+                }
+            }
+        }
 
-            if is_reader_author {
+        let (mut publication_dto, reader_interaction_dto) = if let Some((auth_id, auth_role)) =
+            user_id_and_role
+        {
+            let is_reader_author = publication.author_id() == &auth_id;
+
+            if is_reader_author && auth_role.can("get_own_publication") {
                 (PublicationDto::from(&publication).pages(&publication), None)
-            } else if is_content_manager {
+            } else if auth_role.can("approve_publication") {
                 (PublicationDto::from(&publication), None)
             } else {
-                let reader_id = ReaderId::new(auth_id)?;
-                let reader = self.reader_repo.find_by_id(&reader_id).await?;
+                let reader = self.reader_repo.find_by_id(&auth_id).await?;
 
                 let mut view = publication.view(
                     &reader,
                     self.interaction_repo
-                        .find_views(Some(&reader_id), Some(&publication_id), None, None)
+                        .find_views(Some(&auth_id), Some(&publication_id), None, None)
                         .await?
                         .is_empty(),
                 )?;
@@ -102,17 +105,17 @@ impl<'a> GetById<'a> {
 
                 let reader_statistics = self
                     .statistics_serv
-                    .get_history(Some(&reader_id), Some(&publication_id), None, None)
+                    .get_history(Some(&auth_id), Some(&publication_id), None, None)
                     .await?;
 
                 let reviews = self
                     .interaction_repo
-                    .find_reviews(Some(&reader_id), Some(&publication_id), None, None)
+                    .find_reviews(Some(&auth_id), Some(&publication_id), None, None)
                     .await?;
 
                 let in_favorites = !self
                     .interaction_repo
-                    .find_publication_favorites(Some(&reader_id), Some(&publication_id), None, None)
+                    .find_publication_favorites(Some(&auth_id), Some(&publication_id), None, None)
                     .await?
                     .is_empty();
 
@@ -200,17 +203,14 @@ mod tests {
             c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
-            c.user_repo(),
             c.statistics_serv(),
         );
 
-        let (mut user1, mut author1, mut reader1) = user(1);
-        c.user_repo().save(&mut user1).await.unwrap();
+        let (_user1, mut author1, mut reader1) = user(1);
         c.author_repo().save(&mut author1).await.unwrap();
         c.reader_repo().save(&mut reader1).await.unwrap();
 
-        let (mut user2, mut author2, mut reader2) = user(2);
-        c.user_repo().save(&mut user2).await.unwrap();
+        let (_user2, mut author2, mut reader2) = user(2);
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 
@@ -230,10 +230,11 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         let res = uc
             .exec(
-                Some(reader1.base().id().to_string()),
+                Some((reader1.base().id().clone(), role)),
                 publication.base().id().to_string(),
                 Include::default().add_field("author").add_field("category"),
             )
@@ -267,17 +268,14 @@ mod tests {
             c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
-            c.user_repo(),
             c.statistics_serv(),
         );
 
-        let (mut user1, mut author1, mut reader1) = user(1);
-        c.user_repo().save(&mut user1).await.unwrap();
+        let (_user1, mut author1, mut reader1) = user(1);
         c.author_repo().save(&mut author1).await.unwrap();
         c.reader_repo().save(&mut reader1).await.unwrap();
 
-        let (mut user2, mut author2, mut reader2) = user(2);
-        c.user_repo().save(&mut user2).await.unwrap();
+        let (_user2, mut author2, mut reader2) = user(2);
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 
@@ -297,10 +295,11 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         assert!(uc
             .exec(
-                Some(reader2.base().id().to_string()),
+                Some((reader2.base().id().clone(), role)),
                 publication.base().id().to_string(),
                 Include::default(),
             )
@@ -318,17 +317,14 @@ mod tests {
             c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
-            c.user_repo(),
             c.statistics_serv(),
         );
 
-        let (mut user1, mut author1, mut reader1) = user(1);
-        c.user_repo().save(&mut user1).await.unwrap();
+        let (_user1, mut author1, mut reader1) = user(1);
         c.author_repo().save(&mut author1).await.unwrap();
         c.reader_repo().save(&mut reader1).await.unwrap();
 
-        let (mut user2, mut author2, mut reader2) = user(2);
-        c.user_repo().save(&mut user2).await.unwrap();
+        let (_user2, mut author2, mut reader2) = user(2);
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 
@@ -348,10 +344,11 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         let res = uc
             .exec(
-                Some(reader2.base().id().to_string()),
+                Some((reader2.base().id().clone(), role)),
                 publication.base().id().to_string(),
                 Include::default().add_field("author").add_field("category"),
             )
@@ -379,17 +376,14 @@ mod tests {
             c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
-            c.user_repo(),
             c.statistics_serv(),
         );
 
-        let (mut user1, mut author1, mut reader1) = user(1);
-        c.user_repo().save(&mut user1).await.unwrap();
+        let (_user1, mut author1, mut reader1) = user(1);
         c.author_repo().save(&mut author1).await.unwrap();
         c.reader_repo().save(&mut reader1).await.unwrap();
 
-        let (mut user2, mut author2, mut reader2) = user(2);
-        c.user_repo().save(&mut user2).await.unwrap();
+        let (_user2, mut author2, mut reader2) = user(2);
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 
@@ -409,10 +403,11 @@ mod tests {
             false,
         );
         c.publication_repo().save(&mut publication).await.unwrap();
+        let role = identity_mocks::role("User");
 
         assert!(uc
             .exec(
-                Some(reader1.base().id().to_string()),
+                Some((reader1.base().id().clone(), role)),
                 "#invalid".to_owned(),
                 Include::default(),
             )
@@ -430,17 +425,14 @@ mod tests {
             c.interaction_repo(),
             c.publication_repo(),
             c.reader_repo(),
-            c.user_repo(),
             c.statistics_serv(),
         );
 
-        let (mut user1, mut author1, mut reader1) = user(1);
-        c.user_repo().save(&mut user1).await.unwrap();
+        let (_user1, mut author1, mut reader1) = user(1);
         c.author_repo().save(&mut author1).await.unwrap();
         c.reader_repo().save(&mut reader1).await.unwrap();
 
-        let (mut user2, mut author2, mut reader2) = user(2);
-        c.user_repo().save(&mut user2).await.unwrap();
+        let (_user2, mut author2, mut reader2) = user(2);
         c.author_repo().save(&mut author2).await.unwrap();
         c.reader_repo().save(&mut reader2).await.unwrap();
 
@@ -464,9 +456,11 @@ mod tests {
         let mut like = publication.like(&reader2).unwrap();
         c.interaction_repo().save_like(&mut like).await.unwrap();
 
+        let role = identity_mocks::role("User");
+
         let res = uc
             .exec(
-                Some(reader2.base().id().to_string()),
+                Some((reader2.base().id().clone(), role)),
                 publication.base().id().to_string(),
                 Include::default(),
             )

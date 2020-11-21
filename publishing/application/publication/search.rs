@@ -6,7 +6,7 @@ use serde::Deserialize;
 use common::error::Error;
 use common::request::{Include, PaginationParams, PaginationResponse};
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
 
 use crate::application::dtos::{AuthorDto, CategoryDto, PublicationDto};
 use crate::domain::author::{AuthorId, AuthorRepository};
@@ -28,7 +28,6 @@ pub struct Search<'a> {
     author_repo: &'a dyn AuthorRepository,
     category_repo: &'a dyn CategoryRepository,
     publication_repo: &'a dyn PublicationRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Search<'a> {
@@ -36,33 +35,36 @@ impl<'a> Search<'a> {
         author_repo: &'a dyn AuthorRepository,
         category_repo: &'a dyn CategoryRepository,
         publication_repo: &'a dyn PublicationRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         Search {
             author_repo,
             category_repo,
             publication_repo,
-            user_repo,
         }
     }
 
     pub async fn exec(
         &self,
-        auth_id: Option<String>,
+        user_id_and_role: Option<UserIdAndRole>,
         cmd: SearchCommand,
         include: Include,
         pagination: PaginationParams,
     ) -> Result<PaginationResponse<PublicationDto>> {
-        let is_content_manager = if let Some(auth_id) = &auth_id {
-            let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-            user.is_content_manager()
-        } else {
-            false
-        };
+        if let Some((_, auth_role)) = &user_id_and_role {
+            if !auth_role.can("search_publications") {
+                return Err(Error::unauthorized());
+            }
+        }
 
-        let is_reader_author = if let (Some(auth_id), Some(author_id)) = (&auth_id, &cmd.author_id)
-        {
-            auth_id == author_id
+        let is_reader_author =
+            if let (Some((auth_id, _)), Some(author_id)) = (&user_id_and_role, &cmd.author_id) {
+                auth_id.value() == author_id
+            } else {
+                false
+            };
+
+        let is_content_manager = if let Some((_, auth_role)) = &user_id_and_role {
+            auth_role.can("approve_publication")
         } else {
             false
         };
@@ -127,8 +129,8 @@ impl<'a> Search<'a> {
                 publication_dto = publication_dto.category(CategoryDto::from(&category));
             }
 
-            if let Some(auth_id) = &auth_id {
-                if publication.author_id().value() == auth_id {
+            if let Some((auth_id, _)) = &user_id_and_role {
+                if publication.author_id() == auth_id {
                     publication_dto = publication_dto.pages(&publication)
                 }
             }
@@ -137,73 +139,5 @@ impl<'a> Search<'a> {
         }
 
         Ok(res)
-
-        // publications = publications
-        //     .into_iter()
-        //     .filter(|publication| {
-        //         if is_content_manager {
-        //             return true;
-        //         }
-        //
-        //         if let Some(auth_id) = &auth_id {
-        //             if publication.author_id().value() == auth_id {
-        //                 return true;
-        //             }
-        //         }
-        //
-        //         matches!(publication.status_history().current(), Status::Published { .. })
-        //     })
-        //     .collect();
-
-        // if let Some(order_by) = pagination.order_by {
-        //     match order_by.as_ref() {
-        //         "most_viewed" => {
-        //             publications
-        //                 .sort_by(|a, b| b.statistics().views().cmp(&a.statistics().views()));
-        //         }
-        //         "most_liked" => {
-        //             publications
-        //                 .sort_by(|a, b| b.statistics().likes().cmp(&a.statistics().likes()));
-        //         }
-        //         "newest" => {
-        //             publications.reverse();
-        //         }
-        //         "best_reviews" => {
-        //             publications.sort_by(|a, b| {
-        //                 b.statistics()
-        //                     .stars()
-        //                     .partial_cmp(&a.statistics().stars())
-        //                     .unwrap()
-        //             });
-        //         }
-        //         _ => {}
-        //     }
-        // }
-
-        // let mut publication_dtos = Vec::new();
-        // for publication in publications.iter() {
-        //     let mut publication_dto = PublicationDto::from(publication);
-        //
-        //     if include.has("author") {
-        //         let author = self.author_repo.find_by_id(publication.author_id()).await?;
-        //         publication_dto = publication_dto.author(AuthorDto::from(&author));
-        //     }
-        //
-        //     if include.has("category") {
-        //         let category = self
-        //             .category_repo
-        //             .find_by_id(publication.header().category_id())
-        //             .await?;
-        //         publication_dto = publication_dto.category(CategoryDto::from(&category));
-        //     }
-        //
-        //     if let Some(auth_id) = &auth_id {
-        //         if publication.author_id().value() == auth_id {
-        //             publication_dto = publication_dto.pages(&publication)
-        //         }
-        //     }
-        //
-        //     publication_dtos.push(publication_dto);
-        // }
     }
 }

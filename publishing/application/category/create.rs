@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use common::error::Error;
 use common::event::EventPublisher;
 use common::result::Result;
-use identity::domain::user::{UserId, UserRepository};
+use identity::UserIdAndRole;
 
 use crate::domain::category::{Category, CategoryRepository, Name};
 
@@ -21,25 +21,25 @@ pub struct Create<'a> {
     event_pub: &'a dyn EventPublisher,
 
     category_repo: &'a dyn CategoryRepository,
-    user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> Create<'a> {
     pub fn new(
         event_pub: &'a dyn EventPublisher,
         category_repo: &'a dyn CategoryRepository,
-        user_repo: &'a dyn UserRepository,
     ) -> Self {
         Create {
             event_pub,
             category_repo,
-            user_repo,
         }
     }
 
-    pub async fn exec(&self, auth_id: String, cmd: CreateCommand) -> Result<CreateResponse> {
-        let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-        if !user.is_admin() {
+    pub async fn exec(
+        &self,
+        (_auth_id, auth_role): UserIdAndRole,
+        cmd: CreateCommand,
+    ) -> Result<CreateResponse> {
+        if !auth_role.can("create_category") {
             return Err(Error::unauthorized());
         }
 

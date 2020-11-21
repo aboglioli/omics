@@ -12,7 +12,7 @@ use common::result::Result;
 use identity::container::IdentityContainer;
 use identity::infrastructure::persistence::inmem::InMemTokenRepository;
 use identity::infrastructure::persistence::postgres::{
-    PostgresRoleRepository, PostgresUserRepository,
+    PostgresPermissionRepository, PostgresRoleRepository, PostgresUserRepository,
 };
 use identity::infrastructure::service::{BcryptHasher, JWTEncoder};
 use notification::container::NotificationContainer;
@@ -75,6 +75,7 @@ impl MainContainer {
         let config_serv = Arc::new(ConfigService::new(cache));
 
         // Identity
+        let id_permission_repo = Arc::new(PostgresPermissionRepository::new(client.clone()));
         let id_role_repo = Arc::new(PostgresRoleRepository::new(client.clone()));
         let id_tokenot_repo = Arc::new(InMemTokenRepository::new());
         let id_user_repo = Arc::new(PostgresUserRepository::new(client.clone()));
@@ -107,6 +108,7 @@ impl MainContainer {
         // Containers
         let identity = IdentityContainer::new(
             event_bus.clone(),
+            id_permission_repo,
             id_role_repo,
             id_tokenot_repo,
             id_user_repo.clone(),

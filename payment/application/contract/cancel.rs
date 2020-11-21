@@ -2,6 +2,7 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
+use identity::UserIdAndRole;
 use publishing::domain::publication::PublicationRepository;
 
 use crate::domain::contract::{ContractId, ContractRepository};
@@ -26,7 +27,11 @@ impl<'a> Cancel<'a> {
         }
     }
 
-    pub async fn exec(&self, auth_id: String, contract_id: String) -> Result<CommandResponse> {
+    pub async fn exec(
+        &self,
+        (auth_id, auth_role): UserIdAndRole,
+        contract_id: String,
+    ) -> Result<CommandResponse> {
         let mut contract = self
             .contract_repo
             .find_by_id(&ContractId::new(contract_id)?)
@@ -37,7 +42,7 @@ impl<'a> Cancel<'a> {
             .find_by_id(contract.publication_id())
             .await?;
 
-        if publication.author_id().value() != auth_id {
+        if publication.author_id() != &auth_id || !auth_role.can("cancel_contract") {
             return Err(Error::not_owner("publication"));
         }
 

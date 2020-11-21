@@ -3,8 +3,7 @@ use serde::{Deserialize, Serialize};
 use common::event::EventPublisher;
 use common::result::Result;
 
-use crate::domain::role::RoleId;
-
+use crate::domain::role::RoleRepository;
 use crate::domain::user::{
     Email, Identity, Password, Provider, User, UserRepository, UserService, Username,
 };
@@ -24,6 +23,7 @@ pub struct RegisterResponse {
 pub struct Register<'a> {
     event_pub: &'a dyn EventPublisher,
 
+    role_repo: &'a dyn RoleRepository,
     user_repo: &'a dyn UserRepository,
 
     user_serv: &'a UserService,
@@ -32,11 +32,13 @@ pub struct Register<'a> {
 impl<'a> Register<'a> {
     pub fn new(
         event_pub: &'a dyn EventPublisher,
+        role_repo: &'a dyn RoleRepository,
         user_repo: &'a dyn UserRepository,
         user_serv: &'a UserService,
     ) -> Self {
         Register {
             event_pub,
+            role_repo,
             user_repo,
             user_serv,
         }
@@ -47,6 +49,8 @@ impl<'a> Register<'a> {
 
         let hashed_password = self.user_serv.generate_password(&cmd.password)?;
 
+        let default_role = self.role_repo.find_default().await?;
+
         let mut user = User::new(
             self.user_repo.next_id().await?,
             Identity::new(
@@ -55,7 +59,7 @@ impl<'a> Register<'a> {
                 Email::new(cmd.email)?,
                 Some(Password::new(hashed_password)?),
             )?,
-            RoleId::new("user")?,
+            default_role.base().id().clone(),
         )?;
 
         self.user_repo.save(&mut user).await?;
@@ -78,7 +82,7 @@ mod tests {
     #[tokio::test]
     async fn new_user() {
         let c = mocks::container();
-        let uc = Register::new(c.event_pub(), c.user_repo(), c.user_serv());
+        let uc = Register::new(c.event_pub(), c.role_repo(), c.user_repo(), c.user_serv());
 
         let cmd = RegisterCommand {
             username: "new-user".to_owned(),
@@ -106,7 +110,7 @@ mod tests {
     #[tokio::test]
     async fn invalid_data() {
         let c = mocks::container();
-        let uc = Register::new(c.event_pub(), c.user_repo(), c.user_serv());
+        let uc = Register::new(c.event_pub(), c.role_repo(), c.user_repo(), c.user_serv());
 
         assert!(uc
             .exec(RegisterCommand {
@@ -139,7 +143,7 @@ mod tests {
     #[tokio::test]
     async fn existing_user() {
         let c = mocks::container();
-        let uc = Register::new(c.event_pub(), c.user_repo(), c.user_serv());
+        let uc = Register::new(c.event_pub(), c.role_repo(), c.user_repo(), c.user_serv());
 
         let mut user = mocks::user(
             "user-1",

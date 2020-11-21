@@ -10,7 +10,8 @@ use common::result::Result;
 
 use crate::application::dtos::{RoleDto, UserDto};
 use crate::domain::role::{RoleId, RoleRepository};
-use crate::domain::user::{UserId, UserOrderBy, UserRepository};
+use crate::domain::user::{UserOrderBy, UserRepository};
+use crate::UserIdAndRole;
 
 #[derive(Deserialize)]
 pub struct SearchCommand {
@@ -34,13 +35,12 @@ impl<'a> Search<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (_auth_id, auth_role): UserIdAndRole,
         cmd: SearchCommand,
         include: Include,
         pagination: PaginationParams,
     ) -> Result<PaginationResponse<UserDto>> {
-        let user = self.user_repo.find_by_id(&UserId::new(auth_id)?).await?;
-        if !user.is_admin() {
+        if !auth_role.can("search_users") {
             return Err(Error::unauthorized());
         }
 

@@ -1,4 +1,4 @@
-use crate::domain::role::{Role, RoleId};
+use crate::domain::role::{Name, Permission, Role, RoleId};
 use crate::domain::user::{
     Email, Fullname, Identity, Password, PasswordHasher, Person, Provider, User, UserId, Username,
 };
@@ -50,6 +50,9 @@ pub fn user(
     user
 }
 
-pub fn role(id: &str, name: &str) -> Role {
-    Role::new(RoleId::new(id).unwrap(), name).unwrap()
+pub fn role(name: &str) -> Role {
+    let mut role = Role::new(Name::new(name).unwrap()).unwrap();
+    role.set_permissions(vec![Permission::new("*", "Superpowers").unwrap()])
+        .unwrap();
+    role
 }

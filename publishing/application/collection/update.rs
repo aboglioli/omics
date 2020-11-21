@@ -4,6 +4,7 @@ use common::error::Error;
 use common::event::EventPublisher;
 use common::request::CommandResponse;
 use common::result::Result;
+use identity::UserIdAndRole;
 
 use crate::domain::category::{CategoryId, CategoryRepository};
 use crate::domain::collection::{CollectionId, CollectionRepository};
@@ -40,14 +41,18 @@ impl<'a> Update<'a> {
 
     pub async fn exec(
         &self,
-        auth_id: String,
+        (auth_id, auth_role): UserIdAndRole,
         collection_id: String,
         cmd: UpdateCommand,
     ) -> Result<CommandResponse> {
+        if !auth_role.can("update_collection") {
+            return Err(Error::unauthorized());
+        }
+
         let collection_id = CollectionId::new(collection_id)?;
         let mut collection = self.collection_repo.find_by_id(&collection_id).await?;
 
-        if collection.author_id().value() != auth_id {
+        if collection.author_id() != &auth_id {
             return Err(Error::not_owner("collection"));
         }
 
@@ -82,6 +87,9 @@ impl<'a> Update<'a> {
 mod tests {
     use super::*;
 
+    use identity::domain::user::UserId;
+    use identity::mocks as identity_mocks;
+
     use crate::mocks;
 
     #[tokio::test]
@@ -100,9 +108,10 @@ mod tests {
         c.collection_repo().save(&mut collection).await.unwrap();
         let mut category = mocks::category("Category 2");
         c.category_repo().save(&mut category).await.unwrap();
+        let role = identity_mocks::role("User");
 
         uc.exec(
-            "#user01".to_owned(),
+            (UserId::new("#user01").unwrap(), role),
             collection.base().id().to_string(),
             UpdateCommand {
                 name: "New name".to_owned(),
@@ -143,10 +152,11 @@ mod tests {
         c.collection_repo().save(&mut collection).await.unwrap();
         let mut category = mocks::category("Category 2");
         c.category_repo().save(&mut category).await.unwrap();
+        let role = identity_mocks::role("User");
 
         assert!(uc
             .exec(
-                "#user02".to_owned(),
+                (UserId::new("#user02").unwrap(), role),
                 collection.base().id().to_string(),
                 UpdateCommand {
                     name: "New name".to_owned(),
@@ -175,10 +185,11 @@ mod tests {
         );
         c.collection_repo().save(&mut collection).await.unwrap();
         let category = mocks::category("Category 2");
+        let role = identity_mocks::role("User");
 
         assert!(uc
             .exec(
-                "#user01".to_owned(),
+                (UserId::new("#user01").unwrap(), role),
                 collection.base().id().to_string(),
                 UpdateCommand {
                     name: "New name".to_owned(),

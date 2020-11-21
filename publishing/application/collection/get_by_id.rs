@@ -1,7 +1,9 @@
 use serde::Serialize;
 
+use common::error::Error;
 use common::request::Include;
 use common::result::Result;
+use identity::UserIdAndRole;
 
 use crate::application::dtos::{AuthorDto, CategoryDto, CollectionDto, PublicationDto};
 use crate::domain::author::AuthorRepository;
@@ -40,10 +42,16 @@ impl<'a> GetById<'a> {
 
     pub async fn exec(
         &self,
-        _auth_id: Option<String>,
+        user_id_and_role: Option<UserIdAndRole>,
         collection_id: String,
         include: Include,
     ) -> Result<CollectionDto> {
+        if let Some((_auth_id, auth_role)) = user_id_and_role {
+            if !auth_role.can("get_collection") {
+                return Err(Error::unauthorized());
+            }
+        }
+
         let collection = self
             .collection_repo
             .find_by_id(&CollectionId::new(collection_id)?)
