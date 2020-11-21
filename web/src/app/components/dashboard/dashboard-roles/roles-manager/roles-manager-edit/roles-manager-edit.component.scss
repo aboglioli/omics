@@ -50,7 +50,22 @@ div.parent{
   div.action-buttons {
 
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
+
+    mat-checkbox {
+      display: flex;
+      align-items: center;
+
+      ::ng-deep .mat-checkbox-inner-container {
+        border: white solid 1px;
+        outline: white solid 1px;
+      }
+
+      ::ng-deep .mat-checkbox-layout {
+        margin: 0;
+      }
+
+    }
 
   }
 

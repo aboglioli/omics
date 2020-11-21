@@ -15,6 +15,8 @@ import {MatInputModule } from '@angular/material/input';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatCardModule} from '@angular/material/card';
 import {MatExpansionModule} from '@angular/material/expansion';
+import {MatTableModule} from '@angular/material/table';
+import {MatPaginatorModule} from '@angular/material/paginator';
 
 @NgModule({
   declarations: [],
@@ -54,7 +56,10 @@ import {MatExpansionModule} from '@angular/material/expansion';
     MatDatepickerModule,
     MatNativeDateModule,
     MatCardModule,
-    MatExpansionModule
+    MatExpansionModule,
+    MatTableModule,
+    MatPaginatorModule
+
   ],
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'es-ES' }]
 })

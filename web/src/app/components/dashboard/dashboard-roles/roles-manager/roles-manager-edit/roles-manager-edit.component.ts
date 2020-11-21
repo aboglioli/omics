@@ -23,6 +23,7 @@ export class RolesManagerEditComponent implements OnInit {
 
   public isNewRole = false;
   public title = '';
+  public isDefault = false;
 
   public formRole: FormGroup;
 
@@ -147,7 +148,12 @@ export class RolesManagerEditComponent implements OnInit {
 
     this.formRole.get('permissionList').setValue(arrayPermissionId);
 
+    if ( this.isDefault ) {
+      // TODO: setear rol como predeterminado
+    }
+
     console.log('TEST > ', this.formRole.value);
+    console.log('TEST > ', this.isDefault);
 
   }
 
