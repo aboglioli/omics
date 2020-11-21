@@ -32,7 +32,7 @@ impl<'a> Approve<'a> {
         (auth_id, auth_role): UserIdAndRole,
         contract_id: String,
     ) -> Result<CommandResponse> {
-        if !auth_role.can("approve_contract") {
+        if !auth_role.can("approve_reject_contract") {
             return Err(Error::unauthorized());
         }
 

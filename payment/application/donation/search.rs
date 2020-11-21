@@ -50,15 +50,15 @@ impl<'a> Search<'a> {
         include: Include,
         pagination: PaginationParams,
     ) -> Result<PaginationResponse<DonationDto>> {
-        if !auth_role.can("search_donations") {
+        if !auth_role.can("get_any_donation") {
             if let Some(author_id) = &cmd.author_id {
-                if author_id != auth_id.value() {
+                if author_id != auth_id.value() || !auth_role.can("get_own_donation") {
                     return Err(Error::unauthorized());
                 }
             }
 
             if let Some(reader_id) = &cmd.reader_id {
-                if reader_id != auth_id.value() {
+                if reader_id != auth_id.value() || !auth_role.can("get_own_donation") {
                     return Err(Error::unauthorized());
                 }
             }

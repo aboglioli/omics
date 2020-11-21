@@ -37,7 +37,7 @@ impl<'a> Reject<'a> {
         publication_id: String,
         cmd: RejectCommand,
     ) -> Result<CommandResponse> {
-        if !auth_role.can("reject_publication") {
+        if !auth_role.can("approve_reject_publication") {
             return Err(Error::unauthorized());
         }
 

@@ -28,7 +28,7 @@ impl<'a> GetById<'a> {
     ) -> Result<UserDto> {
         let user_id = UserId::new(user_id)?;
 
-        if !auth_role.can("get_all_users") {
+        if !auth_role.can("get_any_user") {
             if auth_id != user_id || !auth_role.can("get_own_user") {
                 return Err(Error::unauthorized());
             }

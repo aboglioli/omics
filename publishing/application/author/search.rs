@@ -33,7 +33,7 @@ impl<'a> Search<'a> {
         pagination: PaginationParams,
     ) -> Result<PaginationResponse<AuthorDto>> {
         if let Some((_auth_id, auth_role)) = &user_id_and_role {
-            if !auth_role.can("search_authors") {
+            if !auth_role.can("get_any_author") {
                 return Err(Error::unauthorized());
             }
         }

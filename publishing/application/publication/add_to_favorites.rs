@@ -36,7 +36,7 @@ impl<'a> AddToFavorites<'a> {
         (auth_id, auth_role): UserIdAndRole,
         publication_id: String,
     ) -> Result<CommandResponse> {
-        if !auth_role.can("add_publication_to_favorites") {
+        if !auth_role.can("add_remove_publication_from_favorites") {
             return Err(Error::unauthorized());
         }
 

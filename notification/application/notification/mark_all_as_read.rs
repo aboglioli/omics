@@ -16,7 +16,7 @@ impl<'a> MarkAllAsRead<'a> {
     }
 
     pub async fn exec(&self, (auth_id, auth_role): UserIdAndRole) -> Result<CommandResponse> {
-        if !auth_role.can("mark_notifications_as_read") {
+        if !auth_role.can("get_notifications") {
             return Err(Error::unauthorized());
         }
 

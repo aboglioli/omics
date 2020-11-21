@@ -45,7 +45,7 @@ impl<'a> AddReview<'a> {
         publication_id: String,
         cmd: AddReviewCommand,
     ) -> Result<CommandResponse> {
-        if !auth_role.can("add_review_to_publication") {
+        if !auth_role.can("review_publication") {
             return Err(Error::unauthorized());
         }
 

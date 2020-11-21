@@ -31,8 +31,11 @@ impl<'a> GetByPublication<'a> {
             .publication_repo
             .find_by_id(&PublicationId::new(publication_id)?)
             .await?;
-        if publication.author_id() != &auth_id && !auth_role.can("get_contract_by_publication") {
-            return Err(Error::unauthorized());
+
+        if !auth_role.can("get_any_contract") {
+            if publication.author_id() != &auth_id || !auth_role.can("get_own_contract") {
+                return Err(Error::unauthorized());
+            }
         }
 
         let contract = self

@@ -33,7 +33,7 @@ impl<'a> AddPublication<'a> {
         collection_id: String,
         publication_id: String,
     ) -> Result<CommandResponse> {
-        if !auth_role.can("add_publication_to_collection") {
+        if !auth_role.can("add_remove_publication_from_collection") {
             return Err(Error::unauthorized());
         }
 

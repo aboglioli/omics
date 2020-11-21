@@ -65,8 +65,8 @@ impl<'a> GetById<'a> {
         let mut publication = self.publication_repo.find_by_id(&publication_id).await?;
 
         if let Some((auth_id, auth_role)) = &user_id_and_role {
-            if !auth_role.can("get_all_publications") {
-                if publication.author_id() != auth_id && !publication.is_published() {
+            if !auth_role.can("get_any_publication") {
+                if publication.author_id() != auth_id && !publication.is_published() && !auth_role.can("get_unpublished_publications") {
                     return Err(Error::unauthorized());
                 }
 

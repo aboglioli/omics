@@ -51,7 +51,7 @@ impl<'a> Search<'a> {
         pagination: PaginationParams,
     ) -> Result<PaginationResponse<PublicationDto>> {
         if let Some((_, auth_role)) = &user_id_and_role {
-            if !auth_role.can("search_publications") {
+            if !auth_role.can("get_any_publication") {
                 return Err(Error::unauthorized());
             }
         }
@@ -64,7 +64,7 @@ impl<'a> Search<'a> {
             };
 
         let is_content_manager = if let Some((_, auth_role)) = &user_id_and_role {
-            auth_role.can("approve_publication")
+            auth_role.can("approve_reject_publication")
         } else {
             false
         };

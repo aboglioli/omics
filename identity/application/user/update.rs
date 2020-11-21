@@ -43,7 +43,7 @@ impl<'a> Update<'a> {
         cmd: UpdateCommand,
     ) -> Result<CommandResponse> {
         let user_id = UserId::new(user_id)?;
-        if !auth_role.can("update_all_users") {
+        if !auth_role.can("update_any_user") {
             if auth_id != user_id || !auth_role.can("update_own_user") {
                 return Err(Error::unauthorized());
             }

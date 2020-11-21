@@ -26,7 +26,7 @@ impl<'a> Delete<'a> {
         user_id: String,
     ) -> Result<CommandResponse> {
         let user_id = UserId::new(user_id)?;
-        if !auth_role.can("delete_all_users") {
+        if !auth_role.can("delete_any_user") {
             if auth_id != user_id || !auth_role.can("delete_own_user") {
                 return Err(Error::unauthorized());
             }

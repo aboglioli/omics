@@ -20,7 +20,7 @@ impl<'a> GetById<'a> {
         category_id: String,
     ) -> Result<CategoryDto> {
         if let Some((_auth_id, auth_role)) = user_id_and_role {
-            if !auth_role.can("get_category") {
+            if !auth_role.can("get_categories") {
                 return Err(Error::unauthorized());
             }
         }

@@ -19,7 +19,91 @@ VALUES
 
 INSERT INTO permissions(id, name)
 VALUES
-  ('permission-1', 'Permiso 1');
+  -- Roles
+  ('create_role', 'Crear rol'),
+  ('delete_role', 'Eliminar rol'),
+  ('get_all_roles', 'Obtener todos los roles'),
+  ('get_own_role', 'Obtener rol propio'),
+  ('get_permissions', 'Obtener permisos'),
+  ('make_role_default', 'Cambiar rol por defecto'),
+  ('update_role', 'Editar rol'),
+  -- Users
+  ('change_user_password', 'Cambiar contraseña'),
+  ('change_user_payment_email', 'Cambiar dirección de correo para pagos'),
+  ('change_user_role', 'Cambiar rol de usuario'),
+  ('delete_any_user', 'Eliminar cualquier usuario'),
+  ('delete_own_user', 'Eliminar usuario propio'),
+  ('get_any_user', 'Obtener cualquier usuario'),
+  ('get_own_user', 'Obtener usuario propio'),
+  ('login', 'Login'),
+  ('recover_user_password', 'Recuperar contraseña'),
+  ('update_any_user', 'Editar cualquier usuario'),
+  ('update_own_user', 'Editar usuario propio'),
+  ('validate_user_account', 'Validar cuenta de usuario'),
+  -- Authors
+  ('follow_unfollow_author', 'Seguir/Dejar de seguir autor'),
+  ('get_any_author', 'Obtener cualquier autor'),
+  ('get_own_author', 'Obtener autor propio'),
+  -- Categories
+  ('create_category', 'Crear categoría'),
+  ('delete_category', 'Eliminar categoría'),
+  ('get_categories', 'Obtener categorías'),
+  ('update_category', 'Editar categoría'),
+  -- Collections
+  ('add_remove_collection_from_favorites', 'Agregar/Quitar colección de favoritos'),
+  ('add_remove_publication_from_collection', 'Agregar/Quitar publicación de colección'),
+  ('create_collection', 'Crear colección'),
+  ('delete_collection', 'Eliminar colección'),
+  ('get_any_collection', 'Obtener cualquier colección'),
+  ('get_own_collection', 'Obtener colección propia'),
+  ('get_publications_from_collection', 'Obtener publicaciones de una colección'),
+  ('update_collection', 'Editar colección'),
+  -- Publications
+  ('add_remove_publication_from_favorites', 'Agregar/Quitar publicación de favoritos'),
+  ('approve_reject_publication', 'Aprobar/Rechazar publicación'),
+  ('create_publication', 'Crear publicación'),
+  ('delete_publication', 'Eliminar publicación'),
+  ('get_any_publication', 'Obtener cualquier publicación'),
+  ('get_own_publication', 'Obtener publicación propia'),
+  ('get_publication_reviews', 'Obtener calificaciones de publicación'),
+  ('get_unpublished_publications', 'Obtener publicaciones no publicadas'),
+  ('like_unlike_publication', 'Like/Dislike publicación'),
+  ('publish_publication', 'Publicar publicación'),
+  ('read_publication', 'Leer publicación'),
+  ('review_publication', 'Calificar publicación'),
+  ('update_publication', 'Editar publicación'),
+  -- Readers
+  ('get_reader', 'Obtener lector'),
+  ('get_reader_favorites', 'Obtener favoritos'),
+  ('get_reader_following', 'Obtener autores seguidos'),
+  -- Contracts
+  ('approve_reject_contract', 'Aprobar/Rechazar contrato'),
+  ('cancel_contract', 'Rescindir contrato'),
+  ('charge_for_contract', 'Cobrar por contrato'),
+  ('generate_summaries_for_contract', 'Generar resúmenes para contrato'),
+  ('get_any_contract', 'Obtener cualquier contrato'),
+  ('get_own_contract', 'Obtener contrato propio'),
+  ('request_contract', 'Requerir contrato'),
+  -- Donations
+  ('charge_donations', 'Cobrar donaciones'),
+  ('donate', 'Donar'),
+  ('get_any_donation', 'Obtener cualquier donación'),
+  ('get_own_donation', 'Obtener donación propia'),
+  -- Plans
+  ('create_plan', 'Crear plan'),
+  ('delete_plan', 'Eliminar plan'),
+  ('update_plan', 'Editar plan'),
+  -- Subscriptions
+  ('get_any_subscription', 'Obtener cualquier suscripción'),
+  ('get_own_subscription', 'Obtener suscripción propia'),
+  ('subscribe', 'Subscribirse'),
+  -- Notifications
+  ('get_notifications', 'Obtener notificaciones'),
+  -- Reports
+  ('generate_report', 'Generar reports'),
+  -- Configuration
+  ('change_business_rules', 'Editar reglas de negocio');
+
 
 INSERT INTO users(
   id,

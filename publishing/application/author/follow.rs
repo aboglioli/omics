@@ -36,7 +36,7 @@ impl<'a> Follow<'a> {
         (auth_id, auth_role): UserIdAndRole,
         author_id: String,
     ) -> Result<CommandResponse> {
-        if !auth_role.can("follow_author") {
+        if !auth_role.can("follow_unfollow_author") {
             return Err(Error::unauthorized());
         }
 

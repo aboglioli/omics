@@ -46,7 +46,7 @@ impl<'a> Search<'a> {
         include: Include,
         pagination: PaginationParams,
     ) -> Result<PaginationResponse<SubscriptionDto>> {
-        if !auth_role.can("search_subscriptions") {
+        if !auth_role.can("get_any_subscription") {
             return Err(Error::unauthorized());
         }
 

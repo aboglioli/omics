@@ -36,7 +36,7 @@ impl<'a> DeleteReview<'a> {
         (auth_id, auth_role): UserIdAndRole,
         publication_id: String,
     ) -> Result<CommandResponse> {
-        if !auth_role.can("delete_review_from_publication") {
+        if !auth_role.can("review_publication") {
             return Err(Error::unauthorized());
         }
 

@@ -41,7 +41,7 @@ impl<'a> UpdatePages<'a> {
         publication_id: String,
         cmd: UpdatePagesCommand,
     ) -> Result<CommandResponse> {
-        if !auth_role.can("update_publication_pages") {
+        if !auth_role.can("update_publication") {
             return Err(Error::unauthorized());
         }
 

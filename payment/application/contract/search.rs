@@ -44,7 +44,7 @@ impl<'a> Search<'a> {
         include: Include,
         pagination: PaginationParams,
     ) -> Result<PaginationResponse<ContractDto>> {
-        if !auth_role.can("search_contracts") {
+        if !auth_role.can("get_any_contract") {
             return Err(Error::unauthorized());
         }
 

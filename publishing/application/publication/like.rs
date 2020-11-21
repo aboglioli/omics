@@ -36,7 +36,7 @@ impl<'a> Like<'a> {
         (auth_id, auth_role): UserIdAndRole,
         publication_id: String,
     ) -> Result<CommandResponse> {
-        if !auth_role.can("like_publication") {
+        if !auth_role.can("like_unlike_publication") {
             return Err(Error::unauthorized());
         }
 

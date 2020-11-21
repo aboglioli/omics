@@ -36,7 +36,7 @@ impl<'a> RemoveFromFavorites<'a> {
         (auth_id, auth_role): UserIdAndRole,
         collection_id: String,
     ) -> Result<CommandResponse> {
-        if !auth_role.can("remove_collection_from_favorites") {
+        if !auth_role.can("add_remove_collection_from_favorites") {
             return Err(Error::unauthorized());
         }
 

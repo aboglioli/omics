@@ -25,7 +25,7 @@ impl<'a> Unsubscribe<'a> {
     }
 
     pub async fn exec(&self, (auth_id, auth_role): UserIdAndRole) -> Result<CommandResponse> {
-        if !auth_role.can("unsubscribe") {
+        if !auth_role.can("subscribe") {
             return Err(Error::unauthorized());
         }
 

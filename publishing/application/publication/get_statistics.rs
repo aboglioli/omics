@@ -39,16 +39,15 @@ impl<'a> GetStatistics<'a> {
         publication_id: String,
         cmd: GetStatisticsCommand,
     ) -> Result<StatisticsDto> {
-        if !auth_role.can("get_publication_statistics") {
-            return Err(Error::unauthorized());
-        }
-
         let publication = self
             .publication_repo
             .find_by_id(&PublicationId::new(publication_id)?)
             .await?;
-        if publication.author_id() != &auth_id {
-            return Err(Error::not_owner("publication"));
+
+        if !auth_role.can("get_any_publication") {
+            if publication.author_id() != &auth_id || !auth_role.can("get_own_publication") {
+                return Err(Error::unauthorized());
+            }
         }
 
         let statistics = self

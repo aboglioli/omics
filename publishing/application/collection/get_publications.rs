@@ -56,7 +56,7 @@ impl<'a> GetPublications<'a> {
             }
 
             collection.author_id() == &auth_id
-                || auth_role.can("get_unpublished_not_owned_publications")
+                || auth_role.can("get_unpublished_publications")
         } else {
             false
         };

@@ -36,7 +36,7 @@ impl<'a> GetReviews<'a> {
         publication_id: String,
     ) -> Result<GetReviewsResponse> {
         if let Some((_, auth_role)) = user_id_and_role {
-            if !auth_role.can("get_product_reviews") {
+            if !auth_role.can("review_publication") {
                 return Err(Error::unauthorized());
             }
         }

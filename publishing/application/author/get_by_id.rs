@@ -38,7 +38,7 @@ impl<'a> GetById<'a> {
         let author_id = AuthorId::new(author_id)?;
 
         if let Some((auth_id, auth_role)) = &user_id_and_role {
-            if !auth_role.can("get_all_authors") {
+            if !auth_role.can("get_any_author") {
                 if auth_id != &author_id || !auth_role.can("get_own_author") {
                     return Err(Error::unauthorized());
                 }

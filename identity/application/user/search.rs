@@ -40,7 +40,7 @@ impl<'a> Search<'a> {
         include: Include,
         pagination: PaginationParams,
     ) -> Result<PaginationResponse<UserDto>> {
-        if !auth_role.can("search_users") {
+        if !auth_role.can("get_any_user") {
             return Err(Error::unauthorized());
         }
 
