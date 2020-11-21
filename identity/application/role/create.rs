@@ -44,6 +44,11 @@ impl<'a> Create<'a> {
         }
 
         let mut role = Role::new(Name::new(cmd.name)?)?;
+
+        if self.role_repo.find_by_id(role.base().id()).await.is_ok() {
+            return Err(Error::new("role", "already_exists"));
+        }
+
         let available_permissions = self.permission_repo.find_all().await?;
 
         let permissions = &cmd.permissions;
