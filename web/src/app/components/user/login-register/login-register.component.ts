@@ -181,9 +181,11 @@ export class LoginRegisterComponent implements OnInit {
 
   private setUserData( uderId: string ): void {
 
-    this.identityService.getById( uderId ).subscribe( res => {
+    this.identityService.getById( uderId, 'role' ).subscribe( res => {
 
       this.userData = res;
+
+      this.authService.updateUserData( this.userData );
 
       Swal.fire({
           icon: 'success',
