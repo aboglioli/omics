@@ -1,3 +1,6 @@
+export const can = (role: IRole, permission: string): boolean =>
+  role.permissions.some((p) => p.id === permission);
+
 export interface IPermission {
   id: string;
   name: string;

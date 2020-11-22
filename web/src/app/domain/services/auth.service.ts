@@ -1,22 +1,25 @@
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
 import { IUser } from '../models/user';
+import { IdentityService } from "./identity.service";
 
 @Injectable()
 export class AuthService {
 
+  private intialized = false;
   private authToken: string;
 
   public accessUser = new Subject<boolean>();
   public accessUser$ = this.accessUser.asObservable();
 
-  public user = new Subject<IUser>();
+  public user = new BehaviorSubject<IUser>(null);
   public user$ = this.user.asObservable();
 
   constructor(
     private router: Router,
+    private identityService: IdentityService,
   ) {
 
     const authToken = localStorage.getItem('auth_token');
@@ -24,6 +27,18 @@ export class AuthService {
       this.authToken = authToken;
     }
 
+  }
+
+  public getUser(): Observable<IUser> {
+    if (!this.intialized) {
+      this.identityService.getById('me').subscribe(
+        (user: IUser) => {
+          this.user.next(user);
+        },
+      )
+    }
+
+    return this.user.asObservable()
   }
 
   private updateStateSession( newValue: boolean ): void {

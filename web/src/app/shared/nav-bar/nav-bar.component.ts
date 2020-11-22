@@ -1,4 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Observable } from 'rxjs';
 import { faBars, faBell } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -27,6 +28,7 @@ export class NavBarComponent implements OnInit {
   public isAccessUserLogIn: boolean;  // Para habilitar algunas acciones según si esta el usuario logueado
   public userData: IUser;
   public userAvatar: string;
+  public user$: Observable<IUser>;
 
   constructor(  private router: Router,
                 private authService: AuthService,
@@ -47,6 +49,7 @@ export class NavBarComponent implements OnInit {
       this.setAvatarImageFromUser( userId );
     }
 
+    this.user$ = this.authService.getUser();
   }
 
 
@@ -87,7 +90,7 @@ export class NavBarComponent implements OnInit {
 
   private setAvatarImageFromUser( idUser: string): void {
 
-    this.identifyService.getById(idUser).subscribe( (data: IUser) => {
+    this.identifyService.getById(idUser, 'role').subscribe( (data: IUser) => {
 
       this.userData = data;
 

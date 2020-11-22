@@ -35,13 +35,19 @@
     </span>
 
     <!-- Con acceso -->
-    <span *ngIf="isAccessUserLogIn" style="display: flex;">
+    <span *ngIf="isAccessUserLogIn" style="display: flex; align-items: center;">
 
       <!-- Notificaciones -->
       <button mat-icon-button class="button-no-borders"
               (click)="showNotifications()">
         <fa-icon [icon]="faBell" size="2x"></fa-icon>
       </button>
+
+      <div *ngIf="userData" class="user">
+        <span class="username">{{userData.username}}</span>
+        <span *ngIf="userData.name && userData.lastname" class="name">{{userData.name}} {{userData.lastname}}</span>
+        <span *ngIf="userData.role" class="role">{{userData.role.name}}</span>
+      </div>
 
       <!-- Botón perfil usuario -->
       <button mat-icon-button

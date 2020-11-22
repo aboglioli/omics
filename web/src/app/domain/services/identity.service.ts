@@ -62,6 +62,10 @@ export interface IChangePaymentEmailCommand {
   payment_email: string;
 }
 
+export interface IChangeRoleCommand {
+  role_id: string;
+}
+
 @Injectable()
 export class IdentityService {
   private baseUrl: string;
@@ -140,5 +144,9 @@ export class IdentityService {
 
   public changePaymentEmail(id: string, cmd: IChangePaymentEmailCommand): Observable<any> {
     return this.http.put(`${this.baseUrl}/${id}/payment-email`, cmd);
+  }
+
+  public changeRole(userId: string, cmd: IChangeRoleCommand): Observable<any> {
+    return this.http.put(`${this.baseUrl}/${userId}/role`, cmd);
   }
 }
