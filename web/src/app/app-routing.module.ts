@@ -28,9 +28,8 @@ import { CollectionNewEditComponent } from './pages/deskboard/collection-new-edi
 import { CollectionOwnerGuard } from './guard/collection-owner.guard';
 import { CollectionInfoComponent } from './pages/collection-info/collection-info.component';
 import { PlansComponent } from './pages/plans/plans.component';
-import { AdminGuard } from './guard/admin.guard';
-import { ContentManagerGuard } from './guard/content-manager.guard';
 import { DashboardRolesComponent } from './pages/dashboard-roles/dashboard-roles.component';
+import { PermissionGuard } from './guard/permission.guard';
 
 
 const routes: Routes = [
@@ -48,15 +47,15 @@ const routes: Routes = [
   { path: 'deskboard/collection/new', component:  CollectionNewEditComponent},
   { path: 'deskboard/collection/edit/:id', component:  CollectionNewEditComponent, canActivate: [CollectionOwnerGuard]},
   { path: 'profile/:id', component: PerfilComponent },
-  { path: 'profile/:id/editUser', component: PerfilEditarComponent,  canActivate: [AuthLoginGuard, SameUserGuard]},
+  { path: 'profile/:id/editUser', component: PerfilEditarComponent,  canActivate: [AuthLoginGuard, SameUserGuard, PermissionGuard], data: {permission: 'hola'}},
   { path: 'collection/:id', component: CollectionInfoComponent },
   { path: 'about', component: AboutComponent },
   { path: 'read/:id', component: VisorComicComponent, canActivate: [AuthLoginGuard] },
-  { path: 'dashboard-reportes', component: DashboardReportesComponent, canActivate: [AdminGuard] },
-  { path: 'dashboard-publicaciones-contratos', component: DashboardGestionContratosPublicacionesComponent, canActivate: [ContentManagerGuard] },
-  { path: 'dashboard-reglas-negocio', component: DashboardReglasNegociosComponent, canActivate: [AdminGuard]  },
-  { path: 'dashboard-general', component: DashboardGestionAdminComponent, canActivate: [AuthLoginGuard, AdminGuard ] },
-  { path: 'dashboard-roles', component: DashboardRolesComponent, canActivate: [AuthLoginGuard, AdminGuard ] },
+  { path: 'dashboard-reportes', component: DashboardReportesComponent, canActivate: [] },
+  { path: 'dashboard-publicaciones-contratos', component: DashboardGestionContratosPublicacionesComponent, canActivate: [] },
+  { path: 'dashboard-reglas-negocio', component: DashboardReglasNegociosComponent, canActivate: []  },
+  { path: 'dashboard-general', component: DashboardGestionAdminComponent, canActivate: [AuthLoginGuard,  ] },
+  { path: 'dashboard-roles', component: DashboardRolesComponent, canActivate: [AuthLoginGuard,  ] },
   { path: 'plans', component: PlansComponent, canActivate: [AuthLoginGuard] },
   { path: '**', pathMatch: 'full', redirectTo: 'home' },
 

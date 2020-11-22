@@ -4,7 +4,7 @@ import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { IUser, can } from '../models/user';
-import { IdentityService } from "./identity.service";
+import { IdentityService } from './identity.service';
 
 @Injectable()
 export class AuthService {
