@@ -31,7 +31,7 @@
       <button (click)="unsubscribe()">Desuscribirse</button>
     </div>
     <button
-      *ngIf="!readerIsSubscribed"
+      *ngIf="!readerIsSubscribed && can(userData, 'subscribe')"
       mat-stroked-button
       class="button-white-borders subscription-button"
       [ngClass]="{'active': ( activePathSelected === 'subscription' ) }"
