@@ -1,9 +1,9 @@
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, filter } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { IUser, can } from '../models/user';
+import { IUser, can, canAny } from '../models/user';
 import { IdentityService } from "./identity.service";
 
 @Injectable()
@@ -28,6 +28,11 @@ export class AuthService {
       this.authToken = authToken;
     }
 
+    const user = localStorage.getItem('user');
+    if (user) {
+      this.user = new BehaviorSubject<IUser>(JSON.parse(user));
+    }
+
   }
 
   public getUser(): Observable<IUser> {
@@ -36,20 +41,29 @@ export class AuthService {
       this.intialized = true;
     }
 
-    return this.user.asObservable();
+    return this.user.asObservable().pipe(
+      filter((user) => !!user && this.intialized)
+    );
   }
 
   public loadUser(): void {
     this.identityService.getById('me', 'role').subscribe(
       (user: IUser) => {
         this.user.next(user);
+        localStorage.setItem('user', JSON.stringify(user));
       },
     );
   }
 
-  public canUser(permission: string): Observable<boolean> {
+  public canUser(...permissions: string[]): Observable<boolean> {
     return this.getUser().pipe(
-      map((user: IUser) => can(user.role, permission)),
+      map((user: IUser) => can(user, ...permissions)),
+    );
+  }
+
+  public canUserAny(...permissions: string[]): Observable<boolean> {
+    return this.getUser().pipe(
+      map((user: IUser) => canAny(user, ...permissions)),
     );
   }
 
@@ -90,6 +104,7 @@ export class AuthService {
     this.authToken = null;
     localStorage.removeItem('auth_token');
     localStorage.removeItem('id_user');
+    localStorage.removeItem('user');
 
   }
 

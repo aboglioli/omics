@@ -1,5 +1,26 @@
-export const can = (role: IRole, permission: string): boolean =>
-  role.permissions.some((p) => p.id === permission);
+export const can = (user?: IUser, ...permissions: string[]): boolean => {
+  if (!user || !user.role) {
+    return false;
+  }
+
+  return user.role.permissions.some((rolePermission) =>
+    permissions.every((permission) =>
+      permission === rolePermission.id
+    )
+  );
+};
+
+export const canAny = (user?: IUser, ...permissions: string[]): boolean => {
+  if (!user || !user.role) {
+    return false;
+  }
+
+  return user.role.permissions.some((rolePermission) =>
+    permissions.some((permission) =>
+      permission === rolePermission.id
+    )
+  );
+};
 
 export interface IPermission {
   id: string;
