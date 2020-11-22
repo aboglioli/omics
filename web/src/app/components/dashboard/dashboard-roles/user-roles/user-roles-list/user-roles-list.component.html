@@ -15,6 +15,7 @@
       <mat-paginator
         [pageSize]="pageSize"
         [length]="pageLength"
+        [pageIndex]="pageCurrent"
         [pageSizeOptions]="[5, 10, 20]"
         (page)="changePageOptions($event)"
         showFirstLastButtons>
@@ -24,7 +25,7 @@
 
         <!-- Position Column -->
         <ng-container matColumnDef="username">
-          <mat-header-cell mat-header-cell *matHeaderCellDef> ID </mat-header-cell>
+          <mat-header-cell mat-header-cell *matHeaderCellDef> Username </mat-header-cell>
           <mat-cell mat-cell *matCellDef="let element"> {{element.username}} </mat-cell>
         </ng-container>
 

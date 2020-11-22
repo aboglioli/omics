@@ -53,6 +53,7 @@ export class RolesManagerEditComponent implements OnInit {
     public authService: AuthService,
   ) {
     this.permissionArrayToSelect = this.data.permissionArrayToSelect;
+    this.permissionArrayToSelect.sort( (a, b) => a.name.localeCompare(b.name));
   }
 
   ngOnInit(): void {
