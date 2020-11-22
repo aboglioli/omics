@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import { IPermission, IRole } from '../../../../../domain/models/user';
 import { RoleService, ICreateCommand, IUpdateCommand } from '../../../../../domain/services/role.service';
 import { SweetAlertGenericMessageService } from '../../../../../services/sweet-alert-generic-message.service';
+import { AuthService } from "../../../../../domain/services/auth.service";
 
 export interface DialogData {
   isNew: boolean;
@@ -48,7 +49,8 @@ export class RolesManagerEditComponent implements OnInit {
     private fb: FormBuilder,
     private roleService: RoleService,
     private spinnerService: NgxSpinnerService,
-    private sweetAlertGenericService: SweetAlertGenericMessageService
+    private sweetAlertGenericService: SweetAlertGenericMessageService,
+    public authService: AuthService,
   ) {
     this.permissionArrayToSelect = this.data.permissionArrayToSelect;
   }
@@ -288,6 +290,8 @@ export class RolesManagerEditComponent implements OnInit {
 
         }
 
+
+        this.authService.loadUser();
       },
       (err: Error) => {
         this.spinnerService.hide();

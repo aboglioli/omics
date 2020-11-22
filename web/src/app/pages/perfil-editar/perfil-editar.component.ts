@@ -68,7 +68,7 @@ export class PerfilEditarComponent implements OnInit {
   constructor(
 
     private spinnerService: NgxSpinnerService,
-    private authService: AuthService,
+    public authService: AuthService,
     private fileServ: FileService,
     private identityService: IdentityService,
     private fb: FormBuilder,
