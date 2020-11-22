@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { AuthService } from 'src/app/domain/services/auth.service';
-import { IUser } from '../../domain/models/user';
+import { IUser, can } from '../../domain/models/user';
 import { faEdit, faEyeSlash, faEye } from '@fortawesome/free-solid-svg-icons';
 import { IdentityService, IUpdateCommandUser, ILoginCommand, ILoginResponse } from '../../domain/services/identity.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
@@ -33,6 +33,7 @@ export class PerfilEditarComponent implements OnInit {
   // Usuario
   private userId: string;
   public userData: IUser;
+  public can = can;
 
   public readerIsSubscribed = false;
 
@@ -131,7 +132,7 @@ export class PerfilEditarComponent implements OnInit {
 
     this.spinnerService.show();
 
-    this.identityService.getById(this.userId).subscribe(
+    this.identityService.getById(this.userId, 'role').subscribe(
       (resData: IUser) => {
 
         this.userData = resData;
