@@ -40,8 +40,8 @@ export class UserRolesEditComponent implements OnInit {
 
   ngOnInit(): void {
 
-    console.log('TEST > User > ', this.data.user );
-    console.log('TEST > Role List > ', this.data.roleList );
+    // console.log('TEST > User > ', this.data.user );
+    // console.log('TEST > Role List > ', this.data.roleList );
 
     this.user = this.data.user;
     this.newRole = this.user.role.id;
