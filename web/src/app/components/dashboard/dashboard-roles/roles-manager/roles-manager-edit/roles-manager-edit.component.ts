@@ -153,7 +153,7 @@ export class RolesManagerEditComponent implements OnInit {
 
     Swal.fire({
       title: `Eliminar Rol: ${this.data.role.name}`,
-      text: '¿Estas seguro ',
+      text: '¿Estas seguro?',
       icon: 'warning',
       showCancelButton: true,
       focusCancel: true,
