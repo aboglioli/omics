@@ -47,6 +47,11 @@
         <mat-row mat-row *matRowDef="let row; columns: displayedColumns;" (click)="onEditUserRole(row)"></mat-row>
       </mat-table>
 
+      <!-- Sin datos -->
+      <div *ngIf="tableUserData.filteredData.length === 0" style="display: flex; justify-content: center; color: black; background: white;">
+        <h1 style="margin: 1em;">No hay usuarios que cumplan los filtros de búsqueda</h1>
+      </div>
+
     </div>
 
   </div>
