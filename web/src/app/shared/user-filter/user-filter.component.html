@@ -1,0 +1,67 @@
+<div class="parent">
+
+  <div row-flex-center>
+    <h2>Filtrar usuarios:</h2>
+  </div>
+
+  <form autocomplete="off" [formGroup]="formFilter" class="row-flex center">
+
+    <!-- Nombre -->
+    <mat-form-field>
+      <mat-label style="margin-left: 0.5em; margin-top: 0.5em;">Buscar por nombre</mat-label>
+      <input type="text" matInput formControlName="name" style="margin-left: 0.5em">
+      <fa-icon [icon]="faSearch" size="1x" matSuffix style="margin-right: 0.5em;"></fa-icon>
+    </mat-form-field>
+
+    <!-- Rol -->
+    <div  class="d-inline-block"
+          style="margin-left: 1em;"
+          ngbDropdown
+          #dropdownRole="ngbDropdown">
+
+          <mat-form-field appearance="fill">
+            <mat-label>Selecionar un rol</mat-label>
+            <mat-select formControlName="role" name="role">
+              <mat-option [value]="null">
+                Seleccionar un rol
+              </mat-option>
+              <mat-option *ngFor="let role of rolesData" [value]="role.id">
+                {{role.name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+    </div>
+
+  </form>
+
+  <div class="row-flex center">
+
+    <!-- Clear -->
+    <button mat-flat-button
+            class="button-white-borders clear"
+            style="margin: 1em"
+            (click)="onClear()">
+
+    <fa-icon  [icon]="faClear" size="1x"></fa-icon>
+    Reiniciar
+
+    </button>
+
+    <!-- Filtrar -->
+    <button mat-flat-button
+          color="accent"
+          class="button-white-borders"
+          style="margin: 1em"
+          (click)="onFilter()">
+
+    <fa-icon  [icon]="faFilter" size="1x" ></fa-icon>
+    Filtrar
+    </button>
+
+
+  </div>
+
+
+
+</div>

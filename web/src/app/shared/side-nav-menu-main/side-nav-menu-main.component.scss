@@ -99,6 +99,33 @@ div.menu-box {
 }
 
 // Generales
+
+.user {
+  color: white;
+  border-left: 1px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+  padding-left: 0.6rem;
+  text-align: right;
+
+  .username {
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+    font-weight: bold;
+  }
+
+  .name {
+    font-size: 0.8rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .role {
+    font-size: 0.9rem;
+    color: #ddd;
+  }
+}
+
 button.button-white-borders {
 
   color: white;

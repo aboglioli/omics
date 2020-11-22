@@ -16,11 +16,11 @@
 
     <!-- Rol de usuario -->
     <span *ngIf="isAccessUserLogIn && userData">
-
-      <h2 *ngIf="userData.role_id !== 'user' ">
-        [ {{ userData.role_id | uppercase }} ]
-      </h2>
-
+      <div *ngIf="userData" class="user" style="margin-right: 0.75em;">
+        <span class="username">{{userData.username}}</span>
+        <span *ngIf="userData.name && userData.lastname" class="name">{{userData.name}} {{userData.lastname}}</span>
+        <span *ngIf="userData.role" class="role">{{userData.role.name}}</span>
+      </div>
     </span>
 
   </div>
@@ -29,10 +29,10 @@
   <div class="body">
 
     <!-- Admin Options -->
-    <div  *ngIf="isAccessUserLogIn && userData && (userData.role_id === 'admin' || userData.role_id === 'content-manager') "
+    <div  *ngIf="isAccessUserLogIn && userData && (userData.role.id === 'admin'|| userData.role.id === 'content-manager') "
           class="menu-admin dir-column">
 
-      <button *ngIf="userData.role_id === 'admin'"
+      <button *ngIf="userData.role.id === 'admin'"
               mat-stroked-button class="button-white-borders admin-button"
               [ngClass]="{'active': ( activePathSelected === 'dashboard-reportes' ) }"
               (click)="goToPage('dashboard-reportes')">
@@ -45,21 +45,21 @@
               Gestionar Publicaciones y Contratos
       </button>
 
-      <button *ngIf="userData.role_id === 'admin'"
+      <button *ngIf="userData.role.id === 'admin'"
               mat-stroked-button class="button-white-borders admin-button"
               [ngClass]="{'active': ( activePathSelected === 'dashboard-reglas-negocio' ) }"
               (click)="goToPage('dashboard-reglas-negocio')">
               Gestionar Reglas de Negocio
       </button>
 
-      <button *ngIf="userData.role_id === 'admin'"
+      <button *ngIf="userData.role.id === 'admin'"
               mat-stroked-button class="button-white-borders admin-button"
               [ngClass]="{'active': ( activePathSelected === 'dashboard-general' ) }"
               (click)="goToPage('dashboard-general')">
               Gestionar Categorías
       </button>
 
-      <button *ngIf="userData.role_id === 'admin'"
+      <button *ngIf="userData.role.id === 'admin'"
               mat-stroked-button class="button-white-borders admin-button"
               [ngClass]="{'active': ( activePathSelected === 'dashboard-roles' ) }"
               (click)="goToPage('dashboard-roles')">

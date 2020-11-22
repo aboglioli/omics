@@ -24,7 +24,9 @@ export class UserRolesListComponent implements OnInit, AfterViewInit {
   private searchUserCMD: ISearchCommand = {
     limit: 10,
     offset: this.pageCurrent,
-    order_by: 'newest'
+    order_by: 'newest',
+    name: '',
+    role_id: '',
   };
 
   displayedColumns: string[] = ['username', 'name', 'role', 'created_at', 'validated'];
@@ -60,7 +62,7 @@ export class UserRolesListComponent implements OnInit, AfterViewInit {
         // console.log( 'TEST > ', resUserList );
 
         this.tableUserData = new MatTableDataSource<IUser>(resUserList.items);
-        this.pageLength = Math.ceil( resUserList.total / this.pageSize );
+        this.pageLength = Math.ceil( resUserList.matching_criteria / this.pageSize );
 
         if ( isRoleGetNeeded ) {
 
@@ -115,6 +117,17 @@ export class UserRolesListComponent implements OnInit, AfterViewInit {
 
       }
     );
+
+  }
+
+  public filterUser( searchFilter: ISearchCommand ): void {
+
+    console.log('TEST > ', searchFilter);
+
+    this.searchUserCMD.name = searchFilter.name;
+    this.searchUserCMD.role_id = searchFilter.role_id;
+
+    this.getAllUserData(false);
 
   }
 

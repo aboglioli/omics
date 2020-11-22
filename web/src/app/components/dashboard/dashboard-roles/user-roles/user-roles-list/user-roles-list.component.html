@@ -1,5 +1,14 @@
 <div class="parent">
 
+  <div *ngIf="rolesAllData">
+
+    <app-user-filter
+      [rolesData]="rolesAllData"
+      (OnFilterUser)="filterUser($event)">
+    </app-user-filter>
+
+  </div>
+
   <div class="list" >
 
     <div class="mat-elevation-z8">

@@ -67,7 +67,6 @@ export class CollectionNewEditComponent implements OnInit {
 
   private buildForms(): void {
 
-
     this.formCollection = this.fb.group({
 
       name: ['', [ Validators.required, Validators.minLength(5) ] ],

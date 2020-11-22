@@ -85,6 +85,7 @@ import { UserRolesEditComponent } from './components/dashboard/dashboard-roles/u
 import { RolesManagerListComponent } from './components/dashboard/dashboard-roles/roles-manager/roles-manager-list/roles-manager-list.component';
 import { RolesManagerEditComponent } from './components/dashboard/dashboard-roles/roles-manager/roles-manager-edit/roles-manager-edit.component';
 import { MatPaginatorIntl } from '@angular/material/paginator';
+import { UserFilterComponent } from './shared/user-filter/user-filter.component';
 
 
 @NgModule({
@@ -146,6 +147,7 @@ import { MatPaginatorIntl } from '@angular/material/paginator';
     UserRolesEditComponent,
     RolesManagerListComponent,
     RolesManagerEditComponent,
+    UserFilterComponent,
   ],
   imports: [
     BrowserModule,

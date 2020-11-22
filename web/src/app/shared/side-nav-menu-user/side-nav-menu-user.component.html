@@ -2,9 +2,14 @@
 
   <div class="header">
 
-    <h2 >
-      <span *ngIf="userData">¡Hola {{ userData.username }}!</span>
-    </h2>
+    <span *ngIf="userData">
+      <div *ngIf="userData" class="user" style="margin-right: 0.75em;">
+        <span class="username">{{userData.username}}</span>
+        <span *ngIf="userData.name && userData.lastname" class="name">{{userData.name}} {{userData.lastname}}</span>
+        <span *ngIf="userData.role" class="role">{{userData.role.name}}</span>
+      </div>
+    </span>
+
 
     <!-- Volver -->
     <button mat-icon-button (click)="closeSideNavMenu()">

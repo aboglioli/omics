@@ -89,7 +89,7 @@ export class SideNavMenuMainComponent implements OnInit, OnDestroy {
 
   private getUserDataFromService( id: string ): void {
 
-    this.identifyService.getById(id).subscribe( (data: IUser) => {
+    this.identifyService.getById(id, 'role').subscribe( (data: IUser) => {
 
       this.userData = data;
 
