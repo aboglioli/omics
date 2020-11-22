@@ -90,17 +90,29 @@ export class NavBarComponent implements OnInit {
 
   private setAvatarImageFromUser( idUser: string): void {
 
-    this.identifyService.getById(idUser, 'role').subscribe( (data: IUser) => {
+    this.authService.getUser().subscribe((user?: IUser) => {
+      if (user) {
+        this.userData = user;
 
-      this.userData = data;
-
-      if ( this.userData.profile_image ) {
-        this.userAvatar = this.userData.profile_image;
-      } else {
-        this.userAvatar = undefined;
+        if ( this.userData.profile_image ) {
+          this.userAvatar = this.userData.profile_image;
+        } else {
+          this.userAvatar = undefined;
+        }
       }
+    });
 
-    } );
+    // this.identifyService.getById(idUser, 'role').subscribe( (data: IUser) => {
+    //
+    //   this.userData = data;
+    //
+    //   if ( this.userData.profile_image ) {
+    //     this.userAvatar = this.userData.profile_image;
+    //   } else {
+    //     this.userAvatar = undefined;
+    //   }
+    //
+    // } );
 
   }
 

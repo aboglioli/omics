@@ -1,8 +1,9 @@
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { IUser } from '../models/user';
+import { IUser, can } from '../models/user';
 import { IdentityService } from "./identity.service";
 
 @Injectable()
@@ -31,14 +32,25 @@ export class AuthService {
 
   public getUser(): Observable<IUser> {
     if (!this.intialized) {
-      this.identityService.getById('me').subscribe(
-        (user: IUser) => {
-          this.user.next(user);
-        },
-      )
+      this.loadUser();
+      this.intialized = true;
     }
 
-    return this.user.asObservable()
+    return this.user.asObservable();
+  }
+
+  public loadUser(): void {
+    this.identityService.getById('me', 'role').subscribe(
+      (user: IUser) => {
+        this.user.next(user);
+      },
+    );
+  }
+
+  public canUser(permission: string): Observable<boolean> {
+    return this.getUser().pipe(
+      map((user: IUser) => can(user.role, permission)),
+    );
   }
 
   private updateStateSession( newValue: boolean ): void {
