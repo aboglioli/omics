@@ -169,7 +169,14 @@ export class LoginRegisterComponent implements OnInit {
         (error: any) => {
           console.error( 'ERROR !!!', error );
 
-          this.swalFormLoginInvalid.fire();
+          if ( this.authService.canUser('login') ) {
+
+            this.sweetAlertGenericService.showAlertError(`El usuario ${loginCommand.username} no tiene el permiso de Login`, 'Falta de permisos');
+
+          } else {
+            this.swalFormLoginInvalid.fire();
+          }
+
           this.spinnerService.hide();
 
         }
@@ -182,6 +189,7 @@ export class LoginRegisterComponent implements OnInit {
   private setUserData( uderId: string ): void {
 
     this.identityService.getById( uderId, 'role' ).subscribe( res => {
+
 
       this.userData = res;
 
