@@ -1,0 +1,30 @@
+@import "src/scss/vars";
+
+div.parent {
+
+  display: flex;
+  flex-direction: column;
+
+  div.list {
+    padding: 1em;
+
+    mat-table {
+
+      .mat-row:hover {
+        cursor: pointer;
+        background-color: $omics-background-flat;
+        mat-cell {
+          color: white;
+          font-weight: 600;
+        }
+      }
+
+      mat-header-cell, mat-cell {
+        justify-content: center;
+      }
+
+    }
+
+  }
+
+}

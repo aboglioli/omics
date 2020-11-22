@@ -16,6 +16,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { BarRatingModule } from 'ngx-bar-rating';
+import { CustomPaginator } from './shared/custom-instances/CustomPaginatorConfiguration';
 
 // Modulos auxiliares
 import { MaterialModule } from './auxiliar-modules/material.module';
@@ -83,6 +84,7 @@ import { UserRolesListComponent } from './components/dashboard/dashboard-roles/u
 import { UserRolesEditComponent } from './components/dashboard/dashboard-roles/user-roles/user-roles-edit/user-roles-edit.component';
 import { RolesManagerListComponent } from './components/dashboard/dashboard-roles/roles-manager/roles-manager-list/roles-manager-list.component';
 import { RolesManagerEditComponent } from './components/dashboard/dashboard-roles/roles-manager/roles-manager-edit/roles-manager-edit.component';
+import { MatPaginatorIntl } from '@angular/material/paginator';
 
 
 @NgModule({
@@ -165,7 +167,9 @@ import { RolesManagerEditComponent } from './components/dashboard/dashboard-role
     MaterialModule,
     AngularBootstrapModule,
   ],
-  providers: [],
+  providers: [
+    { provide: MatPaginatorIntl, useValue: CustomPaginator() }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

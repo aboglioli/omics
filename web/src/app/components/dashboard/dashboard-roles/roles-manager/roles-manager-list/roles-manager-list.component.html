@@ -43,7 +43,7 @@
       <!-- Fecha creado Column -->
       <ng-container matColumnDef="created_at">
         <mat-header-cell mat-header-cell *matHeaderCellDef> Feche creación: </mat-header-cell>
-        <mat-cell mat-cell *matCellDef="let element"> {{element.created_at| date: 'shortDate' | date: 'dd/MM/yyyy'}} </mat-cell>
+        <mat-cell mat-cell *matCellDef="let element"> {{element.created_at | date: 'shortDate' | date: 'dd/MM/yyyy'}} </mat-cell>
       </ng-container>
 
       <!-- Fecha actualizado Column -->

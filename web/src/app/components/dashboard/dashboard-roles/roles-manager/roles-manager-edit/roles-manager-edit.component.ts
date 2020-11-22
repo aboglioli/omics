@@ -65,8 +65,8 @@ export class RolesManagerEditComponent implements OnInit {
 
     } else {
 
+      // console.log('TEst > ', this.data.role);
       this.title = 'Editar rol';
-      console.log('TEst > ', this.data.role);
       this.isDefault = this.data.role.default;
       this.setFormByData( this.data.role );
 
@@ -179,7 +179,7 @@ export class RolesManagerEditComponent implements OnInit {
       (res) => {
         this.spinnerService.hide();
         this.dialogRef.close(true);
-        
+
         this.sweetAlertGenericService.showAlertSuccess(`El rol ${ this.data.role.name } ha sido eliminado correctamente.`, 'Eliminación exitosa');
 
       },
