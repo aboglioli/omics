@@ -28,10 +28,10 @@ export class AuthService {
       this.authToken = authToken;
     }
 
-    const user = localStorage.getItem('user');
-    if (user) {
-      this.user = new BehaviorSubject<IUser>(JSON.parse(user));
-    }
+    // const user = localStorage.getItem('user');
+    // if (user) {
+    //   this.user = new BehaviorSubject<IUser>(JSON.parse(user));
+    // }
 
   }
 
@@ -41,16 +41,22 @@ export class AuthService {
       this.intialized = true;
     }
 
-    return this.user.asObservable().pipe(
-      filter((user) => !!user && this.intialized)
-    );
+    return this.user
+      .asObservable()
+      .pipe(
+        filter((user) => !!user && this.intialized)
+      );
   }
 
   public loadUser(): void {
     this.identityService.getById('me', 'role').subscribe(
       (user: IUser) => {
         this.user.next(user);
-        localStorage.setItem('user', JSON.stringify(user));
+        // localStorage.setItem('user', JSON.stringify(user));
+      },
+      (err: any) => {
+        this.user.error(err);
+        // localStorage.removeItem('user');
       },
     );
   }
@@ -104,7 +110,7 @@ export class AuthService {
     this.authToken = null;
     localStorage.removeItem('auth_token');
     localStorage.removeItem('id_user');
-    localStorage.removeItem('user');
+    // localStorage.removeItem('user');
 
   }
 
