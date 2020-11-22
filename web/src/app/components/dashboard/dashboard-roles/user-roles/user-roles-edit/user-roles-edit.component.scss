@@ -1,0 +1,140 @@
+@import "src/scss/vars";
+
+$avatar-size-big: 196px;
+$avatar-size-small: 128px;
+
+div.parent{
+
+  color: white;
+  display: flex;
+  flex-direction: column;
+
+  div.header {
+
+    display: flex;
+    justify-content: center;
+    background-color: $omics-background-flat;
+    width: 100%;
+    padding: 10px;
+
+    position: relative;
+
+    h1 {
+      margin: 0.5em;
+    }
+
+    .button-top-menu {
+
+      display: flex;
+      justify-content: flex-end;
+      padding: 5px;
+      position: absolute;
+      top: 2px;
+      right: 2px;
+
+      button {
+        margin: 0px;
+        outline: none;
+      }
+
+    }
+
+  }
+
+  div.body {
+
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin: 1em 0em;
+    padding: 0em 1em;
+
+    min-height: 100px;
+
+    .info-user {
+
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+
+      div.side {
+        flex: 1;
+        display: flex;
+
+
+        &.center {
+
+          justify-content: center;
+
+        }
+
+        &.columns {
+          flex-direction: column;
+        }
+
+      }
+
+      .block-text {
+        margin: 0.5em 0em;
+        color: white;
+        display: flex;
+        h4 {
+          margin: 0px;
+        }
+
+      }
+
+
+    }
+
+
+    ::ng-deep div.mat-form-field-flex {
+      background-color: white;
+      color: black;
+      border-radius: 6px;
+    }
+
+
+  }
+
+}
+
+
+// Generales
+.pointer-type, img {
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+
+    img {
+      border-color: $omics-neon-pink;
+    }
+  }
+}
+
+img.avatar {
+
+  // Pantalla grande
+  @media screen and (min-width: $break-small) {
+
+    width: $avatar-size-big;
+    height: $avatar-size-big;
+    border-radius: ($avatar-size-big * 0.5);
+
+  }
+
+  // Pantalla chica
+  @media screen and (max-width: $break-small) {
+
+    width: $avatar-size-small;
+    height: $avatar-size-small;
+    border-radius: ($avatar-size-small * 0.5);
+
+  }
+
+
+  border-style: solid;
+  border-width: 2px;
+}
+

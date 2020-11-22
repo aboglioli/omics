@@ -1,1 +1,59 @@
-<p>user-roles-list works!</p>
+<div class="parent">
+
+  <div class="list" >
+
+    <div class="mat-elevation-z8">
+      <mat-paginator
+        [pageSize]="pageSize"
+        [length]="pageLength"
+        [pageSizeOptions]="[5, 10, 20]"
+        (page)="changePageOptions($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+
+      <mat-table mat-table [dataSource]="tableUserData">
+
+        <!-- Position Column -->
+        <ng-container matColumnDef="username">
+          <mat-header-cell mat-header-cell *matHeaderCellDef> ID </mat-header-cell>
+          <mat-cell mat-cell *matCellDef="let element"> {{element.username}} </mat-cell>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <mat-header-cell mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+          <mat-cell mat-cell *matCellDef="let element"> {{element.name}} {{element.lastname}} </mat-cell>
+        </ng-container>
+
+        <!-- Role Column -->
+        <ng-container matColumnDef="role">
+          <mat-header-cell mat-header-cell *matHeaderCellDef> Rol </mat-header-cell>
+          <mat-cell mat-cell *matCellDef="let element"> {{element.role.name}}</mat-cell>
+        </ng-container>
+
+        <!-- Role Column -->
+        <ng-container matColumnDef="created_at">
+          <mat-header-cell mat-header-cell *matHeaderCellDef> Usuario desde </mat-header-cell>
+          <mat-cell mat-cell *matCellDef="let element"> {{element.created_at | date: 'shortDate' | date: 'dd/MM/yyyy' }}</mat-cell>
+        </ng-container>
+
+        <!-- Validated Column -->
+        <ng-container matColumnDef="validated">
+          <mat-header-cell mat-header-cell *matHeaderCellDef> ¿Validado? </mat-header-cell>
+          <mat-cell mat-cell *matCellDef="let element"> {{ (element.validated)? 'Sí':'No'}}</mat-cell>
+        </ng-container>
+
+        <mat-header-row mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row mat-row *matRowDef="let row; columns: displayedColumns;" (click)="onEditUserRole(row)"></mat-row>
+      </mat-table>
+
+      <!-- Sin datos -->
+      <div *ngIf="tableUserData.filteredData.length === 0" style="display: flex; justify-content: center; color: black; background: white;">
+        <h1 style="margin: 1em;">No hay usuarios que cumplan los filtros de búsqueda</h1>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

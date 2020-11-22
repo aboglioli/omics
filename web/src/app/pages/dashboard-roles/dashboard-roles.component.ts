@@ -9,7 +9,7 @@ import { typeManagueRoles } from 'src/app/models/enums.model';
 export class DashboardRolesComponent implements OnInit {
 
   public optionMenu = typeManagueRoles;
-  public currentOption = this.optionMenu.roles; // TODO: En vez de esto, debería usarse "patch child" (esto lo hice por tiempo)
+  public currentOption = this.optionMenu.users; // TODO: En vez de esto, debería usarse "patch child" (esto lo hice por tiempo)
 
   constructor() { }
 

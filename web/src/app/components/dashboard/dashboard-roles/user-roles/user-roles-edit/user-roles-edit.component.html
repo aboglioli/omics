@@ -1,1 +1,123 @@
-<p>User-role-edit works</p>
+<div class="parent">
+
+  <div class="header">
+
+    <div class="pointer-type" (click)="onGoToUserProfile()">
+      <h1>{{ user.username | uppercase}}</h1>
+    </div>
+
+    <div  class="button-top-menu"
+          style="flex: 0.5">
+      <button mat-icon-button mat-dialog-close (click)="onClose()">
+        <fa-icon [icon]="faClose" size="2x"></fa-icon>
+      </button>
+    </div>
+
+  </div>
+
+  <div class="body">
+
+    <!-- User Data -->
+    <div class="info-user">
+
+      <!-- Avatar image -->
+      <div class="side center">
+
+        <div class="pointer-type" (click)="onGoToUserProfile()">
+        <img  *ngIf="!user.profile_image"
+              src="assets/images/generic/avatar196x196.jpg"
+              alt="omics-avatar-profile"
+              class="avatar">
+
+        <img  *ngIf="user.profile_image"
+              [src]="user.profile_image"
+              alt="omics-avatar-profile"
+              class="avatar">
+        </div>
+
+
+      </div>
+
+      <!-- User info -->
+      <div class="side columns">
+
+        <div class="block-text">
+          <h4 style="text-decoration: underline;">Nombre completo: </h4>
+          <h4 style="margin-left: 0.25em">{{ user.name }} {{ user.lastname }}</h4>
+        </div>
+
+        <div class="block-text">
+          <h4 style="text-decoration: underline;">Correo: </h4>
+          <h4 style="margin-left: 0.25em">{{ user.email }}</h4>
+        </div>
+
+        <div class="block-text">
+          <h4 style="text-decoration: underline;">Fecha creación: </h4>
+          <h4 style="margin-left: 0.25em">{{ user.created_at | date: 'shortDate' | date: 'dd/MM/yyyy' }}</h4>
+        </div>
+
+        <div class="block-text">
+          <h4 style="text-decoration: underline;">Usuario validado: </h4>
+          <h4 style="margin-left: 0.25em">{{ (user.validated)? 'Sí':'No'}}</h4>
+        </div>
+
+        <!-- Role change -->
+        <div class="block-text" style="align-items: baseline;">
+          <h4 style="text-decoration: underline;">Rol asignado: </h4>
+
+          <div  class="d-inline-block"
+                style="margin-left: 1em;"
+                ngbDropdown
+                #dropdownRole="ngbDropdown">
+
+                <mat-form-field appearance="fill">
+                  <mat-label>Rol</mat-label>
+                  <mat-select [(ngModel)]="newRole" name="role">
+                    <mat-option *ngFor="let role of roleListToSelect" [value]="role.id">
+                      {{role.name}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+    </div>
+
+
+    <!-- Action buttons -->
+    <div class="button-actions">
+
+      <button mat-flat-button
+            color="warn"
+            class="button-white-borders"
+            style="margin: 1em"
+            (click)="deleteUser()">
+
+        <fa-icon  [icon]="faDelete" size="1x"></fa-icon>
+        Eliminar usuario
+
+      </button>
+
+      <button mat-flat-button
+              color="accent"
+              class="button-white-borders"
+              style="margin: 1em"
+              [disabled]="newRole === user.role.id"
+              (click)="onChangeUserRole()">
+
+        <fa-icon  [icon]="faSave" size="1x" ></fa-icon>
+        Guardar cambios
+      </button>
+
+
+
+    </div>
+
+  </div>
+
+</div>
