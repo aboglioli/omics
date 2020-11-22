@@ -92,6 +92,8 @@ export class UserRolesListComponent implements OnInit, AfterViewInit {
 
     this.searchUserCMD.limit = pageEvent.pageSize;
     this.searchUserCMD.offset = pageEvent.pageIndex;
+
+    console.log('TEST > ', pageEvent)
     this.getAllUserData(false);
 
   }
@@ -126,6 +128,9 @@ export class UserRolesListComponent implements OnInit, AfterViewInit {
 
     this.searchUserCMD.name = searchFilter.name;
     this.searchUserCMD.role_id = searchFilter.role_id;
+    this.searchUserCMD.offset = 0;
+    this.pageCurrent = 0;
+    this.paginator.firstPage();
 
     this.getAllUserData(false);
 
