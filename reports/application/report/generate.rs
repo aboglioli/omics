@@ -65,7 +65,15 @@ impl<'a> Generate<'a> {
 
         let p_users = self
             .user_repo
-            .search(None, Some(&date_from), Some(&date_to), None, None, None)
+            .search(
+                None,
+                None,
+                Some(&date_from),
+                Some(&date_to),
+                None,
+                None,
+                None,
+            )
             .await?;
 
         let p_publications = self

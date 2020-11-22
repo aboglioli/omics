@@ -32,7 +32,7 @@ impl<'a> Delete<'a> {
 
         let p_users = self
             .user_repo
-            .search(Some(&role_id), None, None, None, Some(5), None)
+            .search(None, Some(&role_id), None, None, None, Some(5), None)
             .await?;
 
         if p_users.count() > 0 {

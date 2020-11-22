@@ -15,6 +15,7 @@ use crate::UserIdAndRole;
 
 #[derive(Deserialize)]
 pub struct SearchCommand {
+    pub name: Option<String>,
     pub role_id: Option<String>,
     pub date_from: Option<String>,
     pub date_to: Option<String>,
@@ -47,6 +48,7 @@ impl<'a> Search<'a> {
         let pagination_users = self
             .user_repo
             .search(
+                cmd.name.as_ref(),
                 cmd.role_id.map(RoleId::new).transpose()?.as_ref(),
                 cmd.date_from
                     .map(|d| DateTime::from_str(&d))

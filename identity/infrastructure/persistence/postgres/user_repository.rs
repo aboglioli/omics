@@ -175,6 +175,7 @@ impl UserRepository for PostgresUserRepository {
 
     async fn search(
         &self,
+        name: Option<&String>,
         role_id: Option<&RoleId>,
         from: Option<&DateTime<Utc>>,
         to: Option<&DateTime<Utc>>,
@@ -185,6 +186,16 @@ impl UserRepository for PostgresUserRepository {
         let role_id = role_id.map(|id| id.value());
 
         let (sql, params) = WhereBuilder::new()
+            .add_param_opt(
+                "(
+                    LOWER(username) LIKE '%' || LOWER($$) || '%'
+                    OR LOWER(name) LIKE '%' || LOWER($$) || '%'
+                    OR LOWER(lastname) LIKE '%' || LOWER($$) || '%'
+                    OR LOWER(CONCAT(name, ' ', lastname)) LIKE '%' || LOWER($$) || '%'
+                )",
+                &name,
+                name.is_some(),
+            )
             .add_param_opt("role_id = $$", &role_id, role_id.is_some())
             .add_param_opt("created_at >= $$", &from, from.is_some())
             .add_param_opt("created_at <= $$", &to, to.is_some())

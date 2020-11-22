@@ -1,6 +1,5 @@
 use serde::Serialize;
 
-
 use common::request::Include;
 use common::result::Result;
 use identity::UserIdAndRole;

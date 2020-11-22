@@ -64,6 +64,7 @@ impl UserRepository for InMemUserRepository {
 
     async fn search(
         &self,
+        _name: Option<&String>,
         _role_id: Option<&RoleId>,
         _from: Option<&DateTime<Utc>>,
         _to: Option<&DateTime<Utc>>,

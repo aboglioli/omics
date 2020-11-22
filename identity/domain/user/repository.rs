@@ -24,6 +24,7 @@ pub trait UserRepository: Sync + Send {
     async fn find_by_role_id(&self, role_id: &RoleId) -> Result<Vec<User>>;
     async fn search(
         &self,
+        name: Option<&String>,
         role_id: Option<&RoleId>,
         from: Option<&DateTime<Utc>>,
         to: Option<&DateTime<Utc>>,

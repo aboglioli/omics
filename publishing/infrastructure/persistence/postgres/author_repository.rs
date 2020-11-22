@@ -85,6 +85,8 @@ impl AuthorRepository for PostgresAuthorRepository {
                 "(
                     LOWER(username) LIKE '%' || LOWER($$) || '%'
                     OR LOWER(name) LIKE '%' || LOWER($$) || '%'
+                    OR LOWER(lastname) LIKE '%' || LOWER($$) || '%'
+                    OR LOWER(CONCAT(name, ' ', lastname)) LIKE '%' || LOWER($$) || '%'
                 )",
                 &name,
                 name.is_some(),

@@ -6,6 +6,7 @@ import { ConfigService } from './config.service';
 import { IPagination, IUser } from '../models';
 
 export interface ISearchCommand {
+  name?: string;
   role_id?: string;
   date_from?: string;
   date_to?: string;
@@ -86,6 +87,10 @@ export class IdentityService {
 
   public search(cmd: ISearchCommand, include: string = ''): Observable<IPagination<IUser>> {
     let params = new HttpParams();
+
+    if (cmd.name) {
+      params = params.append('name', cmd.name);
+    }
 
     if (cmd.role_id) {
       params = params.append('role_id', cmd.role_id);

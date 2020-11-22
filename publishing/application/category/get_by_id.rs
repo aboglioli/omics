@@ -1,4 +1,3 @@
-
 use common::result::Result;
 use identity::UserIdAndRole;
 
