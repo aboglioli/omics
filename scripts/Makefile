@@ -18,6 +18,3 @@ test:
 
 update-samples:
 	npm run update-samples
-
-backup:
-	./scripts/backup.sh
