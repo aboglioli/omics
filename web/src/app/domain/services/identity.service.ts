@@ -67,6 +67,10 @@ export interface IChangeRoleCommand {
   role_id: string;
 }
 
+export interface ISetFlagCommand {
+  flag: number;
+}
+
 @Injectable()
 export class IdentityService {
   private baseUrl: string;
@@ -153,5 +157,9 @@ export class IdentityService {
 
   public changeRole(userId: string, cmd: IChangeRoleCommand): Observable<any> {
     return this.http.put(`${this.baseUrl}/${userId}/role`, cmd);
+  }
+
+  public setFlag(userId: string, cmd: ISetFlagCommand): Observable<any> {
+    return this.http.put(`${this.baseUrl}/${userId}/flag`, cmd);
   }
 }

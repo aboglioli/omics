@@ -40,6 +40,8 @@ impl User {
 
         let payment_email: Option<String> = row.get("payment_email");
 
+        let flag: Option<i64> = row.get("flag");
+
         let created_at: DateTime<Utc> = row.get("created_at");
         let updated_at: Option<DateTime<Utc>> = row.get("updated_at");
         let deleted_at: Option<DateTime<Utc>> = row.get("deleted_at");
@@ -80,6 +82,7 @@ impl User {
             role_id,
             validation,
             payment_email.map(Email::new).transpose()?,
+            flag,
         ))
     }
 }

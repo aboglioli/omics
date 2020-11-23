@@ -4,8 +4,8 @@ use common::request::{IncludeParams, PaginationParams};
 use identity::application::user::{
     ChangePassword, ChangePasswordCommand, ChangePaymentEmail, ChangePaymentEmailCommand,
     ChangeRole, ChangeRoleCommand, Delete, GetById, Login, LoginCommand, RecoverPassword,
-    RecoverPasswordCommand, Register, RegisterCommand, Search, SearchCommand, Update,
-    UpdateCommand, Validate,
+    RecoverPasswordCommand, Register, RegisterCommand, Search, SearchCommand, SetFlag,
+    SetFlagCommand, Update, UpdateCommand, Validate,
 };
 
 use crate::authorization::auth;
@@ -242,6 +242,27 @@ async fn change_role(
     .map_err(PublicError::from)
 }
 
+#[put("/{user_id}/flag")]
+async fn set_flag(
+    req: HttpRequest,
+    path: web::Path<String>,
+    cmd: web::Json<SetFlagCommand>,
+    c: web::Data<MainContainer>,
+) -> impl Responder {
+    let user_id_and_role = auth(&req, &c).await?;
+
+    let mut user_id = path.into_inner();
+    if user_id == "me" {
+        user_id = user_id_and_role.0.to_string();
+    }
+
+    SetFlag::new(c.identity.user_repo())
+        .exec(user_id_and_role, user_id, cmd.into_inner())
+        .await
+        .map(|res| HttpResponse::Ok().json(res))
+        .map_err(PublicError::from)
+}
+
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(register)
         .service(login)
@@ -255,6 +276,7 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
                 .service(change_password)
                 .service(validate)
                 .service(change_role)
-                .service(change_payment_email),
+                .service(change_payment_email)
+                .service(set_flag),
         );
 }

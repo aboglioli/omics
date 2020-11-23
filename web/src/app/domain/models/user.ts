@@ -50,6 +50,7 @@ export interface IUser {
   role_id?: string;
   role?: IRole;
   payment_email?: string;
+  flag?: number;
   created_at: string;
   updated_at?: string;
 }
