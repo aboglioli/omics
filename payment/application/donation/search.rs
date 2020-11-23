@@ -52,13 +52,13 @@ impl<'a> Search<'a> {
     ) -> Result<PaginationResponse<DonationDto>> {
         if !auth_role.can("get_any_donation") {
             if let Some(author_id) = &cmd.author_id {
-                if author_id != auth_id.value() || !auth_role.can("get_own_donation") {
+                if author_id != auth_id.value() || !auth_role.can("donate") {
                     return Err(Error::unauthorized());
                 }
             }
 
             if let Some(reader_id) = &cmd.reader_id {
-                if reader_id != auth_id.value() || !auth_role.can("get_own_donation") {
+                if reader_id != auth_id.value() || !auth_role.can("donate") {
                     return Err(Error::unauthorized());
                 }
             }

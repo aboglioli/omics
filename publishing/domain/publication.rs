@@ -261,10 +261,6 @@ impl Publication {
             return Err(Error::new("publication", "not_published"));
         }
 
-        if self.has_contract() && !reader.is_subscribed() {
-            return Err(Error::new("reader", "not_subscribed"));
-        }
-
         self.statistics.add_like();
 
         self.events.record_event(PublicationEvent::Liked {
@@ -292,10 +288,6 @@ impl Publication {
     pub fn unlike(&mut self, reader: &Reader) -> Result<()> {
         if !self.is_published() {
             return Err(Error::new("publication", "not_published"));
-        }
-
-        if self.has_contract() && !reader.is_subscribed() {
-            return Err(Error::new("reader", "not_subscribed"));
         }
 
         self.statistics.remove_like();

@@ -74,14 +74,12 @@ VALUES
   ('charge_donations', 'Cobrar donaciones'),
   ('donate', 'Donar'),
   ('get_any_donation', 'Obtener cualquier donación'),
-  ('get_own_donation', 'Obtener donación propia'),
   -- Plans
   ('create_plan', 'Crear plan'),
   ('delete_plan', 'Eliminar plan'),
   ('update_plan', 'Editar plan'),
   -- Subscriptions
   ('get_any_subscription', 'Obtener cualquier suscripción'),
-  ('get_own_subscription', 'Obtener suscripción propia'),
   ('subscribe', 'Subscribirse'),
   -- Notifications
   ('get_notifications', 'Obtener notificaciones'),
@@ -148,12 +146,10 @@ VALUES
       { "id": "charge_donations", "name": "Cobrar donaciones" },
       { "id": "donate", "name": "Donar" },
       { "id": "get_any_donation", "name": "Obtener cualquier donación" },
-      { "id": "get_own_donation", "name": "Obtener donación propia" },
       { "id": "create_plan", "name": "Crear plan" },
       { "id": "delete_plan", "name": "Eliminar plan" },
       { "id": "update_plan", "name": "Editar plan" },
       { "id": "get_any_subscription", "name": "Obtener cualquier suscripción" },
-      { "id": "get_own_subscription", "name": "Obtener suscripción propia" },
       { "id": "subscribe", "name": "Subscribirse" },
       { "id": "get_notifications", "name": "Obtener notificaciones" },
       { "id": "generate_report", "name": "Generar reportes" },
@@ -230,8 +226,6 @@ VALUES
       { "id": "request_contract", "name": "Requerir contrato" },
       { "id": "charge_donations", "name": "Cobrar donaciones" },
       { "id": "donate", "name": "Donar" },
-      { "id": "get_own_donation", "name": "Obtener donación propia" },
-      { "id": "get_own_subscription", "name": "Obtener suscripción propia" },
       { "id": "subscribe", "name": "Subscribirse" },
       { "id": "get_notifications", "name": "Obtener notificaciones" }
     ]',
