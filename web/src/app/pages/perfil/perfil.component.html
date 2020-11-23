@@ -12,6 +12,7 @@
 
           <div class="side-box">
             <button *ngIf="!isSameAsUser && isAccessUserLogIn "
+                    [disabled]="!can(authUser, 'donate')"
                     mat-flat-button color="primary"  class="button-white-borders"
                     (click)="selectDonar()">
               Donar
@@ -22,7 +23,7 @@
 
           <div class="side-box">
             <div style="flex: 1"></div>
-            <div style="flex: 1; margin-right: 1em;" *ngIf="isAccessUserLogIn">
+            <div style="flex: 1; margin-right: 1em;" *ngIf="isAccessUserLogIn && can(authUser, 'follow_unfollow_author')">
               <button *ngIf="!isSameAsUser && !followed"
                       mat-flat-button color="primary" class="button-white-borders"
                       style="width: 100%; margin: 0px;"

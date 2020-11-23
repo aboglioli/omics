@@ -13,14 +13,14 @@
 
         <div class="box-type">
           <button
-              *ngIf="can(user, 'approve_reject_publication')"
+              *ngIf="can(user, 'approve_reject_publication') && can(user, 'get_any_publication')"
               [ngClass]="{'selected': selectedPanel === 'publication'}"
               (click)="selectPanel('publication')">
             Publicaciones
           </button>
 
           <button
-              *ngIf="can(user, 'approve_reject_contract')"
+              *ngIf="can(user, 'approve_reject_contract') && can(user, 'get_any_contract')"
               [ngClass]="{'selected': selectedPanel === 'contract'}"
               (click)="selectPanel('contract')">
             Contratos

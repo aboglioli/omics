@@ -54,6 +54,7 @@
                 style="display: flex; justify-content: center; width: 100%; margin-bottom: 1em;">
             <button mat-flat-button color="warn"
                     class="button-white-borders"
+                    [disabled]="!(authService.canUser('delete_collection') | async)"
                     (click)="onCollectionDelete()">
               <fa-icon [icon]="faDelete" size="1x" style="margin-right: 0.5em"></fa-icon>
               Eliminar Colección

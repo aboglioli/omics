@@ -27,7 +27,8 @@
     <div style="display: flex;">
 
       <!-- Edit -->
-      <button mat-icon-button (click)="goToEdit()" class="option-item">
+      <button mat-icon-button (click)="goToEdit()" class="option-item"
+              *ngIf="can(userData, 'update_publication')">
         <fa-icon [icon]="faEdit" size="2x"></fa-icon>
       </button>
 
@@ -36,6 +37,7 @@
         <fa-icon [icon]="faInfo" size="2x"></fa-icon>
       </button>
 
+      <!-- Contrato -->
       <button *ngIf="can(userData, 'get_own_contract') && publication.contract" mat-icon-button (click)="onOpenInfo()" class="option-item">
         <fa-icon [icon]="faDollarSign" size="2x"></fa-icon>
       </button>

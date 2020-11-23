@@ -49,11 +49,11 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
     this.checkWidthScreen();
 
     this.authService.getUser().subscribe((user) => {
-      if (!can(user, 'approve_reject_publication')) {
+      if ( can(user, 'approve_reject_publication') && can(user, 'get_any_publication') ) {
+        this.getAllPublication();
+      } else {
         this.selectedPanel = 'contract';
         this.getAllContracts();
-      } else {
-        this.getAllPublication();
       }
 
       this.user = user;
