@@ -20,7 +20,7 @@ impl<'a> GetByReader<'a> {
         (auth_id, auth_role): UserIdAndRole,
         reader_id: String,
     ) -> Result<SubscriptionDto> {
-        if auth_id.value() != reader_id || !auth_role.can("get_own_subscription") {
+        if auth_id.value() != reader_id || !auth_role.can("subscribe") {
             return Err(Error::unauthorized());
         }
 
