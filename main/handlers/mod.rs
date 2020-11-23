@@ -1,4 +1,5 @@
 pub mod author;
+pub mod backup;
 pub mod category;
 pub mod collection;
 pub mod configuration;

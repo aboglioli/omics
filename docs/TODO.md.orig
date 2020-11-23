@@ -2,8 +2,11 @@
 
 ## New
 - [ ] Add 'birthdate' in user register.
+<<<<<<< HEAD
 - [ ] Allow edit plan.
+=======
 - [ ]  Remove 'add_remove_collection_from_favorites' from permissions
+>>>>>>> feature/roles
 
 ## Urgent
 - [x] Publication status should be an object in DTO to show comments.

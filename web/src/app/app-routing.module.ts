@@ -14,6 +14,7 @@ import { DashboardReportesComponent } from './pages/dashboard-reportes/dashboard
 import { DashboardGestionContratosPublicacionesComponent } from './pages/dashboard-gestion-contratos-publicaciones/dashboard-gestion-contratos-publicaciones.component';
 import { DashboardReglasNegociosComponent } from './pages/dashboard-reglas-negocios/dashboard-reglas-negocios.component';
 import { DashboardGestionAdminComponent } from './pages/dashboard-gestion-admin/dashboard-gestion-admin.component';
+import { DashboardBackup } from './pages/dashboard-backup/dashboard-backup.component';
 
 import { DevelopmentComponent } from './pages/development/development.component';
 import { VisorComicComponent } from './pages/visor-comic/visor-comic.component';
@@ -56,6 +57,7 @@ const routes: Routes = [
   { path: 'dashboard-reglas-negocio', component: DashboardReglasNegociosComponent, canActivate: []  },
   { path: 'dashboard-general', component: DashboardGestionAdminComponent, canActivate: [AuthLoginGuard, PermissionAnyGuard ], data: { permission: ['create_category', 'update_category', 'delete_category'] } },
   { path: 'dashboard-roles', component: DashboardRolesComponent, canActivate: [AuthLoginGuard,  PermissionAnyGuard], data: { permission: ['get_permissions', 'get_any_user'] } },
+  { path: 'dashboard-backups', component: DashboardBackup, canActivate: [AuthLoginGuard]  },
   { path: 'plans', component: PlansComponent, canActivate: [AuthLoginGuard, PermissionAnyGuard], data: {permission: ['subscribe'] } },
   { path: '**', pathMatch: 'full', redirectTo: 'home' },
 

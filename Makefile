@@ -45,7 +45,7 @@ update-samples:
 	$(MAKE) -C $(SCRIPTS_DIR) update-samples
 
 backup:
-	$(MAKE) -C $(SCRIPTS_DIR) backup
+	./scripts/scripts/backup.sh
 
 
 # ----------
