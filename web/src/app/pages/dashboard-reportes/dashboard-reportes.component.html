@@ -243,14 +243,14 @@
             <div class="chart">
               <mat-card >
                 <h2>Total ingresos ($):</h2>
-                <h1  style="color: green">{{ report.payments.income | currency}}</h1>
+                <h1  style="color: green">{{ report.payments.total_income | currency}}</h1>
               </mat-card>
             </div>
 
             <div class="chart">
               <mat-card >
                 <h2>Total egresos:</h2>
-                <h1 style="color: red">{{ report.payments.outcome | currency}}</h1>
+                <h1 style="color: red">{{ report.payments.total_outcome | currency}}</h1>
               </mat-card>
             </div>
 

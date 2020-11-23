@@ -143,7 +143,11 @@ impl<'a> Generate<'a> {
         report.map_subscriptions(p_subscriptions.items());
         report.map_contracts(p_contracts.items());
         report.map_donations(p_donations.items());
-        report.map_payments(p_subscriptions.items(), p_contracts.items());
+        report.map_payments(
+            p_subscriptions.items(),
+            p_contracts.items(),
+            p_donations.items(),
+        );
 
         let categories = self.category_repo.find_all().await?;
         let mut categories_map = HashMap::new();

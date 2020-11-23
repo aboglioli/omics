@@ -8,7 +8,7 @@ use common::result::Result;
 use identity::domain::user::{Gender, User};
 use payment::domain::contract::{Contract, Status as ContractStatus};
 use payment::domain::donation::{Donation, Status as DonationStatus};
-use payment::domain::subscription::{Subscription, Status as SubscriptionStatus};
+use payment::domain::subscription::{Status as SubscriptionStatus, Subscription};
 use publishing::domain::publication::{Publication, Status as PublicationStatus};
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -62,8 +62,12 @@ pub struct Donations {
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Payments {
-    pub income: f64,
-    pub outcome: f64,
+    pub total_income: f64,
+    pub subscription_income: f64,
+    pub donation_income: f64,
+    pub total_outcome: f64,
+    pub contract_outcome: f64,
+    pub donation_outcome: f64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -157,14 +161,19 @@ impl Report {
         });
     }
 
-    pub fn map_publications(&mut self, publications: &[Publication], categories: HashMap<String, String>) {
+    pub fn map_publications(
+        &mut self,
+        publications: &[Publication],
+        categories: HashMap<String, String>,
+    ) {
         let mut by_category = Counter::new();
         let mut by_contract = Counter::new();
         let mut by_status = Counter::new();
         let mut by_pages = Counter::new();
 
         for publication in publications.iter() {
-            if let Some(category_name) = categories.get(publication.header().category_id().value()) {
+            if let Some(category_name) = categories.get(publication.header().category_id().value())
+            {
                 by_category.inc(category_name);
             }
 
@@ -329,14 +338,21 @@ impl Report {
         });
     }
 
-    pub fn map_payments(&mut self, subscriptions: &[Subscription], contracts: &[Contract]) {
-        let mut income = 0.0;
-        let mut outcome = 0.0;
+    pub fn map_payments(
+        &mut self,
+        subscriptions: &[Subscription],
+        contracts: &[Contract],
+        donations: &[Donation],
+    ) {
+        let mut subscription_income = 0.0;
+        let mut donation_income = 0.0;
+        let mut contract_outcome = 0.0;
+        let mut donation_outcome = 0.0;
 
         for subscription in subscriptions.iter() {
             for payment in subscription.payments().iter() {
                 if payment.datetime() >= &self.from && payment.datetime() <= &self.to {
-                    income += payment.amount().value();
+                    subscription_income += payment.amount().value();
                 }
             }
         }
@@ -344,11 +360,23 @@ impl Report {
         for contract in contracts.iter() {
             for payment in contract.payments().iter() {
                 if payment.datetime() >= &self.from && payment.datetime() <= &self.to {
-                    outcome += payment.amount().value();
+                    contract_outcome += payment.amount().value();
                 }
             }
         }
 
-        self.payments = Some(Payments { income, outcome });
+        for donation in donations.iter() {
+            donation_income += donation.total().value() - donation.subtotal().value();
+            donation_outcome += donation.subtotal().value();
+        }
+
+        self.payments = Some(Payments {
+            total_income: subscription_income + donation_income,
+            subscription_income,
+            donation_income,
+            total_outcome: contract_outcome + donation_outcome,
+            contract_outcome,
+            donation_outcome,
+        });
     }
 }

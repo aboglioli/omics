@@ -469,23 +469,23 @@ export class DashboardReportesComponent implements OnInit {
               ],
               [
                 {text: 'Contratos', style: 'tableRow'},
-                '',
-                ''
+                '$0',
+                `\$${this.report.payments.contract_outcome.toFixed(2)}`,
               ],
               [
                 {text: 'Suscripciones', style: 'tableRow'},
-                '',
-                ''
+                `\$${this.report.payments.subscription_income.toFixed(2)}`,
+                '$0'
               ],
               [
                 {text: 'Donaciones', style: 'tableRow'},
-                '',
-                ''
+                `\$${this.report.payments.donation_income.toFixed(2)}`,
+                `\$${this.report.payments.donation_outcome.toFixed(2)}`,
               ],
               [
                 {text: 'Total', style: 'tableRow'},
-                `\$${this.report.payments.income.toFixed(2)}`,
-                `\$${this.report.payments.outcome.toFixed(2)}`
+                `\$${this.report.payments.total_income.toFixed(2)}`,
+                `\$${this.report.payments.total_outcome.toFixed(2)}`
               ]
             ]
           },
