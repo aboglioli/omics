@@ -18,6 +18,7 @@ pub struct UserDto {
     pub role_id: Option<String>,
     pub role: Option<RoleDto>,
     pub payment_email: Option<String>,
+    pub flag: Option<i64>,
     pub created_at: String,
     pub updated_at: Option<String>,
 }
@@ -58,6 +59,7 @@ impl From<&User> for UserDto {
             role_id: Some(user.role_id().to_string()),
             role: None,
             payment_email: user.payment_email().map(|p| p.to_string()),
+            flag: user.flag(),
             created_at: user.base().created_at().to_rfc3339(),
             updated_at: user.base().updated_at().map(|d| d.to_rfc3339()),
         }
