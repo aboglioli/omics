@@ -83,7 +83,7 @@ div.filter-box {
 }
 
 
-// Generales
+// les
 .fila {
   display: flex;
   flex-direction: row;
@@ -95,13 +95,24 @@ div.filter-box {
 
 }
 
+
 button.button-white-borders {
 
   color: white;
   border-color: white;
 
-  &:hover {
-    box-shadow: 0px 0px 6px 2px $omics-aqua-button
+  &.clear {
+    background-color: gray !important;
+  }
+
+
+  &:hover  {
+    &:not(.clear){
+      box-shadow: 0px 0px 6px 2px $omics-aqua-button
+    }
+    &.clear{
+      box-shadow: inset 0px 0px 0px 2px white;
+    }
   }
 
   h4 {

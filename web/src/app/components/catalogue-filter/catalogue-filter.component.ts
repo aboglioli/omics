@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { typeSearchCatalogue } from '../../models/enums.model';
 import { IDropdownItem } from '../../models/dropdown-item.interface';
 import { DropdownDataObrasService } from 'src/app/services/dropdown-data-obras.service';
+import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-catalogue-filter',
@@ -14,6 +15,9 @@ export class CatalogueFilterComponent implements OnInit {
 
   @Output() typeSearch = new EventEmitter();
   @Output() filterSearch = new EventEmitter();
+
+  // Font Awseome icons
+  public faClear = faTimesCircle;
 
   public optionTypeSearch = typeSearchCatalogue;
   public currentTypeSearch = this.optionTypeSearch.publication;
@@ -165,6 +169,15 @@ export class CatalogueFilterComponent implements OnInit {
     this.formFilterSearch.get('category_id').setValue(category.valueId);
     this.filterSearch.emit(  this.formFilterSearch.value );
 
+  }
+
+  public onClear(): void {
+    this.formFilterSearch.reset();
+    this.publicationFilterTypesOrderList.forEach( filter => {
+      filter.selected = false;
+    });
+
+    this.filterSearch.emit(  this.formFilterSearch.value );
   }
 
   // Getters
