@@ -96,7 +96,7 @@ export class UserRolesListComponent implements OnInit, AfterViewInit {
     this.searchUserCMD.limit = pageEvent.pageSize;
     this.searchUserCMD.offset = pageEvent.pageIndex;
 
-    console.log('TEST > ', pageEvent)
+    // console.log('TEST > ', pageEvent);
     this.getAllUserData(false);
 
   }

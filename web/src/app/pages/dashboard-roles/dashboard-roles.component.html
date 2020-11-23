@@ -8,12 +8,11 @@
 
       <h1>Gestionar: </h1>
 
-
       <!-- #region Elegir que gestionar -->
       <div  class="box-type">
 
         <div
-          *ngIf="can(userData, 'get_any_role')"
+          *ngIf="showRoleOption"
           [ngClass]="{'selected': ( currentOption === optionMenu.roles )}"
           (click)="onSelectManageTypeMenu( optionMenu.roles )">
           Roles

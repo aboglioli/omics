@@ -101,7 +101,7 @@
                   color="accent"
                   class="button-white-borders"
                   style="margin: 1em"
-                  [disabled]="!canCharge(contract)"
+                  [disabled]="!canCharge(contract) || !can(userData, 'charge_for_contract')"
                   (click)="charge(contract)">
             Cobrar
           </button>
@@ -166,7 +166,7 @@
                   color="accent"
                   class="button-white-borders"
                   style="margin: 1em"
-                  [disabled]="!canChargeDonations()"
+                  [disabled]="!canChargeDonations() || !can(userData, 'charge_donations')"
                   (click)="chargeDonations()">
             Cobrar
           </button>

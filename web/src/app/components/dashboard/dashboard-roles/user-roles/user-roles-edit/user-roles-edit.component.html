@@ -3,7 +3,7 @@
   <div class="header">
 
     <div class="pointer-type" (click)="onGoToUserProfile()">
-      <h1>{{ user.username | uppercase}}</h1>
+      <h1>{{ userData.username | uppercase}}</h1>
     </div>
 
     <div  class="button-top-menu"
@@ -24,13 +24,13 @@
       <div class="side center">
 
         <div class="pointer-type" (click)="onGoToUserProfile()">
-        <img  *ngIf="!user.profile_image"
+        <img  *ngIf="!userData.profile_image"
               src="assets/images/generic/avatar196x196.jpg"
               alt="omics-avatar-profile"
               class="avatar">
 
-        <img  *ngIf="user.profile_image"
-              [src]="user.profile_image"
+        <img  *ngIf="userData.profile_image"
+              [src]="userData.profile_image"
               alt="omics-avatar-profile"
               class="avatar">
         </div>
@@ -43,34 +43,33 @@
 
         <div class="block-text">
           <h4 style="text-decoration: underline;">Nombre completo: </h4>
-          <h4 style="margin-left: 0.25em">{{ user.name }} {{ user.lastname }}</h4>
+          <h4 style="margin-left: 0.25em">{{ userData.name }} {{ userData.lastname }}</h4>
         </div>
 
         <div class="block-text">
           <h4 style="text-decoration: underline;">Correo: </h4>
-          <h4 style="margin-left: 0.25em">{{ user.email }}</h4>
+          <h4 style="margin-left: 0.25em">{{ userData.email }}</h4>
         </div>
 
         <div class="block-text">
           <h4 style="text-decoration: underline;">Fecha creación: </h4>
-          <h4 style="margin-left: 0.25em">{{ user.created_at | date: 'shortDate' | date: 'dd/MM/yyyy' }}</h4>
+          <h4 style="margin-left: 0.25em">{{ userData.created_at | date: 'shortDate' | date: 'dd/MM/yyyy' }}</h4>
         </div>
 
         <div class="block-text">
           <h4 style="text-decoration: underline;">Usuario validado: </h4>
-          <h4 style="margin-left: 0.25em">{{ (user.validated)? 'Sí':'No'}}</h4>
+          <h4 style="margin-left: 0.25em">{{ (userData.validated)? 'Sí':'No'}}</h4>
         </div>
 
         <!-- Role change -->
         <div class="block-text" style="align-items: baseline;">
           <h4 style="text-decoration: underline;">Rol asignado: </h4>
-          <h4
-            *ngIf="!can(authUser, 'change_user_role')"
+          <h4 *ngIf="!can(authUser, 'change_user_role') || !roleListToSelect"
             style="margin-left: 0.25em">
-            {{user.role.name}}
+            {{userData.role.name}}
           </h4>
 
-          <div *ngIf="can(authUser, 'change_user_role')"  class="d-inline-block"
+          <div *ngIf="roleListToSelect && can(authUser, 'change_user_role')"  class="d-inline-block"
                 style="margin-left: 1em;"
                 ngbDropdown
                 #dropdownRole="ngbDropdown">
@@ -113,11 +112,11 @@
               color="accent"
               class="button-white-borders"
               style="margin: 1em"
-              [disabled]="newRole === user.role.id || !can(authUser, 'update_any_user')"
+              [disabled]="newRole === userData.role.id || !can(authUser, 'update_any_user')"
               (click)="onChangeUserRole()">
 
         <fa-icon  [icon]="faSave" size="1x" ></fa-icon>
-        Guardar cambios
+        Guardar cambios {{can(authUser, 'update_any_user')}}
       </button>
 
 

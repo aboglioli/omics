@@ -61,7 +61,7 @@
               Gestionar Categorías
       </button>
 
-      <button *ngIf="canAny(userData, 'get_any_role', 'get_any_user')"
+      <button *ngIf="can(userData, 'get_any_user') || (can(userData, 'get_permissions') && can(userData, 'get_any_roles'))"
               mat-stroked-button class="button-white-borders admin-button"
               [ngClass]="{'active': ( activePathSelected === 'dashboard-roles' ) }"
               (click)="goToPage('dashboard-roles')">

@@ -54,8 +54,8 @@ const routes: Routes = [
   { path: 'dashboard-reportes', component: DashboardReportesComponent, canActivate: [] },
   { path: 'dashboard-publicaciones-contratos', component: DashboardGestionContratosPublicacionesComponent, canActivate: [PermissionAnyGuard], data: { permission: ['approve_reject_contract', 'approve_reject_publication'] } },
   { path: 'dashboard-reglas-negocio', component: DashboardReglasNegociosComponent, canActivate: []  },
-  { path: 'dashboard-general', component: DashboardGestionAdminComponent, canActivate: [AuthLoginGuard,  ] },
-  { path: 'dashboard-roles', component: DashboardRolesComponent, canActivate: [AuthLoginGuard,  ] },
+  { path: 'dashboard-general', component: DashboardGestionAdminComponent, canActivate: [AuthLoginGuard, PermissionAnyGuard ], data: { permission: ['create_category', 'update_category', 'delete_category'] } },
+  { path: 'dashboard-roles', component: DashboardRolesComponent, canActivate: [AuthLoginGuard,  PermissionAnyGuard], data: { permission: ['get_permissions', 'get_any_user'] } },
   { path: 'plans', component: PlansComponent, canActivate: [AuthLoginGuard, PermissionAnyGuard], data: {permission: ['subscribe'] } },
   { path: '**', pathMatch: 'full', redirectTo: 'home' },
 
