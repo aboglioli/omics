@@ -19,7 +19,7 @@ impl List {
         List
     }
 
-    pub async fn exec(&self, (_auth_id, _auth_role): UserIdAndRole) -> Result<Vec<BackupFile>> {
+    pub async fn exec(&self, (_auth_id, auth_role): UserIdAndRole) -> Result<Vec<BackupFile>> {
         if !auth_role.can("generate_backup") {
             return Err(Error::unauthorized());
         }
