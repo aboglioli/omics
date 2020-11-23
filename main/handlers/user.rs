@@ -175,25 +175,43 @@ async fn validate(
 ) -> impl Responder {
     let path = path.into_inner();
 
-    Validate::new(
+    let res = Validate::new(
         c.identity.event_pub(),
         c.identity.role_repo(),
         c.identity.user_repo(),
     )
     .exec(path.0, path.1)
-    .await
-    .map(|_res| {
-        HttpResponse::Ok()
-            .header(http::header::LOCATION, "http://localhost:4200")
-            .content_type("text/html")
-            .body(
-                r#"
+    .await;
+
+    let mut http_res = HttpResponse::Ok();
+    let http_res = http_res
+        .header(http::header::LOCATION, "http://localhost:4200")
+        .content_type("text/html");
+
+    match res {
+        Ok(_) => http_res.body(
+            r#"
                 Bienvenido. Tu cuenta ha sido verificada.
                 <a href="http://localhost:4200/">Continua</a>.
             "#,
-            )
-    })
-    .map_err(PublicError::from)
+        ),
+        Err(err) => {
+            if err.code() == "unauthorized" {
+                http_res.body(
+                    r#"
+                    No tienes permiso para realizar esta acción. Por favor, vuelve a intentarlo más
+                    tarde.
+                "#,
+                )
+            } else {
+                http_res.body(
+                    r#"
+                    Ha ocurrido un error inesperado. Estamos trabajando para solucionarlo.
+                "#,
+                )
+            }
+        }
+    }
 }
 
 #[put("/{user_id}/payment-email")]
