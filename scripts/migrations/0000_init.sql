@@ -53,6 +53,8 @@ CREATE TABLE IF NOT EXISTS users (
 
   payment_email VARCHAR(64),
 
+  flag BIGINT,
+
   followers INTEGER DEFAULT 0,
   publications INTEGER DEFAULT 0,
   subscribed BOOLEAN DEFAULT FALSE,
