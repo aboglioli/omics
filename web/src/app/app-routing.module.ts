@@ -57,7 +57,7 @@ const routes: Routes = [
   { path: 'dashboard-reglas-negocio', component: DashboardReglasNegociosComponent, canActivate: []  },
   { path: 'dashboard-general', component: DashboardGestionAdminComponent, canActivate: [AuthLoginGuard, PermissionAnyGuard ], data: { permission: ['create_category', 'update_category', 'delete_category'] } },
   { path: 'dashboard-roles', component: DashboardRolesComponent, canActivate: [AuthLoginGuard,  PermissionAnyGuard], data: { permission: ['get_permissions', 'get_any_user'] } },
-  { path: 'dashboard-backups', component: DashboardBackup, canActivate: [AuthLoginGuard]  },
+  { path: 'dashboard-backups', component: DashboardBackup, canActivate: [AuthLoginGuard, PermissionAnyGuard], data: {permission: ['generate_backup']  } },
   { path: 'plans', component: PlansComponent, canActivate: [AuthLoginGuard, PermissionAnyGuard], data: {permission: ['subscribe'] } },
   { path: '**', pathMatch: 'full', redirectTo: 'home' },
 
