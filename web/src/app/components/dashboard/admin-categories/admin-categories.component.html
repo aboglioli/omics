@@ -39,7 +39,11 @@
               color="accent"
               class="button-white-borders"
               style="margin: 1em"
-              [disabled]="formCategory.invalid"
+              [disabled]="
+                formCategory.invalid ||
+                (!isEditCategory && !can(user, 'create_category')) ||
+                (isEditCategory && !can(user, 'update_category'))
+              "
               (click)="onSubmitForm()">
 
         <span *ngIf="!isEditCategory">
@@ -75,13 +79,15 @@
               [removable]="true"
               (removed)="removeCategory(category, i)">
 
-      <fa-icon  [icon]="faEdit"
-                (click)="editCategory(category, i)">
+      <fa-icon
+        *ngIf="can(user, 'update_category')"
+        [icon]="faEdit"
+        (click)="editCategory(category, i)">
       </fa-icon>
 
         <h2 style="margin: 0;">{{ category.name }}</h2>
 
-      <mat-icon matChipRemove>cancel</mat-icon>
+      <mat-icon *ngIf="can(user, 'delete_category')" matChipRemove>cancel</mat-icon>
     </mat-chip>
 
   </mat-chip-list>

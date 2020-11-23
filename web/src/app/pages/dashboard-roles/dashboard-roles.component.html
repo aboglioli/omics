@@ -12,13 +12,17 @@
       <!-- #region Elegir que gestionar -->
       <div  class="box-type">
 
-        <div  [ngClass]="{'selected': ( currentOption === optionMenu.roles )}"
-              (click)="onSelectManageTypeMenu( optionMenu.roles )">
+        <div
+          *ngIf="can(user, 'get_any_role')"
+          [ngClass]="{'selected': ( currentOption === optionMenu.roles )}"
+          (click)="onSelectManageTypeMenu( optionMenu.roles )">
           Roles
         </div>
 
-        <div  [ngClass]="{'selected': ( currentOption === optionMenu.users )}"
-              (click)="onSelectManageTypeMenu( optionMenu.users )">
+        <div
+          *ngIf="can(user, 'get_any_user')"
+          [ngClass]="{'selected': ( currentOption === optionMenu.users )}"
+          (click)="onSelectManageTypeMenu( optionMenu.users )">
           Usuarios
         </div>
 
@@ -28,7 +32,7 @@
 
     </div>
 
-    <div class="body">
+    <div *ngIf="user" class="body">
 
       <span *ngIf="(currentOption === optionMenu.roles); then rolesList else usersList"></span>
 

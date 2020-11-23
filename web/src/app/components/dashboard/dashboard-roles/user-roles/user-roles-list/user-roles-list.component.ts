@@ -3,7 +3,7 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { IdentityService, ISearchCommand } from '../../../../../domain/services/identity.service';
-import { IUser, IRole } from '../../../../../domain/models/user';
+import { IUser, IRole, can } from '../../../../../domain/models/user';
 import { MatDialog } from '@angular/material/dialog';
 import { UserRolesEditComponent } from '../user-roles-edit/user-roles-edit.component';
 import { RoleService } from '../../../../../domain/services/role.service';
@@ -38,12 +38,13 @@ export class UserRolesListComponent implements OnInit, AfterViewInit {
     private spinnerService: NgxSpinnerService,
     private identityService: IdentityService,
     private dialog: MatDialog,
-    private roleService: RoleService
+    private roleService: RoleService,
   ) { }
 
   ngOnInit(): void {
 
     this.getAllUserData(true);
+
   }
 
 

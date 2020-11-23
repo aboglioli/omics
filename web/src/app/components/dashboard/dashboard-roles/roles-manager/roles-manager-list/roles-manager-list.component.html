@@ -3,10 +3,11 @@
 
   <div class="header">
     <button mat-flat-button
-    color="accent"
-    class="button-white-borders"
-    style="margin: 1em"
-    (click)="onAddRol()">
+      *ngIf="can(user, 'create_role')"
+      color="accent"
+      class="button-white-borders"
+      style="margin: 1em"
+      (click)="onAddRol()">
       <fa-icon  [icon]="faAdd" size="1x"></fa-icon>
       Agregar Nuevo Rol
     </button>

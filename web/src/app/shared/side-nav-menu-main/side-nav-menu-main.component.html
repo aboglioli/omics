@@ -29,37 +29,39 @@
   <div class="body">
 
     <!-- Admin Options -->
-    <div  *ngIf="isAccessUserLogIn && userData && (userData.role.id === 'admin'|| userData.role.id === 'content-manager') "
+    <div  *ngIf="isAccessUserLogIn && userData"
           class="menu-admin dir-column">
 
-      <button *ngIf="userData.role.id === 'admin'"
+      <button *ngIf="can(userData, 'generate_report')"
               mat-stroked-button class="button-white-borders admin-button"
               [ngClass]="{'active': ( activePathSelected === 'dashboard-reportes' ) }"
               (click)="goToPage('dashboard-reportes')">
               Reportes
       </button>
 
-      <button mat-stroked-button class="button-white-borders admin-button"
+      <button *ngIf="canAny(userData, 'approve_reject_publication', 'approve_reject_contract')"
+              mat-stroked-button
+              class="button-white-borders admin-button"
               [ngClass]="{'active': ( activePathSelected === 'dashboard-publicaciones-contratos' ) }"
               (click)="goToPage('dashboard-publicaciones-contratos')">
               Gestionar Publicaciones y Contratos
       </button>
 
-      <button *ngIf="userData.role.id === 'admin'"
+      <button *ngIf="can(userData, 'change_business_rules')"
               mat-stroked-button class="button-white-borders admin-button"
               [ngClass]="{'active': ( activePathSelected === 'dashboard-reglas-negocio' ) }"
               (click)="goToPage('dashboard-reglas-negocio')">
               Gestionar Reglas de Negocio
       </button>
 
-      <button *ngIf="userData.role.id === 'admin'"
+      <button *ngIf="canAny(userData, 'create_category', 'update_category', 'delete_category')"
               mat-stroked-button class="button-white-borders admin-button"
               [ngClass]="{'active': ( activePathSelected === 'dashboard-general' ) }"
               (click)="goToPage('dashboard-general')">
               Gestionar Categorías
       </button>
 
-      <button *ngIf="userData.role.id === 'admin'"
+      <button *ngIf="canAny(userData, 'get_any_role', 'get_any_user')"
               mat-stroked-button class="button-white-borders admin-button"
               [ngClass]="{'active': ( activePathSelected === 'dashboard-roles' ) }"
               (click)="goToPage('dashboard-roles')">
@@ -71,7 +73,7 @@
     <!-- User Options -->
     <div class="menu-user dir-column">
 
-      <button *ngIf="isAccessUserLogIn"
+      <button *ngIf="can(userData, 'get_reader_favorites')"
               mat-stroked-button class="button-white-borders user-button"
               [ngClass]="{'active': ( activePathSelected === 'favorites' ) }"
               (click)="goToPage('favorites')">
@@ -84,7 +86,20 @@
         Biblioteca
       </button>
 
-      <button *ngIf="isAccessUserLogIn"
+      <button *ngIf="canAny(
+                userData,
+                'create_publication',
+                'update_publication',
+                'delete_publication',
+                'publish_publication',
+                'cancel_contract',
+                'charge_for_contract',
+                'generate_summaries_for_contract',
+                'get_own_contract',
+                'request_contract',
+                'charge_donations',
+                'get_own_donation'
+              )"
               mat-stroked-button class="button-white-borders user-button"
               [ngClass]="{'active': ( activePathSelected === 'deskboard' ) }"
               (click)="goToPage('deskboard')">

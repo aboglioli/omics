@@ -12,13 +12,17 @@
         </h2>
 
         <div class="box-type">
-          <button  [ngClass]="{'selected': selectedPanel === 'publication'}"
-                (click)="selectPanel('publication')">
+          <button
+              *ngIf="can(user, 'approve_reject_publication')"
+              [ngClass]="{'selected': selectedPanel === 'publication'}"
+              (click)="selectPanel('publication')">
             Publicaciones
           </button>
 
-          <button  [ngClass]="{'selected': selectedPanel === 'contract'}"
-                (click)="selectPanel('contract')">
+          <button
+              *ngIf="can(user, 'approve_reject_contract')"
+              [ngClass]="{'selected': selectedPanel === 'contract'}"
+              (click)="selectPanel('contract')">
             Contratos
           </button>
         </div>

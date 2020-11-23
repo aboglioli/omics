@@ -6,6 +6,8 @@ import { RolesManagerEditComponent } from '../roles-manager-edit/roles-manager-e
 import { RoleService } from '../../../../../domain/services/role.service';
 import { IRole, IPermission } from '../../../../../domain/models/user';
 import { forkJoin } from 'rxjs';
+import { AuthService } from "../../../../../domain/services/auth.service";
+import { IUser, can } from "../../../../../domain/models/user";
 
 // TODO: Borrar luego de aplicar servicio
 
@@ -25,15 +27,23 @@ export class RolesManagerListComponent implements OnInit {
   tableRoleData: IRole[];
   displayedColumns: string[] = ['position', 'id', 'name', 'permissions', 'created_at', 'updated_at'];
 
+  public user: IUser;
+  public can = can;
+
   constructor(
     private dialog: MatDialog,
     private spinnerService: NgxSpinnerService,
-    private roleService: RoleService
+    private roleService: RoleService,
+    private authService: AuthService,
   ) { }
 
   ngOnInit(): void {
 
     this.getRoleData(true);
+
+    this.authService.getUser().subscribe((user) => {
+      this.user = user;
+    })
 
   }
 

@@ -86,7 +86,7 @@ VALUES
   -- Notifications
   ('get_notifications', 'Obtener notificaciones'),
   -- Reports
-  ('generate_report', 'Generar reports'),
+  ('generate_report', 'Generar reportes'),
   -- Configuration
   ('change_business_rules', 'Editar reglas de negocio');
 
@@ -156,7 +156,7 @@ VALUES
       { "id": "get_own_subscription", "name": "Obtener suscripción propia" },
       { "id": "subscribe", "name": "Subscribirse" },
       { "id": "get_notifications", "name": "Obtener notificaciones" },
-      { "id": "generate_report", "name": "Generar reports" },
+      { "id": "generate_report", "name": "Generar reportes" },
       { "id": "change_business_rules", "name": "Editar reglas de negocio" }
     ]',
     FALSE,
@@ -186,7 +186,7 @@ VALUES
       { "id": "get_any_donation", "name": "Obtener cualquier donación" },
       { "id": "get_any_subscription", "name": "Obtener cualquier suscripción" },
       { "id": "get_notifications", "name": "Obtener notificaciones" },
-      { "id": "generate_report", "name": "Generar reports" }
+      { "id": "generate_report", "name": "Generar reportes" }
     ]',
     FALSE,
     NOW()

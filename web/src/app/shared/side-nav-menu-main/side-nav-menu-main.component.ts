@@ -3,7 +3,7 @@ import { faChevronCircleLeft } from '@fortawesome/free-solid-svg-icons';
 import { Router, NavigationStart, Event as NavigationEvent  } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../domain/services/auth.service';
-import { IUser } from 'src/app/domain/models';
+import { IUser, can, canAny } from 'src/app/domain/models';
 import { IdentityService } from 'src/app/domain/services/identity.service';
 
 @Component({
@@ -28,6 +28,9 @@ export class SideNavMenuMainComponent implements OnInit, OnDestroy {
 
   public userData: IUser;
   private userId: string;
+
+  public can = can;
+  public canAny = canAny;
 
   constructor(  private router: Router,
                 private authService: AuthService,
@@ -89,11 +92,9 @@ export class SideNavMenuMainComponent implements OnInit, OnDestroy {
 
   private getUserDataFromService( id: string ): void {
 
-    this.identifyService.getById(id, 'role').subscribe( (data: IUser) => {
-
-      this.userData = data;
-
-    } );
+    this.authService.getUser().subscribe((user) => {
+      this.userData = user;
+    });
 
   }
 

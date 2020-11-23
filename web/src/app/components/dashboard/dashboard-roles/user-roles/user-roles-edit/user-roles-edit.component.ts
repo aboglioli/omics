@@ -5,8 +5,9 @@ import { faTimesCircle, faTrashAlt, faSave } from '@fortawesome/free-solid-svg-i
 import { NgxSpinnerService } from 'ngx-spinner';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 import Swal from 'sweetalert2';
-import { IUser, IRole } from '../../../../../domain/models/user';
+import { IUser, IRole, can } from '../../../../../domain/models/user';
 import { IdentityService } from '../../../../../domain/services/identity.service';
+import { AuthService } from '../../../../../domain/services/auth.service';
 
 export interface DialogData {
   user: IUser;
@@ -29,6 +30,9 @@ export class UserRolesEditComponent implements OnInit {
   public newRole: string;
   public roleListToSelect: IRole[];
 
+  public authUser: IUser;
+  public can = can;
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     public dialogRef: MatDialogRef<UserRolesEditComponent>,
@@ -36,6 +40,7 @@ export class UserRolesEditComponent implements OnInit {
     private identityService: IdentityService,
     private spinnerService: NgxSpinnerService,
     private sweetAlertGenericService: SweetAlertGenericMessageService,
+    private authService: AuthService,
   ) { }
 
   ngOnInit(): void {
@@ -46,6 +51,10 @@ export class UserRolesEditComponent implements OnInit {
     this.user = this.data.user;
     this.newRole = this.user.role.id;
     this.roleListToSelect = this.data.roleList;
+
+    this.authService.getUser().subscribe((user) => {
+      this.authUser = user;
+    });
 
   }
 

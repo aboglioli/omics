@@ -8,6 +8,7 @@ import { IPermission, IRole } from '../../../../../domain/models/user';
 import { RoleService, ICreateCommand, IUpdateCommand } from '../../../../../domain/services/role.service';
 import { SweetAlertGenericMessageService } from '../../../../../services/sweet-alert-generic-message.service';
 import { AuthService } from "../../../../../domain/services/auth.service";
+import { IUser, can } from "../../../../../domain/models/user";
 
 export interface DialogData {
   isNew: boolean;
@@ -43,6 +44,9 @@ export class RolesManagerEditComponent implements OnInit {
   public currentIndexElementSelected = 0;
   public isToRemoveArrow = false;
 
+  public user: IUser;
+  public can = can;
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     public dialogRef: MatDialogRef<RolesManagerEditComponent>,
@@ -50,14 +54,16 @@ export class RolesManagerEditComponent implements OnInit {
     private roleService: RoleService,
     private spinnerService: NgxSpinnerService,
     private sweetAlertGenericService: SweetAlertGenericMessageService,
-    public authService: AuthService,
+    private authService: AuthService,
   ) {
     this.permissionArrayToSelect = this.data.permissionArrayToSelect;
     this.permissionArrayToSelect.sort( (a, b) => a.name.localeCompare(b.name));
   }
 
   ngOnInit(): void {
-
+    this.authService.getUser().subscribe((user) => {
+      this.user = user;
+    });
 
     this.isNewRole =  (this.data.isNew) ? true : false;
     this.formBuild();

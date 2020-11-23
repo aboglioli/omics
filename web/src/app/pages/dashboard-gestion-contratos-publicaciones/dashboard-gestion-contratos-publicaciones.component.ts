@@ -10,6 +10,8 @@ import { PublicationApproveRejectMotiveComponent } from 'src/app/components/dash
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { ContractService } from '../../domain/services/contract.service';
 import { IContract } from '../../domain/models/contract';
+import { IUser, can } from '../../domain/models/user';
+import { AuthService } from '../../domain/services/auth.service';
 
 @Component({
   selector: 'app-dashboard-gestion-contratos-publicaciones',
@@ -29,6 +31,9 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
   public contracts: IContract[] = [];
   public isBigScreen = true;
 
+  public user: IUser;
+  public can = can;
+
   constructor(
     private publicationService: PublicationService,
     private contractService: ContractService,
@@ -36,12 +41,23 @@ export class DashboardGestionContratosPublicacionesComponent implements OnInit {
     public dialog: MatDialog,
     private sweetAlertGenericService: SweetAlertGenericMessageService,
     private breakpointObserver: BreakpointObserver,
+    private authService: AuthService,
   ) { }
 
   ngOnInit(): void {
 
     this.checkWidthScreen();
-    this.getAllPublication();
+
+    this.authService.getUser().subscribe((user) => {
+      if (!can(user, 'approve_reject_publication')) {
+        this.selectedPanel = 'contract';
+        this.getAllContracts();
+      } else {
+        this.getAllPublication();
+      }
+
+      this.user = user;
+    });
 
   }
 

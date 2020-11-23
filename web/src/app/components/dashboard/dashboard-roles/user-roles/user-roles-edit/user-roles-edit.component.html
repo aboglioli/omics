@@ -64,8 +64,13 @@
         <!-- Role change -->
         <div class="block-text" style="align-items: baseline;">
           <h4 style="text-decoration: underline;">Rol asignado: </h4>
+          <h4
+            *ngIf="!can(authUser, 'change_user_role')"
+            style="margin-left: 0.25em">
+            {{user.role.name}}
+          </h4>
 
-          <div  class="d-inline-block"
+          <div *ngIf="can(authUser, 'change_user_role')"  class="d-inline-block"
                 style="margin-left: 1em;"
                 ngbDropdown
                 #dropdownRole="ngbDropdown">
@@ -96,6 +101,7 @@
             color="warn"
             class="button-white-borders"
             style="margin: 1em"
+            [disabled]="!can(authUser, 'delete_any_user')"
             (click)="deleteUser()">
 
         <fa-icon  [icon]="faDelete" size="1x"></fa-icon>
@@ -107,7 +113,7 @@
               color="accent"
               class="button-white-borders"
               style="margin: 1em"
-              [disabled]="newRole === user.role.id"
+              [disabled]="newRole === user.role.id || !can(authUser, 'update_any_user')"
               (click)="onChangeUserRole()">
 
         <fa-icon  [icon]="faSave" size="1x" ></fa-icon>

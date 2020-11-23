@@ -128,6 +128,7 @@
             color="warn"
             class="button-white-borders"
             style="margin: 1em"
+            [disabled]="!can(user, 'delete_role')"
             (click)="deleteRol()">
 
         <fa-icon  [icon]="faDelete" size="1x"></fa-icon>
@@ -137,6 +138,7 @@
 
 
       <mat-checkbox
+        *ngIf="can(user, 'make_role_default')"
         color="primary"
         [(ngModel)]="isDefault">
         Rol por defecto
@@ -146,7 +148,10 @@
               color="accent"
               class="button-white-borders"
               style="margin: 1em"
-              [disabled]="formRole.invalid"
+              [disabled]="
+                formRole.invalid ||
+                !can(user, 'update_role')
+              "
               (click)="onSubmitForm()">
 
         <fa-icon  [icon]="faSave" size="1x"></fa-icon>

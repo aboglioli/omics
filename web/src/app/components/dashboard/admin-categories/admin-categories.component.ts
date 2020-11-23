@@ -7,6 +7,8 @@ import { ICategory } from '../../../domain/models/category';
 import { CategoryService, ICreateCommand } from '../../../domain/services/category.service';
 import { faEdit, faPlusCircle, faSave, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from "../../../domain/services/auth.service";
+import { IUser, can } from "../../../domain/models/user";
 
 @Component({
   selector: 'app-admin-categories',
@@ -26,11 +28,15 @@ export class AdminCategoriesComponent implements OnInit {
 
   public formCategory: FormGroup;
 
+  public user: IUser;
+  public can = can;
+
   constructor(
     private categoryService: CategoryService,
     private spinnerService: NgxSpinnerService,
     private sweetAlertGenericService: SweetAlertGenericMessageService,
     private fb: FormBuilder,
+    private authService: AuthService,
   ) { }
 
   ngOnInit(): void {
@@ -38,6 +44,10 @@ export class AdminCategoriesComponent implements OnInit {
     this.isEditCategory = false;
     this.formBuild();
     this.getCategories();
+
+    this.authService.getUser().subscribe((user) => {
+      this.user = user;
+    });
 
   }
 
