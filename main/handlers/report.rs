@@ -16,6 +16,7 @@ async fn generate(
 
     Generate::new(
         c.publishing.author_repo(),
+        c.publishing.category_repo(),
         c.payment.contract_repo(),
         c.payment.donation_repo(),
         c.publishing.publication_repo(),

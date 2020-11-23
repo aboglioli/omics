@@ -47,8 +47,12 @@ export interface IDonations {
 }
 
 export interface IPayments {
-  income: number;
-  outcome: number;
+  total_income: number;
+  subscription_income: number;
+  donation_income: number;
+  total_outcome: number;
+  contract_outcome: number;
+  donation_outcome: number;
 }
 
 export interface IReport {
