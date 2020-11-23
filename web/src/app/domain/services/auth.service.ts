@@ -54,10 +54,10 @@ export class AuthService {
         this.user.next(user);
         // localStorage.setItem('user', JSON.stringify(user));
       },
-      (err: any) => {
-        this.user.error(err);
-        // localStorage.removeItem('user');
-      },
+      // (err: any) => {
+      //   this.user.error(err);
+      //   // localStorage.removeItem('user');
+      // },
     );
   }
 
