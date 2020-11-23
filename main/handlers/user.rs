@@ -199,15 +199,17 @@ async fn validate(
             if err.code() == "unauthorized" {
                 http_res.body(
                     r#"
-                    No tienes permiso para realizar esta acción. Por favor, vuelve a intentarlo más
-                    tarde.
-                "#,
+                        No tienes permiso para realizar esta acci&oacute;n. Por favor, vuelve a
+                        intentarlo m&aacute;s tarde.
+                        <a href="http://localhost:4200/">Ir a Omics.</a>.
+                    "#,
                 )
             } else {
                 http_res.body(
                     r#"
-                    Ha ocurrido un error inesperado. Estamos trabajando para solucionarlo.
-                "#,
+                        Ha ocurrido un error inesperado. Estamos trabajando para solucionarlo.
+                        <a href="http://localhost:4200/">Ir a Omics.</a>.
+                    "#,
                 )
             }
         }
