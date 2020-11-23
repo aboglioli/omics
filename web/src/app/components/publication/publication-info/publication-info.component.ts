@@ -7,7 +7,6 @@ import { IGetByIdResponse } from '../../../domain/services/publication.service';
 import { IPublication } from '../../../domain/models/publication';
 import { IReaderPublicationInteraction } from '../../../domain/models/reader';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 import { Router } from '@angular/router';
 import { PublicationReviewAddComponent } from '../publication-review-add/publication-review-add.component';
 import { IReview } from '../../../domain/models/review';
@@ -93,7 +92,7 @@ export class PublicationInfoComponent implements OnInit {
           this.readerIsSubscribed = res.status.status === 'active';
         },
         (err) => {
-          console.error(err);
+          console.error('Error: ', err);
         },
       );
 
@@ -103,7 +102,7 @@ export class PublicationInfoComponent implements OnInit {
           this.readerIsContentManager = res.role_id === 'admin' || res.role_id === 'content-manager';
         },
         (err: Error) => {
-          console.error(err);
+          console.error('Error: ', err);
 
         }
       );
@@ -114,34 +113,43 @@ export class PublicationInfoComponent implements OnInit {
 
   private getPublicationInfo(): void {
 
-    this.publicationService.getById( this.data.idPublication,  'author, category').subscribe(
-      (resPub: IGetByIdResponse ) => {
 
-        const loggedInUserId = this.authService.getIdUser();
-        this.readerIsAuthor = resPub.publication.author.id === loggedInUserId;
+    this.authService.canUser( 'request_contract' ).subscribe(
+      (can) => {
 
-        if ( this.isUserLogIn  ) {
-
+        if ( can ) {
           this.publicationService.canRequestContract(this.data.idPublication).subscribe(
             (res) => {
               this.canRequestContract = res.can_request;
             },
             (err: Error) => {
-              console.error(err);
+              console.error('Error: ', err);
             }
           );
-
-          this.publicationService.getContract(this.data.idPublication).subscribe(
-            (res) => {
-              this.contract = res;
-            },
-            (err: Error) => {
-              console.error(err);
-            }
-          );
-
         }
+      }
+    );
 
+    this.authService.canUser( 'get_own_contract' ).subscribe(
+      (can) => {
+        this.publicationService.getContract(this.data.idPublication).subscribe(
+          (res) => {
+            this.contract = res;
+          },
+          (err: Error) => {
+            console.error('Error: ', err);
+          }
+        );
+
+      }
+    );
+
+
+    this.publicationService.getById( this.data.idPublication,  'author, category').subscribe(
+      (resPub: IGetByIdResponse ) => {
+
+        const loggedInUserId = this.authService.getIdUser();
+        this.readerIsAuthor = resPub.publication.author.id === loggedInUserId;
         // console.log('TEST > ', resPub);
 
         //#region Obtener info general de la publicación
