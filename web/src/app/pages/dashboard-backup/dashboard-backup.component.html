@@ -1,0 +1,47 @@
+<div class="parent">
+
+  <div class="side"></div>
+
+  <div class="center">
+
+    <div class="header">
+
+      <h1 style="margin: 0;">Backups</h1>
+
+    </div>
+
+    <div class="body">
+
+      <div class="buttons">
+        <button mat-flat-button
+          color="accent"
+          class="button-white-borders"
+          style="margin: 1em"
+          (click)="generate()">
+          <fa-icon  [icon]="faAdd" size="1x"></fa-icon>
+          Generar nuevo backup
+        </button>
+      </div>
+
+      <div class="content">
+        <table>
+          <tr>
+            <th>Fecha</th>
+            <th>Archivo</th>
+            <th>Descarga</th>
+          </tr>
+          <tr *ngFor="let backup of backups">
+            <td>{{backup.date | date:'dd/MM/yyyy HH:mm:ss'}}</td>
+            <td>{{backup.file}}</td>
+            <td class="download"><a [href]="'http://localhost:3000/static/backups/' + backup.file">Descargar</a></td>
+          </tr>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="side"></div>
+
+</div>

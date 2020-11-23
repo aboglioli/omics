@@ -68,6 +68,13 @@
               Gestionar usuarios y roles
       </button>
 
+      <button *ngIf="can(userData, 'generate_backup')"
+              mat-stroked-button class="button-white-borders admin-button"
+              [ngClass]="{'active': ( activePathSelected === 'dashboard-backups' ) }"
+              (click)="goToPage('dashboard-backups')">
+              Backups
+      </button>
+
     </div>
 
     <!-- User Options -->

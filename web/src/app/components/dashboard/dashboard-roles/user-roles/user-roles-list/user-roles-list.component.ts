@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { NgxSpinnerService } from 'ngx-spinner';
@@ -14,6 +14,8 @@ import { RoleService } from '../../../../../domain/services/role.service';
   styleUrls: ['./user-roles-list.component.scss']
 })
 export class UserRolesListComponent implements OnInit, AfterViewInit {
+
+  @Input() userData: IUser;
 
   @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
 
@@ -65,7 +67,7 @@ export class UserRolesListComponent implements OnInit, AfterViewInit {
         this.tableUserData = new MatTableDataSource<IUser>(resUserList.items);
         this.pageLength = Math.ceil( resUserList.matching_criteria / this.pageSize );
 
-        if ( isRoleGetNeeded ) {
+        if ( isRoleGetNeeded && can(this.userData, 'get_any_role') ) {
 
           this.roleService.getAll().subscribe(
             (resRoleData) => {

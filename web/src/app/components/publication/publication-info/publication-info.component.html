@@ -32,13 +32,13 @@
       <fa-icon [icon]="faDonar" size="2x"></fa-icon>
     </button>
 
-    <button mat-icon-button (click)="onFavorito()" class="option-item">
+    <button mat-icon-button (click)="onFavorito()" class="option-item" *ngIf="authService.canUser('add_remove_publication_from_favorites') | async">
       <fa-icon  [icon]="faFavorito" size="2x"
                 [ngClass]="{'selected': readerInfo.in_favorites}">
       </fa-icon>
     </button>
 
-    <button mat-icon-button (click)="onLike()" class="option-item">
+    <button mat-icon-button (click)="onLike()" class="option-item" *ngIf="authService.canUser('like_unlike_publication') | async">
       <fa-icon  [icon]="faLike" size="2x"s
                 [ngClass]="{'selected': readerInfo.liked}">
       </fa-icon>
@@ -122,8 +122,7 @@
               || !publication.contract
               || readerIsContentManager
             )"
-          style="flex: 1; display: flex; justify-content: center; margin-bottom: 10px;"
-        >
+          style="flex: 1; display: flex; justify-content: center; margin-bottom: 10px;">
 
 
           <button *ngIf="isUserLogIn && ( authService.canUser('read_publication') | async )" mat-stroked-button class="button-white-borders"
@@ -187,7 +186,7 @@
 
     <div class="side opacity-background">
 
-      <div  *ngIf="readerInfo && readerIsSubscribed"
+      <div  *ngIf="readerInfo && readerIsSubscribed && (authService.canUser('review_publication') | async)"
             class="fila" style="justify-content: center;">
         <bar-rating [(rate)]="ratingPublication" [max]="5" [theme]="'stars'"
                     (rateChange)="addReview($event)">

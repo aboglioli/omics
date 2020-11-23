@@ -7,14 +7,15 @@ mod handlers;
 mod infrastructure;
 
 use actix_cors::Cors;
+use actix_files as fs;
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 
 use common::config::Config;
 
 use container::MainContainer;
 use handlers::{
-    author, category, collection, configuration, contract, donation, event, file, notification,
-    payment, plan, publication, reader, report, role, subscription, user,
+    author, backup, category, collection, configuration, contract, donation, event, file,
+    notification, payment, plan, publication, reader, report, role, subscription, user,
 };
 
 async fn index() -> impl Responder {
@@ -66,8 +67,10 @@ async fn main() -> std::io::Result<()> {
                     .configure(notification::routes)
                     .configure(report::routes)
                     .configure(donation::routes)
-                    .configure(configuration::routes),
+                    .configure(configuration::routes)
+                    .configure(backup::routes),
             )
+            .service(fs::Files::new("/static/backups", "./backups").show_files_listing())
     })
     .bind(format!("0.0.0.0:{}", config.port()))?
     .run()

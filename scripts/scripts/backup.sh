@@ -14,7 +14,7 @@ pg_dump -U ${USER} ${DATABASE} -F p -f ${OUTPUT_FILE}
 
 gzip $OUTPUT_FILE
 
-echo "${OUTPUT_FILE} was created:"
+echo "${OUTPUT_FILE} was created"
 # ls -l ${OUTPUT_FILE}.gz
 
 find $BACKUP_DIR -maxdepth 1 -mtime +$DAYS_TO_KEEP -name "*${FILE_SUFFIX}.gz" -exec rm -rf '{}' ';'
