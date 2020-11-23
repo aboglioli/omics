@@ -20,9 +20,9 @@ impl List {
     }
 
     pub async fn exec(&self, (_auth_id, _auth_role): UserIdAndRole) -> Result<Vec<BackupFile>> {
-        // if !auth_role.can("generate_backup") {
-        //     return Err(Error::unauthorized());
-        // }
+        if !auth_role.can("generate_backup") {
+            return Err(Error::unauthorized());
+        }
 
         let mut dir = fs::read_dir("backups")
             .await

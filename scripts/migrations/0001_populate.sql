@@ -86,7 +86,9 @@ VALUES
   -- Reports
   ('generate_report', 'Generar reportes'),
   -- Configuration
-  ('change_business_rules', 'Editar reglas de negocio');
+  ('change_business_rules', 'Editar reglas de negocio'),
+  -- Backup
+  ('generate_backup', 'Generar backup');
 
 INSERT INTO roles(id, name, permissions, "default", created_at)
 VALUES
@@ -153,7 +155,8 @@ VALUES
       { "id": "subscribe", "name": "Subscribirse" },
       { "id": "get_notifications", "name": "Obtener notificaciones" },
       { "id": "generate_report", "name": "Generar reportes" },
-      { "id": "change_business_rules", "name": "Editar reglas de negocio" }
+      { "id": "change_business_rules", "name": "Editar reglas de negocio" },
+      { "id": "generate_backup", "name": "Generar backup" }
     ]',
     FALSE,
     NOW()

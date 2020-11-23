@@ -13,9 +13,9 @@ impl Generate {
     }
 
     pub async fn exec(&self, (_auth_id, _auth_role): UserIdAndRole) -> Result<CommandResponse> {
-        // if !auth_role.can("generate_backup") {
-        //     return Err(Error::unauthorized());
-        // }
+        if !auth_role.can("generate_backup") {
+            return Err(Error::unauthorized());
+        }
 
         Command::new("docker-compose")
             .arg("exec")
