@@ -2,6 +2,7 @@
 
 ## New
 - [ ] Add 'birthdate' in user register.
+- [ ] Allow edit plan.
 
 ## Urgent
 - [x] Publication status should be an object in DTO to show comments.
