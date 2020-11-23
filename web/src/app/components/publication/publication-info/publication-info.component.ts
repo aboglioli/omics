@@ -166,22 +166,32 @@ export class PublicationInfoComponent implements OnInit {
         //#endregion
 
         //#region Obtener información de reviews de esta publicación
-        this.publicationService.getReviews( this.data.idPublication ).subscribe(
-          ( resReviews: IGetReviewsResponse ) => {
+        this.authService.canUser( 'get_publication_reviews' ).subscribe(
+          (resGetReviews) => {
 
-            this.reviewList = resReviews.reviews;
-            this.spinnerService.hide();
+            if ( resGetReviews ) {
+              this.publicationService.getReviews( this.data.idPublication ).subscribe(
+                ( resReviews: IGetReviewsResponse ) => {
 
-            // console.log('TEST > ', this.reviewList);
+                  this.reviewList = resReviews.reviews;
+                  this.spinnerService.hide();
 
-          },
-          (err: Error) => {
+                  // console.log('TEST > ', this.reviewList);
 
-            console.error(err);
-            this.spinnerService.hide();
+                },
+                (err: Error) => {
 
+                  console.error(err);
+                  this.spinnerService.hide();
+
+                }
+              );
+            } else {
+              this.spinnerService.hide();
+            }
           }
-        )
+        );
+
         //#endregion
 
 

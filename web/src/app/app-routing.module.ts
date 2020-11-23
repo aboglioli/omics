@@ -44,7 +44,7 @@ const routes: Routes = [
   { path: 'deskboard', component:  DeskboardGeneralComponent, canActivate: [AuthLoginGuard]},
   { path: 'deskboard/publication/new', component:  PublicationNewEditComponent},
   { path: 'deskboard/publication/edit/:id', component:  PublicationNewEditComponent, canActivate: [PublicationOwnerGuard]},
-  { path: 'deskboard/collection/new', component:  CollectionNewEditComponent},
+  { path: 'deskboard/collection/new', component:  CollectionNewEditComponent, canActivate: [AuthLoginGuard, PermissionAnyGuard], data: {permission: ['create_collection']} },
   { path: 'deskboard/collection/edit/:id', component:  CollectionNewEditComponent, canActivate: [CollectionOwnerGuard]},
   { path: 'profile/:id', component: PerfilComponent },
   { path: 'profile/:id/editUser', component: PerfilEditarComponent,  canActivate: [AuthLoginGuard, SameUserGuard, PermissionAnyGuard], data: {permission: ['update_own_user', 'subscribe', 'delete_own_user', 'change_user_password']}},

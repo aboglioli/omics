@@ -19,6 +19,7 @@
     <span *ngIf="typeSearch === typeSearchList.collection">
 
       <button mat-stroked-button class="button-white-borders pink-hover"
+              *ngIf="can(userData, 'create_collection' )"
               style="padding-top: 0.25em;"
               (click)="goToNewCollection()">
         <fa-icon [icon]="faAdd" size="2x" style="margin-right: 0.5em"></fa-icon>

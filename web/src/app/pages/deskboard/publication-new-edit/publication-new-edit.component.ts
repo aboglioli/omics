@@ -21,6 +21,8 @@ import { ICreateCommand, CollectionService } from '../../../domain/services/coll
 import { SweetAlertGenericMessageService } from '../../../services/sweet-alert-generic-message.service';
 import { ICollection } from '../../../domain/models/collection';
 import Swal from 'sweetalert2';
+import { IdentityService } from '../../../domain/services/identity.service';
+import { IUser, can } from '../../../domain/models/user';
 
 export interface IPageForm {
   number: number;
@@ -67,6 +69,8 @@ export class PublicationNewEditComponent implements OnInit {
   public isToEdit: boolean;
   private isToSketch: boolean;
   private publicationToEditId: string;
+  public userData: IUser;
+  public can = can;
 
   public chipTagsKeysCodes: number[] = [ENTER, COMMA]; // Usado para los tags
 
@@ -81,11 +85,20 @@ export class PublicationNewEditComponent implements OnInit {
     private publicationService: PublicationService,
     private collectionService: CollectionService,
     private sweetAlertGenericService: SweetAlertGenericMessageService,
+    private identityService: IdentityService
   ) { }
 
   ngOnInit(): void {
 
     this.isToSketch = false;
+
+    this.identityService.getById('me', 'role').subscribe(
+
+      (res) => {
+        this.userData = res;
+      }
+
+    );
 
     this.authService.authStart();
     this.buildForms();
