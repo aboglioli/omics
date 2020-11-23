@@ -5,15 +5,16 @@ FILE_SUFFIX=_backup.sql
 DATABASE=omics
 USER=admin
 
-FILE=`date +"%Y%m%d%H%M"`${FILE_SUFFIX}
+# FILE=`date +"%Y%m%d%H%M"`${FILE_SUFFIX}
+FILE=`date +"%s"`${FILE_SUFFIX}
 
 OUTPUT_FILE=${BACKUP_DIR}/${FILE}
 
 pg_dump -U ${USER} ${DATABASE} -F p -f ${OUTPUT_FILE}
 
-# gzip $OUTPUT_FILE
+gzip $OUTPUT_FILE
 
 echo "${OUTPUT_FILE} was created:"
-ls -l ${OUTPUT_FILE}
+# ls -l ${OUTPUT_FILE}.gz
 
 find $BACKUP_DIR -maxdepth 1 -mtime +$DAYS_TO_KEEP -name "*${FILE_SUFFIX}.gz" -exec rm -rf '{}' ';'
