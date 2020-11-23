@@ -6,6 +6,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { faEdit, faInfoCircle, faDollarSign } from '@fortawesome/free-solid-svg-icons';
 import { PublicationInfoComponent } from '../../publication/publication-info/publication-info.component';
 import { MatDialog } from '@angular/material/dialog';
+import { can, IUser } from '../../../domain/models/user';
 
 @Component({
   selector: 'app-publication-card-author',
@@ -15,6 +16,7 @@ import { MatDialog } from '@angular/material/dialog';
 export class PublicationCardAuthorComponent implements OnInit {
 
   @Input() publication: IPublication;
+  @Input() userData: IUser;
 
   // Font Awseome icons
   public faEdit = faEdit;
@@ -26,6 +28,8 @@ export class PublicationCardAuthorComponent implements OnInit {
     title: '',
     index: 0
   };
+
+  can = can;
 
   constructor(
     private sweetAlertGenericService: SweetAlertGenericMessageService,

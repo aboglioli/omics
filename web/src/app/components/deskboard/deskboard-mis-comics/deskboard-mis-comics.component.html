@@ -6,6 +6,7 @@
     <span *ngIf="typeSearch === typeSearchList.publication">
 
       <button mat-stroked-button class="button-white-borders pink-hover"
+              *ngIf="can(userData, 'create_publication' )"
               style="padding-top: 0.25em;"
               (click)="goToNewPublication()">
         <fa-icon [icon]="faUpload" size="2x" style="margin-right: 0.5em"></fa-icon>
@@ -34,7 +35,7 @@
   <div *ngIf=" (typeSearch === typeSearchList.publication ) && publicationList" class="card-container" >
 
     <div *ngFor="let publication of publicationList" class="card-box">
-      <app-publication-card-author [publication]="publication"></app-publication-card-author>
+      <app-publication-card-author [publication]="publication" [userData]="userData"></app-publication-card-author>
     </div>
 
   </div>

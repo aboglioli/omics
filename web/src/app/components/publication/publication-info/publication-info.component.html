@@ -28,7 +28,7 @@
 
   <div class="multiple-option-menu" *ngIf="readerInfo && !isBigScreen">
 
-    <button mat-icon-button (click)="onDonar()" class="option-item">
+    <button mat-icon-button (click)="onDonar()" class="option-item" *ngIf="authService.canUser('donate') | async">
       <fa-icon [icon]="faDonar" size="2x"></fa-icon>
     </button>
 
@@ -143,8 +143,7 @@
 
         <div
           style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-bottom: 10px;"
-          *ngIf="publication.contract && !readerIsSubscribed && !readerIsAuthor && !readerIsContentManager"
-        >
+          *ngIf="publication.contract && !readerIsSubscribed && !readerIsAuthor && !readerIsContentManager && (authService.canUser('subscribe') | async)">
             <button
               mat-stroked-button class="button-white-borders"
               style="font-size: 1rem; width: 80%; background-color: #ffb347; color: #000;"
@@ -208,16 +207,16 @@
       <!-- Option bar -->
       <div class="multiple-option-menu" *ngIf="readerInfo && isBigScreen">
 
-        <button mat-icon-button (click)="onDonar()" class="option-item">
+        <button mat-icon-button (click)="onDonar()" class="option-item" *ngIf="authService.canUser('donate') | async">
           <fa-icon [icon]="faDonar" size="2x"></fa-icon>
         </button>
 
-        <button mat-icon-button (click)="onFavorito()" class="option-item">
+        <button mat-icon-button (click)="onFavorito()" class="option-item" *ngIf="authService.canUser('add_remove_publication_from_favorites') | async">
           <fa-icon  [icon]="faFavorito" size="2x"
                     [ngClass]="{'selected': readerInfo.in_favorites}"></fa-icon>
         </button>
 
-        <button mat-icon-button (click)="onLike()" class="option-item" style="margin-bottom: 5px;">
+        <button mat-icon-button (click)="onLike()" class="option-item" style="margin-bottom: 5px;" *ngIf="authService.canUser('like_unlike_publication') | async">
           <fa-icon  [icon]="faLike" size="2x"
                     [ngClass]="{'selected': readerInfo.liked}"></fa-icon>
         </button>

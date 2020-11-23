@@ -56,7 +56,7 @@ const routes: Routes = [
   { path: 'dashboard-reglas-negocio', component: DashboardReglasNegociosComponent, canActivate: []  },
   { path: 'dashboard-general', component: DashboardGestionAdminComponent, canActivate: [AuthLoginGuard,  ] },
   { path: 'dashboard-roles', component: DashboardRolesComponent, canActivate: [AuthLoginGuard,  ] },
-  { path: 'plans', component: PlansComponent, canActivate: [AuthLoginGuard] },
+  { path: 'plans', component: PlansComponent, canActivate: [AuthLoginGuard, PermissionAnyGuard], data: {permission: ['subscribe'] } },
   { path: '**', pathMatch: 'full', redirectTo: 'home' },
 
 ];

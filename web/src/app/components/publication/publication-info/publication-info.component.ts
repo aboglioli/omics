@@ -63,7 +63,7 @@ export class PublicationInfoComponent implements OnInit {
     private publicationService: PublicationService,
     private readerService: ReaderService,
     private identityService: IdentityService,
-    private authService: AuthService,
+    public authService: AuthService,
     private spinnerService: NgxSpinnerService,
     private breakpointObserver: BreakpointObserver,
     private router: Router,

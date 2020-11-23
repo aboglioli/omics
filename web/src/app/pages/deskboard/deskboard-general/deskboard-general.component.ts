@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/domain/services/auth.service';
 import { IdentityService } from 'src/app/domain/services/identity.service';
-import { IUser } from 'src/app/domain/models';
+import { IUser, can } from 'src/app/domain/models';
 import { NgxSpinnerService } from 'ngx-spinner';
 import {BreakpointObserver } from '@angular/cdk/layout';
 import { Router } from '@angular/router';
@@ -23,6 +23,7 @@ export class DeskboardGeneralComponent implements OnInit {
   public faDesk = faDesktop;
 
   public userData: IUser;
+  public can = can;
   public isBigScreen = true;
 
   public optionMenu = DeskboardOptionMenu;
@@ -43,10 +44,11 @@ export class DeskboardGeneralComponent implements OnInit {
 
     this.authService.authStart();
 
+
     this.checkWidthScreen();
 
     this.spinnerService.show();
-    this.identityService.getById(this.authService.getIdUser() ).subscribe(
+    this.identityService.getById(this.authService.getIdUser(), 'role' ).subscribe(
       (resData: IUser) => {
 
         this.userData = resData;
@@ -59,7 +61,7 @@ export class DeskboardGeneralComponent implements OnInit {
         this.spinnerService.hide();
 
       }
-    )
+    );
 
   }
 

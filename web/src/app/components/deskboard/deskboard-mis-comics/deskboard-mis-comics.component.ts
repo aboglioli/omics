@@ -3,10 +3,10 @@ import { faFileUpload, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthorService } from '../../../domain/services/author.service';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { IGetPublicationsResponse } from 'src/app/domain/services/collection.service';
 import { IPublication } from '../../../domain/models/publication';
 import { typeSearchCatalogue } from 'src/app/models/enums.model';
 import { ICollection } from 'src/app/domain/models';
+import { can, IUser } from '../../../domain/models/user';
 
 @Component({
   selector: 'app-deskboard-mis-comics',
@@ -16,6 +16,7 @@ import { ICollection } from 'src/app/domain/models';
 export class DeskboardMisComicsComponent implements OnInit, OnChanges {
 
   @Input() typeSearch: typeSearchCatalogue = typeSearchCatalogue.publication;
+  @Input() userData: IUser;
 
   // Font Awseome icons
   public faUpload = faFileUpload;
@@ -25,6 +26,7 @@ export class DeskboardMisComicsComponent implements OnInit, OnChanges {
   public collectionList: ICollection[];
 
   public typeSearchList = typeSearchCatalogue;
+  can = can;
 
   constructor(
     private router: Router,

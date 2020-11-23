@@ -114,14 +114,14 @@ export class DonacionComponent implements OnInit, OnDestroy {
 
         this.spinnerService.hide();
 
-        // this.sweetAlertGenericService.showAlertSuccess(`Donación de $${monto} realizada a ${ this.userToDonate.username }.`, 'Gracias por tu aporte')
+        this.sweetAlertGenericService.showAlertSuccess(`Donación de $${monto} realizada a ${ this.userToDonate.username }.`, 'Gracias por tu aporte')
         window.open( res.payment_link, '_blank' );
 
         this.lastInterval = setInterval(
           () => {
             this.donationService.getById(res.id).subscribe(
-              (res) => {
-                if (res.status.status === 'paid') {
+              (resDonate) => {
+                if (resDonate.status.status === 'paid') {
                   clearInterval(this.lastInterval);
                   this.sweetAlertGenericService.showAlertSuccess(`Donación de $${monto} realizada a ${ this.userToDonate.username }.`, 'Gracias por tu aporte');
                   this.closeMatDialog();
@@ -132,7 +132,7 @@ export class DonacionComponent implements OnInit, OnDestroy {
                 console.log(err);
                 this.closeMatDialog();
               }
-            )
+            );
           },
           2000,
         );
