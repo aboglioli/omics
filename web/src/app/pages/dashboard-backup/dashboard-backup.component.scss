@@ -58,6 +58,16 @@ div.parent {
       margin-top: 1em;
       padding: 0em 1em;
 
+      .buttons {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1rem;
+      }
+
+      .table {
+
+      }
+
     }
 
 
