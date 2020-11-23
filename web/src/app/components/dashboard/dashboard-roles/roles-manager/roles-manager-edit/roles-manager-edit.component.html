@@ -148,10 +148,7 @@
               color="accent"
               class="button-white-borders"
               style="margin: 1em"
-              [disabled]="
-                formRole.invalid ||
-                !can(user, 'update_role')
-              "
+              [disabled]="formRole.invalid || !can(user, 'update_role')"
               (click)="onSubmitForm()">
 
         <fa-icon  [icon]="faSave" size="1x"></fa-icon>

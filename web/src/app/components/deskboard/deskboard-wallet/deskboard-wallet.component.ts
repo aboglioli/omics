@@ -273,7 +273,7 @@ export class DeskboardWalletComponent implements OnInit {
           return acc;
         }
 
-        return acc + d.subtotal
+        return acc + d.subtotal;
       }, 0);
   }
 

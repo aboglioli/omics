@@ -26,7 +26,7 @@ export class UserRolesEditComponent implements OnInit {
   public faSave = faSave;
   public faClose = faTimesCircle;
 
-  public user: IUser;
+  public userData: IUser;
   public newRole: string;
   public roleListToSelect: IRole[];
 
@@ -48,8 +48,8 @@ export class UserRolesEditComponent implements OnInit {
     // console.log('TEST > User > ', this.data.user );
     // console.log('TEST > Role List > ', this.data.roleList );
 
-    this.user = this.data.user;
-    this.newRole = this.user.role.id;
+    this.userData = this.data.user;
+    this.newRole = this.userData.role.id;
     this.roleListToSelect = this.data.roleList;
 
     this.authService.getUser().subscribe((user) => {
@@ -64,7 +64,7 @@ export class UserRolesEditComponent implements OnInit {
 
   public onGoToUserProfile(): void {
 
-    this.router.navigate( [`/profile/${this.user.id}`] );
+    this.router.navigate( [`/profile/${this.userData.id}`] );
     this.onClose();
 
   }
@@ -72,7 +72,7 @@ export class UserRolesEditComponent implements OnInit {
   public deleteUser(): void {
 
     Swal.fire({
-      title: `Eliminar usuario: ${this.user.username}`,
+      title: `Eliminar usuario: ${this.userData.username}`,
       text: '¿Estas seguro?',
       icon: 'warning',
       showCancelButton: true,
@@ -95,12 +95,12 @@ export class UserRolesEditComponent implements OnInit {
   private deleteUserConfirm(): void {
 
     this.spinnerService.show();
-    this.identityService.delete(this.user.id).subscribe(
+    this.identityService.delete(this.userData.id).subscribe(
       (res) => {
         this.spinnerService.hide();
         this.dialogRef.close(true);
 
-        this.sweetAlertGenericService.showAlertSuccess(`El usuario ${ this.user.username } ha sido eliminado correctamente.`, 'Eliminación exitosa');
+        this.sweetAlertGenericService.showAlertSuccess(`El usuario ${ this.userData.username } ha sido eliminado correctamente.`, 'Eliminación exitosa');
 
       },
       (err ) => {
@@ -113,12 +113,12 @@ export class UserRolesEditComponent implements OnInit {
   public onChangeUserRole(): void {
 
     this.spinnerService.show();
-    this.identityService.changeRole( this.user.id, { role_id: this.newRole } ).subscribe(
+    this.identityService.changeRole( this.userData.id, { role_id: this.newRole } ).subscribe(
       (res) => {
 
         this.spinnerService.hide();
         this.sweetAlertGenericService.showAlertSuccess(
-          `El usuario ${this.user.username} tiene ahora el rol ${this.newRole}`,
+          `El usuario ${this.userData.username} tiene ahora el rol ${this.newRole}`,
           'Rol asignado'
         );
 

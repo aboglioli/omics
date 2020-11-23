@@ -8,6 +8,8 @@ import { AuthorService, IGetByIdResponse } from '../../domain/services/author.se
 import { IAuthor } from '../../domain/models/author';
 import { DonacionComponent } from '../../components/donacion/donacion.component';
 import { MatDialog } from '@angular/material/dialog';
+import { IUser } from '../../domain/models/user';
+import { can } from 'src/app/domain/models';
 
 @Component({
   selector: 'app-perfil',
@@ -24,6 +26,9 @@ export class PerfilComponent implements OnInit {
   public followed = false;
   public isAccessUserLogIn = false;
 
+  public authUser: IUser;
+  public can = can;
+
   // Font Awseome icons
   public faFollowers = faUsers;
 
@@ -38,6 +43,11 @@ export class PerfilComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+
+
+    this.authService.getUser().subscribe((user) => {
+      this.authUser = user;
+    });
 
     this.getUserDataByParams();
 

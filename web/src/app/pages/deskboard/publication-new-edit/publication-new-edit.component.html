@@ -18,6 +18,7 @@
 
       <button mat-flat-button color="accent"
               class="button-white-borders"
+              [disabled]="!can(userData, 'publish_publication')"
               (click)="submitPublicationForm()">
             Publicar
       </button>
@@ -55,6 +56,7 @@
           <div  *ngIf="isToEdit"
                 style="display: flex; justify-content: center; margin-bottom: 1em;">
             <button mat-flat-button color="warn"
+                    [disabled]="!can(userData, 'delete_publication')"
                     class="button-white-borders"
                     (click)="onPublicationDelete()">
               <fa-icon [icon]="faDelete" size="1x" style="margin-right: 0.5em"></fa-icon>

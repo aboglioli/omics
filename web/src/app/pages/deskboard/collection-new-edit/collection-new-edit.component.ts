@@ -47,7 +47,7 @@ export class CollectionNewEditComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private authService: AuthService,
+    public authService: AuthService,
     private spinnerService: NgxSpinnerService,
     private activateRoute: ActivatedRoute,
     private fileServ: FileService,

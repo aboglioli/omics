@@ -45,7 +45,7 @@
   <div *ngIf=" (typeSearch === typeSearchList.collection ) && collectionList" class="card-container" >
 
     <div *ngFor="let collection of collectionList" class="card-box">
-      <app-collection-card-author [collection]="collection"></app-collection-card-author>
+      <app-collection-card-author [collection]="collection" [userData]="userData"></app-collection-card-author>
     </div>
 
   </div>

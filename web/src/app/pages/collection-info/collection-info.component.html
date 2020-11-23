@@ -98,9 +98,15 @@
 
           </span>
 
-          <span *ngIf="!publicationList || publicationList.length === 0">
+          <span *ngIf="showPublications && (!publicationList || publicationList.length === 0)">
 
             <h1>No hay publicaciones añadidas</h1>
+
+          </span>
+
+          <span *ngIf="!showPublications">
+
+            <h2>No tienes permisos para ver las publicaciones de la colección</h2>
 
           </span>
 

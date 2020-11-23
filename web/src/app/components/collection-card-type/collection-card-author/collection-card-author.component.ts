@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ICollection } from '../../../domain/models/collection';
 import { faEdit, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { ActivatedRoute, Router } from '@angular/router';
+import { IUser, can } from 'src/app/domain/models';
 
 @Component({
   selector: 'app-collection-card-author',
@@ -11,10 +12,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class CollectionCardAuthorComponent implements OnInit {
 
   @Input() collection: ICollection;
+  @Input() userData: IUser;
 
   // Font Awseome icons
   public faEdit = faEdit;
   public faInfo = faInfoCircle;
+
+  public can = can;
 
   constructor(
     private router: Router,

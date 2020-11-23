@@ -6,6 +6,7 @@ import { ICollection } from '../../domain/models/collection';
 import { IPublication } from 'src/app/domain/models/publication';
 import { MatDialog } from '@angular/material/dialog';
 import { PublicationInfoComponent } from 'src/app/components/publication/publication-info/publication-info.component';
+import { AuthService } from '../../domain/services/auth.service';
 
 @Component({
   selector: 'app-collection-info',
@@ -17,12 +18,16 @@ export class CollectionInfoComponent implements OnInit {
   public collectionData: ICollection;
   public publicationList: IPublication[];
 
+
+  public showPublications = false;
+
   constructor(
     private spinnerService: NgxSpinnerService,
     private activatedRoute: ActivatedRoute,
     private collectionService: CollectionService,
     private dialog: MatDialog,
     private router: Router,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -43,7 +48,19 @@ export class CollectionInfoComponent implements OnInit {
             // console.log('TEST > ', resData);
 
             this.collectionData = resData;
-            this.getPublicationsByCategory( this.collectionData.id );
+
+            this.authService.canUser('get_publications_from_collection').subscribe(
+              (resCan) => {
+
+                if ( resCan ) {
+                  this.showPublications = true;
+                  this.getPublicationsByCategory( this.collectionData.id );
+                } else {
+                  this.spinnerService.hide();
+                }
+
+              }
+            );
           },
           (err: Error) => {
             console.error(err);

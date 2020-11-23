@@ -85,6 +85,7 @@
                   color="warn"
                   class="button-white-borders"
                   style="margin: 1em"
+                  [disabled]="!can(userData, 'cancel_contract')"
                   (click)="onRescindirContrato(contract)">
             Rescindir contrato
           </button>
@@ -93,6 +94,7 @@
                   color="primary"
                   class="button-white-borders"
                   style="margin: 1em"
+                  [disabled]="!can(userData, 'generate_summaries_for_contract')"
                   (click)="generateSummaries(contract)">
             Actualizar resúmenes
           </button>
@@ -101,7 +103,7 @@
                   color="accent"
                   class="button-white-borders"
                   style="margin: 1em"
-                  [disabled]="!canCharge(contract)"
+                  [disabled]="!canCharge(contract) || !can(userData, 'charge_for_contract')"
                   (click)="charge(contract)">
             Cobrar
           </button>
@@ -118,7 +120,7 @@
 
   </span>
 
-  <span *ngIf="donations.length > 0">
+  <span *ngIf="donations.length > 0 && can(userData, 'get_any_donation')">
     <h1>Donaciones</h1>
 
     <div class="donations" >
@@ -166,7 +168,7 @@
                   color="accent"
                   class="button-white-borders"
                   style="margin: 1em"
-                  [disabled]="!canChargeDonations()"
+                  [disabled]="!canChargeDonations() || !can(userData, 'charge_donations')"
                   (click)="chargeDonations()">
             Cobrar
           </button>

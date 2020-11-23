@@ -7,8 +7,8 @@ import Swal from 'sweetalert2';
 import { IPermission, IRole } from '../../../../../domain/models/user';
 import { RoleService, ICreateCommand, IUpdateCommand } from '../../../../../domain/services/role.service';
 import { SweetAlertGenericMessageService } from '../../../../../services/sweet-alert-generic-message.service';
-import { AuthService } from "../../../../../domain/services/auth.service";
-import { IUser, can } from "../../../../../domain/models/user";
+import { AuthService } from '../../../../../domain/services/auth.service';
+import { IUser, can } from '../../../../../domain/models/user';
 
 export interface DialogData {
   isNew: boolean;
@@ -195,15 +195,31 @@ export class RolesManagerEditComponent implements OnInit {
       (err ) => {
         this.spinnerService.hide();
 
-        if ( err.error.code === 'existing_users_assigned_to_role' ) {
+        switch( err.error.code ){
 
-          this.sweetAlertGenericService.showAlertError(
-            // tslint:disable-next-line: max-line-length
-            'El rol no puede eliminarse debido a que hay usuarios asignados con el mismo. Contactarse con el encargado de la base de datos.',
-            `No puede eliminarse ${ this.data.role.name }`);
+          case 'existing_users_assigned_to_role': {
+            this.sweetAlertGenericService.showAlertError(
+              // tslint:disable-next-line: max-line-length
+              'El rol no puede eliminarse debido a que hay usuarios asignados con el mismo. Contactarse con el encargado de la base de datos.',
+              `No puede eliminarse ${ this.data.role.name }`
+            );
 
-        } else {
-          console.error(err);
+            break;
+
+          }
+
+          case 'is_default': {
+
+            this.sweetAlertGenericService.showAlertError('No puede eliminarse un rol preterminado');
+
+            break;
+
+          }
+
+          default: {
+            console.error(err);
+          }
+
         }
       }
     );
