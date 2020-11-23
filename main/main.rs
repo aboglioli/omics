@@ -7,6 +7,7 @@ mod handlers;
 mod infrastructure;
 
 use actix_cors::Cors;
+use actix_files as fs;
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 
 use common::config::Config;
@@ -69,6 +70,7 @@ async fn main() -> std::io::Result<()> {
                     .configure(configuration::routes)
                     .configure(backup::routes),
             )
+            .service(fs::Files::new("/static/backups", "./backups").show_files_listing())
     })
     .bind(format!("0.0.0.0:{}", config.port()))?
     .run()
