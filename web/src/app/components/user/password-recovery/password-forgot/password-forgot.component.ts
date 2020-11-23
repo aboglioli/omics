@@ -5,6 +5,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { IdentityService, IRecoverPasswordCommand } from '../../../../domain/services/identity.service';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { SweetAlertGenericMessageService } from '../../../../services/sweet-alert-generic-message.service';
 
 @Component({
   selector: 'app-password-forgot',
@@ -14,7 +15,6 @@ import { NgxSpinnerService } from 'ngx-spinner';
 export class PasswordForgotComponent implements OnInit {
 
   @ViewChild('forgotPasswordValid') private swalFormValid: SwalComponent;
-  @ViewChild('forgotErrorUser') private swalForgotErrorUser: SwalComponent;
 
   // Font Awseome icons
   public faClose = faTimesCircle;
@@ -26,7 +26,8 @@ export class PasswordForgotComponent implements OnInit {
   constructor(  private dialogRef: MatDialogRef<PasswordForgotComponent>,
                 private fb: FormBuilder,
                 private identityService: IdentityService,
-                private spinnerService: NgxSpinnerService) {
+                private spinnerService: NgxSpinnerService,
+                private sweetAlertGenericMessageService: SweetAlertGenericMessageService) {
 
     dialogRef.disableClose = true;
 
@@ -86,12 +87,15 @@ export class PasswordForgotComponent implements OnInit {
           this.swalFormValid.fire();
 
         },
-        (error: Error ) => {
+        (err) => {
 
-          console.error('ERROR: Correo de usuario inexistente');
-          console.error(error);
+          if ( err.error.code === 'unauthorized' ) {
+            this.sweetAlertGenericMessageService.showAlertError('No tiene los permisos suficientes', 'Error');
+          } else {
+            this.sweetAlertGenericMessageService.showAlertError('El correo ingresado no pertenece a usuario alguno.', 'Correro no válido');
+          }
+          console.error(err);
           this.spinnerService.hide();
-          this.swalForgotErrorUser.fire();
 
         });
 
