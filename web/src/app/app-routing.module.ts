@@ -52,7 +52,7 @@ const routes: Routes = [
   { path: 'about', component: AboutComponent },
   { path: 'read/:id', component: VisorComicComponent, canActivate: [AuthLoginGuard] },
   { path: 'dashboard-reportes', component: DashboardReportesComponent, canActivate: [] },
-  { path: 'dashboard-publicaciones-contratos', component: DashboardGestionContratosPublicacionesComponent, canActivate: [] },
+  { path: 'dashboard-publicaciones-contratos', component: DashboardGestionContratosPublicacionesComponent, canActivate: [PermissionAnyGuard], data: { permission: ['approve_reject_contract', 'approve_reject_publication'] } },
   { path: 'dashboard-reglas-negocio', component: DashboardReglasNegociosComponent, canActivate: []  },
   { path: 'dashboard-general', component: DashboardGestionAdminComponent, canActivate: [AuthLoginGuard,  ] },
   { path: 'dashboard-roles', component: DashboardRolesComponent, canActivate: [AuthLoginGuard,  ] },

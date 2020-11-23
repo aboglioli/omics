@@ -14,8 +14,8 @@ import { DeskboardMedioCobroComponent } from '../deskboard/deskboard-medio-cobro
 import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../../domain/services/auth.service';
 import { IdentityService } from '../../../domain/services/identity.service';
-import { IUser } from 'src/app/domain/models';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
+import { can, IUser } from '../../../domain/models/user';
 @Component({
   selector: 'app-deskboard-wallet',
   templateUrl: './deskboard-wallet.component.html',
@@ -26,6 +26,8 @@ export class DeskboardWalletComponent implements OnInit {
   public donations: IDonation[] = [];
   public businessRules: IBusinessRules;
   public message: string;
+  public userData: IUser;
+  public can = can;
 
   public emailPaymentUser: string;
 
@@ -102,10 +104,11 @@ export class DeskboardWalletComponent implements OnInit {
 
   private getPayMentEmail(): void {
 
-    this.identifyService.getById( 'me' ).subscribe(
+    this.identifyService.getById( 'me', 'role' ).subscribe(
       (res: IUser) => {
 
         this.emailPaymentUser = res.payment_email;
+        this.userData = res;
         // console.log('test >', this.emailPaymentUser)
         this.spinnerService.hide();
 

@@ -1,6 +1,6 @@
 <div class="wallet-container">
 
-  <div style="display: flex; justify-content: center; flex-direction: column; align-items: center;">
+  <div style="display: flex; justify-content: center; flex-direction: column; align-items: center;" *ngIf="can(userData, 'change_user_payment_email')">
     <button mat-flat-button
             color="primary"
             class="button-white-borders"
