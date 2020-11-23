@@ -36,8 +36,7 @@ impl EventHandler for PublicationCounterHandler {
         let event: PublicationEvent = serde_json::from_value(event.payload())?;
 
         match event {
-            // TODO: change to published
-            PublicationEvent::Created { author_id, .. } => {
+            PublicationEvent::Published { author_id, .. } => {
                 let mut author = self
                     .author_repo
                     .find_by_id(&AuthorId::new(author_id)?)

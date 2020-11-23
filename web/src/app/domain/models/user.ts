@@ -36,6 +36,11 @@ export interface IRole {
   updated_at?: string;
 }
 
+export enum Flags {
+  New = 0,
+  Welcomed,
+}
+
 export interface IUser {
   id: string;
   username: string;
@@ -50,7 +55,7 @@ export interface IUser {
   role_id?: string;
   role?: IRole;
   payment_email?: string;
-  flag?: number;
+  flag: Flags;
   created_at: string;
   updated_at?: string;
 }
