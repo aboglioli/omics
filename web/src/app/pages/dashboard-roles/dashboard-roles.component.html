@@ -13,14 +13,14 @@
       <div  class="box-type">
 
         <div
-          *ngIf="can(user, 'get_any_role')"
+          *ngIf="can(userData, 'get_any_role')"
           [ngClass]="{'selected': ( currentOption === optionMenu.roles )}"
           (click)="onSelectManageTypeMenu( optionMenu.roles )">
           Roles
         </div>
 
         <div
-          *ngIf="can(user, 'get_any_user')"
+          *ngIf="can(userData, 'get_any_user')"
           [ngClass]="{'selected': ( currentOption === optionMenu.users )}"
           (click)="onSelectManageTypeMenu( optionMenu.users )">
           Usuarios
@@ -32,7 +32,7 @@
 
     </div>
 
-    <div *ngIf="user" class="body">
+    <div *ngIf="userData" class="body">
 
       <span *ngIf="(currentOption === optionMenu.roles); then rolesList else usersList"></span>
 
@@ -41,7 +41,7 @@
       </ng-template>
 
       <ng-template #usersList>
-        <app-user-roles-list></app-user-roles-list>
+        <app-user-roles-list [userData]="userData"></app-user-roles-list>
       </ng-template>
 
     </div>

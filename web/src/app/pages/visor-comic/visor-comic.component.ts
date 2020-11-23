@@ -3,12 +3,13 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { PublicationService } from 'src/app/domain/services/publication.service';
 import { IPublication, IPage } from '../../domain/models/publication';
 import { IGetByIdResponse, IReadResponse } from '../../domain/services/publication.service';
-import { faChevronLeft, faChevronRight, faMoneyBillAlt, faBookmark, faInfoCircle, faHeart, faCommentDots  } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faBookmark, faInfoCircle, faHeart  } from '@fortawesome/free-solid-svg-icons';
 import { ActivatedRoute } from '@angular/router';
-import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 import { IReaderPublicationInteraction } from '../../domain/models/reader';
 import { PublicationInfoComponent } from 'src/app/components/publication/publication-info/publication-info.component';
 import { MatDialog } from '@angular/material/dialog';
+import { IUser, can } from '../../domain/models/user';
+import { IdentityService } from '../../domain/services/identity.service';
 
 @Component({
   selector: 'app-visor-comic',
@@ -37,11 +38,14 @@ export class VisorComicComponent implements OnInit {
   public pageCurrent: number;
   public pageToShow: string;
 
+  public userData: IUser;
+  public can = can;
+
   constructor(
     private spinnerService: NgxSpinnerService,
     private publicationService: PublicationService,
     private activateRoute: ActivatedRoute,
-    private sweetAlertGenericService: SweetAlertGenericMessageService,
+    private identityService: IdentityService,
     private dialog: MatDialog,
   ) { }
 
@@ -49,6 +53,12 @@ export class VisorComicComponent implements OnInit {
 
     this.pagesTotal = 0;
     this.pageCurrent = 0;
+
+    this.identityService.getById( 'me', 'role' ).subscribe(
+      (res) => {
+        this.userData = res;
+      }
+    );
 
     this.getPublicationDataByParams();
   }
