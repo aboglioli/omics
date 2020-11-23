@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { faTimesCircle, faBookmark, faMoneyBillAlt, faHeart, faEye, faStar } from '@fortawesome/free-solid-svg-icons';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { IGetReviewsResponse, PublicationService } from '../../../domain/services/publication.service';
@@ -16,6 +16,7 @@ import { IContract } from '../../../domain/models/contract';
 import { IdentityService } from '../../../domain/services/identity.service';
 import { LoginRegisterComponent } from '../../user/login-register/login-register.component';
 import { DonacionComponent } from '../../donacion/donacion.component';
+import { forkJoin, Subscription } from 'rxjs';
 
 export interface DialogData {
   idPublication: string;
@@ -28,7 +29,7 @@ export interface DialogData {
   styleUrls: ['./publication-info.component.scss']
 })
 
-export class PublicationInfoComponent implements OnInit {
+export class PublicationInfoComponent implements OnInit, OnDestroy {
 
   // Font Awseome icons
   public faClose = faTimesCircle;
@@ -56,6 +57,8 @@ export class PublicationInfoComponent implements OnInit {
   public canRequestContract = false;
   public readerIsAuthor = false;
   public readerIsContentManager = false;
+
+  public authServiceContractSubscriber: Subscription;
 
   constructor(
     public dialogRef: MatDialogRef<PublicationInfoComponent>,
@@ -113,11 +116,10 @@ export class PublicationInfoComponent implements OnInit {
 
   private getPublicationInfo(): void {
 
+    this.authServiceContractSubscriber = forkJoin( [this.authService.canUser( 'request_contract' ), this.authService.canUser( 'get_own_contract' )] )
+      .subscribe( ([canRequest, canOwnContract])  => {
 
-    this.authService.canUser( 'request_contract' ).subscribe(
-      (can) => {
-
-        if ( can ) {
+        if ( canRequest) {
           this.publicationService.canRequestContract(this.data.idPublication).subscribe(
             (res) => {
               this.canRequestContract = res.can_request;
@@ -127,22 +129,19 @@ export class PublicationInfoComponent implements OnInit {
             }
           );
         }
-      }
-    );
 
-    this.authService.canUser( 'get_own_contract' ).subscribe(
-      (can) => {
-        this.publicationService.getContract(this.data.idPublication).subscribe(
-          (res) => {
-            this.contract = res;
-          },
-          (err: Error) => {
-            console.error('Error: ', err);
-          }
-        );
+        if ( canOwnContract ) {
+          this.publicationService.getContract(this.data.idPublication).subscribe(
+            (res) => {
+              this.contract = res;
+            },
+            (err: Error) => {
+              console.error('Error: ', err);
+            }
+          );
+        }
 
-      }
-    );
+      });
 
 
     this.publicationService.getById( this.data.idPublication,  'author, category').subscribe(
@@ -286,7 +285,7 @@ export class PublicationInfoComponent implements OnInit {
 
   public addReview(ratingSelected: number): void {
 
-    const dialogRef = this.dialog.open(
+    const dialogRefReview = this.dialog.open(
       PublicationReviewAddComponent,
       {
         panelClass: 'no-padding-dialog',
@@ -298,7 +297,7 @@ export class PublicationInfoComponent implements OnInit {
       }
     );
 
-    dialogRef.afterClosed().subscribe( resReviewChanged => {
+    dialogRefReview.afterClosed().subscribe( resReviewChanged => {
 
       if ( resReviewChanged ) {
         this.getPublicationInfo();
@@ -306,7 +305,11 @@ export class PublicationInfoComponent implements OnInit {
         this.ratingPublication = this.oldRatingPublication;
       }
 
+
+
     });
+
+
 
   }
 
@@ -337,6 +340,12 @@ export class PublicationInfoComponent implements OnInit {
   public subscribe(): void {
     this.router.navigate(['/plans']);
     this.onClose();
+  }
+
+  ngOnDestroy(): void {
+
+    this.authServiceContractSubscriber.unsubscribe();
+
   }
 
 }

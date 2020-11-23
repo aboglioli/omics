@@ -195,7 +195,7 @@ export class RolesManagerEditComponent implements OnInit {
       (err ) => {
         this.spinnerService.hide();
 
-        switch( err.error.code ){
+        switch ( err.error.code ){
 
           case 'existing_users_assigned_to_role': {
             this.sweetAlertGenericService.showAlertError(
@@ -277,9 +277,16 @@ export class RolesManagerEditComponent implements OnInit {
 
 
       },
-      ( err: Error ) => {
+      ( err ) => {
         this.spinnerService.hide();
-        console.error(err);
+
+        if ( err.error.code === 'already_exists' ){
+
+          this.sweetAlertGenericService.showAlertError(`El rol ${ createdRole.name } genera un id igual que otro rol existente`, 'ID repetido');
+
+        } else {
+          console.error('Error: ', err);
+        }
       }
     );
 
@@ -316,9 +323,14 @@ export class RolesManagerEditComponent implements OnInit {
 
         this.authService.loadUser();
       },
-      (err: Error) => {
-        this.spinnerService.hide();
-        console.error(err);
+      (err ) => {
+
+        if ( err.error.code === 'already_exists' ){
+          this.sweetAlertGenericService.showAlertError(`El rol ${ editedRole.name } genera un id igual que otro rol existente`, 'ID repetido');
+        } else {
+          console.error('Error: ', err);
+        }
+
       }
     );
 
