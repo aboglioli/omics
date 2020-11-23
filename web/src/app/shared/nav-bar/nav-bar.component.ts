@@ -4,11 +4,9 @@ import { faBars, faBell } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from 'src/app/domain/services/auth.service';
-import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 import { IdentityService } from 'src/app/domain/services/identity.service';
-import { IUser } from 'src/app/domain/models';
+import { IUser, can } from 'src/app/domain/models';
 import { LoginRegisterComponent } from 'src/app/components/user/login-register/login-register.component';
-import { SubscriptionService } from 'src/app/domain/services/subscription.service';
 
 @Component({
   selector: 'app-nav-bar',
@@ -29,11 +27,11 @@ export class NavBarComponent implements OnInit {
   public userData: IUser;
   public userAvatar: string;
   public user$: Observable<IUser>;
+  public can = can;
 
   constructor(  private router: Router,
                 private authService: AuthService,
-                private dialog: MatDialog,
-                private identifyService: IdentityService ) {
+                private dialog: MatDialog ) {
 
 
     this.subscribeAuthService();
@@ -101,18 +99,6 @@ export class NavBarComponent implements OnInit {
         }
       }
     });
-
-    // this.identifyService.getById(idUser, 'role').subscribe( (data: IUser) => {
-    //
-    //   this.userData = data;
-    //
-    //   if ( this.userData.profile_image ) {
-    //     this.userAvatar = this.userData.profile_image;
-    //   } else {
-    //     this.userAvatar = undefined;
-    //   }
-    //
-    // } );
 
   }
 

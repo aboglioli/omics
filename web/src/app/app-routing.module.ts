@@ -37,7 +37,7 @@ const routes: Routes = [
   { path: 'development', component: DevelopmentComponent },
   { path: 'home', component: HomeComponent },
   { path: 'home/:id/recover-password/:temporal_password', component: HomeComponent, canActivate: [AuthNotLoginGuard] },
-  { path: 'notifications', component: NotificationsComponent, canActivate: [AuthLoginGuard] },
+  { path: 'notifications', component: NotificationsComponent, canActivate: [AuthLoginGuard, PermissionAnyGuard], data: {permission: ['get_notifications']} },
   { path: 'favorites', component: FavoritosComponent, canActivate: [AuthLoginGuard] },
   { path: 'catalogue', component: CatalogoComponent },
   { path: 'authors', component:  AutoresComponent},
