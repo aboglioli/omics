@@ -23,7 +23,7 @@
         </button>
       </div>
 
-      <div class="table">
+      <div class="content">
         <table>
           <tr>
             <th>Fecha</th>
@@ -33,7 +33,7 @@
           <tr *ngFor="let backup of backups">
             <td>{{backup.date | date:'dd/MM/yyyy HH:mm:ss'}}</td>
             <td>{{backup.file}}</td>
-            <td><a [href]="'http://localhost:3000/static/backups/' + backup.file">Descargar</a></td>
+            <td class="download"><a [href]="'http://localhost:3000/static/backups/' + backup.file">Descargar</a></td>
           </tr>
         </table>
       </div>

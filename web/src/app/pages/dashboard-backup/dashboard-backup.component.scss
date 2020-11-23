@@ -64,8 +64,36 @@ div.parent {
         margin-bottom: 1rem;
       }
 
-      .table {
+      .content {
+        background-color: rgba(0, 0, 0, 0.2);
 
+        table {
+          width: 100%;
+          border-collapse: collapse;
+
+          th, td {
+            border: 1px solid rgba(0, 0, 0, 0.5);
+            text-align: left;
+            padding: 8px;
+          }
+
+          td {
+            font-size: 0.8rem;
+
+            &.download {
+              font-size: 1rem;
+              text-align: center;
+
+              a {
+                color: #e06f6f;
+
+                &:hover {
+                  text-decoration: underline;
+                }
+              }
+            }
+          }
+        }
       }
 
     }
