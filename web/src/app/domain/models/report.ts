@@ -53,6 +53,8 @@ export interface IPayments {
   total_outcome: number;
   contract_outcome: number;
   donation_outcome: number;
+  income: number;
+  outcome: number;
 }
 
 export interface IReport {
