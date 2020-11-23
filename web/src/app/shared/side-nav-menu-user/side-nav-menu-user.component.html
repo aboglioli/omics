@@ -49,6 +49,7 @@
 
     <!-- Editar cuenta -->
     <button mat-stroked-button class="button-white-borders user-button"
+            *ngIf="canAny( userData, 'update_own_user', 'subscribe', 'delete_own_user', 'change_user_password' )"
             [ngClass]="{'active': ( activePathSelected === 'profileEdit' ) }"
             (click)="goToUserPage(true)">
       Editar Perfil

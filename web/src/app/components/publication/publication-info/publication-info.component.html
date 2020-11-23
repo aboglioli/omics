@@ -126,7 +126,7 @@
         >
 
 
-          <button *ngIf="isUserLogIn" mat-stroked-button class="button-white-borders"
+          <button *ngIf="isUserLogIn && ( authService.canUser('read_publication') | async )" mat-stroked-button class="button-white-borders"
                 style="font-size: 1rem; width: 100%;"
                 (click)="onGoToRead()">
             <h3>LEER</h3>

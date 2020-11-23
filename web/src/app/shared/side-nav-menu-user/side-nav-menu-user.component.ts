@@ -5,7 +5,7 @@ import { AuthService } from 'src/app/domain/services/auth.service';
 import { IdentityService } from '../../domain/services/identity.service';
 import { SubscriptionService } from '../../domain/services/subscription.service';
 import { ReaderService } from '../../domain/services/reader.service';
-import { IUser, can } from '../../domain/models/user';
+import { IUser, can, canAny } from '../../domain/models/user';
 
 @Component({
   selector: 'app-side-nav-menu-user',
@@ -26,11 +26,11 @@ export class SideNavMenuUserComponent implements OnInit {
   private userId: string;
   public readerIsSubscribed = false;
   public can = can;
+  public canAny = canAny;
 
   constructor(
     private router: Router,
     private authService: AuthService,
-    private identifyService: IdentityService,
     private readerService: ReaderService,
     private subscriptionService: SubscriptionService,
   ) {

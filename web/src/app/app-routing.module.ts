@@ -29,7 +29,7 @@ import { CollectionOwnerGuard } from './guard/collection-owner.guard';
 import { CollectionInfoComponent } from './pages/collection-info/collection-info.component';
 import { PlansComponent } from './pages/plans/plans.component';
 import { DashboardRolesComponent } from './pages/dashboard-roles/dashboard-roles.component';
-import { PermissionGuard } from './guard/permission.guard';
+import { PermissionAnyGuard } from './guard/permission-any.guard';
 
 
 const routes: Routes = [
@@ -37,7 +37,7 @@ const routes: Routes = [
   { path: 'development', component: DevelopmentComponent },
   { path: 'home', component: HomeComponent },
   { path: 'home/:id/recover-password/:temporal_password', component: HomeComponent, canActivate: [AuthNotLoginGuard] },
-  { path: 'notifications', component: NotificationsComponent, canActivate: [AuthLoginGuard] },
+  { path: 'notifications', component: NotificationsComponent, canActivate: [AuthLoginGuard, PermissionAnyGuard], data: {permission: ['get_notifications']} },
   { path: 'favorites', component: FavoritosComponent, canActivate: [AuthLoginGuard] },
   { path: 'catalogue', component: CatalogoComponent },
   { path: 'authors', component:  AutoresComponent},
@@ -47,7 +47,7 @@ const routes: Routes = [
   { path: 'deskboard/collection/new', component:  CollectionNewEditComponent},
   { path: 'deskboard/collection/edit/:id', component:  CollectionNewEditComponent, canActivate: [CollectionOwnerGuard]},
   { path: 'profile/:id', component: PerfilComponent },
-  { path: 'profile/:id/editUser', component: PerfilEditarComponent,  canActivate: [AuthLoginGuard, SameUserGuard, PermissionGuard], data: {permission: 'update_own_user'}},
+  { path: 'profile/:id/editUser', component: PerfilEditarComponent,  canActivate: [AuthLoginGuard, SameUserGuard, PermissionAnyGuard], data: {permission: ['update_own_user', 'subscribe', 'delete_own_user', 'change_user_password']}},
   { path: 'collection/:id', component: CollectionInfoComponent },
   { path: 'about', component: AboutComponent },
   { path: 'read/:id', component: VisorComicComponent, canActivate: [AuthLoginGuard] },
