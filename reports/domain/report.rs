@@ -5,11 +5,11 @@ use serde::{Deserialize, Serialize};
 
 use common::counter::Counter;
 use common::result::Result;
-use identity::domain::user::User;
-use payment::domain::contract::Contract;
-use payment::domain::donation::Donation;
-use payment::domain::subscription::Subscription;
-use publishing::domain::publication::Publication;
+use identity::domain::user::{Gender, User};
+use payment::domain::contract::{Contract, Status as ContractStatus};
+use payment::domain::donation::{Donation, Status as DonationStatus};
+use payment::domain::subscription::{Subscription, Status as SubscriptionStatus};
+use publishing::domain::publication::{Publication, Status as PublicationStatus};
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Users {
@@ -103,18 +103,22 @@ impl Report {
 
         for user in users.iter() {
             if user.is_active() {
-                by_status.inc("active");
+                by_status.inc("Activos");
             } else if !user.is_validated() {
-                by_status.inc("not-validated");
+                by_status.inc("No validados");
             } else {
                 by_status.inc("inative");
             }
 
             if let Some(person) = user.person() {
                 if let Some(gender) = person.gender() {
-                    by_gender.inc(gender.to_string());
+                    by_gender.inc(match gender {
+                        Gender::Male => "Masculino",
+                        Gender::Female => "Femenino",
+                        Gender::Other => "Otro",
+                    });
                 } else {
-                    by_gender.inc("unknown");
+                    by_gender.inc("Desconocido");
                 }
 
                 if let Some(birthdate) = person.birthdate() {
@@ -137,11 +141,11 @@ impl Report {
                         by_age.inc("+60");
                     }
                 } else {
-                    by_age.inc("unknown");
+                    by_age.inc("Desconocida");
                 }
             } else {
-                by_gender.inc("unknown");
-                by_age.inc("unknown");
+                by_gender.inc("Desconocido");
+                by_age.inc("Desconocido");
             }
         }
 
@@ -153,20 +157,30 @@ impl Report {
         });
     }
 
-    pub fn map_publications(&mut self, publications: &[Publication]) {
+    pub fn map_publications(&mut self, publications: &[Publication], categories: HashMap<String, String>) {
         let mut by_category = Counter::new();
         let mut by_contract = Counter::new();
         let mut by_status = Counter::new();
         let mut by_pages = Counter::new();
 
         for publication in publications.iter() {
-            by_category.inc(publication.header().category_id().to_string());
+            if let Some(category_name) = categories.get(publication.header().category_id().value()) {
+                by_category.inc(category_name);
+            }
+
             by_contract.inc(if publication.has_contract() {
-                "with-contract"
+                "Con contrato"
             } else {
-                "without-contract"
+                "Sin contrato"
             });
-            by_status.inc(publication.status_history().current().to_string());
+
+            by_status.inc(match publication.status_history().current() {
+                PublicationStatus::Draft => "Borrador",
+                PublicationStatus::WaitingApproval => "Esperando aprobación",
+                PublicationStatus::Published { .. } => "Publicada",
+                PublicationStatus::Rejected { .. } => "Rechazada",
+            });
+
             by_pages.inc(publication.pages().len().to_string());
         }
 
@@ -187,7 +201,11 @@ impl Report {
 
         for subscription in subscriptions.iter() {
             by_payment.inc(subscription.payments().len().to_string());
-            by_status.inc(subscription.status_history().current().to_string());
+            by_status.inc(match subscription.status_history().current() {
+                SubscriptionStatus::WaitingForPayment => "Esperando pago",
+                SubscriptionStatus::Active => "Activa",
+                SubscriptionStatus::Inactive => "Inactive",
+            });
 
             let mut s_amount = 0.0;
 
@@ -231,7 +249,12 @@ impl Report {
         for contract in contracts.iter() {
             by_summary.inc(contract.summaries().len().to_string());
             by_payment.inc(contract.payments().len().to_string());
-            by_status.inc(contract.status_history().current().to_string());
+            by_status.inc(match contract.status_history().current() {
+                ContractStatus::Requested => "Requerido",
+                ContractStatus::Approved { .. } => "Aprobado",
+                ContractStatus::Rejected { .. } => "Rechazado",
+                ContractStatus::Cancelled => "Cancelado",
+            });
 
             let mut c_amount = 0.0;
 
@@ -272,7 +295,12 @@ impl Report {
         let mut amount = 0.0;
 
         for donation in donations.iter() {
-            by_status.inc(donation.status_history().current().to_string());
+            by_status.inc(match donation.status_history().current() {
+                DonationStatus::WaitingForPayment => "Esperando pago",
+                DonationStatus::Paid => "Pagada",
+                DonationStatus::Charged => "Cobrada",
+                DonationStatus::Cancelled => "Cancelada",
+            });
 
             let d_amount = donation.total().value();
 
