@@ -275,14 +275,48 @@ export class DashboardReportesComponent implements OnInit {
 
     const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
-    const mapItem = (item) => Object.keys(item)
-      .map((key) => ({
-        text: [
-          { text: capitalize(key), bold: true },
-          ': ',
-          item[key],
-        ],
+    // const mapItem = (item) => Object.keys(item)
+    //   .map((key) => ({
+    //     text: [
+    //       { text: capitalize(key), bold: true },
+    //       ': ',
+    //       item[key],
+    //     ],
+    //   }));
+
+    const mapItem = (arr) => arr
+      .map(({ key, value }) => ({
+          text: [
+            { text: capitalize(key), bold: true },
+            ': ',
+            value,
+          ],
       }));
+
+    const toArr = (obj) => Object.keys(obj)
+      .map((key) => ({
+        key,
+        value: obj[key],
+      }));
+
+    const sort = (arr) => arr
+      .map((item, index, arr) => {
+        let order = index;
+
+        if (typeof item.key === 'number') {
+          order = item.key;
+        } else if (item.key.startsWith('+')) {
+          order = +item.key.slice(1);
+        } else if (item.key.includes('-')) {
+          order = +item.key.split('-')[0];
+        }
+
+        return {
+          ...item,
+          order,
+        }
+      })
+      .sort((a, b) => a.order - b.order);
 
     const docDefinition = {
 
@@ -311,10 +345,10 @@ export class DashboardReportesComponent implements OnInit {
             body: [
               [{text: 'Por Categoría', style: 'tableHeader'}, {text: 'Por Contrato', style: 'tableHeader'}, {text: 'Por Estado', style: 'tableHeader'}, {text: 'Por Cantidad de Páginas', style: 'tableHeader'}],
               [
-                {style: 'tablebody', ul: mapItem(this.report.publications.by_category) },
-                {style: 'tablebody', ul: mapItem(this.report.publications.by_contract) },
-                {style: 'tablebody', ul: mapItem(this.report.publications.by_status) },
-                {style: 'tablebody', ul: mapItem(this.report.publications.by_pages) }
+                {style: 'tablebody', ul: mapItem(toArr(this.report.publications.by_category)) },
+                {style: 'tablebody', ul: mapItem(toArr(this.report.publications.by_contract)) },
+                {style: 'tablebody', ul: mapItem(toArr(this.report.publications.by_status)) },
+                {style: 'tablebody', ul: mapItem(sort(toArr(this.report.publications.by_pages))) }
               ],
             ]
           }
@@ -340,9 +374,9 @@ export class DashboardReportesComponent implements OnInit {
               // tslint:disable-next-line: max-line-length
               [{text: 'Por Estado', style: 'tableHeader'}, {text: 'Por Monto Cobrado', style: 'tableHeader'}, {text: 'Por Cantidad de Pagos', style: 'tableHeader'}],
               [
-                {style: 'tablebody', ul: mapItem(this.report.contracts.by_status) },
-                {style: 'tablebody', ul: mapItem(this.report.contracts.by_amount) },
-                {style: 'tablebody', ul: mapItem(this.report.contracts.by_payment) }
+                {style: 'tablebody', ul: mapItem(toArr(this.report.contracts.by_status)) },
+                {style: 'tablebody', ul: mapItem(sort(toArr(this.report.contracts.by_amount))) },
+                {style: 'tablebody', ul: mapItem(sort(toArr(this.report.contracts.by_payment))) }
               ],
             ]
           }
@@ -368,9 +402,9 @@ export class DashboardReportesComponent implements OnInit {
             body: [
               [{text: 'Por Estado', style: 'tableHeader'}, {text: 'Por Género', style: 'tableHeader'}, {text: 'Por Edad', style: 'tableHeader'}],
               [
-                {style: 'tablebody', ul: mapItem(this.report.users.by_status) },
-                {style: 'tablebody', ul: mapItem(this.report.users.by_gender) },
-                {style: 'tablebody', ul: mapItem(this.report.users.by_age) }
+                {style: 'tablebody', ul: mapItem(toArr(this.report.users.by_status)) },
+                {style: 'tablebody', ul: mapItem(toArr(this.report.users.by_gender)) },
+                {style: 'tablebody', ul: mapItem(sort(toArr(this.report.users.by_age))) }
 
               ],
             ]
@@ -399,9 +433,9 @@ export class DashboardReportesComponent implements OnInit {
               [{text: 'Por Estado', style: 'tableRow'}, {text: 'Por Monto', style: 'tableRow'}, {text: 'Por Estado', style: 'tableRow'}],
               [
 
-                {style: 'tablebody', ul: mapItem(this.report.subscriptions.by_status) },
-                {style: 'tablebody', ul: mapItem(this.report.donations.by_amount) },
-                {style: 'tablebody', ul: mapItem(this.report.donations.by_status) }
+                {style: 'tablebody', ul: mapItem(toArr(this.report.subscriptions.by_status)) },
+                {style: 'tablebody', ul: mapItem(sort(toArr(this.report.donations.by_amount))) },
+                {style: 'tablebody', ul: mapItem(toArr(this.report.donations.by_status)) }
 
               ],
             ]
