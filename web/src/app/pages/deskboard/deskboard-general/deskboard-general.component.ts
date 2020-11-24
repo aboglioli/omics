@@ -56,16 +56,19 @@ export class DeskboardGeneralComponent implements OnInit {
 
         this.userData = resData;
 
-        this.authorService.getById('me').subscribe(({ author }) => {
-          if (this.userData.flag === Flags.New && author.publications > 0) {
-            this.sweetAlertService.showAlertSuccess(
-              'Tu primera publicación fue aprobada. Gracias por formar parte de Omics.',
-              'Bienvenido',
-            );
+        if (this.userData.flag === Flags.New) {
+          this.authorService.getById('me').subscribe(({ author }) => {
+            if (author.publications > 0) {
+              this.sweetAlertService.showAlertSuccess(
+                'Tu primera publicación fue aprobada. Gracias por formar parte de Omics.',
+                'Bienvenido',
+              );
 
-            this.identityService.setFlag('me', { flag: Flags.Welcomed }).subscribe();
-          }
-        });
+              this.identityService.setFlag('me', { flag: Flags.Welcomed }).subscribe();
+            }
+          });
+        }
+
 
         this.spinnerService.hide();
       },
