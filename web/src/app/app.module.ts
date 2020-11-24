@@ -87,6 +87,7 @@ import { RolesManagerListComponent } from './components/dashboard/dashboard-role
 import { RolesManagerEditComponent } from './components/dashboard/dashboard-roles/roles-manager/roles-manager-edit/roles-manager-edit.component';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { UserFilterComponent } from './shared/user-filter/user-filter.component';
+import { AdminManagerPlanCardComponent } from './components/dashboard/admin-manager-plan-card/admin-manager-plan-card.component';
 
 
 @NgModule({
@@ -150,6 +151,7 @@ import { UserFilterComponent } from './shared/user-filter/user-filter.component'
     RolesManagerListComponent,
     RolesManagerEditComponent,
     UserFilterComponent,
+    AdminManagerPlanCardComponent,
   ],
   imports: [
     BrowserModule,

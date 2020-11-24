@@ -23,7 +23,6 @@ export interface IRegisterCommand {
   username: string;
   email: string;
   password: string;
-  birthdate: string; // RFC 3339
 }
 
 export interface IRegisterResponse {

@@ -36,8 +36,6 @@ export class LoginRegisterComponent implements OnInit {
   formLogin: FormGroup;
   formSignUp: FormGroup;
 
-  maxDatebirthdate = new Date();
-
   // Otros atributos
   isLoginOptionShow = true;
   userData: IUser;
@@ -82,9 +80,7 @@ export class LoginRegisterComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.maxDatebirthdate.setFullYear(  this.maxDatebirthdate.getFullYear() - 14 );
     this.buildForms();
-
 
   }
 
@@ -109,9 +105,10 @@ export class LoginRegisterComponent implements OnInit {
 
       correo     : ['', [ Validators.required, Validators.pattern( '^[a-zA-Z0-9]+[a-zA-Z0-9_.+-]*@[a-zA-Z0-9]+[a-zA-Z0-9-]*\.[a-zA-Z0-9-.]+$' )] ],
       usuario    : ['', [ Validators.required, Validators.minLength(5) ]],
-      birthdate  : ['', [ Validators.required ] ],
       password1  : ['', [ Validators.required, Validators.minLength(8) ] ],
       password2  : ['', [ Validators.required, Validators.minLength(8) ] ],
+      confirmAge : [false, [Validators.required, Validators.requiredTrue]],
+      confirmTerms : [false, [Validators.required, Validators.requiredTrue]]
 
     }, {
       // A nivel formulario asyncValidators (sino uno creado)
@@ -259,7 +256,6 @@ export class LoginRegisterComponent implements OnInit {
           username: this.formSignUp.get('usuario').value,
           email: this.formSignUp.get('correo').value,
           password: this.formSignUp.get('password1').value,
-          birthdate: this.formSignUp.get('birthdate').value
 
         };
 
@@ -351,12 +347,6 @@ export class LoginRegisterComponent implements OnInit {
 
   }
 
-  public convertDateToRFC3339(changeDate: Date): void {
-
-    this.formSignUp.get('birthdate').setValue( changeDate.toISOString() );
-
-  }
-
   // #region getters
   get correoUsuarioLoginNovalido(): boolean {
     return ( this.formLogin.get('correoUsuario').invalid && this.formLogin.get('correoUsuario').touched );
@@ -387,9 +377,6 @@ export class LoginRegisterComponent implements OnInit {
 
   }
 
-  get fechaUsuarioSignUpNovalido(): boolean {
-    return ( this.formSignUp.get('birthdate').invalid && this.formSignUp.get('birthdate').touched );
-  }
 
   // #endregion
 

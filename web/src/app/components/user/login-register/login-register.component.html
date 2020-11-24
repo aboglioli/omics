@@ -156,37 +156,6 @@
           </div>
         </div>
 
-        <!-- Feecha Nacimiento -->
-        <div class="form-group row">
-          <div class="col">
-
-            <div class="top-field">
-
-              <small class="form-text text-top">
-                Fecha de nacimiento
-              </small>
-
-              <!-- mensaje de error -->
-              <small  *ngIf="fechaUsuarioSignUpNovalido"
-                      class="form-text text-danger">
-                  Debes tener al menos 14 años
-              </small>
-            </div>
-
-            <mat-form-field appearance="fill" class="matDate">
-              <mat-label>Selecciona una fecha</mat-label>
-              <input  matInput
-                      [max]="maxDatebirthdate"
-                      [matDatepicker]="picker"
-                      formControlName="birthdate"
-                      (dateChange)="convertDateToRFC3339($event.value)">
-              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-              <mat-datepicker #picker></mat-datepicker>
-            </mat-form-field>
-
-          </div>
-        </div>
-
         <!-- Contraseña -->
         <div class="form-group row">
           <div class="col">
@@ -262,7 +231,44 @@
 
         <br>
 
+
+        <!-- Confirmar edad minima -->
+        <div class="form-group row">
+
+          <div class="col">
+            <div class="top-field">
+              <small  *ngIf="true"
+                      class="form-text text-danger">
+                      Usuario no válido (mínimo 5 carácteres)
+              </small>
+            </div>
+            <mat-checkbox
+              color="primary"
+              formControlName="confirmAge">
+            </mat-checkbox>
+            Confirmo que tengo al menos 14 años.
+          </div>
+
+        </div>
+
+        <!-- Confirmar acuerdo de uso -->
+        <div class="form-group row">
+          <div class="col">
+            <mat-checkbox
+              color="primary"
+              formControlName="confirmTerms">
+            </mat-checkbox>
+            <span class="is-invalid">
+              Estoy de acuerdo a los <a href="javascript:void(0);">Terminos y condiciones</a>
+            </span>
+          </div>
+
+        </div>
+
+        <br>
+
       </form>
+
     </mat-tab>
 
   </mat-tab-group>
