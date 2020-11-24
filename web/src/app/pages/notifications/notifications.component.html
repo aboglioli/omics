@@ -66,6 +66,11 @@
             contenido que Omics tiene para ofrecerte.
           </div>
 
+          <div *ngSwitchCase="'subscription-plan-changed'">
+            El plan de tu suscripción cambió a
+            ${{notification.body.amount.toFixed(2)}} mensuales.
+          </div>
+
           <div *ngSwitchCase="'contract-approved'">
             El contrato para tu obra
             <a href="/deskboard">
