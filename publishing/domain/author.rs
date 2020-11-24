@@ -155,13 +155,8 @@ impl Author {
         Ok(())
     }
 
-    pub fn add_publication(&mut self) -> Result<()> {
-        self.publications += 1;
-        Ok(())
-    }
-
-    pub fn remove_publication(&mut self) -> Result<()> {
-        self.publications -= 1;
+    pub fn set_publications(&mut self, publications: u32) -> Result<()> {
+        self.publications = publications;
         Ok(())
     }
 
