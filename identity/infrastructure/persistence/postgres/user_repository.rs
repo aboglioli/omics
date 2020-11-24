@@ -40,7 +40,7 @@ impl User {
 
         let payment_email: Option<String> = row.get("payment_email");
 
-        let flag: Option<i64> = row.get("flag");
+        let flag: i64 = row.get("flag");
 
         let created_at: DateTime<Utc> = row.get("created_at");
         let updated_at: Option<DateTime<Utc>> = row.get("updated_at");
@@ -289,6 +289,7 @@ impl UserRepository for PostgresUserRepository {
                         profile_image,
                         role_id,
                         validation_code,
+                        flag,
                         created_at,
                         updated_at,
                         deleted_at
@@ -308,7 +309,8 @@ impl UserRepository for PostgresUserRepository {
                         $13,
                         $14,
                         $15,
-                        $16
+                        $16,
+                        $17
                     )",
                     &[
                         &user.base().id().to_uuid()?,
@@ -336,6 +338,7 @@ impl UserRepository for PostgresUserRepository {
                             .flatten(),
                         &user.role_id().value(),
                         &user.validation().map(|v| v.code()),
+                        &user.flag(),
                         &user.base().created_at(),
                         &user.base().updated_at(),
                         &user.base().deleted_at(),
@@ -358,8 +361,9 @@ impl UserRepository for PostgresUserRepository {
                         role_id = $9,
                         validation_code = $10,
                         payment_email = $11,
-                        updated_at = $12,
-                        deleted_at = $13
+                        flag = $12,
+                        updated_at = $13,
+                        deleted_at = $14
                     WHERE
                         id = $1",
                     &[
@@ -386,6 +390,7 @@ impl UserRepository for PostgresUserRepository {
                         &user.role_id().value(),
                         &user.validation().map(|v| v.code()),
                         &user.payment_email().map(|e| e.to_string()),
+                        &user.flag(),
                         &user.base().updated_at(),
                         &user.base().deleted_at(),
                     ],

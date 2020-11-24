@@ -52,7 +52,7 @@ pub struct User {
     role_id: RoleId,
     validation: Option<Validation>,
     payment_email: Option<Email>,
-    flag: Option<i64>,
+    flag: i64,
 }
 
 impl User {
@@ -65,7 +65,7 @@ impl User {
             role_id,
             validation: Some(Validation::new()),
             payment_email: None,
-            flag: None,
+            flag: 0,
         };
 
         user.events.record_event(UserEvent::Registered {
@@ -86,7 +86,7 @@ impl User {
         role_id: RoleId,
         validation: Option<Validation>,
         payment_email: Option<Email>,
-        flag: Option<i64>,
+        flag: i64,
     ) -> Self {
         User {
             base,
@@ -136,8 +136,8 @@ impl User {
         self.base.deleted_at().is_none() && self.is_validated()
     }
 
-    pub fn flag(&self) -> Option<i64> {
-        self.flag.clone()
+    pub fn flag(&self) -> i64 {
+        self.flag
     }
 
     pub fn set_password(&mut self, password: Password) -> Result<()> {
@@ -262,7 +262,8 @@ impl User {
     }
 
     pub fn set_flag(&mut self, flag: i64) {
-        self.flag = Some(flag);
+        self.flag = flag;
+        self.base.update();
     }
 
     pub fn delete(&mut self) -> Result<()> {

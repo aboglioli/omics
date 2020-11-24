@@ -18,7 +18,7 @@ pub struct UserDto {
     pub role_id: Option<String>,
     pub role: Option<RoleDto>,
     pub payment_email: Option<String>,
-    pub flag: Option<i64>,
+    pub flag: i64,
     pub created_at: String,
     pub updated_at: Option<String>,
 }

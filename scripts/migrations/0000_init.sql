@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS users (
 
   payment_email VARCHAR(64),
 
-  flag BIGINT,
+  flag BIGINT DEFAULT 0,
 
   followers INTEGER DEFAULT 0,
   publications INTEGER DEFAULT 0,

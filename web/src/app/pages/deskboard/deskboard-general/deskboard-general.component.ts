@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/domain/services/auth.service';
 import { IdentityService } from 'src/app/domain/services/identity.service';
-import { IUser, can } from 'src/app/domain/models';
+import { IUser, can, Flags } from 'src/app/domain/models';
 import { NgxSpinnerService } from 'ngx-spinner';
 import {BreakpointObserver } from '@angular/cdk/layout';
 import { Router } from '@angular/router';
 import { faBookOpen, faChartPie, faWallet, faDesktop } from '@fortawesome/free-solid-svg-icons';
 import { DeskboardOptionMenu, typeSearchCatalogue } from '../../../models/enums.model';
+import { AuthorService } from '../../../domain/services/author.service';
+import { SweetAlertGenericMessageService } from '../../../services/sweet-alert-generic-message.service';
 
 
 @Component({
@@ -35,15 +37,16 @@ export class DeskboardGeneralComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private identityService: IdentityService,
+    private authorService: AuthorService,
     private spinnerService: NgxSpinnerService,
     private breakpointObserver: BreakpointObserver,
+    private sweetAlertService: SweetAlertGenericMessageService,
     private router: Router,
   ) { }
 
   ngOnInit(): void {
 
     this.authService.authStart();
-
 
     this.checkWidthScreen();
 
@@ -52,8 +55,22 @@ export class DeskboardGeneralComponent implements OnInit {
       (resData: IUser) => {
 
         this.userData = resData;
-        this.spinnerService.hide();
 
+        if (this.userData.flag === Flags.New) {
+          this.authorService.getById('me').subscribe(({ author }) => {
+            if (author.publications > 0) {
+              this.sweetAlertService.showAlertSuccess(
+                'Tu primera publicación fue aprobada. Gracias por formar parte de Omics.',
+                'Bienvenido',
+              );
+
+              this.identityService.setFlag('me', { flag: Flags.Welcomed }).subscribe();
+            }
+          });
+        }
+
+
+        this.spinnerService.hide();
       },
       (err: Error) => {
 

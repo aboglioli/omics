@@ -40,7 +40,7 @@ VALUES
   ('delete_category', 'Eliminar categoría'),
   ('update_category', 'Editar categoría'),
   -- Collections
-  ('add_remove_collection_from_favorites', 'Agregar/Quitar colección de favoritos'),
+  -- ('add_remove_collection_from_favorites', 'Agregar/Quitar colección de favoritos'),
   ('add_remove_publication_from_collection', 'Agregar/Quitar publicación de colección'),
   ('create_collection', 'Crear colección'),
   ('delete_collection', 'Eliminar colección'),
@@ -61,7 +61,7 @@ VALUES
   -- Readers
   ('get_reader', 'Obtener lector'),
   ('get_reader_favorites', 'Obtener favoritos'),
-  ('get_reader_following', 'Obtener autores seguidos'),
+  -- ('get_reader_following', 'Obtener autores seguidos'),
   -- Contracts
   ('approve_reject_contract', 'Aprobar/Rechazar contrato'),
   ('cancel_contract', 'Rescindir contrato'),
@@ -79,7 +79,7 @@ VALUES
   ('delete_plan', 'Eliminar plan'),
   ('update_plan', 'Editar plan'),
   -- Subscriptions
-  ('get_any_subscription', 'Obtener cualquier suscripción'),
+  -- ('get_any_subscription', 'Obtener cualquier suscripción'),
   ('subscribe', 'Subscribirse'),
   -- Notifications
   ('get_notifications', 'Obtener notificaciones'),
@@ -118,7 +118,6 @@ VALUES
       { "id": "create_category", "name": "Crear categoría" },
       { "id": "delete_category", "name": "Eliminar categoría" },
       { "id": "update_category", "name": "Editar categoría" },
-      { "id": "add_remove_collection_from_favorites", "name": "Agregar/Quitar colección de favoritos" },
       { "id": "add_remove_publication_from_collection", "name": "Agregar/Quitar publicación de colección" },
       { "id": "create_collection", "name": "Crear colección" },
       { "id": "delete_collection", "name": "Eliminar colección" },
@@ -137,7 +136,6 @@ VALUES
       { "id": "update_publication", "name": "Editar publicación" },
       { "id": "get_reader", "name": "Obtener lector" },
       { "id": "get_reader_favorites", "name": "Obtener favoritos" },
-      { "id": "get_reader_following", "name": "Obtener autores seguidos" },
       { "id": "approve_reject_contract", "name": "Aprobar/Rechazar contrato" },
       { "id": "cancel_contract", "name": "Rescindir contrato" },
       { "id": "charge_for_contract", "name": "Cobrar por contrato" },
@@ -151,7 +149,6 @@ VALUES
       { "id": "create_plan", "name": "Crear plan" },
       { "id": "delete_plan", "name": "Eliminar plan" },
       { "id": "update_plan", "name": "Editar plan" },
-      { "id": "get_any_subscription", "name": "Obtener cualquier suscripción" },
       { "id": "subscribe", "name": "Subscribirse" },
       { "id": "get_notifications", "name": "Obtener notificaciones" },
       { "id": "generate_report", "name": "Generar reportes" },
@@ -183,7 +180,6 @@ VALUES
       { "id": "approve_reject_contract", "name": "Aprobar/Rechazar contrato" },
       { "id": "get_any_contract", "name": "Obtener cualquier contrato" },
       { "id": "get_any_donation", "name": "Obtener cualquier donación" },
-      { "id": "get_any_subscription", "name": "Obtener cualquier suscripción" },
       { "id": "get_notifications", "name": "Obtener notificaciones" },
       { "id": "generate_report", "name": "Generar reportes" }
     ]',
@@ -204,7 +200,6 @@ VALUES
       { "id": "update_own_user", "name": "Editar usuario propio" },
       { "id": "validate_user_account", "name": "Validar cuenta de usuario" },
       { "id": "follow_unfollow_author", "name": "Seguir/Dejar de seguir autor" },
-      { "id": "add_remove_collection_from_favorites", "name": "Agregar/Quitar colección de favoritos" },
       { "id": "add_remove_publication_from_collection", "name": "Agregar/Quitar publicación de colección" },
       { "id": "create_collection", "name": "Crear colección" },
       { "id": "delete_collection", "name": "Eliminar colección" },
@@ -221,7 +216,6 @@ VALUES
       { "id": "update_publication", "name": "Editar publicación" },
       { "id": "get_reader", "name": "Obtener lector" },
       { "id": "get_reader_favorites", "name": "Obtener favoritos" },
-      { "id": "get_reader_following", "name": "Obtener autores seguidos" },
       { "id": "cancel_contract", "name": "Rescindir contrato" },
       { "id": "charge_for_contract", "name": "Cobrar por contrato" },
       { "id": "generate_summaries_for_contract", "name": "Generar resúmenes para contrato" },

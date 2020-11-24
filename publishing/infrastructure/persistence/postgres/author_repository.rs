@@ -168,10 +168,15 @@ impl AuthorRepository for PostgresAuthorRepository {
             .execute(
                 "UPDATE users
                 SET
-                    followers = $2
+                    followers = $2,
+                    publications = $3
                 WHERE
                     id = $1",
-                &[&author.base().id().to_uuid()?, &(author.followers() as i32)],
+                &[
+                    &author.base().id().to_uuid()?,
+                    &(author.followers() as i32),
+                    &(author.publications() as i32),
+                ],
             )
             .await
             .map_err(|err| Error::new("author", "update").wrap_raw(err))?;

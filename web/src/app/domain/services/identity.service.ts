@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ConfigService } from './config.service';
-import { IPagination, IUser } from '../models';
+import { IPagination, IUser, Flags } from '../models';
 
 export interface ISearchCommand {
   name?: string;
@@ -67,7 +67,7 @@ export interface IChangeRoleCommand {
 }
 
 export interface ISetFlagCommand {
-  flag: number;
+  flag: Flags;
 }
 
 @Injectable()

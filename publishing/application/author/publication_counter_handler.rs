@@ -6,8 +6,10 @@ use common::event::{Event, EventHandler};
 use common::result::Result;
 use shared::event::PublicationEvent;
 
-use crate::domain::author::{AuthorId, AuthorRepository};
-use crate::domain::publication::{PublicationId, PublicationRepository};
+use crate::domain::author::AuthorRepository;
+use crate::domain::publication::{
+    PublicationId, PublicationRepository, Status as PublicationStatus,
+};
 
 pub struct PublicationCounterHandler {
     author_repo: Arc<dyn AuthorRepository>,
@@ -36,22 +38,35 @@ impl EventHandler for PublicationCounterHandler {
         let event: PublicationEvent = serde_json::from_value(event.payload())?;
 
         match event {
-            // TODO: change to published
-            PublicationEvent::Created { author_id, .. } => {
-                let mut author = self
-                    .author_repo
-                    .find_by_id(&AuthorId::new(author_id)?)
-                    .await?;
-                author.add_publication()?;
-                self.author_repo.save(&mut author).await?;
-            }
-            PublicationEvent::Deleted { id } => {
+            PublicationEvent::Published { id, .. }
+            | PublicationEvent::ChangedToDraft { id, .. }
+            | PublicationEvent::Deleted { id } => {
                 let publication = self
                     .publication_repo
                     .find_by_id(&PublicationId::new(id)?)
                     .await?;
+
+                let p_publications = self
+                    .publication_repo
+                    .search(
+                        Some(publication.author_id()),
+                        None,
+                        None,
+                        Some(&PublicationStatus::Published {
+                            admin_id: None,
+                            comment: None,
+                        }),
+                        None,
+                        None,
+                        None,
+                        None,
+                        None,
+                        None,
+                    )
+                    .await?;
+
                 let mut author = self.author_repo.find_by_id(publication.author_id()).await?;
-                author.remove_publication()?;
+                author.set_publications(p_publications.matching_criteria() as u32);
                 self.author_repo.save(&mut author).await?;
             }
             _ => return Ok(false),
