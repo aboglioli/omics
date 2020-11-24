@@ -498,7 +498,10 @@ class Populator {
   }
 
   generateSummariesForContracts() {
-    const total = this.subscriptions.reduce((acc, s) => acc + s.payments[0].amount, 0);
+    const total = this.subscriptions.reduce(
+      (acc, s) => acc + s.payments[0].amount,
+      0
+    );
     const amount = total * 0.3;
 
     for (const contract of this.contracts) {
