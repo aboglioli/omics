@@ -377,6 +377,13 @@ export class LoginRegisterComponent implements OnInit {
 
   }
 
+  get checkboxAgeValido(): boolean {
+    return ( this.formSignUp.get('confirmAge').invalid && this.formSignUp.get('confirmAge').touched );
+  }
+
+  get checkboxTermsValido(): boolean {
+    return ( this.formSignUp.get('confirmTerms').invalid && this.formSignUp.get('confirmTerms').touched );
+  }
 
   // #endregion
 
