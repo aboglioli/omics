@@ -125,9 +125,11 @@ async function main() {
       const newDate = new Date();
       newDate.setHours(newDate.getHours() - 24 * 10);
       populator.lastDate = newDate;
-      if (rand(0, 100) < 5) {
+      // if (rand(0, 100) < 5) {
+      if (i < 3000) {
         populator.createSubscription({
           userId: user.id,
+          planPrice: 150.0,
         });
       }
       populator.lastDate = oldLastDate;
@@ -203,6 +205,8 @@ async function main() {
 
       interactions.push([user.id, publication.id]);
     }
+
+    populator.generateSummariesForContracts();
 
     createCompleteUser(populator);
 
