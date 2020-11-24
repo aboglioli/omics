@@ -61,7 +61,7 @@ export class DeskboardGeneralComponent implements OnInit {
             if (author.publications > 0) {
               this.sweetAlertService.showAlertSuccess(
                 'Tu primera publicación fue aprobada. Gracias por formar parte de Omics.',
-                'Bienvenido',
+                'Felicitaciones',
               );
 
               this.identityService.setFlag('me', { flag: Flags.Welcomed }).subscribe();
