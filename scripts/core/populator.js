@@ -33,6 +33,7 @@ class Populator {
 
     this.subscriptions = [];
     this.contracts = [];
+    this.donations = [];
   }
 
   nextDate() {
@@ -66,7 +67,7 @@ class Populator {
       password,
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      birthdate: "1994-08-01 15:30:00Z",
+      birthdate: `${rand(1980, 2005)}-08-01 15:30:00Z`,
       gender: randArr(genders),
       biography: faker.lorem.paragraph(),
       profile_image: image(200),
@@ -506,13 +507,13 @@ class Populator {
 
     for (const contract of this.contracts) {
       const summaries = [];
-      const summaryCount = 15;
+      const summaryCount = 6;
       const date = new Date(this.nextDate());
 
       for (let i = 0; i < summaryCount; i++) {
-        date.setHours(date.getHours() + 24);
+        date.setHours(date.getHours() + 6);
         const to = new Date(date);
-        to.setHours(date.getHours() + 24);
+        to.setHours(date.getHours() + 6);
 
         const statistics = {
           views: rand(100, 1000),
@@ -526,13 +527,32 @@ class Populator {
         const summary = {
           statistics,
           total: rand(1000, 10000) * 1.0,
-          amount: rand(1000, amount) * (1.0 / this.contracts.length),
-          paid: i / summaryCount <= 0.7,
+          amount: 0,
+          paid: i / summaryCount <= 0.3,
           from: new Date(date),
           to,
         };
 
         summaries.push(summary);
+      }
+
+      contract.summaries = summaries;
+    }
+
+    const totalViews = this.contracts.reduce(
+      (acc, contract) =>
+        acc +
+        contract.summaries.reduce(
+          (acc, summary) => acc + summary.statistics.views,
+          0
+        ),
+      0
+    );
+
+    for (const contract of this.contracts) {
+      for (const summary of contract.summaries) {
+        const percentage = summary.statistics.views / totalViews;
+        summary.amount = amount * percentage;
 
         this.addEvent("contract", "summary-added", {
           SummaryAdded: {
@@ -545,12 +565,13 @@ class Populator {
           },
         });
       }
-      contract.summaries = summaries;
+    }
 
+    for (const contract of this.contracts) {
       contract.payments = [
         {
           kind: "outcome",
-          amount: summaries
+          amount: contract.summaries
             .filter((s) => s.paid)
             .reduce((acc, s) => acc + s.amount, 0.0),
           datetime: new Date(),
@@ -564,6 +585,49 @@ class Populator {
         },
       });
     }
+  }
+
+  async createDonation({ readerId, authorId }) {
+    const id = uuid();
+    const total = rand(20, 5000);
+    const percentage = 0.7;
+    const subtotal = total * percentage;
+
+    this.donations.push({
+      id,
+      author_id: authorId,
+      reader_id: readerId,
+      total,
+      subtotal,
+      author_percentage: percentage,
+      comment: "Gracias por existir",
+      reader_payment: {
+        kind: "income",
+        amount: total,
+        datetime: new Date(),
+      },
+      author_charge: {
+        kind: "outcome",
+        amount: subtotal,
+        datetime: new Date(),
+      },
+      status_history: [
+        {
+          status: "waiting-for-payment",
+          datetime: new Date(),
+        },
+        {
+          status: "paid",
+          datetime: new Date(),
+        },
+        {
+          status: "charged",
+          datetime: new Date(),
+        },
+      ],
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
   }
 
   async saveItems(items, dbTable) {
@@ -622,6 +686,12 @@ class Populator {
       status_history: JSON.stringify(s.status_history),
     }));
     await this.saveItems(subscriptions, "subscriptions");
+
+    const donations = this.donations.map((d) => ({
+      ...d,
+      status_history: JSON.stringify(d.status_history),
+    }));
+    await this.saveItems(donations, "donations");
 
     // Events
     await this.saveItems(this.events, "events");

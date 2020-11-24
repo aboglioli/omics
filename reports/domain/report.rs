@@ -366,7 +366,7 @@ impl Report {
         }
 
         for donation in donations.iter() {
-            donation_income += donation.total().value() - donation.subtotal().value();
+            donation_income += donation.total().value();
             donation_outcome += donation.subtotal().value();
         }
 

@@ -73,7 +73,7 @@ async function main() {
           });
 
           const is_published = status === "published";
-          if (is_published && rand(0, 100) < 30) {
+          if (is_published && rand(0, 100) < 20) {
             populator.createContract({
               publicationId: publication.id,
               userId: user.id,
@@ -179,6 +179,18 @@ async function main() {
       }
 
       interactions.push([user.id, publication.id]);
+    }
+
+    // Donations
+    for (let i = 0; i < 500; i++) {
+      const reader = randArr(Object.values(populator.users));
+      const author = randArr(
+        Object.values(populator.users).filter((u) => u.publications > 0)
+      );
+
+      if (reader.id != author.id) {
+        populator.createDonation({ readerId: reader.id, authorId: author.id });
+      }
     }
 
     populator.generateSummariesForContracts();
