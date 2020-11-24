@@ -6,7 +6,7 @@ use common::event::{Event, EventHandler};
 use common::result::Result;
 use shared::event::PublicationEvent;
 
-use crate::domain::author::{AuthorRepository};
+use crate::domain::author::AuthorRepository;
 use crate::domain::publication::{
     PublicationId, PublicationRepository, Status as PublicationStatus,
 };
