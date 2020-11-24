@@ -28,7 +28,7 @@ export class NavBarComponent implements OnInit {
   public userAvatar: string;
   public user$: Observable<IUser>;
   public can = can;
-  public notificationUnreadTotal: number;
+  public notificationUnreadTotal: number = 0;
 
   constructor(  private router: Router,
                 private authService: AuthService,
@@ -60,7 +60,7 @@ export class NavBarComponent implements OnInit {
             return !notification.read;
           }
         ).length;
-        console.log('TEST > ', res);
+        // console.log('TEST > ', res);
       }
     );
 
