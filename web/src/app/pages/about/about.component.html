@@ -5,13 +5,23 @@
     <div class="overlay-header">
       <h1>Sobre Omics</h1>
 
-      <button mat-stroked-button class="button-white-borders"
-              style="margin-top: 2em"
-              (click)="onGoFacebookPage()">
+      <div style="display: flex;">
+        <button mat-stroked-button class="button-white-borders"
+                style="margin: 2em"
+                (click)="onGoFacebookPage()">
 
-        <fa-icon [icon]="faFacebook" size="3x" style="margin-right: 0em;"></fa-icon>
+          <fa-icon [icon]="faFacebook" size="3x" style="margin-right: 0em;"></fa-icon>
 
-      </button>
+        </button>
+
+        <button mat-stroked-button class="button-white-borders"
+                style="margin: 2em"
+                (click)="onGoYoutubePage()">
+
+          <fa-icon [icon]="faYoutube" size="3x" style="margin-right: 0em;"></fa-icon>
+
+        </button>
+      </div>
 
     </div>
 
@@ -37,6 +47,17 @@
         </div>
 
       </div>
+
+    </div>
+
+    <hr>
+
+    <!-- Contactarnos -->
+    <div class="group column center">
+
+      <h1>¡CONTÁCTANOS!</h1>
+
+      <h1><a href="mailto:omics.contacto@gmail.com" style="color: #59ADFF;">omics.contacto@gmail.com</a></h1>
 
     </div>
 

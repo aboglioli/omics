@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { faFacebook } from '@fortawesome/free-brands-svg-icons';
+import { faFacebook, faYoutube } from '@fortawesome/free-brands-svg-icons';
 
 export interface IFaq {
 
@@ -53,6 +53,7 @@ export class AboutComponent implements OnInit {
 
   // FontAwesome iconos
   public faFacebook = faFacebook;
+  public faYoutube = faYoutube;
 
   constructor(
     private httpClient: HttpClient
@@ -69,6 +70,12 @@ export class AboutComponent implements OnInit {
   public onGoFacebookPage(): void {
 
     window.open( 'https://www.facebook.com/OmicsReader/', '_blank' );
+
+  }
+
+  public onGoYoutubePage(): void {
+
+    window.open( 'https://www.youtube.com/playlist?list=PLMPWTwQbpl9MT6Gv5EnChfpFEmSkQd8hE', '_blank' );
 
   }
 
