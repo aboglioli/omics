@@ -24,7 +24,8 @@
       </div>
 
       <div class="content">
-        <table>
+        <p *ngIf="!backups || backups.length === 0" style="margin: 0;">Aún no hay backups generados.</p>
+        <table *ngIf="backups && backups.length > 0">
           <tr>
             <th>Fecha</th>
             <th>Archivo</th>
