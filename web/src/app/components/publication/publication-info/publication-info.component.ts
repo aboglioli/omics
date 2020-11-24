@@ -166,39 +166,41 @@ export class PublicationInfoComponent implements OnInit, OnDestroy {
         //#region Obtener información de reviews de esta publicación
         if ( !this.isUserLogIn ) {
           this.spinnerService.hide();
-        }
+        } else {
 
-        this.authService.canUser( 'get_publication_reviews' ).subscribe(
-          (resGetReviews) => {
+          this.authService.canUser( 'get_publication_reviews' ).subscribe(
+            (resGetReviews) => {
 
-            if ( resGetReviews ) {
-              this.publicationService.getReviews( this.data.idPublication ).subscribe(
-                ( resReviews: IGetReviewsResponse ) => {
+              if ( resGetReviews ) {
+                this.publicationService.getReviews( this.data.idPublication ).subscribe(
+                  ( resReviews: IGetReviewsResponse ) => {
 
-                  this.reviewList = resReviews.reviews;
-                  this.spinnerService.hide();
+                    this.reviewList = resReviews.reviews;
+                    this.spinnerService.hide();
 
-                  // console.log('TEST > ', this.reviewList);
+                    // console.log('TEST > ', this.reviewList);
 
-                },
-                (err: Error) => {
+                  },
+                  (err: Error) => {
 
-                  console.error(err);
-                  this.spinnerService.hide();
+                    console.error(err);
+                    this.spinnerService.hide();
 
-                }
-              );
-            } else {
+                  }
+                );
+              } else {
+                this.spinnerService.hide();
+              }
+            },
+            (err: Error ) => {
               this.spinnerService.hide();
+              console.error('ERROR: ', err);
+
+
             }
-          },
-          (err: Error ) => {
-            this.spinnerService.hide();
-            console.error('ERROR: ', err);
+          );
 
-
-          }
-        );
+        }
 
         //#endregion
 

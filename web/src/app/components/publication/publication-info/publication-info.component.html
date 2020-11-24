@@ -66,7 +66,14 @@
                     (click)="onGoToAuthorProfile()">
                 <h4 style="margin: 0px"> {{ publication.author.username }}</h4>
 
-                <img  [src]="publication.author.profile_image"
+                <img  *ngIf="!publication.author.profile_image"
+                      src="assets/images/generic/avatar196x196.jpg"
+                      alt="omics-avatar-profile"
+                      class="avatar"
+                      style="margin-left: 5px;">
+
+                <img  *ngIf="publication.author.profile_image"
+                      [src]="publication.author.profile_image"
                       alt="omics-avatar-profile"
                       class="avatar"
                       style="margin-left: 5px;">
@@ -189,26 +196,26 @@
 
     <div class="side opacity-background">
 
-      <span *ngIf="isUserLogIn">
-        <div  *ngIf="readerInfo && readerIsSubscribed && (authService.canUser('review_publication') | async)"
-              class="fila" style="justify-content: center;">
-          <bar-rating [(rate)]="ratingPublication" [max]="5" [theme]="'stars'"
-                      (rateChange)="addReview($event)">
-          </bar-rating>
-        </div>
 
-        <div class="comment-box">
+      <div  *ngIf="readerInfo && readerIsSubscribed && (authService.canUser('review_publication') | async)"
+            class="fila" style="justify-content: center;">
+        <bar-rating [(rate)]="ratingPublication" [max]="5" [theme]="'stars'"
+                    (rateChange)="addReview($event)">
+        </bar-rating>
+      </div>
 
-          <app-publication-reviews-box
-            *ngIf="reviewList !== undefined"
-            [reviewArray]="reviewList"
-            [readerData]="readerInfo">
-          </app-publication-reviews-box>
+      <div class="comment-box">
 
-        </div>
+        <app-publication-reviews-box
+          *ngIf="reviewList !== undefined"
+          [reviewArray]="reviewList"
+          [readerData]="readerInfo">
+        </app-publication-reviews-box>
 
-        <!-- Option bar -->
-        <div class="multiple-option-menu" *ngIf="readerInfo && isBigScreen">
+      </div>
+
+      <!-- Option bar -->
+      <div class="multiple-option-menu" *ngIf="readerInfo && isBigScreen">
 
           <button mat-icon-button (click)="onDonar()" class="option-item" *ngIf="authService.canUser('donate') | async">
             <fa-icon [icon]="faDonar" size="2x"></fa-icon>
@@ -225,7 +232,7 @@
           </button>
 
         </div>
-      </span>
+
 
       <span *ngIf="!isUserLogIn" style="height: 100%; display: flex; justify-content: center; align-items: center;">
         <h3 style="text-align: center;">Registrate para ver opiniones sobre esta publicación</h3>

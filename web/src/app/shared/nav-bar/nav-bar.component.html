@@ -39,9 +39,17 @@
 
       <!-- Notificaciones -->
       <button mat-icon-button class="button-no-borders"
+              [matBadge]="notificationUnreadTotal"
+              matBadgeOverlap="true"
+              matBadgeColor="accent"
+              [matBadgeHidden]="notificationUnreadTotal === 0"
               *ngIf="can(userData, 'get_notifications')"
               (click)="showNotifications()">
-        <fa-icon [icon]="faBell" size="2x"></fa-icon>
+        <fa-icon
+          [style.color]=" (notificationUnreadTotal === 0) ? 'white' : '#69F0AE'"
+          [icon]="faBell"
+          size="2x">
+        </fa-icon>
       </button>
 
       <div *ngIf="userData" class="user">

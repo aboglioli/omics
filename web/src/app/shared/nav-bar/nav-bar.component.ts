@@ -4,9 +4,9 @@ import { faBars, faBell } from '@fortawesome/free-solid-svg-icons';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from 'src/app/domain/services/auth.service';
-import { IdentityService } from 'src/app/domain/services/identity.service';
 import { IUser, can } from 'src/app/domain/models';
 import { LoginRegisterComponent } from 'src/app/components/user/login-register/login-register.component';
+import { NotificationService } from '../../domain/services/notification.service';
 
 @Component({
   selector: 'app-nav-bar',
@@ -28,10 +28,12 @@ export class NavBarComponent implements OnInit {
   public userAvatar: string;
   public user$: Observable<IUser>;
   public can = can;
+  public notificationUnreadTotal: number;
 
   constructor(  private router: Router,
                 private authService: AuthService,
-                private dialog: MatDialog ) {
+                private dialog: MatDialog,
+                private notificactionService: NotificationService ) {
 
 
     this.subscribeAuthService();
@@ -48,6 +50,21 @@ export class NavBarComponent implements OnInit {
     }
 
     this.user$ = this.authService.getUser();
+
+    // Obtener notificaciones
+    // @TODO: No esta funcionando la llamada para obtener no leidos, asi que se aplica un filtro (tampoco se hace en tiempor real)
+    this.notificactionService.getAll( {read: false} ).subscribe(
+      (res) => {
+        this.notificationUnreadTotal = res.notifications.filter(
+          (notification) => {
+            return !notification.read;
+          }
+        ).length;
+        console.log('TEST > ', res);
+      }
+    );
+
+
   }
 
 
