@@ -255,6 +255,7 @@ export class PerfilEditarComponent implements OnInit {
 
           });
 
+          this.authService.loadUser();
 
           this.spinnerService.hide();
 

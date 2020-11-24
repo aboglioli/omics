@@ -24,6 +24,19 @@
         <h2>Filtros</h2>
       </div>
 
+
+      <!-- Otros -->
+
+      <button mat-flat-button
+              class="button-white-borders clear"
+              style="margin: 1em"
+              (click)="onClear()">
+
+        <fa-icon  [icon]="faClear" size="1x"></fa-icon>
+        <span style="font-size: 1vw; margin-left: 0.5em;">Reiniciar Filtros</span>
+
+      </button>
+
       <div class="date-filter">
         <h3 style="text-align: center; margin: 0">Fecha publicación: </h3>
 
@@ -141,6 +154,7 @@
         </div>
 
       </div>
+
 
     </form>
 
