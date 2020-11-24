@@ -274,6 +274,25 @@
 
           </div>
 
+          <!-- Por Total donaciones realizadas e ingresos por donacion -->
+          <div class="chart-group-row">
+            <div class="chart">
+              <mat-card >
+                <h2>Total donaciones realizadas:</h2>
+                <h1>{{ report.donations.total }}</h1>
+              </mat-card>
+            </div>
+
+            <!--  Total donaciones -->
+            <div class="chart">
+              <mat-card >
+                <h2>Total ingresos en donaciones:</h2>
+                <h1 style="color: green">{{ report.donations.amount | currency }}</h1>
+              </mat-card>
+            </div>
+
+          </div>
+
         </div>
 
         <hr>
