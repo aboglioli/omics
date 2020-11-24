@@ -229,19 +229,18 @@
           </div>
         </div>
 
-        <br>
-
-
         <!-- Confirmar edad minima -->
         <div class="form-group row">
 
           <div class="col">
+
             <div class="top-field">
-              <small  *ngIf="true"
+              <small  *ngIf="checkboxAgeValido"
                       class="form-text text-danger">
-                      Usuario no válido (mínimo 5 carácteres)
+                      Requerido confirmar
               </small>
             </div>
+
             <mat-checkbox
               color="primary"
               formControlName="confirmAge">
@@ -254,12 +253,20 @@
         <!-- Confirmar acuerdo de uso -->
         <div class="form-group row">
           <div class="col">
+
+            <div class="top-field">
+              <small  *ngIf="checkboxTermsValido"
+                      class="form-text text-danger">
+                      Requerido confirmar
+              </small>
+            </div>
+
             <mat-checkbox
               color="primary"
               formControlName="confirmTerms">
             </mat-checkbox>
             <span class="is-invalid">
-              Estoy de acuerdo a los <a href="javascript:void(0);">Terminos y condiciones</a>
+              Estoy de acuerdo a los <a href="javascript:void(0);" (click)="openTermsConditions()">Terminos y Condiciones</a>
             </span>
           </div>
 

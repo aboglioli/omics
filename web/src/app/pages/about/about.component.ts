@@ -61,7 +61,6 @@ export class AboutComponent implements OnInit {
   ngOnInit(): void {
 
     this.httpClient.get('assets/json/faq.json').subscribe((data: any) => {
-      console.log(data)
       this.faqList = data.faq;
     });
 
@@ -75,7 +74,6 @@ export class AboutComponent implements OnInit {
 
   public onGoToTweeter( dev: ITeamOmics ): void {
 
-    console.log(dev)
     if (  dev.url ) {
 
       window.open( dev.url, '_blank' );

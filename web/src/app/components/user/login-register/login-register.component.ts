@@ -13,6 +13,7 @@ import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import Swal from 'sweetalert2';
 import { IUser } from 'src/app/domain/models';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
+import { TermsConditionsTextComponent } from '../terms-conditions-text/terms-conditions-text.component';
 
 @Component({
   selector: 'app-login-register',
@@ -347,6 +348,18 @@ export class LoginRegisterComponent implements OnInit {
 
   }
 
+  public openTermsConditions(): void {
+
+    const dialogTerms = this.dialog.open(
+      TermsConditionsTextComponent,
+      {
+        panelClass: 'info-publication',
+        disableClose: true,
+      }
+    );
+
+  }
+
   // #region getters
   get correoUsuarioLoginNovalido(): boolean {
     return ( this.formLogin.get('correoUsuario').invalid && this.formLogin.get('correoUsuario').touched );
@@ -377,6 +390,13 @@ export class LoginRegisterComponent implements OnInit {
 
   }
 
+  get checkboxAgeValido(): boolean {
+    return ( this.formSignUp.get('confirmAge').invalid && this.formSignUp.get('confirmAge').touched );
+  }
+
+  get checkboxTermsValido(): boolean {
+    return ( this.formSignUp.get('confirmTerms').invalid && this.formSignUp.get('confirmTerms').touched );
+  }
 
   // #endregion
 
