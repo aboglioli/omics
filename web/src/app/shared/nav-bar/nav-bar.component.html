@@ -46,7 +46,7 @@
               *ngIf="can(userData, 'get_notifications')"
               (click)="showNotifications()">
         <fa-icon
-          [style.color]=" (notificationUnreadTotal === 0) ? 'white' : '#69F0AE'"
+          [style.color]="(notificationUnreadTotal === 0) ? 'white' : '#69F0AE'"
           [icon]="faBell"
           size="2x">
         </fa-icon>

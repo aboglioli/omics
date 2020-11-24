@@ -167,12 +167,30 @@ export class LoginRegisterComponent implements OnInit {
         (error: any) => {
           console.error( 'ERROR !!!', error );
 
-          if ( this.authService.canUser('login') ) {
+          switch ( error.error.code ) {
 
-            this.sweetAlertGenericService.showAlertError(`El usuario ${loginCommand.username} no tiene el permiso de Login`, 'Falta de permisos');
+            case 'invalid': {
+              this.swalFormLoginInvalid.fire();
+              break;
+            }
 
-          } else {
-            this.swalFormLoginInvalid.fire();
+            case 'unauthorized': {
+              this.sweetAlertGenericService.showAlertError(`El usuario ${loginCommand.username} el permiso de Login`, 'Falta de permisos');
+              break;
+            }
+
+            case 'not_validated': {
+              this.sweetAlertGenericService.showAlertError(
+                `El usuario ${loginCommand.username} no ha sido validado`,
+                'Usuario no validado'
+              );
+              break;
+            }
+
+            default:  {
+              this.sweetAlertGenericService.showAlertError('Un error inesperado ha ocurrido');
+            }
+
           }
 
           this.spinnerService.hide();
