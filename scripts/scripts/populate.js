@@ -48,8 +48,31 @@ async function main() {
 
   try {
     // User
-    for (let i = 0; i < 1200; i++) {
+    for (let i = 0; i < 10000; i++) {
       const user = populator.createUser({ username: `user-${i}` });
+
+      // Subscriptions
+      if (i < 1200) {
+      }
+
+      // Publications
+      if (i < 150) {
+        for (let i = 0; i < rand(1, 10); i++) {
+
+        }
+
+        // Contracts
+        if (i < 80) {
+
+        }
+      }
+
+      // Collections
+      if (i < 80) {
+        for (let i = 0; i < rand(1, 10); i++) {
+
+        }
+      }
 
       if (rand(0, 100) < 5) {
         // Publications

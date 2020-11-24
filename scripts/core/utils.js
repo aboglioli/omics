@@ -19,6 +19,7 @@ const randArr = (arr, multiple = false) => {
     return acc;
   }, []);
 };
+const randDate = (start, end) => new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 
 // const randDate = (start, end, startHour, endHour) => {
 //   const date = new Date(+start + Math.random() * (end - start));
@@ -41,4 +42,5 @@ module.exports = {
   sleep,
   rand,
   randArr,
+  randDate,
 };
