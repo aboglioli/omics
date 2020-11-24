@@ -58,7 +58,8 @@ export class PublicationInfoComponent implements OnInit, OnDestroy {
   public readerIsAuthor = false;
   public readerIsContentManager = false;
 
-  public authServiceContractSubscriber: Subscription;
+  public authServiceContractRequestSubscriber: Subscription;
+  public authServiceContractOwnSubscriber: Subscription;
 
   constructor(
     public dialogRef: MatDialogRef<PublicationInfoComponent>,
@@ -116,10 +117,9 @@ export class PublicationInfoComponent implements OnInit, OnDestroy {
 
   private getPublicationInfo(): void {
 
-    this.authServiceContractSubscriber = forkJoin( [this.authService.canUser( 'request_contract' ), this.authService.canUser( 'get_own_contract' )] )
-      .subscribe( ([canRequest, canOwnContract])  => {
-
-        if ( canRequest) {
+    this.authServiceContractRequestSubscriber = this.authService.canUser( 'request_contract' ).subscribe(
+      (canRes) => {
+        if ( canRes) {
           this.publicationService.canRequestContract(this.data.idPublication).subscribe(
             (res) => {
               this.canRequestContract = res.can_request;
@@ -130,7 +130,12 @@ export class PublicationInfoComponent implements OnInit, OnDestroy {
           );
         }
 
-        if ( canOwnContract ) {
+      }
+    );
+
+    this.authServiceContractOwnSubscriber = this.authService.canUser( 'get_own_contract' ).subscribe(
+      (canRes ) => {
+        if ( canRes ) {
           this.publicationService.getContract(this.data.idPublication).subscribe(
             (res) => {
               this.contract = res;
@@ -141,7 +146,8 @@ export class PublicationInfoComponent implements OnInit, OnDestroy {
           );
         }
 
-      });
+      }
+    );
 
 
     this.publicationService.getById( this.data.idPublication,  'author, category').subscribe(
@@ -354,9 +360,8 @@ export class PublicationInfoComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-
-    this.authServiceContractSubscriber.unsubscribe();
-
+    this.authServiceContractRequestSubscriber.unsubscribe();
+    this.authServiceContractOwnSubscriber.unsubscribe();
   }
 
 }

@@ -60,7 +60,7 @@ export class NavBarComponent implements OnInit {
             return !notification.read;
           }
         ).length;
-        console.log('TEST > ', res);
+        // console.log('TEST > ', res);
       }
     );
 
