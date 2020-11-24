@@ -241,6 +241,22 @@ impl EventHandler for NotificationHandler {
 
                         self.notification_repo.save(&mut notification).await?;
                     }
+                    SubscriptionEvent::PlanChanged { user_id, price, .. } => {
+                        let user = self.user_repo.find_by_id(&UserId::new(user_id)?).await?;
+
+                        let body = Body::new()
+                            .reader(user.base().id().value(), user.identity().username().value())
+                            .amount(price);
+
+                        let mut notification = Notification::new(
+                            self.notification_repo.next_id().await?,
+                            user.base().id().clone(),
+                            "subscription-plan-changed",
+                            body,
+                        )?;
+
+                        self.notification_repo.save(&mut notification).await?;
+                    }
                     _ => return Ok(false),
                 }
             }

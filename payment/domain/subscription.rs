@@ -128,6 +128,7 @@ impl Subscription {
             id: self.base().id().to_string(),
             user_id: self.user_id().to_string(),
             plan_id: self.plan().plan_id().to_string(),
+            price: self.plan().price(),
         });
 
         Ok(())
