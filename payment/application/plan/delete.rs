@@ -5,19 +5,25 @@ use common::result::Result;
 use identity::UserIdAndRole;
 
 use crate::domain::plan::{PlanId, PlanRepository};
+use crate::domain::subscription::SubscriptionRepository;
 
 pub struct Delete<'a> {
     event_pub: &'a dyn EventPublisher,
 
     plan_repo: &'a dyn PlanRepository,
+    subscription_repo: &'a dyn SubscriptionRepository,
 }
 
-// TODO: update subscriptions before deleting
 impl<'a> Delete<'a> {
-    pub fn new(event_pub: &'a dyn EventPublisher, plan_repo: &'a dyn PlanRepository) -> Self {
+    pub fn new(
+        event_pub: &'a dyn EventPublisher,
+        plan_repo: &'a dyn PlanRepository,
+        subscription_repo: &'a dyn SubscriptionRepository,
+    ) -> Self {
         Delete {
             event_pub,
             plan_repo,
+            subscription_repo,
         }
     }
 
@@ -30,7 +36,17 @@ impl<'a> Delete<'a> {
             return Err(Error::unauthorized());
         }
 
-        let mut plan = self.plan_repo.find_by_id(&PlanId::new(plan_id)?).await?;
+        let plan_id = PlanId::new(plan_id)?;
+
+        let p_subscriptions = self
+            .subscription_repo
+            .search(None, Some(&plan_id), None, None, None, None, None, None)
+            .await?;
+        if p_subscriptions.matching_criteria() > 0 {
+            return Err(Error::new("plan", "existing_subscriptions"));
+        }
+
+        let mut plan = self.plan_repo.find_by_id(&plan_id).await?;
 
         plan.delete()?;
 
