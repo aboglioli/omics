@@ -13,6 +13,7 @@ import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import Swal from 'sweetalert2';
 import { IUser } from 'src/app/domain/models';
 import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
+import { TermsConditionsTextComponent } from '../terms-conditions-text/terms-conditions-text.component';
 
 @Component({
   selector: 'app-login-register',
@@ -344,6 +345,18 @@ export class LoginRegisterComponent implements OnInit {
   public openForgetPassword(): void {
 
     const dialogRef = this.dialog.open(PasswordForgotComponent, {panelClass: 'no-padding-dialog'} );
+
+  }
+
+  public openTermsConditions(): void {
+
+    const dialogTerms = this.dialog.open(
+      TermsConditionsTextComponent,
+      {
+        panelClass: 'info-publication',
+        disableClose: true,
+      }
+    );
 
   }
 
