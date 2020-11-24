@@ -39,6 +39,7 @@ impl AuthorRepository for InMemAuthorRepository {
     async fn search(
         &self,
         _name: Option<&String>,
+        _publications_gt: Option<u32>,
         _from: Option<&DateTime<Utc>>,
         _to: Option<&DateTime<Utc>>,
         _offset: Option<usize>,

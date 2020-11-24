@@ -74,12 +74,15 @@ impl AuthorRepository for PostgresAuthorRepository {
     async fn search(
         &self,
         name: Option<&String>,
+        publications_gt: Option<u32>,
         from: Option<&DateTime<Utc>>,
         to: Option<&DateTime<Utc>>,
         offset: Option<usize>,
         limit: Option<usize>,
         order_by: Option<&AuthorOrderBy>,
     ) -> Result<Pagination<Author>> {
+        let publications_gt = publications_gt.map(|publications_gt| publications_gt as i32);
+
         let (sql, params) = WhereBuilder::new()
             .add_param_opt(
                 "(
@@ -90,6 +93,11 @@ impl AuthorRepository for PostgresAuthorRepository {
                 )",
                 &name,
                 name.is_some(),
+            )
+            .add_param_opt(
+                "publications >= $$",
+                &publications_gt,
+                publications_gt.is_some(),
             )
             .add_param_opt("created_at >= $$", &from, from.is_some())
             .add_param_opt("created_at <= $$", &to, to.is_some())

@@ -37,6 +37,7 @@ impl<'a> Search<'a> {
             .author_repo
             .search(
                 cmd.name.as_ref(),
+                cmd.publications_gt,
                 cmd.date_from
                     .map(|d| DateTime::from_str(&d))
                     .transpose()
@@ -70,12 +71,6 @@ impl<'a> Search<'a> {
                 || author.username().starts_with("content-manager")
             {
                 continue;
-            }
-
-            if let Some(publications_gt) = cmd.publications_gt {
-                if author.publications() < publications_gt {
-                    continue;
-                }
             }
 
             res.add_item(AuthorDto::from(&author));

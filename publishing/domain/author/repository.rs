@@ -20,6 +20,7 @@ pub trait AuthorRepository: Sync + Send {
     async fn search(
         &self,
         name: Option<&String>,
+        publications_gt: Option<u32>,
         from: Option<&DateTime<Utc>>,
         to: Option<&DateTime<Utc>>,
         offset: Option<usize>,
