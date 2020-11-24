@@ -48,10 +48,10 @@ async function main() {
 
   try {
     // User
-    for (let i = 0; i < 1200; i++) {
+    for (let i = 0; i < 10000; i++) {
       const user = populator.createUser({ username: `user-${i}` });
 
-      if (rand(0, 100) < 5) {
+      if (rand(0, 100) < 8) {
         // Publications
         for (let i = 0; i < rand(0, 10); i++) {
           let status = null;
@@ -72,14 +72,12 @@ async function main() {
             status,
           });
 
-          const is_published =
-            publication.status_history[publication.status_history.length - 1]
-              .status === "published";
+          const is_published = status === "published";
           if (is_published && rand(0, 100) < 30) {
             populator.createContract({
               publicationId: publication.id,
               userId: user.id,
-              summaryCount: rand(0, 15),
+              summaryCount: rand(3, 15),
             });
           }
         }
@@ -102,9 +100,11 @@ async function main() {
       const newDate = new Date();
       newDate.setHours(newDate.getHours() - 24 * 10);
       populator.lastDate = newDate;
-      if (rand(0, 100) < 5) {
+      // if (rand(0, 100) < 5) {
+      if (i < 1200) {
         populator.createSubscription({
           userId: user.id,
+          planPrice: 75.0,
         });
       }
       populator.lastDate = oldLastDate;
@@ -180,6 +180,8 @@ async function main() {
 
       interactions.push([user.id, publication.id]);
     }
+
+    populator.generateSummariesForContracts();
 
     createCompleteUser(populator);
 

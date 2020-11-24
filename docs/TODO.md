@@ -1,9 +1,14 @@
+# Fix
+
+backup.sh for Windows:
+sed -i -e 's/\r$//' scriptname.sh
+
 # All
 
 ## New
-- [ ] Add 'birthdate' in user register.
-- [ ] Allow edit plan.
-- [ ]  Remove 'add_remove_collection_from_favorites' from permissions
+- [x] Add 'birthdate' in user register.
+- [x] Allow edit plan.
+- [x]  Remove 'add_remove_collection_from_favorites' from permissions
 
 ## Urgent
 - [x] Publication status should be an object in DTO to show comments.
