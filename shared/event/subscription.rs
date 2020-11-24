@@ -14,6 +14,7 @@ pub enum SubscriptionEvent {
         id: String,
         user_id: String,
         plan_id: String,
+        price: f64,
     },
     PaymentRequired {
         id: String,

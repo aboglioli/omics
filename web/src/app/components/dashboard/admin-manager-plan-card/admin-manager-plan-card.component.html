@@ -1,1 +1,67 @@
-<p>admin-manager-plan-card works!</p>
+<div *ngIf="form && plan" class="parent">
+  <div class="header">
+    <h1 style="margin: 0;">Precio de Plan: <b>{{this.plan.name}}</b></h1>
+  </div>
+
+  <div class="body">
+    <form [formGroup]="form">
+      <div class="block-field">
+        <div class="input-field-row">
+          <div class="title-and-error">
+            <p class="field-name">Valor: </p>
+
+            <!-- mensaje de error -->
+            <p  *ngIf="valorNoValido"
+                class="form-text text-danger">
+                <span> El valor debe ser un número >= $0 </span>
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Input text -->
+        <div style="display: flex">
+          <fa-icon [icon]="faCurrency" size="2x" style="margin-right: 0.25em;"></fa-icon>
+          <input  class="form-control"
+                  type="number"
+                  placeholder="Ingresar un valor"
+                  [style.text-align]="'left'"
+                  formControlName="value"
+                  [class.is-invalid]="valorNoValido">
+        </div>
+      </div>
+    </form>
+
+
+    <div class="buttons-action">
+      <button mat-flat-button
+              color="warn"
+              class="button-white-borders"
+              style="margin: 1em"
+              (click)="onResetPlan()">
+        <span *ngIf="isBigScreen">
+          <fa-icon  [icon]="faCancel" size="1x"></fa-icon>
+          Revertir Cambios
+        </span>
+        <span *ngIf="!isBigScreen">
+          <fa-icon  [icon]="faCancel" size="2x"></fa-icon>
+        </span>
+      </button>
+
+      <button mat-flat-button
+              color="accent"
+              class="button-white-borders"
+              style="margin: 1em"
+              [disabled]="form.invalid"
+              (click)="onSavePlan()">
+        <span *ngIf="isBigScreen">
+          <fa-icon  [icon]="faSave" size="1x"></fa-icon>
+          Guardar Cambios
+        </span>
+        <span *ngIf="!isBigScreen">
+          <fa-icon  [icon]="faSave" size="2x"></fa-icon>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>

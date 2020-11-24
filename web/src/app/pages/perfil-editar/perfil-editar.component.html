@@ -66,10 +66,12 @@
                 <button mat-flat-button
                         color="primary"
                         class="button-white-borders subscription-button"
+                        style="margin-right: 0.5rem;"
                         [disabled]="!can(userData, 'subscribe')"
                         (click)="onSuscribirse()">
                   Desuscribirse
                 </button>
+                <span *ngIf="subscription">(Plan de <b>${{subscription.plan.price.toFixed(2)}}</b>)</span>
               </span>
 
               <!-- @endregion -->

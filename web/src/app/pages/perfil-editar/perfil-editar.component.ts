@@ -13,6 +13,7 @@ import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { PasswordRewriteComponent } from 'src/app/components/user/password-recovery/password-rewrite/password-rewrite.component';
 import { SubscriptionService } from 'src/app/domain/services/subscription.service';
+import { ISubscription } from 'src/app/domain/models/subscription';
 import { ReaderService } from 'src/app/domain/services/reader.service';
 
 @Component({
@@ -36,6 +37,7 @@ export class PerfilEditarComponent implements OnInit {
   public can = can;
 
   public readerIsSubscribed = false;
+  public subscription: ISubscription;
 
   // Del formulario
   public formProfile: FormGroup;
@@ -96,6 +98,7 @@ export class PerfilEditarComponent implements OnInit {
       (res) => {
         if (res && res.status.status === 'active') {
           this.readerIsSubscribed = true;
+          this.subscription = res;
         }
       },
       (err) => {

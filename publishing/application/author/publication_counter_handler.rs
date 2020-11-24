@@ -66,7 +66,7 @@ impl EventHandler for PublicationCounterHandler {
                     .await?;
 
                 let mut author = self.author_repo.find_by_id(publication.author_id()).await?;
-                author.set_publications(p_publications.matching_criteria() as u32);
+                author.set_publications(p_publications.matching_criteria() as u32)?;
                 self.author_repo.save(&mut author).await?;
             }
             _ => return Ok(false),

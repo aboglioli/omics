@@ -96,12 +96,14 @@ impl Plan {
     }
 
     pub fn change_price(&mut self, price: Price) -> Result<()> {
-        self.price = price;
+        if self.price.value() != price.value() {
+            self.price = price;
 
-        self.events.record_event(PlanEvent::PriceChanged {
-            id: self.base().id().to_string(),
-            price: self.price().value(),
-        });
+            self.events.record_event(PlanEvent::PriceChanged {
+                id: self.base().id().to_string(),
+                price: self.price().value(),
+            });
+        }
 
         Ok(())
     }
