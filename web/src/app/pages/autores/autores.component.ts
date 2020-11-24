@@ -21,7 +21,7 @@ export class AutoresComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.authorService.search({order_by: 'newest' }).subscribe(
+    this.authorService.search({order_by: 'newest', publications_gt: 1 }).subscribe(
       res => {
         this.authors = res.items;
       },

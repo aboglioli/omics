@@ -163,8 +163,11 @@ export class PublicationInfoComponent implements OnInit, OnDestroy {
         this.oldRatingPublication = this.ratingPublication;
 
         //#endregion
-
         //#region Obtener información de reviews de esta publicación
+        if ( !this.isUserLogIn ) {
+          this.spinnerService.hide();
+        }
+
         this.authService.canUser( 'get_publication_reviews' ).subscribe(
           (resGetReviews) => {
 
@@ -188,6 +191,12 @@ export class PublicationInfoComponent implements OnInit, OnDestroy {
             } else {
               this.spinnerService.hide();
             }
+          },
+          (err: Error ) => {
+            this.spinnerService.hide();
+            console.error('ERROR: ', err);
+
+
           }
         );
 

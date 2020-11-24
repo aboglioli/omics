@@ -115,29 +115,32 @@
         </div>
 
         <div
-          *ngIf="isReadButtonVisible
-            && (
-              (publication.contract && readerIsSubscribed)
-              || readerIsAuthor
-              || !publication.contract
-              || readerIsContentManager
-            )"
+          *ngIf="isUserLogIn && isReadButtonVisible && (
+                                                          (publication.contract && readerIsSubscribed)
+                                                          || readerIsAuthor
+                                                          || !publication.contract
+                                                          || readerIsContentManager
+                                                        )
+                "
           style="flex: 1; display: flex; justify-content: center; margin-bottom: 10px;">
 
 
-          <button *ngIf="isUserLogIn && ( authService.canUser('read_publication') | async )" mat-stroked-button class="button-white-borders"
+          <button *ngIf="( authService.canUser('read_publication') | async )" mat-stroked-button class="button-white-borders"
                 style="font-size: 1rem; width: 100%;"
                 (click)="onGoToRead()">
             <h3>LEER</h3>
           </button>
 
-          <button *ngIf="!isUserLogIn" mat-stroked-button class="button-white-borders"
-                style="font-size: 1rem; width: 80%;"
-                (click)="onGoToLogIn()">
-            <h3>¡Ingresa para leer!</h3>
+        </div>
+
+        <div
+          *ngIf="!isUserLogIn"
+          style="flex: 1; display: flex; justify-content: center; margin-bottom: 10px;">
+          <button mat-stroked-button class="button-white-borders"
+          style="font-size: 1rem; width: 80%;"
+          (click)="onGoToLogIn()">
+          <h3>¡Ingresa para leer!</h3>
           </button>
-
-
         </div>
 
         <div
@@ -186,41 +189,47 @@
 
     <div class="side opacity-background">
 
-      <div  *ngIf="readerInfo && readerIsSubscribed && (authService.canUser('review_publication') | async)"
-            class="fila" style="justify-content: center;">
-        <bar-rating [(rate)]="ratingPublication" [max]="5" [theme]="'stars'"
-                    (rateChange)="addReview($event)">
-        </bar-rating>
-      </div>
+      <span *ngIf="isUserLogIn">
+        <div  *ngIf="readerInfo && readerIsSubscribed && (authService.canUser('review_publication') | async)"
+              class="fila" style="justify-content: center;">
+          <bar-rating [(rate)]="ratingPublication" [max]="5" [theme]="'stars'"
+                      (rateChange)="addReview($event)">
+          </bar-rating>
+        </div>
 
-      <div class="comment-box">
+        <div class="comment-box">
 
-        <app-publication-reviews-box
-          *ngIf="reviewList !== undefined"
-          [reviewArray]="reviewList"
-          [readerData]="readerInfo">
-        </app-publication-reviews-box>
+          <app-publication-reviews-box
+            *ngIf="reviewList !== undefined"
+            [reviewArray]="reviewList"
+            [readerData]="readerInfo">
+          </app-publication-reviews-box>
 
-      </div>
+        </div>
 
-      <!-- Option bar -->
-      <div class="multiple-option-menu" *ngIf="readerInfo && isBigScreen">
+        <!-- Option bar -->
+        <div class="multiple-option-menu" *ngIf="readerInfo && isBigScreen">
 
-        <button mat-icon-button (click)="onDonar()" class="option-item" *ngIf="authService.canUser('donate') | async">
-          <fa-icon [icon]="faDonar" size="2x"></fa-icon>
-        </button>
+          <button mat-icon-button (click)="onDonar()" class="option-item" *ngIf="authService.canUser('donate') | async">
+            <fa-icon [icon]="faDonar" size="2x"></fa-icon>
+          </button>
 
-        <button mat-icon-button (click)="onFavorito()" class="option-item" *ngIf="authService.canUser('add_remove_publication_from_favorites') | async">
-          <fa-icon  [icon]="faFavorito" size="2x"
-                    [ngClass]="{'selected': readerInfo.in_favorites}"></fa-icon>
-        </button>
+          <button mat-icon-button (click)="onFavorito()" class="option-item" *ngIf="authService.canUser('add_remove_publication_from_favorites') | async">
+            <fa-icon  [icon]="faFavorito" size="2x"
+                      [ngClass]="{'selected': readerInfo.in_favorites}"></fa-icon>
+          </button>
 
-        <button mat-icon-button (click)="onLike()" class="option-item" style="margin-bottom: 5px;" *ngIf="authService.canUser('like_unlike_publication') | async">
-          <fa-icon  [icon]="faLike" size="2x"
-                    [ngClass]="{'selected': readerInfo.liked}"></fa-icon>
-        </button>
+          <button mat-icon-button (click)="onLike()" class="option-item" style="margin-bottom: 5px;" *ngIf="authService.canUser('like_unlike_publication') | async">
+            <fa-icon  [icon]="faLike" size="2x"
+                      [ngClass]="{'selected': readerInfo.liked}"></fa-icon>
+          </button>
 
-      </div>
+        </div>
+      </span>
+
+      <span *ngIf="!isUserLogIn" style="height: 100%; display: flex; justify-content: center; align-items: center;">
+        <h3 style="text-align: center;">Registrate para ver opiniones sobre esta publicación</h3>
+      </span>
 
   </div>
 

@@ -12,9 +12,10 @@ export class TermsConditionsTextComponent implements OnInit {
   // FontAwesome Icon
   public faClose = faTimesCircle;
 
-  public dialogRef: MatDialogRef<TermsConditionsTextComponent>;
 
-  constructor() { }
+  constructor(
+    public dialogRef: MatDialogRef<TermsConditionsTextComponent>
+  ) { }
 
   ngOnInit(): void {
   }
