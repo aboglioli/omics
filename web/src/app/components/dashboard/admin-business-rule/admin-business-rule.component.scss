@@ -4,6 +4,7 @@ div.parent {
 
   display: flex;
   flex-direction: column;
+  width: 100%;
 
   margin: 1em 0em;
 
@@ -14,6 +15,9 @@ div.parent {
 
     padding: 0.25em;
     background-color: $omics-background-menu;
+    h1 {
+      font-size: 1.25vw;
+    }
 
   }
 

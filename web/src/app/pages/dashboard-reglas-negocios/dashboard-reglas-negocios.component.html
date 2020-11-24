@@ -12,11 +12,12 @@
 
     <div class="body">
 
-      <app-admin-business-rule
-        *ngFor="let rule of businessRulesList"
-        [businessRule]="rule"
-        (OnRuleChange)="saveRule($event)">
-      </app-admin-business-rule>
+      <div *ngFor="let rule of businessRulesList">
+        <app-admin-business-rule
+          [businessRule]="rule"
+          (OnRuleChange)="saveRule($event)">
+        </app-admin-business-rule>
+      </div>
 
     </div>
 

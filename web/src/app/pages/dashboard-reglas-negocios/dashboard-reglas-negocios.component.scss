@@ -58,6 +58,17 @@ div.parent {
       margin-top: 1em;
       padding: 0em 1em;
 
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+
+      div {
+        margin: 0em 1em;
+        display: flex;
+        align-items: center;
+        width: 40%
+      }
+
     }
 
 
