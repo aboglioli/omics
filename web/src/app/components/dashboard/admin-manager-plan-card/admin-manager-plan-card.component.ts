@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { faPercentage, faSave, faTimesCircle, faDollarSign } from '@fortawesome/free-solid-svg-icons';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { SweetAlertGenericMessageService } from 'src/app/services/sweet-alert-generic-message.service';
 
 import { PlanService } from '../../../domain/services/plan.service';
 import { IPlan } from '../../../domain/models/plan';
@@ -27,6 +29,8 @@ export class AdminManagerPlanCardComponent implements OnInit {
   constructor(
     private planService: PlanService,
     private fb: FormBuilder,
+    private spinnerService: NgxSpinnerService,
+    private sweetAlertGenericService: SweetAlertGenericMessageService,
     private breakpointObserver: BreakpointObserver
   ) { }
 
@@ -59,6 +63,7 @@ export class AdminManagerPlanCardComponent implements OnInit {
 
   public onSavePlan(): void {
     const planPrice = this.form.get('value').value;
+    this.spinnerService.show();
 
     this.planService
       .update(
@@ -69,9 +74,17 @@ export class AdminManagerPlanCardComponent implements OnInit {
           price: planPrice,
         },
       )
-      .subscribe(() => {
-        this.loadPlan();
-      });
+      .subscribe(
+        () => {
+          this.loadPlan();
+          this.sweetAlertGenericService.showAlertSuccess( 'Se ha guardado el cambio con éxito', 'Éxito' );
+          this.spinnerService.hide();
+        },
+        (err: Error) => {
+          this.sweetAlertGenericService.showAlertError('Problemas de conexión con el servidor', 'Error');
+          this.spinnerService.hide();
+        }
+      );
   }
 
   private checkWidthScreen(): void {

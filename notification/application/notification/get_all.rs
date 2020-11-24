@@ -36,6 +36,7 @@ impl<'a> GetAll<'a> {
             return Err(Error::unauthorized());
         }
 
+        // TODO: check 'read' filter
         let notifications = self
             .notification_repo
             .find_by_user_id(&auth_id, cmd.read)
