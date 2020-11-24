@@ -31,10 +31,15 @@ impl List {
         let mut files = Vec::new();
         while let Some(f) = dir.next().await {
             let f = f.map_err(|err| Error::new("backup", "read_file").wrap_raw(err))?;
-            files.push(BackupFile {
-                file: f.file_name().to_str().unwrap().to_string(),
-                path: f.path().to_str().unwrap().to_string(),
-            });
+
+            if let Some(file_name) = f.file_name().to_str() {
+                if file_name.ends_with(".sql.gz") {
+                    files.push(BackupFile {
+                        file: file_name.to_string(),
+                        path: f.path().to_str().unwrap().to_string(),
+                    });
+                }
+            }
         }
 
         Ok(files)
