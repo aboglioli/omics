@@ -4,11 +4,13 @@ use async_trait::async_trait;
 
 use common::config::ConfigService;
 use common::container::Container;
-use common::event::EventPublisher;
+use common::event::{EventPublisher, EventSubscriber};
+use common::result::Result;
 use identity::domain::user::UserRepository;
 use publishing::domain::publication::{PublicationRepository, StatisticsService};
 use publishing::domain::reader::ReaderRepository;
 
+use crate::application::subscription::PlanPriceChangedHandler;
 use crate::domain::contract::{ContractRepository, ContractService};
 use crate::domain::donation::DonationRepository;
 use crate::domain::payment::PaymentService;
@@ -111,4 +113,23 @@ where
 }
 
 #[async_trait]
-impl<EPub> Container for PaymentContainer<EPub> where EPub: Sync + Send {}
+impl<EPub> Container for PaymentContainer<EPub>
+where
+    EPub: EventPublisher + Sync + Send + 'static,
+{
+    async fn subscribe<ES>(&self, event_sub: &ES) -> Result<()>
+    where
+        ES: EventSubscriber + Sync + Send,
+    {
+        let plan_price_changed_handler = PlanPriceChangedHandler::new(
+            self.event_pub.clone(),
+            self.plan_repo.clone(),
+            self.subscription_repo.clone(),
+        );
+        event_sub
+            .subscribe(Box::new(plan_price_changed_handler))
+            .await?;
+
+        Ok(())
+    }
+}

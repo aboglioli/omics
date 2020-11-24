@@ -1,8 +1,10 @@
 mod get_by_reader;
+mod plan_price_changed_handler;
 mod search;
 mod subscribe;
 mod unsubscribe;
 pub use get_by_reader::*;
+pub use plan_price_changed_handler::*;
 pub use search::*;
 pub use subscribe::*;
 pub use unsubscribe::*;
