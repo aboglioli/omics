@@ -69,13 +69,9 @@ export class AdminBusinessRuleComponent implements OnInit {
   }
 
   public onResetRule(): void {
-
     this.formRule.reset({
-
       value: this.initialValue
-
     });
-
   }
 
   public onSaveRule(): void {
