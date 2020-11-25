@@ -11,7 +11,7 @@ import { AuthorService } from '../../domain/services/author.service';
 })
 export class AutoresComponent implements OnInit {
 
-  // Font Awseome icons
+  // Font Awseome icon
   public faFollowers = faUsers;
 
   public authors: IAuthor[];
